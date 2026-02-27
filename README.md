@@ -1,135 +1,247 @@
-# Turborepo starter
+# 🏗️ My Platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+> A production-grade collaboration platform built in public. Learning what it takes to build systems that scale, not just features that ship.
 
-## Using this example
+## What This Is
 
-Run the following command:
+A **monorepo** containing a fullstack SaaS platform with:
 
-```sh
-npx create-turbo@latest
+- **Authentication** (JWT + Redis session validation)
+- **Workspaces** (multi-tenant collaboration spaces)
+- **Discussions** (threaded conversations)
+- **Comments** (nested replies with depth limits)
+- **Security by default** (40+ security tests, permission matrix, rate limiting)
+- **Observability from day 1** (audit logs, metrics, alerts)
+
+**Not microservices. Not premature optimization. Just clean fundamentals.**
+
+---
+
+## 🎯 Why This Repo Exists
+
+I'm learning what **senior engineering** means:
+
+- Security-first, not security-last
+- Testing as architecture, not QA
+- Observability built-in, not bolted-on
+- Systems thinking, not feature-counting
+
+My goal: Show that I think deliberately about scale, security, and maintainability.
+
+---
+
+## 📊 Architecture
+
+### Design Principles
+
+**Thin Routers, Fat Services**
+
+```typescript
+// ✅ Router: validation + delegation only
+export const workspaceRouter = router({
+  create: protectedProcedure
+    .input(createSchema)
+    .mutation(({ ctx, input }) => workspaceService.create(ctx.userId, input)),
+});
+
+// ✅ Service: all business logic
+export async function create(userId: string, input: CreateInput) {
+  // Validation, authorization, DB queries, audit logging
+}
 ```
 
-## What's inside?
+**Centralized Permission Matrix**
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```typescript
+// One place to update what roles can do
+const WORKSPACE_PERMISSIONS = {
+  MEMBER: [READ_DISCUSSION, CREATE_COMMENT],
+  ADMIN: [READ_DISCUSSION, MANAGE_DISCUSSION, MANAGE_MEMBER],
+  OWNER: [ALL],
+};
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+**Security by Default**
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+- No header-based auth (JWT only)
+- Normalized error codes (no resource enumeration)
+- Adaptive rate limiting (stricter after repeated denials)
+- Idempotent retries (safe to replay requests)
+- Audit logs for every permission change
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+---
 
-### Develop
+## 🧪 Testing (40+ Security Tests)
 
-To develop all apps and packages, run the following command:
+```bash
+# Auth spoof rejection
+pnpm -C apps/web run test:auth
 
-```
-cd my-turborepo
+# Workspace permission enforcement
+pnpm -C apps/web run test:workspace-security
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+# Discussion multi-tenant isolation
+pnpm -C apps/web run test:discussion-security
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+# Comment thread safety
+pnpm -C apps/web run test:comment-security
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+# End-to-end integration
+pnpm -C apps/web run test:integration
 ```
 
-### Remote Caching
+**What Tests Catch**
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+❌ Spoofed auth headers  
+❌ Permission escalation (MEMBER → OWNER)  
+❌ Multi-tenant data leaks  
+❌ Resource enumeration attacks  
+❌ Thread depth DOS  
+❌ Stale cache after delete  
+❌ Rate limiting bypasses  
+❌ Idempotency collisions
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+---
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## 🛠️ Tech Stack
 
+| Layer              | Technology                   | Why                                                |
+| ------------------ | ---------------------------- | -------------------------------------------------- |
+| **Frontend**       | Next.js (App Router) + React | Server rendering + type safety                     |
+|                    | TypeScript                   | Eliminate entire classes of bugs                   |
+|                    | Tailwind + Chakra UI         | Component consistency                              |
+| **Backend**        | tRPC                         | Type-safe RPC layer                                |
+|                    | Prisma                       | ORM with migrations, no N+1 surprises              |
+|                    | PostgreSQL                   | Boring, proven, scales horizontally                |
+| **Cache**          | Redis                        | Session storage, rate limiting, short-lived caches |
+| **Infrastructure** | Docker                       | Local dev matches production                       |
+|                    | Monorepo (pnpm)              | Shared code, unified build                         |
+
+---
+
+## 🚀 Getting Started (Local)
+
+### Prerequisites
+
+- Node.js 18+
+- Docker + Docker Compose
+- pnpm
+
+### Setup
+
+```bash
+# 1. Clone
+git clone https://github.com/yourusername/my-platform.git
+cd my-platform
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Start services (PostgreSQL + Redis)
+docker-compose up -d
+
+# 4. Run migrations
+cd apps/web
+pnpm exec prisma migrate dev
+
+# 5. Start dev server
+pnpm dev
 ```
-cd my-turborepo
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+Visit `http://localhost:3000`
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+---
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 🔐 Security
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+### What's Implemented
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+✅ JWT + Redis session validation (no header trust)  
+✅ Permission matrix (centralized, testable)  
+✅ Role-based access control (MEMBER, ADMIN, OWNER)  
+✅ Normalized HTTP responses (no resource enumeration)  
+✅ Adaptive rate limiting (stricter after denials)  
+✅ Audit logging (every permission change)  
+✅ Idempotent retries (safe replays)  
+✅ Thread depth limits (DOS prevention)  
+✅ PII minimization (author DTO: id + name only)
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+---
 
-## Useful Links
+## 📈 Observability
 
-Learn more about the power of Turborepo:
+### Built-In
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- **Structured logging** (with correlation IDs)
+- **Audit logs** (every permission change)
+- **Metrics** (operations, denials, rate limits, cache hits/misses)
+- **Error tracking** (with stack traces and context)
+
+---
+
+## 📚 Documentation
+
+- **[docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md)** — Architecture decisions, tech choices, scaling strategy
+- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — Local Docker setup, troubleshooting
+- **[docs/DEPLOYMENT_FREE_TIER.md](docs/DEPLOYMENT_FREE_TIER.md)** — Deploy to production with zero cost (Vercel + Neon + Upstash)
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — Staging + production deployment guide
+- **[docs/CODEX_PROMPT_FRAMEWORK.md](docs/CODEX_PROMPT_FRAMEWORK.md)** — How I prompt AI for structured engineering
+- **[docs/LINKEDIN_POSTS.md](docs/LINKEDIN_POSTS.md)** — Posts about building in public
+- **[docs/security-alert-thresholds.md](docs/security-alert-thresholds.md)** — Observability + alerts
+
+---
+
+## 🎨 What I'm Learning
+
+### Systems Thinking
+
+- Permission matrices scale better than scattered checks
+- Cursor pagination beats offset pagination at scale
+- Rate limiting prevents abuse patterns early
+
+### Clean Architecture
+
+- Service layer owns business logic (not routers)
+- Permission checks in one place (not three)
+- Tests prove security assumptions
+
+### Production Engineering
+
+- Observability isn't optional
+- Idempotency matters for reliability
+- Audit logs enable forensics
+
+### Tech Depth
+
+- **tRPC**: Type safety end-to-end, eliminates API contract bugs
+- **Prisma**: Migrations versioned with code
+- **PostgreSQL**: Scales with proper indexing + replication
+- **Redis**: Cache + session store + rate limiter
+
+---
+
+## 🚀 What's Next
+
+**Phase 2:** Notifications (via BullMQ + email/push)  
+**Phase 3:** Analytics (event streaming + aggregation)  
+**Phase 4:** Real-time (WebSocket layer for live updates)
+
+Each phase builds on proven fundamentals.
+
+---
+
+## 💼 For Recruiters
+
+If you're looking for engineers who:
+
+- ✅ Think in systems, not features
+- ✅ Sweat security + observability details
+- ✅ Test assumptions, not just ship code
+- ✅ Learn by building in public
+- ✅ Care about things lasting
+
+Let's talk. [LinkedIn](https://www.linkedin.com/in/jinadu-olamilekan-5b8a15285/)
+
+---
+
+**Built in public. Learning what senior engineering means.**
