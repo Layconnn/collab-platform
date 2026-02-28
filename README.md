@@ -1,4 +1,4 @@
-# 🏗️ My Platform
+# 🏗️ Collab Platform
 
 > A production-grade collaboration platform built in public. Learning what it takes to build systems that scale, not just features that ship.
 
@@ -131,7 +131,7 @@ pnpm -C apps/web run test:integration
 
 ```bash
 # 1. Clone
-git clone https://github.com/yourusername/my-platform.git
+git clone https://github.com/yourusername/collab-platform.git
 cd my-platform
 
 # 2. Install dependencies
@@ -176,18 +176,6 @@ Visit `http://localhost:3000`
 - **Audit logs** (every permission change)
 - **Metrics** (operations, denials, rate limits, cache hits/misses)
 - **Error tracking** (with stack traces and context)
-
----
-
-## 📚 Documentation
-
-- **[docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md)** — Architecture decisions, tech choices, scaling strategy
-- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — Local Docker setup, troubleshooting
-- **[docs/DEPLOYMENT_FREE_TIER.md](docs/DEPLOYMENT_FREE_TIER.md)** — Deploy to production with zero cost (Vercel + Neon + Upstash)
-- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — Staging + production deployment guide
-- **[docs/CODEX_PROMPT_FRAMEWORK.md](docs/CODEX_PROMPT_FRAMEWORK.md)** — How I prompt AI for structured engineering
-- **[docs/LINKEDIN_POSTS.md](docs/LINKEDIN_POSTS.md)** — Posts about building in public
-- **[docs/security-alert-thresholds.md](docs/security-alert-thresholds.md)** — Observability + alerts
 
 ---
 
