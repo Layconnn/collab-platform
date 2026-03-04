@@ -16,3 +16,12 @@ export const WorkspaceRole = {
 } as const
 
 export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole]
+
+
+export const NotificationType = {
+  DISCUSSION_CREATED: 'DISCUSSION_CREATED',
+  COMMENT_CREATED: 'COMMENT_CREATED',
+  MENTION: 'MENTION'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

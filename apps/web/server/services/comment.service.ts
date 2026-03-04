@@ -15,6 +15,7 @@ import {
   recordCommentOperation,
   recordCommentPermissionDenied,
 } from "../observability/security-events";
+import { notificationService } from "./notification.service";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
@@ -353,6 +354,31 @@ export const commentService = {
         action: "create",
         timestamp: new Date().toISOString(),
       });
+      try {
+        await notificationService.enqueueCommentCreated({
+          requestId: context.requestId,
+          actorUserId: userId,
+          workspaceId: discussion.workspaceId,
+          discussionId: comment.discussionId,
+          commentId: comment.id,
+          body: comment.body,
+          parentCommentId: comment.parentCommentId,
+        });
+      } catch (error) {
+        // Comment creation should succeed even if async notification enqueue fails.
+        console.error(
+          JSON.stringify({
+            level: "ERROR",
+            event: "notification.enqueue.failed",
+            requestId: context.requestId,
+            workspaceId: discussion.workspaceId,
+            discussionId: comment.discussionId,
+            commentId: comment.id,
+            error: String(error),
+            timestamp: new Date().toISOString(),
+          }),
+        );
+      }
 
       if (idempotencyResultKey) {
         await redisCache.setJSON(

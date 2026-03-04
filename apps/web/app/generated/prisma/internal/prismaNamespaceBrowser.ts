@@ -55,6 +55,7 @@ export const ModelName = {
   Workspace: 'Workspace',
   Discussion: 'Discussion',
   Comment: 'Comment',
+  Notification: 'Notification',
   WorkspaceMember: 'WorkspaceMember'
 } as const
 
@@ -125,6 +126,25 @@ export const CommentScalarFieldEnum = {
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
 
 
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  recipientUserId: 'recipientUserId',
+  actorUserId: 'actorUserId',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  type: 'type',
+  message: 'message',
+  metadata: 'metadata',
+  dedupeKey: 'dedupeKey',
+  readAt: 'readAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const WorkspaceMemberScalarFieldEnum = {
   id: 'id',
   workspaceId: 'workspaceId',
@@ -145,6 +165,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -159,4 +187,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

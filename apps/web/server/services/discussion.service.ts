@@ -16,6 +16,7 @@ import {
   recordDiscussionOperation,
   recordDiscussionPermissionDenied,
 } from "../observability/security-events";
+import { notificationService } from "./notification.service";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
@@ -212,6 +213,29 @@ export const discussionService = {
         action: "create",
         timestamp: new Date().toISOString(),
       });
+      try {
+        await notificationService.enqueueDiscussionCreated({
+          requestId: context.requestId,
+          actorUserId: userId,
+          workspaceId: discussion.workspaceId,
+          discussionId: discussion.id,
+          title: discussion.title,
+          body: discussion.body,
+        });
+      } catch (error) {
+        // Discussion creation should succeed even if async notification enqueue fails.
+        console.error(
+          JSON.stringify({
+            level: "ERROR",
+            event: "notification.enqueue.failed",
+            requestId: context.requestId,
+            workspaceId: discussion.workspaceId,
+            discussionId: discussion.id,
+            error: String(error),
+            timestamp: new Date().toISOString(),
+          }),
+        );
+      }
 
       if (idempotencyResultKey) {
         await redisCache.setJSON(

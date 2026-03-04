@@ -1,4 +1,5 @@
 import { redis } from "../cache/redis";
+import type { NotificationType } from "../../app/generated/prisma/client";
 
 type SecurityLevel = "INFO" | "WARN" | "ERROR";
 
@@ -502,4 +503,57 @@ export async function recordCommentIdempotency(data: BaseEvent & {
   }
 
   logSecurityEvent("INFO", eventName, data);
+}
+
+type NotificationAction =
+  | "enqueue"
+  | "enqueue_failed"
+  | "deliver"
+  | "drop_non_member"
+  | "list"
+  | "mark_read"
+  | "mark_all_read";
+
+export async function recordNotificationOperation(data: BaseEvent & {
+  action: NotificationAction;
+  actorUserId: string | null;
+  recipientUserId: string;
+  workspaceId: string | null;
+  notificationId: string | null;
+}): Promise<void> {
+  const metricKey = `metrics:notification:operation:${data.action}:count`;
+
+  if (!METRICS_DISABLED) {
+    try {
+      await redis.incr(metricKey);
+    } catch (error) {
+      await trackCounterWriteFailure({
+        requestId: data.requestId,
+        userId: data.recipientUserId,
+        reason: "notification_operation_metric_write_failed",
+        error,
+        timestamp: data.timestamp,
+      });
+    }
+  }
+
+  const eventName = `notification.operation.${data.action}`;
+  if (data.action === "enqueue_failed") {
+    logSecurityEvent("ERROR", eventName, data);
+    return;
+  }
+
+  logSecurityEvent("INFO", eventName, data);
+}
+
+export async function recordNotificationAudit(data: BaseEvent & {
+  actorUserId: string | null;
+  recipientUserId: string;
+  workspaceId: string | null;
+  discussionId: string | null;
+  commentId: string | null;
+  type: NotificationType | null;
+  action: Exclude<NotificationAction, "enqueue_failed" | "drop_non_member">;
+}): Promise<void> {
+  logSecurityEvent("INFO", "notification.audit", data);
 }

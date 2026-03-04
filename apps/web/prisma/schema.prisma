@@ -19,6 +19,12 @@ enum WorkspaceRole {
   MEMBER
 }
 
+enum NotificationType {
+  DISCUSSION_CREATED
+  COMMENT_CREATED
+  MENTION
+}
+
 model User {
   id            String            @id @default(cuid())
   email         String            @unique
@@ -29,6 +35,8 @@ model User {
   memberships   WorkspaceMember[]
   discussions   Discussion[]
   comments      Comment[]
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+  notificationsSent     Notification[] @relation("NotificationActor")
 }
 
 model Workspace {
@@ -42,6 +50,7 @@ model Workspace {
   members     WorkspaceMember[]
   discussions Discussion[]
   comments    Comment[]
+  notifications Notification[]
 
   @@index([ownerId, createdAt])
   // Recommended (optional): @@index([createdAt]) for global recent-workspaces feeds.
@@ -58,6 +67,7 @@ model Discussion {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments    Comment[]
+  notifications Notification[]
 
   @@index([workspaceId, createdAt])
   @@index([workspaceId, id])
@@ -80,11 +90,39 @@ model Comment {
   author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   parentComment   Comment?   @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
   replies         Comment[]  @relation("CommentReplies")
+  notifications   Notification[]
 
   @@index([discussionId, parentCommentId, id(sort: Desc)])
   @@index([workspaceId, discussionId, id(sort: Desc)])
   @@index([authorId, createdAt])
   // Recommended (optional): @@index([discussionId, createdAt]) for chronological thread views.
+}
+
+model Notification {
+  id              String           @id @default(cuid())
+  recipientUserId String
+  actorUserId     String?
+  workspaceId     String
+  discussionId    String?
+  commentId       String?
+  type            NotificationType
+  message         String
+  metadata        Json?
+  dedupeKey       String           @unique
+  readAt          DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  recipient       User             @relation("NotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade)
+  actor           User?            @relation("NotificationActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  discussion      Discussion?      @relation(fields: [discussionId], references: [id], onDelete: SetNull)
+  comment         Comment?         @relation(fields: [commentId], references: [id], onDelete: SetNull)
+
+  @@index([recipientUserId, id(sort: Desc)])
+  @@index([recipientUserId, readAt, id(sort: Desc)])
+  @@index([workspaceId, recipientUserId, id(sort: Desc)])
+  @@index([discussionId, recipientUserId, id(sort: Desc)])
+  // Recommended (optional): @@index([recipientUserId, createdAt]) for time-sorted analytics.
 }
 
 model WorkspaceMember {

@@ -60,6 +60,11 @@ export type Discussion = Prisma.DiscussionModel
  */
 export type Comment = Prisma.CommentModel
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model WorkspaceMember
  * 
  */
