@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "postinstall": "prisma generate",
     "build": "next build",
+    "db:migrate:deploy": "prisma migrate deploy",
     "start": "next start",
     "lint": "eslint",
     "test:auth": "node --test server/api/trpc.auth.test.mjs",
