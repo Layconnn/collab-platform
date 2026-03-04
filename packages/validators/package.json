@@ -6,7 +6,8 @@
     ".": "./src/index.ts",
     "./workspace": "./src/workspace.ts",
     "./discussion": "./src/discussion.ts",
-    "./comment": "./src/comment.ts"
+    "./comment": "./src/comment.ts",
+    "./notification": "./src/notification.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
