@@ -9,6 +9,7 @@ const envSchema = z.object({
   TRUSTED_PROXY_TOKEN: z.string().min(16).optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   SENTRY_DSN: z.string().url().optional(),
+  RUN_WORKER_IN_API: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

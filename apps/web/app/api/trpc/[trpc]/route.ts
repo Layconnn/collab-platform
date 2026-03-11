@@ -6,6 +6,16 @@ import { initSentry, captureError } from "../../../../server/observability/sentr
 
 initSentry();
 
+if (process.env.RUN_WORKER_IN_API === "1" && process.env.NODE_ENV !== "production") {
+  const globalState = globalThis as typeof globalThis & {
+    __notificationWorkerStarted?: boolean;
+  };
+  if (!globalState.__notificationWorkerStarted) {
+    globalState.__notificationWorkerStarted = true;
+    void import("../../../../server/queue/workers/notification.entry");
+  }
+}
+
 const handler = async (req: Request) => {
   try {
     return await fetchRequestHandler({
