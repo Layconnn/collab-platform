@@ -16,6 +16,7 @@ import {
   recordCommentPermissionDenied,
 } from "../observability/security-events";
 import { notificationService } from "./notification.service";
+import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
@@ -28,11 +29,6 @@ const MAX_COMMENT_DEPTH = 8;
 
 type RequestContext = {
   requestId: string;
-};
-
-type PaginatedResult<T> = {
-  items: T[];
-  nextCursor: string | null;
 };
 
 type DiscussionScope = {
@@ -62,24 +58,6 @@ type CreateIdempotencyResult = {
   commentId: string;
   workspaceId: string;
 };
-
-function toPaginatedResult<T extends { id: string }>(
-  rows: T[],
-  take: number,
-): PaginatedResult<T> {
-  if (rows.length <= take) {
-    return {
-      items: rows,
-      nextCursor: null,
-    };
-  }
-
-  const items = rows.slice(0, take);
-  return {
-    items,
-    nextCursor: items[items.length - 1]?.id ?? null,
-  };
-}
 
 function commentByIdKey(commentId: string): string {
   return `comment:${commentId}`;

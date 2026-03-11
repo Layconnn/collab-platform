@@ -5,15 +5,15 @@ const discussionIdSchema = z.string().cuid();
 
 export const createDiscussionInputSchema = z.object({
   workspaceId: workspaceIdSchema,
-  title: z.string().trim().min(3).max(180),
-  body: z.string().trim().min(1).max(10000),
+  title: z.string().trim().min(3).max(120),
+  body: z.string().trim().min(1).max(5000),
   idempotencyKey: z.string().trim().min(8).max(128).optional(),
 });
 
 export const updateDiscussionInputSchema = z.object({
   discussionId: discussionIdSchema,
-  title: z.string().trim().min(3).max(180).optional(),
-  body: z.string().trim().min(1).max(10000).optional(),
+  title: z.string().trim().min(3).max(120).optional(),
+  body: z.string().trim().min(1).max(5000).optional(),
 });
 
 export const getDiscussionByIdInputSchema = z.object({

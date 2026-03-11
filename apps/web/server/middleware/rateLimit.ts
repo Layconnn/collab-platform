@@ -51,4 +51,32 @@ export function createRateLimitGuard(
   };
 }
 
+export function createRateLimitGuardByKey(
+  options: RateLimitOptions,
+  store: RateLimitStore = redisRateLimitStore,
+) {
+  return async (subjectKey: string, requestId: string): Promise<void> => {
+    const key = `ratelimit:${options.routeKey}:key:${subjectKey}`;
+    const count = await store.incr(key);
+
+    if (count === 1) {
+      await store.expire(key, options.windowSeconds);
+    }
+
+    if (count > options.limit) {
+      await recordRateLimitHit({
+        requestId,
+        userId: subjectKey,
+        routeKey: options.routeKey,
+        count,
+        timestamp: new Date().toISOString(),
+      });
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: `Rate limit exceeded for ${options.routeKey}.`,
+      });
+    }
+  };
+}
+
 export type { RateLimitStore, RateLimitOptions };

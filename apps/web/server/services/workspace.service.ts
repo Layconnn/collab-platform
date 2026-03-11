@@ -31,30 +31,11 @@ import {
   assertCanUpdateMemberRole,
   assertExactlyOneOwner,
 } from "./workspace.permissions";
+import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
 
 const WORKSPACE_TTL_SECONDS = 120;
 const WORKSPACE_LIST_TTL_SECONDS = 60;
 const MEMBER_LIST_TTL_SECONDS = 60;
-
-type PaginationResult<T> = {
-  items: T[];
-  nextCursor: string | null;
-};
-
-function toPaginatedResult<T extends { id: string }>(rows: T[], take: number): PaginationResult<T> {
-  if (rows.length <= take) {
-    return {
-      items: rows,
-      nextCursor: null,
-    };
-  }
-
-  const items = rows.slice(0, take);
-  return {
-    items,
-    nextCursor: items[items.length - 1]?.id ?? null,
-  };
-}
 
 function userWorkspacesCacheKey(userId: string, cursor: string | undefined, take: number): string {
   return `user:${userId}:workspaces:${cursor ?? "start"}:${take}`;
@@ -219,7 +200,7 @@ export const workspaceService = {
   async listForUser(userId: string, input: ListWorkspacesInput, context: RequestContext) {
     const cacheKey = userWorkspacesCacheKey(userId, input.cursor, input.take);
     const cached = await redisCache.getJSON<
-      PaginationResult<{ id: string; workspaceId: string; name: string; slug: string; role: WorkspaceRole; createdAt: Date }>
+      PaginatedResult<{ id: string; workspaceId: string; name: string; slug: string; role: WorkspaceRole; createdAt: Date }>
     >(cacheKey);
     if (cached) {
       return cached;
@@ -358,7 +339,7 @@ export const workspaceService = {
 
     const cacheKey = membersCacheKey(input.workspaceId, input.cursor, input.take);
     const cached = await redisCache.getJSON<
-      PaginationResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; email: string; name: string | null } }>
+      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; email: string; name: string | null } }>
     >(cacheKey);
     if (cached) {
       return cached;

@@ -13,6 +13,8 @@ import {
   recordNotificationOperation,
 } from "../observability/security-events";
 import { enqueueNotificationJob } from "../queue/notification.queue";
+import { extractMentions, normalizeUsername } from "../utils/mentions";
+import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
 
 type RequestContext = {
   requestId: string;
@@ -24,35 +26,7 @@ type NotificationResource = {
   commentId: string | null;
 };
 
-type PaginatedResult<T> = {
-  items: T[];
-  nextCursor: string | null;
-};
-
 const NOTIFICATION_LIST_TTL_SECONDS = 30;
-const MENTION_REGEX = /@([a-zA-Z0-9_.-]{2,50})/g;
-
-function toPaginatedResult<T extends { id: string }>(
-  rows: T[],
-  take: number,
-): PaginatedResult<T> {
-  if (rows.length <= take) {
-    return {
-      items: rows,
-      nextCursor: null,
-    };
-  }
-
-  const items = rows.slice(0, take);
-  return {
-    items,
-    nextCursor: items[items.length - 1]?.id ?? null,
-  };
-}
-
-function normalizeMentionName(value: string): string {
-  return value.trim().toLowerCase().replace(/\s+/g, "");
-}
 
 function notificationFeedCacheKey(
   userId: string,
@@ -89,21 +63,26 @@ async function resolveMentionUserIds(
   actorUserId: string,
   text: string,
 ): Promise<Set<string>> {
-  const matches = [...text.matchAll(MENTION_REGEX)].map((match) =>
-    normalizeMentionName(match[1] ?? ""),
-  );
-  if (matches.length === 0) {
+  const mentions = extractMentions(text);
+  if (mentions.length === 0) {
     return new Set<string>();
   }
 
-  const mentions = new Set(matches.filter(Boolean));
+  const mentionSet = new Set(mentions);
   const members = await prisma.workspaceMember.findMany({
-    where: { workspaceId },
+    where: {
+      workspaceId,
+      user: {
+        username: {
+          in: mentions,
+        },
+      },
+    },
     select: {
       userId: true,
       user: {
         select: {
-          name: true,
+          username: true,
         },
       },
     },
@@ -114,8 +93,8 @@ async function resolveMentionUserIds(
     if (member.userId === actorUserId) {
       continue;
     }
-    const normalized = normalizeMentionName(member.user.name ?? "");
-    if (normalized && mentions.has(normalized)) {
+    const normalized = normalizeUsername(member.user.username ?? "");
+    if (normalized && mentionSet.has(normalized)) {
       resolved.add(member.userId);
     }
   }

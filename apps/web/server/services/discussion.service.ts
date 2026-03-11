@@ -17,6 +17,7 @@ import {
   recordDiscussionPermissionDenied,
 } from "../observability/security-events";
 import { notificationService } from "./notification.service";
+import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
@@ -29,29 +30,6 @@ const DISCUSSION_CREATE_IDEMPOTENCY_TTL_SECONDS = 60 * 60;
 type RequestContext = {
   requestId: string;
 };
-
-type PaginatedResult<T> = {
-  items: T[];
-  nextCursor: string | null;
-};
-
-function toPaginatedResult<T extends { id: string }>(
-  rows: T[],
-  take: number,
-): PaginatedResult<T> {
-  if (rows.length <= take) {
-    return {
-      items: rows,
-      nextCursor: null,
-    };
-  }
-
-  const items = rows.slice(0, take);
-  return {
-    items,
-    nextCursor: items[items.length - 1]?.id ?? null,
-  };
-}
 
 function discussionByIdKey(discussionId: string): string {
   return `discussion:${discussionId}`;

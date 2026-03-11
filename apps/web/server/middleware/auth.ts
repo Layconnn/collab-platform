@@ -4,9 +4,11 @@ import { z } from "zod";
 import { redis } from "../cache/redis";
 import { env } from "../env";
 import { recordAuthFailure } from "../observability/security-events";
+import { parseCookies } from "./cookies";
 
 const SESSION_KEY_PREFIX = "auth:session:";
 const AUTH_COOKIE_NAMES = ["access_token", "session_token", "auth_token"] as const;
+const SESSION_COOKIE_NAME = "session_token";
 
 export type AuthenticatedUser = {
   id: string;
@@ -26,21 +28,6 @@ const jwtClaimsSchema = z.object({
   sid: z.string().optional(),
   tokenType: z.enum(["access", "session"]).optional(),
 });
-
-function parseCookies(cookieHeader: string | null): Record<string, string> {
-  if (!cookieHeader) {
-    return {};
-  }
-
-  return cookieHeader.split(";").reduce<Record<string, string>>((acc, pair) => {
-    const [name, ...rest] = pair.trim().split("=");
-    if (!name || rest.length === 0) {
-      return acc;
-    }
-    acc[name] = decodeURIComponent(rest.join("="));
-    return acc;
-  }, {});
-}
 
 function getBearerToken(headers: Headers): string | null {
   const authorization = headers.get("authorization");
@@ -93,6 +80,15 @@ function getCookieToken(headers: Headers): string | null {
   }
 
   return null;
+}
+
+export function getSessionCookieToken(headers: Headers): string | null {
+  const cookies = parseCookies(headers.get("cookie"));
+  return cookies[SESSION_COOKIE_NAME] ?? null;
+}
+
+export function isCookieAuth(headers: Headers): boolean {
+  return Boolean(getCookieToken(headers));
 }
 
 function tryVerifyJWT(token: string): AuthenticatedUser | null {
