@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: my_platform_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d my_platform_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/my_platform_ci
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-jwt-secret-change-me-123456
+      JWT_REFRESH_SECRET: ci-refresh-secret-change-me-123456
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C apps/web run lint
+      - run: pnpm -C apps/web run check-types
+      - run: pnpm -C apps/web exec prisma migrate deploy
+      - run: pnpm -C apps/web run test:auth
+      - run: pnpm -C apps/web run test:frontend
+      - run: pnpm -C apps/web run test:workspace-security
+      - run: pnpm -C apps/web run test:discussion-security
+      - run: pnpm -C apps/web run test:comment-security
+      - run: pnpm -C apps/web run test:integration
+      - run: pnpm -C apps/web run build
+        env:
+          NODE_ENV: production
+      - run: docker build -f apps/web/Dockerfile.worker -t my-platform-notification-worker:ci .

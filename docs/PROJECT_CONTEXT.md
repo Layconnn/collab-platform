@@ -2,15 +2,17 @@
 
 ## Overview
 
-This project is a production-grade fullstack SaaS collaboration platform
+This project is an in-progress fullstack SaaS collaboration platform
 built as a **TypeScript monorepo** using modern scalable architecture
-principles.
+principles. Production readiness and the stated scale targets are goals, not validated operating results.
 
 The architecture is **intentionally designed** to support **10k–100k users**
-before requiring structural changes. Every decision prioritizes clarity,
+before requiring structural changes; this scale has not been load-tested. Every decision prioritizes clarity,
 maintainability, and production readiness from day one.
 
 ### Core Features
+
+Feature bullets below describe the intended product scope, not proof of production readiness. Notification jobs have a worker implementation, but external delivery and production operation are not verified. The architecture has not been load-tested at the stated scale.
 
 - 🔐 **Authentication** — Email + OAuth-ready with JWT sessions
 - 👥 **Workspaces** — Multi-tenant collaboration spaces
@@ -178,7 +180,7 @@ pnpm dev
 
 ### Services
 
-- **PostgreSQL**: `localhost:5432` (user: `postgres`, password: `postgres`)
+- **PostgreSQL**: `localhost:5433` (host port; container port 5432; user/password: `postgres`)
 - **Redis**: `localhost:6379`
 - **Next.js App**: `http://localhost:3000`
 - **Prisma Studio**: `pnpm -C apps/web exec prisma studio`
@@ -569,7 +571,9 @@ The platform is being built deliberately—not rushed.
 
 **Goal**: Ship a stable, usable MVP with clean architecture.
 
-**Status**: In Progress
+**Status**: In Progress. Hosted CI, production deployment, and live migration/worker operations still need verification.
+
+The CI workflow is now present in `.github/workflows/ci.yml`, but it has not yet been validated by a hosted run. A Docker target exists for the notification worker; no production environment has been deployed or exercised. Any older checked-off deployment/CI bullets below should be read with these verification limits.
 
 #### Deliverables
 
@@ -581,8 +585,8 @@ The platform is being built deliberately—not rushed.
 - ✅ Prisma schema finalized (v1)
 - ✅ Redis caching (initial read-heavy endpoints)
 - ✅ BullMQ background jobs (email + notifications)
-- ✅ CI pipeline (lint, typecheck, test)
-- ✅ Production deployment (Vercel + Managed DB + Redis)
+- ⏳ CI workflow is configured; first hosted run pending
+- ⏳ Production deployment (Vercel + managed services) is not verified
 
 #### Focus
 
@@ -803,11 +807,7 @@ export const discussionRouter = router({
 
 - [Development Setup Guide](./DEVELOPMENT.md) — Local Docker development environment
 - [Master Codex Prompt Framework](./CODEX_PROMPT_FRAMEWORK.md) — How to prompt Codex effectively
-- [Architecture Decisions](./architecture.md)
-- [Database Decisions](./database-decisions.md)
-- [API Decisions](./api-decisions.md)
-- [Scaling Plan](./scaling-plan.md)
 
 ---
 
-**Last Updated**: February 27, 2026
+**Last Updated**: September 30, 2026

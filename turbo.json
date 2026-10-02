@@ -12,6 +12,9 @@
         "JWT_SECRET",
         "JWT_REFRESH_SECRET",
         "TRUSTED_PROXY_TOKEN",
+        "SENTRY_DSN",
+        "RUN_WORKER_IN_API",
+        "NEXT_PUBLIC_APP_URL",
         "NODE_ENV"
       ]
     },
