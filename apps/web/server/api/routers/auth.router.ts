@@ -1,5 +1,6 @@
 import {
   changePasswordInputSchema,
+  currentUserSchema,
   loginInputSchema,
   logoutInputSchema,
   registerInputSchema,
@@ -39,6 +40,10 @@ function appendSetCookies(headers: Headers, cookies: string[]): void {
 }
 
 export const authRouter = createTRPCRouter({
+  me: protectedProcedure.output(currentUserSchema).query(({ ctx }) =>
+    execute(() => authService.getCurrentUser(ctx.user.id)),
+  ),
+
   register: publicProcedure.input(registerInputSchema).mutation(({ ctx, input }) =>
     execute(async () => {
       const result = await authService.register(input, { requestId: ctx.requestId });

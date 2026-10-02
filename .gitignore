@@ -29,7 +29,6 @@ dist/
 
 # === TESTS & COVERAGE ===
 coverage/
-*.test.mjs
 
 # === PACKAGE MANAGERS ===
 # Lock files only at root level (apps/web shouldn't have these)
@@ -47,6 +46,7 @@ docs/CODEX_PROMPT_FRAMEWORK.md
 docs/DEPLOYMENT_FREE_TIER.md
 docs/security-alert-thresholds.md
 docs/security-guidelines.md
+docs/FRONTEND_CONTEXT.md
 CLEANUP_GUIDE.md
 GITHUB_CLEANUP.md
 
@@ -65,3 +65,6 @@ pnpm-debug.log*
 *.pem
 .turbo
 .vercel
+
+
+trpc-prompts.txt

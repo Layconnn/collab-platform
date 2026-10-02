@@ -55,8 +55,9 @@ docker-compose up -d
 
 This starts:
 
-- **PostgreSQL** (port 5432)
+- **PostgreSQL** (host port 5433, container port 5432)
 - **Redis** (port 6379)
+- **Notification worker** (separate container)
 
 ### 2. Verify Services Are Running
 
@@ -152,14 +153,14 @@ docker-compose down -v
 
 ### Port Already In Use
 
-If you get "port 5432 already in use":
+If you get a host port conflict on 5433:
 
 ```bash
-# Find process using port 5432
-lsof -i :5432
+# Find process using host port 5433
+lsof -i :5433
 
 # Or for Windows:
-netstat -ano | findstr :5432
+netstat -ano | findstr :5433
 
 # Stop the container
 docker-compose down
@@ -210,7 +211,7 @@ docker system prune -a
 Your `.env` is already configured for Docker:
 
 ```bash
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/postgres"
 REDIS_URL="redis://localhost:6379"
 ```
 

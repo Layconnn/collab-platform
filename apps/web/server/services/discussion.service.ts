@@ -17,7 +17,7 @@ import {
   recordDiscussionPermissionDenied,
 } from "../observability/security-events";
 import { notificationService } from "./notification.service";
-import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
+import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
