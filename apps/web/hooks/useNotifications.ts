@@ -19,8 +19,10 @@ export function useUnreadNotifications() {
 }
 
 export function useNotificationActions() {
-  const markAsRead = trpc.notification.markAsRead.useMutation();
-  const markAllAsRead = trpc.notification.markAllAsRead.useMutation();
+  const utils = trpc.useUtils();
+  const refresh = () => utils.notification.listForUser.invalidate();
+  const markAsRead = trpc.notification.markAsRead.useMutation({ onSuccess: refresh });
+  const markAllAsRead = trpc.notification.markAllAsRead.useMutation({ onSuccess: refresh });
 
   return { markAsRead, markAllAsRead };
 }

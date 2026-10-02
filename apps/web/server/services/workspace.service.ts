@@ -31,7 +31,7 @@ import {
   assertCanUpdateMemberRole,
   assertExactlyOneOwner,
 } from "./workspace.permissions";
-import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
+import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 
 const WORKSPACE_TTL_SECONDS = 120;
 const WORKSPACE_LIST_TTL_SECONDS = 60;

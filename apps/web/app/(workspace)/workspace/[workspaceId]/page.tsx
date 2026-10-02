@@ -34,6 +34,12 @@ export default function WorkspaceOverviewPage() {
           >
             View discussions
           </Link>
+          <Link
+            href={`/workspace/${workspaceId}/members`}
+            className="rounded border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+          >
+            Manage members
+          </Link>
         </div>
       </div>
     </div>

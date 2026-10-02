@@ -10,7 +10,7 @@ A **monorepo** containing a fullstack SaaS platform with:
 - **Workspaces** (multi-tenant collaboration spaces)
 - **Discussions** (threaded conversations)
 - **Comments** (nested replies with depth limits)
-- **Security by default** (40+ security tests, permission matrix, rate limiting)
+- **Security by default** (38 backend security/integration tests, plus 6 frontend tests, permission matrix, rate limiting)
 - **Observability from day 1** (audit logs, metrics, alerts)
 
 **Not microservices. Not premature optimization. Just clean fundamentals.**
@@ -71,7 +71,7 @@ const WORKSPACE_PERMISSIONS = {
 
 ---
 
-## 🧪 Testing (40+ Security Tests)
+## 🧪 Testing (44 Automated Tests)
 
 ```bash
 # Auth spoof rejection
@@ -210,9 +210,7 @@ Visit `http://localhost:3000`
 
 ## 🚀 What's Next
 
-**Phase 2:** Notifications (via BullMQ + email/push)  
-**Phase 3:** Analytics (event streaming + aggregation)  
-**Phase 4:** Real-time (WebSocket layer for live updates)
+**Next:** Verify hosted CI, run migrations against staging, deploy and observe the notification worker, then close remaining authentication and frontend workflow gaps. Analytics and real-time updates remain future work.
 
 Each phase builds on proven fundamentals.
 

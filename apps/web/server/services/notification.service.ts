@@ -14,7 +14,7 @@ import {
 } from "../observability/security-events";
 import { enqueueNotificationJob } from "../queue/notification.queue";
 import { extractMentions, normalizeUsername } from "../utils/mentions";
-import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
+import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 
 type RequestContext = {
   requestId: string;

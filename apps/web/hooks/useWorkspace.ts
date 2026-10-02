@@ -9,6 +9,13 @@ export function useWorkspaceList() {
   });
 }
 
+export function useCreateWorkspace() {
+  const utils = trpc.useUtils();
+  return trpc.workspace.create.useMutation({
+    onSuccess: () => utils.workspace.listForUser.invalidate(),
+  });
+}
+
 export function useWorkspaceDetail(workspaceId: string) {
   return trpc.workspace.getById.useQuery({ workspaceId }, { enabled: Boolean(workspaceId) });
 }

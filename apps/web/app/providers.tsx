@@ -1,6 +1,6 @@
 "use client";
 
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import superjson from "superjson";
@@ -14,7 +14,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const trpcClient = useMemo(
     () =>
       trpc.createClient({
-        transformer: superjson,
         links: [
           loggerLink({
             enabled: (opts) =>
@@ -23,6 +22,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           }),
           httpBatchLink({
             url: "/api/trpc",
+            transformer: superjson,
+            headers: () => {
+              if (typeof window === "undefined") return {};
+              const csrfToken = sessionStorage.getItem("csrf_token");
+              return csrfToken ? { "x-csrf-token": csrfToken } : {};
+            },
           }),
         ],
       }),
@@ -32,7 +37,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <ChakraProvider>{children}</ChakraProvider>
+        <ChakraProvider value={defaultSystem}>{children}</ChakraProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

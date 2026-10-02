@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 
-import { trpc } from "@/lib/trpc/api-client";
+import { useDiscussionDetail } from "@/hooks/useDiscussion";
 import { LoadingState, ErrorState } from "@/components/common/StateNotice";
 import { CommentList } from "@/components/comment/CommentList";
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
@@ -10,7 +10,7 @@ import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
 export default function DiscussionDetailPage() {
   const params = useParams<{ discussionId: string }>();
   const discussionId = params.discussionId;
-  const discussion = trpc.discussion.getById.useQuery({ discussionId });
+  const discussion = useDiscussionDetail(discussionId);
 
   if (discussion.isLoading) {
     return <LoadingState label="Loading discussion..." />;
