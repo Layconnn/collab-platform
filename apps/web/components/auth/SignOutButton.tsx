@@ -13,7 +13,7 @@ export function SignOutButton() {
   };
 
   return (
-    <button className="text-sm font-medium text-slate-600 disabled:opacity-60" onClick={signOut} disabled={logout.isPending}>
+    <button className="whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-[#63716a] transition-colors hover:bg-[#edf4ef] hover:text-[#17231f] disabled:opacity-60" onClick={signOut} disabled={logout.isPending}>
       {logout.isPending ? "Signing out..." : "Sign out"}
     </button>
   );

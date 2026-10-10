@@ -1,20 +1,8 @@
 "use client";
 
-import { ReactNode } from "react";
+import { Button as ChakraButton } from "@chakra-ui/react/button";
+import type { ButtonProps } from "@chakra-ui/react/button";
 
-interface ButtonProps {
-  children: ReactNode;
-  className?: string;
-  appName: string;
+export function Button(props: ButtonProps) {
+  return <ChakraButton colorPalette="brand" {...props} />;
 }
-
-export const Button = ({ children, className, appName }: ButtonProps) => {
-  return (
-    <button
-      className={className}
-      onClick={() => alert(`Hello from your ${appName} app!`)}
-    >
-      {children}
-    </button>
-  );
-};

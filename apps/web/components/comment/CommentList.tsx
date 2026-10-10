@@ -34,10 +34,10 @@ function CommentThread({ comment, discussionId }: { comment: CommentItem; discus
 
   return (
     <li className="border-l-2 border-slate-200 pl-4">
-      <article className="rounded border border-slate-200 bg-white p-3">
+      <article className="border-b border-[#dce6e0] bg-transparent py-4">
         {editing ? (
           <form onSubmit={onSubmit} className="space-y-3">
-            <textarea className="w-full rounded border border-slate-300 px-3 py-2" rows={3} aria-label="Edit comment" {...form.register("body")} />
+            <textarea className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5" rows={3} aria-label="Edit comment" {...form.register("body")} />
             {update.error ? <p role="alert" className="text-sm text-red-700">{update.error.message}</p> : null}
             <div className="flex gap-3">
               <button disabled={update.isPending} className="text-sm font-medium text-teal-800">Save</button>
@@ -46,11 +46,11 @@ function CommentThread({ comment, discussionId }: { comment: CommentItem; discus
           </form>
         ) : (
           <>
-            <p className="whitespace-pre-wrap text-sm text-slate-700">{comment.body}</p>
-            <p className="mt-2 text-xs text-slate-500">{comment.author.name ?? "Unknown"}</p>
+            <p className="whitespace-pre-wrap text-sm leading-6 text-[#34443c]">{comment.body}</p>
+            <p className="mt-3 text-xs font-medium text-[#63716a]">{comment.author.name ?? "Community member"}</p>
             <div className="mt-3 flex flex-wrap gap-4">
               {comment.depth < 8 ? (
-                <button className="text-xs font-medium text-teal-800" onClick={() => { setShowReplies(true); setReplying((value) => !value); }}>
+              <button className="text-xs font-semibold text-[#16765b]" onClick={() => { setShowReplies(true); setReplying((value) => !value); }}>
                   Reply
                 </button>
               ) : null}

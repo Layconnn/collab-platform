@@ -22,12 +22,13 @@ export function CreateCommentForm({ discussionId, parentCommentId }: { discussio
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      <label className="block space-y-1 text-sm font-medium text-slate-700">
+      <label className="block space-y-1.5 text-sm font-medium text-[#34443c]">
         <span>Comment</span>
-        <textarea className="w-full rounded border border-slate-300 px-3 py-2" rows={3} {...form.register("body")} />
+        <textarea className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5 text-[#17231f] placeholder:text-[#89958f]" placeholder="Be kind, constructive, and specific." rows={4} {...form.register("body")} />
       </label>
-      <button type="submit" disabled={createComment.isPending} className="rounded bg-teal-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-        Post Comment
+      {createComment.error ? <p role="alert" className="text-sm text-red-700">{createComment.error.message}</p> : null}
+      <button type="submit" disabled={createComment.isPending} className="rounded-md bg-[#16765b] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#105d47] disabled:opacity-60">
+        {createComment.isPending ? "Posting..." : "Post comment"}
       </button>
     </form>
   );

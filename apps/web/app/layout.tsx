@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../styles/globals.css";
+import "./globals.css";
 import Providers from "./providers";
 
 const geistSans = Geist({
@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Collab Platform",
-  description: "Workspace collaboration platform",
+  title: "Commons | Open-source communities",
+  description: "A welcoming place for open-source communities to share ideas, ask questions, and build together.",
 };
 
 export default function RootLayout({

@@ -31,25 +31,32 @@ function DiscussionEntry({ discussion, workspaceId }: { discussion: DiscussionIt
   });
 
   return (
-    <li className="rounded border border-slate-200 p-4">
+    <li className="border-b border-[#dce6e0] py-5 first:border-t">
       {editing ? (
         <form onSubmit={onSubmit} className="space-y-3">
-          <input className="w-full rounded border border-slate-300 px-3 py-2" aria-label="Discussion title" {...form.register("title")} />
+          <input className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5" aria-label="Discussion title" {...form.register("title")} />
           {update.error ? <p role="alert" className="text-sm text-red-700">{update.error.message}</p> : null}
           <div className="flex gap-3">
-            <button disabled={update.isPending} className="text-sm font-medium text-teal-800">Save</button>
-            <button type="button" className="text-sm text-slate-600" onClick={() => setEditing(false)}>Cancel</button>
+            <button disabled={update.isPending} className="text-sm font-semibold text-[#16765b]">{update.isPending ? "Saving..." : "Save"}</button>
+            <button type="button" className="text-sm text-[#63716a]" onClick={() => setEditing(false)}>Cancel</button>
           </div>
         </form>
       ) : (
         <>
-          <Link href={`/workspace/${workspaceId}/discussions/${discussion.id}`}>
-            <div className="text-base font-semibold text-slate-900">{discussion.title}</div>
-            <div className="text-xs text-slate-500">{discussion.author.name ?? "Unknown"}</div>
+          <Link href={`/workspace/${workspaceId}/discussions/${discussion.id}`} className="group block">
+            <div className="text-lg font-semibold text-[#17231f] group-hover:text-[#105d47]">{discussion.title}</div>
+            <div className="mt-2 flex items-center gap-2 text-sm text-[#63716a]">
+              <span className="grid size-7 place-items-center rounded-full bg-[#e6f2ec] text-xs font-semibold text-[#16765b]" aria-hidden="true">
+                {(discussion.author.name ?? "?").slice(0, 1).toUpperCase()}
+              </span>
+              <span>{discussion.author.name ?? "Community member"}</span>
+              <span aria-hidden="true">·</span>
+              <span>Open discussion</span>
+            </div>
           </Link>
           {isAuthor ? (
             <div className="mt-3 flex gap-4">
-              <button className="text-sm font-medium text-teal-800" onClick={() => setEditing(true)}>Edit</button>
+              <button className="text-sm font-medium text-[#16765b]" onClick={() => setEditing(true)}>Edit</button>
               <button className="text-sm font-medium text-red-700" onClick={() => {
                 if (window.confirm("Delete this discussion and its comments?")) remove.mutate({ discussionId: discussion.id });
               }}>Delete</button>
@@ -87,8 +94,8 @@ export function DiscussionList({ workspaceId }: { workspaceId: string }) {
         ))}
       </ul>
       {query.hasNextPage ? (
-        <button
-          className="text-sm text-teal-600"
+          <button
+          className="mt-4 rounded-md border border-[#cbd8d0] bg-white px-4 py-2 text-sm font-medium text-[#34443c] hover:bg-[#edf4ef]"
           onClick={() => query.fetchNextPage()}
           disabled={query.isFetchingNextPage}
         >

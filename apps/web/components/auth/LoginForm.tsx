@@ -23,16 +23,16 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <label className="block space-y-1 text-sm font-medium text-slate-700">
+      <label className="block space-y-1.5 text-sm font-medium text-[#34443c]">
         <span>Email</span>
-        <input className="w-full rounded border border-slate-300 px-3 py-2" type="email" autoComplete="email" {...form.register("email")} />
+        <input className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5 text-[#17231f]" type="email" autoComplete="email" {...form.register("email")} />
       </label>
-      <label className="block space-y-1 text-sm font-medium text-slate-700">
+      <label className="block space-y-1.5 text-sm font-medium text-[#34443c]">
         <span>Password</span>
-        <input className="w-full rounded border border-slate-300 px-3 py-2" type="password" autoComplete="current-password" {...form.register("password")} />
+        <input className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5 text-[#17231f]" type="password" autoComplete="current-password" {...form.register("password")} />
       </label>
-      <button type="submit" disabled={login.isPending} className="rounded bg-teal-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-        Sign in
+      <button type="submit" disabled={login.isPending} className="w-full rounded-md bg-[#16765b] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#105d47] disabled:opacity-60">
+        {login.isPending ? "Signing in..." : "Sign in"}
       </button>
       {login.error ? (
         <p className="text-sm text-red-600">Login failed: {login.error.message}</p>
