@@ -571,9 +571,9 @@ The platform is being built deliberately—not rushed.
 
 **Goal**: Ship a stable, usable MVP with clean architecture.
 
-**Status**: In Progress. Hosted CI, production deployment, and live migration/worker operations still need verification.
+**Status**: Core workflows are implemented. The project owner reports that hosted CI passes and that the application has been thoroughly tested in development and production. Load testing and broader operational readiness are not established by this status.
 
-The CI workflow is now present in `.github/workflows/ci.yml`, but it has not yet been validated by a hosted run. A Docker target exists for the notification worker; no production environment has been deployed or exercised. Any older checked-off deployment/CI bullets below should be read with these verification limits.
+The CI workflow is defined in `.github/workflows/ci.yml` and hosted checks are reported passing. Production is deployed and core workflows are reported tested. The architecture has not been load-tested at the stated scale; external email/push delivery is not implemented.
 
 #### Deliverables
 
@@ -585,8 +585,9 @@ The CI workflow is now present in `.github/workflows/ci.yml`, but it has not yet
 - ✅ Prisma schema finalized (v1)
 - ✅ Redis caching (initial read-heavy endpoints)
 - ✅ BullMQ background jobs (email + notifications)
-- ⏳ CI workflow is configured; first hosted run pending
-- ⏳ Production deployment (Vercel + managed services) is not verified
+- ✅ Hosted CI checks pass (owner-reported)
+- ✅ Development and production core workflows tested (owner-reported)
+- ⏳ Load testing and external email/push delivery remain future work
 
 #### Focus
 

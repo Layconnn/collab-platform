@@ -2,9 +2,9 @@
 
 **For: Workspace + Discussion + Comment MVP**
 
-This guide walks you through deploying to staging environment before production.
+This guide documents deployment, validation, and operational readiness for the current application.
 
-**Current verified state (September 30, 2026):** Local typecheck, lint, production build, and automated test suites pass; lint/build have warnings. CI is configured but its hosted run, a staging deployment, and production operations are not yet verified. BullMQ persists in-app notification records; email/push delivery is not implemented. Validate the deployed worker rather than treating notifications as future feature work.
+**Current status (October 10, 2026):** The project owner reports that hosted CI passes and that core workflows have been thoroughly tested in development and production. This is an owner-reported status, not an independent audit. Load testing, backup/rollback drills, and external email/push delivery should be tracked separately; BullMQ supports in-app notification jobs, but email/push delivery is not implemented.
 
 ---
 
@@ -388,11 +388,11 @@ Before deploying to production:
 
 ## 🎯 Next Steps
 
-1. ✅ **Local validation**: All tests passing
-2. → **Staging deployment**: Deploy to staging environment
-3. → **Staging validation**: Run checklist above
-4. → **Production deployment**: Deploy to production
-5. → **Next phase**: Extend analytics, realtime, and notification delivery capabilities
+1. ✅ **Local validation**: Reported passing
+2. ✅ **Hosted CI**: Reported passing
+3. ✅ **Development and production workflows**: Reported thoroughly tested by the project owner
+4. → **Operate and improve**: Monitor production, collect feedback, and prioritize UX improvements
+5. → **Future capabilities**: Consider load testing, analytics, real-time updates, and external notification delivery when needed
 
 ---
 
