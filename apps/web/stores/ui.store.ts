@@ -4,10 +4,16 @@ type UiState = {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   setSidebarOpen: (value: boolean) => void;
+  isMobileNavOpen: boolean;
+  toggleMobileNav: () => void;
+  setMobileNavOpen: (value: boolean) => void;
 };
 
 export const useUiStore = create<UiState>((set) => ({
   isSidebarOpen: true,
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   setSidebarOpen: (value) => set({ isSidebarOpen: value }),
+  isMobileNavOpen: false,
+  toggleMobileNav: () => set((state) => ({ isMobileNavOpen: !state.isMobileNavOpen })),
+  setMobileNavOpen: (value) => set({ isMobileNavOpen: value }),
 }));

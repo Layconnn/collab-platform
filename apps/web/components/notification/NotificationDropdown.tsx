@@ -2,18 +2,32 @@
 
 import { useNotificationActions, useNotificationsFeed, useUnreadNotifications } from "@/hooks/useNotifications";
 import { LoadingState } from "@/components/common/StateNotice";
+import { AppIcon } from "@/components/common/AppIcon";
 
-export function NotificationDropdown() {
+export function NotificationDropdown({ compact = false }: { compact?: boolean }) {
   const feed = useNotificationsFeed();
   const unread = useUnreadNotifications();
   const { markAsRead, markAllAsRead } = useNotificationActions();
 
   const unreadCount = unread.data?.items.length ?? 0;
+  const accessibleLabel = unread.isLoading
+    ? "Notifications, unread count loading"
+    : `Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`;
 
   return (
     <details className="relative">
-      <summary className="cursor-pointer list-none whitespace-nowrap rounded-md border border-[#cbd8d0] bg-white px-3 py-2 text-sm font-medium text-[#34443c] hover:bg-[#edf4ef]">
-        Notifications {unreadCount > 0 ? `(${unreadCount})` : ""}
+      <summary
+        aria-label={accessibleLabel}
+        title={accessibleLabel}
+        className={`flex h-10 cursor-pointer list-none items-center justify-center gap-2 rounded-md text-sm font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:ring-2 focus-visible:ring-focus-ring ${compact ? "w-10" : "w-auto border border-border-subtle bg-surface px-3"}`}
+      >
+        <AppIcon name="bell" />
+        {!compact ? <span>Notifications</span> : <span className="sr-only">Notifications</span>}
+        {unreadCount > 0 ? (
+          <span aria-hidden="true" className="absolute right-0.5 top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-brand-700 px-1 text-[9px] font-semibold leading-4 text-white">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        ) : null}
       </summary>
       <div className="absolute right-0 z-20 mt-2 max-h-96 w-[min(20rem,calc(100vw-2rem))] overflow-y-auto rounded-md border border-[#dce6e0] bg-white p-2 shadow-lg">
         {feed.isLoading ? (

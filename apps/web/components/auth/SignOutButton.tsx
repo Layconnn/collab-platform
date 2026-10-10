@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { AppIcon } from "@/components/common/AppIcon";
 
 export function SignOutButton() {
   const router = useRouter();
@@ -13,7 +14,8 @@ export function SignOutButton() {
   };
 
   return (
-    <button className="whitespace-nowrap rounded-md px-2 py-2 text-sm font-medium text-[#63716a] transition-colors hover:bg-[#edf4ef] hover:text-[#17231f] disabled:opacity-60" onClick={signOut} disabled={logout.isPending}>
+    <button type="button" className="flex min-h-10 w-full items-center gap-2 rounded px-2 py-2 text-left text-sm font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary disabled:opacity-60" onClick={signOut} disabled={logout.isPending}>
+      <AppIcon name="logout" />
       {logout.isPending ? "Signing out..." : "Sign out"}
     </button>
   );

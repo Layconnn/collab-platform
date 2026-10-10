@@ -1,30 +1,9 @@
-import Link from "next/link";
 import { CreateWorkspaceForm } from "@/components/workspace/CreateWorkspaceForm";
 import { WorkspaceList } from "@/components/workspace/WorkspaceList";
-import { NotificationDropdown } from "@/components/notification/NotificationDropdown";
-import { AuthGuard } from "@/components/auth/AuthGuard";
-import { SignOutButton } from "@/components/auth/SignOutButton";
 
 export default function WorkspaceDashboardPage() {
   return (
-    <AuthGuard>
-    <div className="min-h-screen bg-[#f5f8f6]">
-      <header className="border-b border-[#dce6e0] bg-white">
-        <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link href="/workspace" className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-md bg-[#16765b] text-sm font-bold text-white">C</span>
-            <span>
-              <span className="block text-sm font-semibold text-[#17231f]">Commons</span>
-              <span className="hidden text-[11px] text-[#63716a] sm:block">Open-source communities</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <NotificationDropdown />
-            <SignOutButton />
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto flex max-w-6xl flex-col gap-9 px-4 py-8 sm:px-6 sm:py-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-9 py-2">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-[#16765b]">Your community spaces</p>
           <h1 className="mt-2 text-3xl font-semibold text-[#17231f]">Find your people and get involved.</h1>
@@ -37,14 +16,12 @@ export default function WorkspaceDashboardPage() {
             </div>
             <WorkspaceList />
           </section>
-          <aside className="h-fit border-t border-[#dce6e0] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+          <aside id="new-workspace" className="h-fit border-t border-[#dce6e0] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
             <h2 className="text-base font-semibold text-[#17231f]">Start a community</h2>
             <p className="mb-5 mt-1 text-sm leading-6 text-[#63716a]">Create a space for your project’s questions, ideas, and contributors.</p>
             <CreateWorkspaceForm />
           </aside>
         </div>
-      </main>
-    </div>
-    </AuthGuard>
+      </div>
   );
 }
