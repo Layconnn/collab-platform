@@ -29,6 +29,7 @@
   --color-warning: var(--warning);
   --color-success: var(--success);
   --color-info: var(--info);
+  --color-focus-ring: var(--focus-ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

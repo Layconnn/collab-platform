@@ -10,6 +10,7 @@ const brandScale = Object.fromEntries(
 export const uiSystem = createSystem(
   defaultConfig,
   defineConfig({
+    preflight: false,
     theme: {
       tokens: { colors: { brand: brandScale } },
       semanticTokens: {
