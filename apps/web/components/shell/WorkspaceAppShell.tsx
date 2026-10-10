@@ -200,7 +200,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
   const contextName = workspaceName ?? (workspaceId ? "Loading workspace" : "Workspaces");
 
   return (
-    <div className="min-h-screen bg-canvas text-text-primary">
+    <div className={`min-h-screen bg-canvas text-text-primary md:grid md:transition-[grid-template-columns] md:duration-150 motion-reduce:transition-none ${sidebarExpanded ? "md:grid-cols-[16rem_minmax(0,1fr)]" : "md:grid-cols-[4.5rem_minmax(0,1fr)]"}`}>
       <a href="#main-content" className="sr-only z-[60] rounded bg-surface px-3 py-2 text-sm font-medium text-text-primary focus:not-sr-only focus:fixed focus:left-3 focus:top-3">
         Skip to content
       </a>
@@ -208,12 +208,12 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
       <aside
         aria-label="Application sidebar"
         inert={mobileNavOpen}
-        className={`fixed inset-y-0 left-0 z-30 hidden border-r border-border-subtle bg-surface md:block ${sidebarExpanded ? "w-64" : "w-[4.5rem]"}`}
+        className="sticky top-0 z-30 hidden h-dvh min-w-0 self-start border-r border-border-subtle bg-surface md:block"
       >
         {sidebarContent}
       </aside>
 
-      <div inert={mobileNavOpen} className={`min-h-screen min-w-0 transition-[padding] duration-150 motion-reduce:transition-none ${sidebarExpanded ? "md:pl-64" : "md:pl-[4.5rem]"}`}>
+      <div inert={mobileNavOpen} className="min-h-screen min-w-0">
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border-subtle bg-surface px-3 sm:px-5 lg:px-8">
           <div className="flex min-w-0 items-center gap-2 md:hidden">
             <IconButton
@@ -241,7 +241,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main id="main-content" className="mx-auto w-full min-w-0 max-w-none px-4 py-6 sm:px-6 lg:px-8">
+        <main id="main-content" className="mx-auto w-full min-w-0 max-w-none wrap-anywhere px-4 py-6 sm:px-6 lg:px-8">
           {children}
         </main>
       </div>
@@ -292,18 +292,20 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
 
 export function WorkspaceShellLoading() {
   return (
-    <div className="min-h-screen bg-canvas" role="status" aria-label="Checking your session">
-      <aside aria-hidden="true" className="fixed inset-y-0 left-0 hidden w-64 border-r border-border-subtle bg-surface p-4 md:block">
+    <div className="min-h-screen bg-canvas md:grid md:grid-cols-[16rem_minmax(0,1fr)]" role="status" aria-label="Checking your session">
+      <aside aria-hidden="true" className="sticky top-0 hidden h-dvh min-w-0 self-start border-r border-border-subtle bg-surface p-4 md:block">
         <div className="h-8 w-32 animate-pulse rounded bg-surface-active" />
         <div className="mt-8 h-11 animate-pulse rounded bg-surface-subtle" />
         <div className="mt-8 space-y-3"><div className="h-9 animate-pulse rounded bg-surface-subtle" /><div className="h-9 animate-pulse rounded bg-surface-subtle" /><div className="h-9 animate-pulse rounded bg-surface-subtle" /></div>
       </aside>
-      <header aria-hidden="true" className="h-14 border-b border-border-subtle bg-surface px-4 md:ml-64">
-        <div className="ml-auto h-8 w-24 animate-pulse rounded bg-surface-subtle" />
-      </header>
-      <main className="px-4 py-6 md:ml-64" aria-live="polite">
-        <p className="text-sm text-text-muted">Checking your session...</p>
-      </main>
+      <div className="min-w-0">
+        <header aria-hidden="true" className="h-14 border-b border-border-subtle bg-surface px-4">
+          <div className="ml-auto h-8 w-24 animate-pulse rounded bg-surface-subtle" />
+        </header>
+        <main className="px-4 py-6" aria-live="polite">
+          <p className="text-sm text-text-muted">Checking your session...</p>
+        </main>
+      </div>
     </div>
   );
 }
