@@ -3,40 +3,62 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { ArrowRight, LoaderCircle } from "lucide-react";
 
 import { loginInputSchema, type LoginInput } from "@repo/validators/auth";
 
 import { useAuth } from "@/hooks/useAuth";
+import { AuthField } from "@/components/auth/AuthField";
+import { authErrorMessage } from "@/components/auth/authError";
 
 export function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
+  const submittingRef = useRef(false);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+  const [redirecting, setRedirecting] = useState(false);
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginInputSchema),
     defaultValues: { email: "", password: "" },
+    shouldFocusError: true,
   });
 
-  const onSubmit = form.handleSubmit(async (values) => {
-    await login.mutateAsync(values);
-    router.replace("/workspace");
-  });
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    if (submittingRef.current || redirecting) {
+      event.preventDefault();
+      return;
+    }
+    submittingRef.current = true;
+    void form.handleSubmit(async (values) => {
+      form.clearErrors("root");
+      try {
+        await login.mutateAsync(values);
+        setRedirecting(true);
+        router.replace("/workspace");
+      } catch (error) {
+        form.setError("root", { type: "server", message: authErrorMessage(error, "login") });
+        submittingRef.current = false;
+      }
+    }, () => { submittingRef.current = false; })(event);
+  };
+
+  const rootError = form.formState.errors.root?.message;
+  const busy = form.formState.isSubmitting || login.isPending || redirecting;
+  useEffect(() => {
+    if (rootError) errorRef.current?.focus();
+  }, [rootError]);
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <label className="block space-y-1.5 text-sm font-medium text-[#34443c]">
-        <span>Email</span>
-        <input className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5 text-[#17231f]" type="email" autoComplete="email" {...form.register("email")} />
-      </label>
-      <label className="block space-y-1.5 text-sm font-medium text-[#34443c]">
-        <span>Password</span>
-        <input className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5 text-[#17231f]" type="password" autoComplete="current-password" {...form.register("password")} />
-      </label>
-      <button type="submit" disabled={login.isPending} className="w-full rounded-md bg-[#16765b] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#105d47] disabled:opacity-60">
-        {login.isPending ? "Signing in..." : "Sign in"}
+    <form onSubmit={onSubmit} onChangeCapture={() => form.clearErrors("root")} className="space-y-5" noValidate>
+      <AuthField id="login-email" label="Email" type="email" autoComplete="email" registration={form.register("email")} error={form.formState.errors.email} disabled={busy} />
+      <AuthField id="login-password" label="Password" type="password" autoComplete="current-password" registration={form.register("password")} error={form.formState.errors.password} disabled={busy} />
+      {rootError ? <p ref={errorRef} tabIndex={-1} role="alert" className="rounded-sm border border-danger/30 bg-surface-subtle px-3.5 py-3 text-sm text-danger outline-none focus-visible:ring-2 focus-visible:ring-focus-ring">{rootError}</p> : null}
+      <button type="submit" disabled={busy} className="flex h-12 w-full items-center justify-center gap-2 rounded-sm bg-brand-action px-5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:opacity-65">
+        {busy ? <LoaderCircle size={17} className="animate-spin" aria-hidden="true" /> : null}
+        {redirecting ? "Opening workspace..." : busy ? "Signing in..." : "Sign in"}
+        {!busy ? <ArrowRight size={17} aria-hidden="true" /> : null}
       </button>
-      {login.error ? (
-        <p className="text-sm text-red-600">Login failed: {login.error.message}</p>
-      ) : null}
     </form>
   );
 }

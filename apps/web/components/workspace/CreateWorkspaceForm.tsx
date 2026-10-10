@@ -30,7 +30,7 @@ export function CreateWorkspaceForm() {
         <input className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5 text-[#17231f] placeholder:text-[#89958f]" placeholder="aurora-project" {...form.register("slug")} />
       </label>
       {createWorkspace.error ? <p role="alert" className="text-sm text-red-700">{createWorkspace.error.message}</p> : null}
-      <button type="submit" disabled={createWorkspace.isPending} className="w-full rounded-md bg-[#16765b] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#105d47] disabled:opacity-60">
+      <button type="submit" disabled={createWorkspace.isPending} className="w-full rounded-md bg-brand-action px-4 py-2.5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover disabled:opacity-60">
         {createWorkspace.isPending ? "Creating..." : "Create community"}
       </button>
     </form>

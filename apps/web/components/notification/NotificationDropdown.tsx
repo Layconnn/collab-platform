@@ -24,7 +24,7 @@ export function NotificationDropdown({ compact = false }: { compact?: boolean })
         <AppIcon name="bell" />
         {!compact ? <span>Notifications</span> : <span className="sr-only">Notifications</span>}
         {unreadCount > 0 ? (
-          <span aria-hidden="true" className="absolute right-0.5 top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-brand-700 px-1 text-[9px] font-semibold leading-4 text-white">
+          <span aria-hidden="true" className="absolute right-0.5 top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-brand-action px-1 text-[9px] font-semibold leading-4 text-on-brand-action">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         ) : null}

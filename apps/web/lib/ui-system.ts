@@ -15,6 +15,15 @@ export const uiSystem = createSystem(
       tokens: { colors: { brand: brandScale } },
       semanticTokens: {
         colors: {
+          brand: {
+            contrast: { value: "var(--on-brand-action)" },
+            fg: { value: "var(--brand-link)" },
+            subtle: { value: "var(--brand-100)" },
+            muted: { value: "var(--brand-200)" },
+            emphasized: { value: "var(--brand-300)" },
+            solid: { value: "var(--brand-action)" },
+            focusRing: { value: "var(--focus-ring)" },
+          },
           canvas: { value: "var(--canvas)" },
           surface: { value: "var(--surface)" },
           surfaceSubtle: { value: "var(--surface-subtle)" },

@@ -63,7 +63,7 @@ const workflow = [
 ];
 
 const primaryAction =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-brand-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-800 active:bg-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-brand-action px-5 py-3 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
 const secondaryAction =
   "inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-border bg-surface px-5 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-hover active:bg-surface-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
 
@@ -85,7 +85,7 @@ export default function Home() {
           >
             <span
               aria-hidden="true"
-              className="grid size-8 shrink-0 place-items-center rounded bg-brand-700 text-sm font-bold text-white"
+              className="grid size-8 shrink-0 place-items-center rounded bg-brand-accent text-sm font-bold text-on-brand-accent"
             >
               C
             </span>
@@ -105,7 +105,7 @@ export default function Home() {
             </Link>
             <Link
               href="/register"
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-md bg-brand-700 px-3 text-xs font-semibold text-white transition-colors hover:bg-brand-800 active:bg-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring sm:px-4 sm:text-sm"
+              className="inline-flex min-h-10 items-center gap-1.5 rounded-md bg-brand-action px-3 text-xs font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring sm:px-4 sm:text-sm"
             >
               Get started{" "}
               <ArrowRight
@@ -428,7 +428,7 @@ export default function Home() {
           <div className="flex items-center gap-2.5">
             <span
               aria-hidden="true"
-              className="grid size-7 place-items-center rounded bg-brand-700 text-xs font-bold text-white"
+              className="grid size-7 place-items-center rounded bg-brand-accent text-xs font-bold text-on-brand-accent"
             >
               C
             </span>

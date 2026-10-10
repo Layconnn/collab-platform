@@ -20,7 +20,7 @@ export function ProductPreview() {
       >
         <aside className="hidden min-w-0 flex-col border-r border-border-subtle bg-[#f8faf9] md:flex">
           <div className="flex h-14 items-center justify-center border-b border-border-subtle px-3 xl:justify-start xl:gap-2.5">
-            <span className="grid size-8 shrink-0 place-items-center rounded bg-brand-700 text-sm font-bold text-white">
+            <span className="grid size-8 shrink-0 place-items-center rounded bg-brand-accent text-sm font-bold text-on-brand-accent">
               C
             </span>
             <span className="hidden truncate text-sm font-semibold text-text-primary xl:block">
@@ -71,7 +71,7 @@ export function ProductPreview() {
         <div className="min-w-0 bg-surface">
           <div className="flex h-14 items-center justify-between gap-3 border-b border-border-subtle px-4 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-2 text-xs text-text-muted">
-              <span className="grid size-7 shrink-0 place-items-center rounded bg-brand-700 text-[11px] font-bold text-white md:hidden">
+              <span className="grid size-7 shrink-0 place-items-center rounded bg-brand-accent text-[11px] font-bold text-on-brand-accent md:hidden">
                 C
               </span>
               <span className="hidden shrink-0 md:inline">Workspaces</span>
@@ -84,7 +84,7 @@ export function ProductPreview() {
             </div>
             <span className="relative grid size-9 shrink-0 place-items-center rounded text-text-secondary">
               <Bell size={17} />
-              <span className="absolute right-0.5 top-0.5 grid size-4 place-items-center rounded-full bg-brand-700 text-[9px] font-bold text-white">
+              <span className="absolute right-0.5 top-0.5 grid size-4 place-items-center rounded-full bg-brand-action text-[9px] font-bold text-on-brand-action">
                 1
               </span>
             </span>
@@ -163,7 +163,7 @@ export function ProductPreview() {
               </div>
               <div className="mt-5 flex min-h-12 items-center justify-between gap-3 rounded border border-border bg-[#fbfcfb] px-3 text-xs text-text-muted">
                 <span>Add your perspective...</span>
-                <span className="shrink-0 rounded bg-brand-700 px-2.5 py-1.5 font-semibold text-white">
+                <span className="shrink-0 rounded bg-brand-action px-2.5 py-1.5 font-semibold text-on-brand-action">
                   Reply
                 </span>
               </div>

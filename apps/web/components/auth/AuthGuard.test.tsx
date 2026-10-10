@@ -47,6 +47,8 @@ describe("AuthGuard", () => {
     render(<AuthGuard><p>Protected content</p></AuthGuard>);
 
     expect(screen.getByText("Could not verify your session")).toBeTruthy();
+    expect(screen.queryByText("Database unavailable")).toBeNull();
+    expect(screen.queryByText("Protected content")).toBeNull();
     expect(mocks.replace).not.toHaveBeenCalled();
   });
 });

@@ -1,12 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
   mutateAsync: vi.fn(),
   isPending: false,
-  error: null as null | { message: string },
 }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: mocks.replace }) }));
@@ -15,7 +14,6 @@ vi.mock("@/hooks/useAuth", () => ({
     register: {
       mutateAsync: mocks.mutateAsync,
       isPending: mocks.isPending,
-      error: mocks.error,
     },
   }),
 }));
@@ -26,7 +24,6 @@ describe("RegisterForm", () => {
   beforeEach(() => {
     mocks.replace.mockReset();
     mocks.mutateAsync.mockReset().mockResolvedValue({});
-    mocks.error = null;
     mocks.isPending = false;
   });
 
@@ -60,12 +57,34 @@ describe("RegisterForm", () => {
 
     expect(mocks.mutateAsync).not.toHaveBeenCalled();
     expect(mocks.replace).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Username").getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByLabelText("Username").getAttribute("aria-describedby")).toContain("register-username-error");
+    expect(document.getElementById("register-username-error")?.textContent).toBeTruthy();
   });
 
-  it("shows registration errors returned by the API", () => {
-    mocks.error = { message: "Email already in use." };
+  it("shows a safe conflict error and focuses it", async () => {
+    mocks.mutateAsync.mockRejectedValue({ data: { code: "CONFLICT" }, message: "internal detail" });
+    const user = userEvent.setup();
     render(<RegisterForm />);
 
-    expect(screen.getByRole("alert").textContent).toContain("Email already in use.");
+    await user.type(screen.getByLabelText("Email"), "person@example.com");
+    await user.type(screen.getByLabelText("Username"), "person");
+    await user.type(screen.getByLabelText("Password"), "correct-horse-42");
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain("email or username is unavailable");
+    expect(alert.textContent).not.toContain("internal detail");
+    await waitFor(() => expect(document.activeElement).toBe(alert));
+  });
+
+  it("toggles password visibility without submitting", async () => {
+    const user = userEvent.setup();
+    render(<RegisterForm />);
+
+    await user.type(screen.getByLabelText("Password"), "correct-horse-42");
+    await user.click(screen.getByRole("button", { name: "Show password" }));
+    expect(screen.getByLabelText("Password").getAttribute("type")).toBe("text");
+    expect(mocks.mutateAsync).not.toHaveBeenCalled();
   });
 });

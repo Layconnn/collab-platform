@@ -14,6 +14,14 @@
   --color-border-subtle: var(--border-subtle);
   --color-brand: var(--brand-600);
   --color-brand-hover: var(--brand-700);
+  --color-brand-accent: var(--brand-accent);
+  --color-on-brand-accent: var(--on-brand-accent);
+  --color-brand-link: var(--brand-link);
+  --color-brand-link-hover: var(--brand-link-hover);
+  --color-brand-action: var(--brand-action);
+  --color-brand-action-hover: var(--brand-action-hover);
+  --color-brand-action-active: var(--brand-action-active);
+  --color-on-brand-action: var(--on-brand-action);
   --color-brand-50: var(--brand-50);
   --color-brand-100: var(--brand-100);
   --color-brand-200: var(--brand-200);
@@ -30,6 +38,12 @@
   --color-success: var(--success);
   --color-info: var(--info);
   --color-focus-ring: var(--focus-ring);
+  --color-auth-stage: var(--auth-stage);
+  --color-auth-stage-surface: var(--auth-stage-surface);
+  --color-auth-stage-border: var(--auth-stage-border);
+  --color-auth-stage-text: var(--auth-stage-text);
+  --color-auth-stage-muted: var(--auth-stage-muted);
+  --color-auth-stage-avatar: var(--auth-stage-avatar);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

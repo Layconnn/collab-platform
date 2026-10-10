@@ -34,7 +34,7 @@ export function CreateDiscussionForm({ workspaceId }: { workspaceId: string }) {
         <textarea className="w-full rounded-md border border-[#cbd8d0] bg-white px-3 py-2.5 text-[#17231f] placeholder:text-[#89958f]" placeholder="Add context so others can jump in." rows={5} {...form.register("body")} />
       </label>
       {createDiscussion.error ? <p role="alert" className="text-sm text-red-700">{createDiscussion.error.message}</p> : null}
-      <button type="submit" disabled={createDiscussion.isPending} className="rounded-md bg-[#16765b] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#105d47] disabled:opacity-60">
+      <button type="submit" disabled={createDiscussion.isPending} className="rounded-md bg-brand-action px-4 py-2.5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover disabled:opacity-60">
         {createDiscussion.isPending ? "Posting..." : "Post discussion"}
       </button>
     </form>

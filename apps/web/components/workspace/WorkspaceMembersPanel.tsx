@@ -132,7 +132,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
               </select>
             </label>
             {form.formState.errors.userId ? <p role="alert" className="text-sm text-red-700">{form.formState.errors.userId.message}</p> : null}
-            <button className="w-full rounded-md bg-[#16765b] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#105d47] disabled:opacity-60" disabled={addMember.isPending}>
+            <button className="w-full rounded-md bg-brand-action px-4 py-2.5 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover disabled:opacity-60" disabled={addMember.isPending}>
               {addMember.isPending ? "Adding..." : "Add contributor"}
             </button>
           </form>

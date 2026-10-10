@@ -78,7 +78,7 @@ export default function WorkspaceOverviewPage() {
               <div className="rounded-md border border-dashed border-[#b8c9be] bg-white p-6">
                 <p className="font-semibold text-[#17231f]">The first conversation starts here.</p>
                 <p className="mt-1 text-sm text-[#63716a]">Share a project update or ask a question to bring contributors in.</p>
-                <Link href={`/workspace/${workspaceId}/discussions`} className="mt-4 inline-flex rounded-md bg-[#16765b] px-3 py-2 text-sm font-semibold text-white hover:bg-[#105d47]">Start a discussion</Link>
+                <Link href={`/workspace/${workspaceId}/discussions`} className="mt-4 inline-flex rounded-md bg-brand-action px-3 py-2 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover">Start a discussion</Link>
               </div>
             ) : null}
             {discussionItems.length > 0 ? (

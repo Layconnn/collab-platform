@@ -60,7 +60,7 @@ function SidebarContent({
     <div className="flex h-full min-h-0 flex-col">
       <div className={`flex h-14 shrink-0 items-center border-b border-border-subtle px-3 ${collapsed ? "justify-center" : "justify-between"}`}>
         <Link href="/workspace" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5 rounded focus-visible:ring-2 focus-visible:ring-focus-ring" aria-label="Commons home">
-          <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-700 text-sm font-bold text-white">C</span>
+          <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent">C</span>
           {!collapsed ? <span className="truncate text-sm font-semibold text-text-primary">Commons</span> : null}
         </Link>
         {!collapsed && onToggle ? (
@@ -228,7 +228,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
             >
               <AppIcon name="menu" />
             </IconButton>
-            <Link href="/workspace" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-700 text-sm font-bold text-white" aria-label="Commons home">C</Link>
+            <Link href="/workspace" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent" aria-label="Commons home">C</Link>
             <span className="min-w-0 truncate text-sm font-medium text-text-primary">{contextName}</span>
           </div>
           <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-xs text-text-muted md:flex">
@@ -260,7 +260,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
           >
             <div className="flex h-14 shrink-0 items-center justify-between border-b border-border-subtle px-3">
               <Link href="/workspace" onClick={() => setMobileNavOpen(false)} className="flex items-center gap-2.5 rounded focus-visible:ring-2 focus-visible:ring-focus-ring">
-                <span aria-hidden="true" className="grid size-8 place-items-center rounded-md bg-brand-700 text-sm font-bold text-white">C</span>
+                <span aria-hidden="true" className="grid size-8 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent">C</span>
                 <span className="text-sm font-semibold">Commons</span>
               </Link>
               <IconButton ref={mobileCloseRef} type="button" aria-label="Close navigation" size="sm" variant="ghost" onClick={() => setMobileNavOpen(false)}>
