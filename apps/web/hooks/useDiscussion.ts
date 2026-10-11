@@ -16,6 +16,17 @@ export function useDiscussionDetail(discussionId: string) {
 export function useDiscussionActions(workspaceId: string) {
   const utils = trpc.useUtils();
   const refreshList = () => utils.discussion.listByWorkspace.invalidate({ workspaceId, take: 20 });
+  const refreshAfterRejection = async (error: { data?: { code?: string } | null }) => {
+    if (error.data?.code === "FORBIDDEN" || error.data?.code === "UNAUTHORIZED") {
+      await Promise.allSettled([
+        refreshList(),
+        utils.workspace.getById.invalidate({ workspaceId }),
+        utils.workspace.listForUser.invalidate(),
+      ]);
+    } else if (error.data?.code === "NOT_FOUND") {
+      await Promise.allSettled([refreshList()]);
+    }
+  };
   const create = trpc.discussion.create.useMutation({ onSuccess: refreshList });
   const update = trpc.discussion.update.useMutation({
     onSuccess: async (discussion) => {
@@ -24,7 +35,8 @@ export function useDiscussionActions(workspaceId: string) {
         utils.discussion.getById.invalidate({ discussionId: discussion.id }),
       ]);
     },
+    onError: refreshAfterRejection,
   });
-  const remove = trpc.discussion.remove.useMutation({ onSuccess: refreshList });
+  const remove = trpc.discussion.remove.useMutation({ onSuccess: refreshList, onError: refreshAfterRejection });
   return { create, update, remove };
 }

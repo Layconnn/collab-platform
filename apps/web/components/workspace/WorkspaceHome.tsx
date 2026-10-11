@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  ArrowUpRight,
   CalendarDays,
   MessageSquareText,
   Plus,
@@ -13,6 +12,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "@/server/api/root";
 import { ErrorState } from "@/components/common/StateNotice";
+import { DiscussionRow } from "@/components/discussion/DiscussionRow";
 import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionList } from "@/hooks/useDiscussion";
 import {
@@ -21,8 +21,6 @@ import {
 } from "@/hooks/useWorkspace";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 
-type Discussion =
-  inferRouterOutputs<AppRouter>["discussion"]["listByWorkspace"]["items"][number];
 type Member =
   inferRouterOutputs<AppRouter>["workspace"]["listMembers"]["items"][number];
 
@@ -95,48 +93,6 @@ function WorkspaceHomeSkeleton() {
         </div>
       </div>
     </div>
-  );
-}
-
-function DiscussionRow({
-  discussion,
-  workspaceId,
-}: {
-  discussion: Discussion;
-  workspaceId: string;
-}) {
-  const author = discussion.author.name?.trim() || "Contributor";
-  return (
-    <li>
-      <Link
-        href={`/workspace/${workspaceId}/discussions/${discussion.id}`}
-        className="group flex min-h-20 min-w-0 items-center gap-3 border-b border-border-subtle px-1 py-3 transition-colors hover:bg-surface-hover focus-visible:bg-surface-hover sm:gap-4 sm:px-3"
-      >
-        <span
-          aria-hidden="true"
-          className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-active text-xs font-semibold text-brand-link"
-        >
-          {initials(author)}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block break-words text-sm font-semibold leading-6 text-text-primary transition-colors group-hover:text-brand-link sm:text-[0.95rem]">
-            {discussion.title}
-          </span>
-          <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-5 text-text-muted">
-            <span className="max-w-full truncate">{author}</span>
-            <span aria-hidden="true">/</span>
-            <time dateTime={new Date(discussion.createdAt).toISOString()}>
-              {dateLabel(discussion.createdAt)}
-            </time>
-          </span>
-        </span>
-        <ArrowUpRight
-          size={17}
-          className="shrink-0 text-text-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none"
-          aria-hidden="true"
-        />
-      </Link>
-    </li>
   );
 }
 
@@ -399,6 +355,7 @@ export function WorkspaceHome({ workspaceId }: { workspaceId: string }) {
                   key={item.id}
                   discussion={item}
                   workspaceId={workspaceId}
+                  compact
                 />
               ))}
             </ol>
