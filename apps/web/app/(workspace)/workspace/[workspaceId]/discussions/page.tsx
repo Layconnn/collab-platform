@@ -20,9 +20,9 @@ export default function DiscussionListPage() {
         <section aria-label="Discussion feed" className="min-w-0">
         <DiscussionList workspaceId={workspaceId} />
         </section>
-        <aside className="border-t border-[#dce6e0] pt-6 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+        <aside id="new-discussion" className="scroll-mt-20 border-t border-[#dce6e0] pt-6 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
         <h2 className="text-base font-semibold text-[#17231f]">Start a discussion</h2>
-        <p className="mb-5 mt-1 text-sm leading-6 text-[#63716a]">Share a question or update with the community.</p>
+        <p className="mb-5 mt-1 text-sm leading-6 text-[#63716a]">Share a question or update with your workspace.</p>
         <CreateDiscussionForm workspaceId={workspaceId} />
         </aside>
       </div>

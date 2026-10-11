@@ -49,7 +49,7 @@ export function WorkspaceSwitcher({
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const selected = workspaces.find((workspace) => workspace.workspaceId === currentId);
-  const label = currentWorkspace?.name ?? selected?.name ?? (currentId ? "Loading community..." : "Your workspaces");
+  const label = currentWorkspace?.name ?? selected?.name ?? (currentId ? "Loading workspace..." : "Your workspaces");
   const closeMenu = () => {
     if (detailsRef.current) detailsRef.current.open = false;
     onNavigate?.();
@@ -75,9 +75,9 @@ export function WorkspaceSwitcher({
           </>
         ) : null}
       </summary>
-      <div className={`absolute top-full z-30 mt-2 w-[min(18rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border bg-surface shadow-lg ${collapsed ? "left-full ml-2" : "left-0"}`}>
+      <div className={`z-30 overflow-y-auto rounded-md border border-border bg-surface ${collapsed ? "absolute left-full top-0 ml-2 max-h-[calc(100dvh-5rem)] w-[min(18rem,calc(100vw-5.5rem))] shadow-lg" : "mt-2 max-h-[min(20rem,50dvh)] w-full shadow-sm"}`}>
         <p className="px-3 pb-2 pt-3 text-xs font-medium text-text-muted">Switch workspace</p>
-        <div className="max-h-64 overflow-y-auto p-1">
+        <div className="p-1">
           {isLoading ? (
             <div aria-label="Loading workspaces" className="space-y-2 p-3" role="status">
               <span className="block h-3 w-2/3 animate-pulse rounded bg-surface-active" />

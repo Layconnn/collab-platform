@@ -29,7 +29,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
   });
 
   if (members.isLoading) return <LoadingState label="Loading contributors..." />;
-  if (members.error) return <ErrorState title="Unable to load community members" description={members.error.message} />;
+  if (members.error) return <ErrorState title="Unable to load workspace members" description={members.error.message} />;
 
   return (
     <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
@@ -81,7 +81,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
                       className="rounded-md px-2 py-2 text-xs font-semibold text-[#a33f37] hover:bg-red-50 disabled:opacity-50"
                       disabled={removeMember.isPending}
                       onClick={() => {
-                        if (window.confirm(`Remove ${member.user.name || member.user.email} from this community?`)) {
+                        if (window.confirm(`Remove ${member.user.name || member.user.email} from this workspace?`)) {
                           removeMember.mutate({ workspaceId, userId: member.userId });
                         }
                       }}
@@ -94,7 +94,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
                       className="rounded-md px-2 py-2 text-xs font-semibold text-[#63716a] hover:bg-[#edf4ef] disabled:opacity-50"
                       disabled={transferOwnership.isPending}
                       onClick={() => {
-                        if (window.confirm(`Transfer community ownership to ${member.user.name || member.user.email}? You will become an admin.`)) {
+                        if (window.confirm(`Transfer workspace ownership to ${member.user.name || member.user.email}? You will become an admin.`)) {
                           transferOwnership.mutate({ workspaceId, newOwnerUserId: member.userId });
                         }
                       }}
@@ -140,7 +140,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
       ) : (
         <aside className="rounded-md border border-[#dce6e0] bg-[#fffdf7] p-5">
           <p className="text-xs font-semibold uppercase text-[#b2603e]">Welcome aboard</p>
-          <h2 className="mt-2 text-lg font-semibold text-[#17231f]">A community grows through conversation.</h2>
+          <h2 className="mt-2 text-lg font-semibold text-[#17231f]">A workspace grows through conversation.</h2>
           <p className="mt-2 text-sm leading-6 text-[#63716a]">Ask a thoughtful question, share a useful update, or help another contributor find their next step.</p>
         </aside>
       )}

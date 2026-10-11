@@ -47,7 +47,7 @@ function CommentThread({ comment, discussionId }: { comment: CommentItem; discus
         ) : (
           <>
             <p className="whitespace-pre-wrap text-sm leading-6 text-[#34443c]">{comment.body}</p>
-            <p className="mt-3 text-xs font-medium text-[#63716a]">{comment.author.name ?? "Community member"}</p>
+            <p className="mt-3 text-xs font-medium text-[#63716a]">{comment.author.name ?? "Workspace member"}</p>
             <div className="mt-3 flex flex-wrap gap-4">
               {comment.depth < 8 ? (
               <button className="text-xs font-semibold text-[#16765b]" onClick={() => { setShowReplies(true); setReplying((value) => !value); }}>

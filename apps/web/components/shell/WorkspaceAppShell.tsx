@@ -41,6 +41,7 @@ function SidebarContent({
   onLoadMoreWorkspaces,
   user,
   onToggle,
+  showBrandHeader = true,
 }: {
   collapsed: boolean;
   onNavigate?: () => void;
@@ -55,20 +56,23 @@ function SidebarContent({
   onLoadMoreWorkspaces: () => void;
   user: NonNullable<ReturnType<typeof useAuth>["user"]>;
   onToggle?: () => void;
+  showBrandHeader?: boolean;
 }) {
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className={`flex h-14 shrink-0 items-center border-b border-border-subtle px-3 ${collapsed ? "justify-center" : "justify-between"}`}>
-        <Link href="/workspace" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5 rounded focus-visible:ring-2 focus-visible:ring-focus-ring" aria-label="Commons home">
-          <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent">C</span>
-          {!collapsed ? <span className="truncate text-sm font-semibold text-text-primary">Commons</span> : null}
-        </Link>
-        {!collapsed && onToggle ? (
-          <IconButton type="button" aria-label="Collapse sidebar" title="Collapse sidebar" size="sm" variant="ghost" onClick={onToggle}>
-            <AppIcon name="panel" />
-          </IconButton>
-        ) : null}
-      </div>
+      {showBrandHeader ? (
+        <div className={`flex h-14 shrink-0 items-center border-b border-border-subtle px-3 ${collapsed ? "justify-center" : "justify-between"}`}>
+          <Link href="/workspace" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5 rounded focus-visible:ring-2 focus-visible:ring-focus-ring" aria-label="Commons home">
+            <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent">C</span>
+            {!collapsed ? <span className="truncate text-sm font-semibold text-text-primary">Commons</span> : null}
+          </Link>
+          {!collapsed && onToggle ? (
+            <IconButton type="button" aria-label="Collapse sidebar" title="Collapse sidebar" size="sm" variant="ghost" onClick={onToggle}>
+              <AppIcon name="panel" />
+            </IconButton>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="shrink-0 p-3">
         <WorkspaceSwitcher
@@ -270,6 +274,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
             <div className="min-h-0 flex-1">
               <SidebarContent
                 collapsed={false}
+                showBrandHeader={false}
                 onNavigate={() => setMobileNavOpen(false)}
                 pathname={pathname}
                 workspaceId={workspaceId}

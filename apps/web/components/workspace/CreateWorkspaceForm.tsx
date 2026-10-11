@@ -31,7 +31,7 @@ export function CreateWorkspaceForm() {
       </label>
       {createWorkspace.error ? <p role="alert" className="text-sm text-red-700">{createWorkspace.error.message}</p> : null}
       <button type="submit" disabled={createWorkspace.isPending} className="w-full rounded-md bg-brand-action px-4 py-2.5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover disabled:opacity-60">
-        {createWorkspace.isPending ? "Creating..." : "Create community"}
+        {createWorkspace.isPending ? "Creating..." : "Create workspace"}
       </button>
     </form>
   );

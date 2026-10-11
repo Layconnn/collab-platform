@@ -25,13 +25,13 @@ export default function DiscussionDetailPage() {
     <div className="mx-auto max-w-3xl space-y-8">
       <Link href={`/workspace/${discussion.data.workspaceId}/discussions`} className="inline-flex text-sm font-medium text-[#16765b] hover:text-[#105d47]">&lt;- All discussions</Link>
       <article className="border-b border-[#dce6e0] pb-8">
-        <p className="text-sm font-semibold text-[#16765b]">Community discussion</p>
+        <p className="text-sm font-semibold text-[#16765b]">Workspace discussion</p>
         <h1 className="mt-2 text-3xl font-semibold leading-tight text-[#17231f]">{discussion.data.title}</h1>
         <div className="mt-4 flex items-center gap-2 text-sm text-[#63716a]">
           <span className="grid size-8 place-items-center rounded-full bg-[#e6f2ec] text-xs font-semibold text-[#16765b]" aria-hidden="true">
             {(discussion.data.author?.name ?? "?").slice(0, 1).toUpperCase()}
           </span>
-          <span>{discussion.data.author?.name ?? "Community member"}</span>
+          <span>{discussion.data.author?.name ?? "Workspace member"}</span>
           <span aria-hidden="true">started this conversation</span>
         </div>
         <p className="mt-6 whitespace-pre-wrap text-base leading-7 text-[#34443c]">{discussion.data.body}</p>

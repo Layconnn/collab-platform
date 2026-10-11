@@ -23,7 +23,7 @@ export function WorkspaceList() {
         <div>
           <p className="text-xs font-bold uppercase text-[#b2603e]">A good place to start</p>
           <h3 className="mt-2 text-xl font-semibold text-[#17231f]">Every great project starts with people.</h3>
-          <p className="mt-2 max-w-lg text-sm leading-6 text-[#63716a]">Create a community space for questions, project decisions, and the contributors who bring the work to life.</p>
+          <p className="mt-2 max-w-lg text-sm leading-6 text-[#63716a]">Create a workspace for questions, project decisions, and the contributors who bring the work to life.</p>
         </div>
         <Image
           src="/community-onboarding.png"
@@ -42,7 +42,7 @@ export function WorkspaceList() {
       <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className="rounded-md border border-[#dce6e0] bg-white p-4">
           <p className="text-2xl font-semibold text-[#17231f]">{data.items.length}{data.nextCursor ? "+" : ""}</p>
-          <p className="mt-1 text-xs font-medium text-[#63716a]">Communities</p>
+          <p className="mt-1 text-xs font-medium text-[#63716a]">Workspaces</p>
         </div>
         <div className="rounded-md border border-[#dce6e0] bg-white p-4">
           <p className="text-2xl font-semibold text-[#16765b]">{data.items.filter((item) => item.role === "OWNER").length}</p>

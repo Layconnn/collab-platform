@@ -49,7 +49,7 @@ function DiscussionEntry({ discussion, workspaceId }: { discussion: DiscussionIt
               <span className="grid size-7 place-items-center rounded-full bg-[#e6f2ec] text-xs font-semibold text-[#16765b]" aria-hidden="true">
                 {(discussion.author.name ?? "?").slice(0, 1).toUpperCase()}
               </span>
-              <span>{discussion.author.name ?? "Community member"}</span>
+              <span>{discussion.author.name ?? "Workspace member"}</span>
               <span aria-hidden="true">·</span>
               <span>Open discussion</span>
             </div>
