@@ -164,7 +164,7 @@ export function DiscussionList({ workspaceId, query, onCreate, accessDenied = fa
           key={discussion.id}
           discussion={discussion}
           workspaceId={workspaceId}
-          canManage={Boolean(user && workspace.data && !workspace.error && (discussion.author.id === user.id || canManageOthers))}
+          canManage={Boolean(user && workspace.data && !workspace.error && (discussion.author?.id === user.id || canManageOthers))}
         />
       ))}</ol> : null}
       {query.hasNextPage && !query.isFetchNextPageError ? (

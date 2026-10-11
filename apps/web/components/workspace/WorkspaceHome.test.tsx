@@ -33,7 +33,7 @@ function discussion(id: number) {
   return {
     id: `discussion-${id}`,
     title: `Discussion ${id}`,
-    author: { id: "user-2", name: "Maya Chen" },
+    author: { id: "user-2", name: "Maya Chen", username: "maya" },
     createdAt,
     updatedAt: createdAt,
   };
@@ -146,7 +146,8 @@ describe("WorkspaceHome", () => {
                 role: "OWNER",
                 user: {
                   id: "user-1",
-                  name: "Maya Chen",
+                  name: null,
+                  username: "maya",
                   email: "maya@example.com",
                 },
               },
@@ -165,7 +166,8 @@ describe("WorkspaceHome", () => {
     expect(mocks.memberEnabled).toHaveBeenCalledWith(true);
     expect(screen.getByRole("heading", { name: "Contributors" })).toBeTruthy();
     expect(screen.getByText("1 contributor")).toBeTruthy();
-    expect(screen.getByText("Maya Chen")).toBeTruthy();
+    expect(screen.getByText("maya")).toBeTruthy();
+    expect(screen.queryByText("maya@example.com")).toBeNull();
   });
 
   it("renders a contextual skeleton while workspace details load", () => {
@@ -243,6 +245,7 @@ describe("WorkspaceHome", () => {
                 user: {
                   id: "user-2",
                   name: "Maya Chen",
+                  username: "maya",
                   email: "maya@example.com",
                 },
               },

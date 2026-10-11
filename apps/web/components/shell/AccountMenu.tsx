@@ -4,6 +4,8 @@ import { useRef } from "react";
 
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { AppIcon } from "@/components/common/AppIcon";
+import { UserAvatar } from "@/components/common/UserAvatar";
+import { resolveUserIdentity } from "@/lib/user-identity";
 
 export function AccountMenu({
   user,
@@ -13,8 +15,8 @@ export function AccountMenu({
   collapsed?: boolean;
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
-  const label = user.name?.trim() || user.username || user.email;
-  const initials = (user.name?.trim() || user.username || user.email).slice(0, 1).toUpperCase();
+  const identity = resolveUserIdentity(user);
+  const label = identity.label;
 
   return (
     <details ref={detailsRef} className="group relative">
@@ -23,7 +25,7 @@ export function AccountMenu({
         title={collapsed ? label : undefined}
         className={`flex min-h-11 w-full cursor-pointer list-none items-center gap-3 rounded-md px-2 text-left hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center" : ""}`}
       >
-        <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-active text-xs font-semibold text-text-primary">{initials}</span>
+        <UserAvatar name={identity.avatarName} className="size-8" />
         {!collapsed ? (
           <>
             <span className="min-w-0 flex-1">

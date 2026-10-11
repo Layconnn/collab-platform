@@ -76,7 +76,7 @@ function seedMembership(targetWorkspaceId, userId, role) {
 }
 
 function seedUser(userId, name) {
-  state.users.set(userId, { id: userId, name });
+  state.users.set(userId, { id: userId, name, username: `member_${userId.slice(-3)}`, email: "private@example.test" });
 }
 
 function seedDiscussion({ id, workspaceId: discussionWorkspaceId, authorId, title, body }) {
@@ -184,16 +184,17 @@ function projectDiscussionWithSelect(row, select) {
   const selected = {};
   for (const key of Object.keys(select)) {
     if (key === "author" && select.author) {
-      const author = state.users.get(row.authorId) ?? { id: row.authorId, name: null };
-      selected.author = {
-        id: author.id,
-        name: author.name,
-      };
+      const author = state.users.get(row.authorId);
+      selected.author = projectAuthor(author, select.author.select);
       continue;
     }
     selected[key] = row[key];
   }
   return selected;
+}
+
+function projectAuthor(author, select) {
+  return Object.fromEntries(Object.keys(select).map((key) => [key, author?.[key]]));
 }
 
 prisma.discussion.create = async ({ data, select }) => {
@@ -317,6 +318,8 @@ test("2. Workspace member can create discussion -> 200", async () => {
   assert.equal(created.workspaceId, workspaceId);
   assert.equal(created.author.id, memberUserId);
   assert.equal(created.author.name, "Member One");
+  assert.equal(created.author.username, "member_002");
+  assert.deepEqual(Object.keys(created.author).sort(), ["id", "name", "username"]);
   assert.equal(created.title, "Member create");
 });
 
@@ -353,6 +356,7 @@ test("4. Member can read discussion -> 200", async () => {
   assert.equal(discussion.id, discussionId);
   assert.equal(discussion.workspaceId, workspaceId);
   assert.equal(discussion.author.id, memberUserId);
+  assert.equal(discussion.author.username, "member_002");
 });
 
 test("5. Author can update own discussion -> 200", async () => {
@@ -375,6 +379,7 @@ test("5. Author can update own discussion -> 200", async () => {
   assert.equal(updated.title, "New title");
   assert.equal(updated.body, "New body");
   assert.equal(updated.author.id, memberUserId);
+  assert.equal(updated.author.username, "member_002");
 });
 
 test("6. Non-author member cannot update -> 403", async () => {
@@ -557,6 +562,29 @@ test("13. Idempotency key prevents duplicate create on retry", async () => {
 
   assert.equal(first.id, second.id);
   assert.equal(first.title, second.title);
+  assert.equal(second.author.username, "member_002");
+  assert.equal(state.discussions.size, 1);
+});
+
+test("14. A pre-upgrade idempotency result regains the public username without a duplicate", async () => {
+  const caller = createCaller(memberUserId, "req-legacy-idempotency");
+  const input = {
+    workspaceId,
+    title: "Legacy cached create",
+    body: "Body",
+    idempotencyKey: "legacy-idem-123456",
+  };
+  const first = await caller.create(input);
+  const cacheKey = `idempotency:discussion:create:result:${workspaceId}:${memberUserId}:${input.idempotencyKey}`;
+  const cached = JSON.parse(state.redisKeyValues.get(cacheKey));
+  delete cached.author.username;
+  state.redisKeyValues.set(cacheKey, JSON.stringify(cached));
+
+  const retry = await caller.create({ ...input, title: "Should not create again" });
+
+  assert.equal(retry.id, first.id);
+  assert.equal(retry.title, first.title);
+  assert.equal(retry.author.username, "member_002");
   assert.equal(state.discussions.size, 1);
 });
 
@@ -573,6 +601,7 @@ test("11. Member removed after cache warm-up cannot read cached discussion -> 40
   const memberCaller = createCaller(secondMemberUserId, "req-cache-warm");
   const warm = await memberCaller.getById({ discussionId });
   assert.equal(warm.id, discussionId);
+  assert.equal(warm.author.username, "member_002");
 
   state.memberships.delete(membershipKey(workspaceId, secondMemberUserId));
 
@@ -616,5 +645,7 @@ test("12. Cursor from other workspace cannot leak results or behavior", async ()
   for (const item of result.items) {
     assert.equal(item.workspaceId, workspaceId);
     assert.notEqual(item.id, makeCuid(1203));
+    assert.equal(typeof item.author.username, "string");
+    assert.deepEqual(Object.keys(item.author).sort(), ["id", "name", "username"]);
   }
 });

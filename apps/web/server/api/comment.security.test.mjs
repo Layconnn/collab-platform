@@ -80,7 +80,7 @@ function seedMembership(targetWorkspaceId, userId, role) {
 }
 
 function seedUser(userId, name) {
-  state.users.set(userId, { id: userId, name });
+  state.users.set(userId, { id: userId, name, username: `member_${userId.slice(-3)}`, email: "private@example.test" });
 }
 
 function seedDiscussion({ id, workspaceId: targetWorkspaceId }) {
@@ -221,11 +221,8 @@ function projectCommentWithSelect(row, select) {
   const selected = {};
   for (const key of Object.keys(select)) {
     if (key === "author" && select.author) {
-      const author = state.users.get(row.authorId) ?? { id: row.authorId, name: null };
-      selected.author = {
-        id: author.id,
-        name: author.name,
-      };
+      const author = state.users.get(row.authorId);
+      selected.author = Object.fromEntries(Object.keys(select.author.select).map((field) => [field, author?.[field]]));
       continue;
     }
 
@@ -362,6 +359,7 @@ test("2. Workspace member can create comment -> 200", async () => {
   assert.equal(created.discussionId, discussionId);
   assert.equal(created.author.id, memberUserId);
   assert.equal(created.author.name, "Member One");
+  assert.equal(created.author.username, "member_002");
 });
 
 test("3. Non-member cannot read comment -> 404", async () => {
@@ -393,6 +391,7 @@ test("4. Member can read comment -> 200", async () => {
   const comment = await caller.getById({ commentId });
   assert.equal(comment.id, commentId);
   assert.equal(comment.discussionId, discussionId);
+  assert.equal(comment.author.username, "member_002");
 });
 
 test("5. Author can update own comment -> 200", async () => {
@@ -413,6 +412,7 @@ test("5. Author can update own comment -> 200", async () => {
 
   assert.equal(updated.body, "New body");
   assert.equal(updated.author.id, memberUserId);
+  assert.equal(updated.author.username, "member_002");
 });
 
 test("6. Non-author member cannot update -> 403", async () => {
@@ -612,6 +612,7 @@ test("12. Cursor pagination works for nested threads", async () => {
     take: 2,
   });
   assert.equal(page1.items.length, 2);
+  assert.equal(typeof page1.items[0].author.username, "string");
   assert.equal(typeof page1.nextCursor, "string");
 
   const page2 = await caller.listByDiscussion({
@@ -621,10 +622,11 @@ test("12. Cursor pagination works for nested threads", async () => {
     take: 2,
   });
   assert.equal(page2.items.length, 1);
+  assert.equal(typeof page2.items[0].author.username, "string");
   assert.equal(page2.nextCursor, null);
 });
 
-test("13. Author appears as DTO only (id, name)", async () => {
+test("13. Author appears as a public identity DTO only", async () => {
   const commentId = makeCuid(920);
   seedComment({
     id: commentId,
@@ -635,7 +637,7 @@ test("13. Author appears as DTO only (id, name)", async () => {
 
   const caller = createCaller(memberUserId);
   const comment = await caller.getById({ commentId });
-  assert.deepEqual(Object.keys(comment.author).sort(), ["id", "name"]);
+  assert.deepEqual(Object.keys(comment.author).sort(), ["id", "name", "username"]);
   assert.equal("authorId" in comment, false);
 });
 
@@ -669,6 +671,7 @@ test("15. Member removed from workspace cannot read cached comment", async () =>
   const memberCaller = createCaller(secondMemberUserId, "req-cache-warm");
   const warm = await memberCaller.getById({ commentId });
   assert.equal(warm.id, commentId);
+  assert.equal(warm.author.username, "member_002");
 
   state.memberships.delete(membershipKey(workspaceId, secondMemberUserId));
 
@@ -749,6 +752,7 @@ test("17. Cross-discussion cursor cannot leak behavior", async () => {
   for (const item of result.items) {
     assert.equal(item.discussionId, discussionId);
     assert.notEqual(item.id, makeCuid(952));
+    assert.deepEqual(Object.keys(item.author).sort(), ["id", "name", "username"]);
   }
 });
 

@@ -45,6 +45,7 @@ type PublicComment = {
   author: {
     id: string;
     name: string | null;
+    username: string;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -60,7 +61,7 @@ type CreateIdempotencyResult = {
 };
 
 function commentByIdKey(commentId: string): string {
-  return `comment:${commentId}`;
+  return `comment:v2:${commentId}`;
 }
 
 function discussionCommentListKey(
@@ -69,7 +70,7 @@ function discussionCommentListKey(
   cursor: string | undefined,
   take: number,
 ): string {
-  return `discussion:${discussionId}:comments:${parentCommentId ?? "root"}:${cursor ?? "start"}:${take}`;
+  return `discussion:${discussionId}:comments:v2:${parentCommentId ?? "root"}:${cursor ?? "start"}:${take}`;
 }
 
 async function invalidateCommentCaches(
@@ -194,6 +195,7 @@ async function getCommentByIdWithWorkspace(
         select: {
           id: true,
           name: true,
+          username: true,
         },
       },
       createdAt: true,
@@ -305,6 +307,7 @@ export const commentService = {
             select: {
               id: true,
               name: true,
+              username: true,
             },
           },
           createdAt: true,
@@ -445,6 +448,7 @@ export const commentService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -669,6 +673,7 @@ export const commentService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,

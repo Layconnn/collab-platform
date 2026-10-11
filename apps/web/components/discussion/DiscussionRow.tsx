@@ -1,20 +1,14 @@
 import Link from "next/link";
-import { ArrowUpRight, UserRound } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
 import type { inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "@/server/api/root";
+import { UserAvatar } from "@/components/common/UserAvatar";
+import { resolveUserIdentity } from "@/lib/user-identity";
 
 export type DiscussionSummary =
   inferRouterOutputs<AppRouter>["discussion"]["listByWorkspace"]["items"][number];
-
-function initials(value: string) {
-  const words = value.trim().split(/\s+/).filter(Boolean);
-  return (words.length > 1
-    ? `${words[0][0]}${words[1][0]}`
-    : (words[0]?.slice(0, 2) ?? "W")
-  ).toUpperCase();
-}
 
 function dateLabel(value: Date | string) {
   return new Intl.DateTimeFormat("en", {
@@ -38,8 +32,7 @@ export function DiscussionRow({
   actions?: ReactNode;
   error?: string;
 }) {
-  const name = discussion.author.name?.trim();
-  const author = name || "Workspace member";
+  const author = resolveUserIdentity(discussion.author);
   const createdAt = new Date(discussion.createdAt);
   const updatedAt = new Date(discussion.updatedAt);
   const wasUpdated = updatedAt.getTime() > createdAt.getTime() + 1000;
@@ -51,15 +44,13 @@ export function DiscussionRow({
           href={`/workspace/${workspaceId}/discussions/${discussion.id}`}
           className={`group flex min-w-0 flex-1 items-center gap-3 rounded-sm px-1 transition-colors hover:bg-surface-hover focus-visible:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring motion-reduce:transition-none sm:px-3 ${compact ? "min-h-[4.25rem] py-2.5" : "min-h-[4.5rem] py-3"}`}
         >
-          <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-active text-xs font-semibold text-brand-link">
-            {name ? initials(name) : <UserRound size={15} />}
-          </span>
+          <UserAvatar name={author.avatarName} className="size-8" />
           <span className="min-w-0 flex-1">
             <span className={`block wrap-anywhere font-semibold text-text-primary transition-colors group-hover:text-brand-link motion-reduce:transition-none ${compact ? "text-sm leading-5 sm:text-[0.95rem]" : "text-[0.95rem] leading-5 sm:text-base"}`}>
               {discussion.title}
             </span>
             <span className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-4 text-text-muted">
-              <span className="max-w-full truncate text-text-secondary">{author}</span>
+              <span className="max-w-full truncate text-text-secondary">{author.label}</span>
               <span aria-hidden="true">/</span>
               <time dateTime={createdAt.toISOString()}>{dateLabel(createdAt)}</time>
               {!compact && wasUpdated ? (

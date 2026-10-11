@@ -12,6 +12,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "@/server/api/root";
 import { ErrorState } from "@/components/common/StateNotice";
+import { UserAvatar } from "@/components/common/UserAvatar";
 import { DiscussionRow } from "@/components/discussion/DiscussionRow";
 import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionList } from "@/hooks/useDiscussion";
@@ -20,6 +21,7 @@ import {
   useWorkspaceSwitcherList,
 } from "@/hooks/useWorkspace";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
+import { resolveUserIdentity } from "@/lib/user-identity";
 
 type Member =
   inferRouterOutputs<AppRouter>["workspace"]["listMembers"]["items"][number];
@@ -97,18 +99,13 @@ function WorkspaceHomeSkeleton() {
 }
 
 function MemberRow({ member }: { member: Member }) {
-  const name = member.user.name?.trim() || member.user.email;
+  const identity = resolveUserIdentity(member.user);
   return (
     <li className="flex min-w-0 items-center gap-3 py-2.5">
-      <span
-        aria-hidden="true"
-        className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-active text-[0.7rem] font-semibold text-brand-link"
-      >
-        {initials(name)}
-      </span>
+      <UserAvatar name={identity.avatarName} className="size-8" />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium text-text-primary">
-          {name}
+          {identity.label}
         </span>
         <span className="block text-xs text-text-muted">
           {member.role.charAt(0) + member.role.slice(1).toLowerCase()}

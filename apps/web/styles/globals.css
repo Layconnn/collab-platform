@@ -188,3 +188,12 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+@keyframes thread-reveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.thread-reveal {
+  animation: thread-reveal 160ms ease-out;
+}

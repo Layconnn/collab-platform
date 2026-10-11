@@ -9,6 +9,8 @@ import { addWorkspaceMemberInputSchema, type AddWorkspaceMemberInput } from "@re
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 import { ErrorState, LoadingState } from "@/components/common/StateNotice";
+import { UserAvatar } from "@/components/common/UserAvatar";
+import { resolveUserIdentity } from "@/lib/user-identity";
 
 export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) {
   const { user } = useAuth();
@@ -48,14 +50,14 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
           <div className="rounded-md border border-dashed border-[#b8c9be] bg-white p-6 text-sm text-[#63716a]">No contributors to show yet.</div>
         ) : (
           <ul className="divide-y divide-[#dce6e0] rounded-md border border-[#dce6e0] bg-white px-4 sm:px-5">
-            {allMembers.map((member) => (
+            {allMembers.map((member) => {
+              const identity = resolveUserIdentity(member.user);
+              return (
               <li key={member.id} className="flex flex-wrap items-center justify-between gap-4 py-4">
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#e6f2ec] text-sm font-semibold text-[#16765b]" aria-hidden="true">
-                    {(member.user.name || member.user.email).slice(0, 1).toUpperCase()}
-                  </span>
+                  <UserAvatar name={identity.avatarName} className="size-10" />
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-[#17231f]">{member.user.name || member.user.email}</p>
+                    <p className="truncate font-semibold text-[#17231f]">{identity.label}</p>
                     <p className="truncate text-sm text-[#63716a]">{member.user.email}</p>
                   </div>
                 </div>
@@ -63,7 +65,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
                   {canManage && member.role !== "OWNER" ? (
                     <select
                       className="rounded-md border border-[#cbd8d0] bg-white px-2.5 py-2 text-xs font-medium text-[#34443c]"
-                      aria-label={`Role for ${member.user.email}`}
+                      aria-label={`Role for ${identity.label}`}
                       value={member.role}
                       disabled={(!isOwner && member.role === "ADMIN") || updateRole.isPending}
                       onChange={(event) => updateRole.mutate({ workspaceId, userId: member.userId, role: event.target.value as "ADMIN" | "MEMBER" })}
@@ -81,7 +83,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
                       className="rounded-md px-2 py-2 text-xs font-semibold text-[#a33f37] hover:bg-red-50 disabled:opacity-50"
                       disabled={removeMember.isPending}
                       onClick={() => {
-                        if (window.confirm(`Remove ${member.user.name || member.user.email} from this workspace?`)) {
+                        if (window.confirm(`Remove ${identity.label} from this workspace?`)) {
                           removeMember.mutate({ workspaceId, userId: member.userId });
                         }
                       }}
@@ -94,7 +96,7 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
                       className="rounded-md px-2 py-2 text-xs font-semibold text-[#63716a] hover:bg-[#edf4ef] disabled:opacity-50"
                       disabled={transferOwnership.isPending}
                       onClick={() => {
-                        if (window.confirm(`Transfer workspace ownership to ${member.user.name || member.user.email}? You will become an admin.`)) {
+                        if (window.confirm(`Transfer workspace ownership to ${identity.label}? You will become an admin.`)) {
                           transferOwnership.mutate({ workspaceId, newOwnerUserId: member.userId });
                         }
                       }}
@@ -104,7 +106,8 @@ export function WorkspaceMembersPanel({ workspaceId }: { workspaceId: string }) 
                   ) : null}
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
         {members.hasNextPage ? (

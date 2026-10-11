@@ -46,7 +46,7 @@ function workspaceByIdCacheKey(workspaceId: string): string {
 }
 
 function membersCacheKey(workspaceId: string, cursor: string | undefined, take: number): string {
-  return `workspace:${workspaceId}:members:${cursor ?? "start"}:${take}`;
+  return `workspace:${workspaceId}:members:v2:${cursor ?? "start"}:${take}`;
 }
 
 type MembershipRoleRecord = {
@@ -339,7 +339,7 @@ export const workspaceService = {
 
     const cacheKey = membersCacheKey(input.workspaceId, input.cursor, input.take);
     const cached = await redisCache.getJSON<
-      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; email: string; name: string | null } }>
+      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; email: string; name: string | null; username: string } }>
     >(cacheKey);
     if (cached) {
       return cached;
@@ -363,6 +363,7 @@ export const workspaceService = {
             id: true,
             email: true,
             name: true,
+            username: true,
           },
         },
       },

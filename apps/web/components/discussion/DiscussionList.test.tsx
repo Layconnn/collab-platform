@@ -35,7 +35,7 @@ const discussion = {
   id: "c000000000000000000000002",
   workspaceId,
   title: "Keep onboarding decisions together",
-  author: { id: "user-2", name: "Maya Chen" },
+  author: { id: "user-2", name: "Maya Chen", username: "maya" },
   createdAt: new Date("2026-10-01T10:00:00.000Z"),
   updatedAt: new Date("2026-10-02T10:00:00.000Z"),
 };
@@ -106,11 +106,28 @@ describe("DiscussionList", () => {
   });
 
   it("shows a neutral identity when the author has no display name", () => {
-    const unnamed = { ...discussion, author: { ...discussion.author, name: null } };
+    const unnamed = { ...discussion, author: { ...discussion.author, name: null, username: "" } };
     render(<DiscussionList workspaceId={workspaceId} query={query({ data: { pages: [{ items: [unnamed], nextCursor: null }] } })} onCreate={vi.fn()} />);
 
     expect(screen.getByText("Workspace member")).toBeTruthy();
     expect(screen.queryByText("WM")).toBeNull();
+  });
+
+  it("shows a real username when no display name has been set", () => {
+    const unnamed = { ...discussion, author: { ...discussion.author, name: null } };
+    render(<DiscussionList workspaceId={workspaceId} query={query({ data: { pages: [{ items: [unnamed], nextCursor: null }] } })} onCreate={vi.fn()} />);
+
+    expect(screen.getByText("maya")).toBeTruthy();
+    expect(screen.getByText("MA")).toBeTruthy();
+    expect(screen.queryByText("Workspace member")).toBeNull();
+  });
+
+  it("shows a neutral identity when an author record is unavailable", () => {
+    const unavailable = { ...discussion, author: null };
+    render(<DiscussionList workspaceId={workspaceId} query={query({ data: { pages: [{ items: [unavailable], nextCursor: null }] } })} onCreate={vi.fn()} />);
+
+    expect(screen.getByText("Unavailable account")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: `Actions for ${discussion.title}` })).toBeNull();
   });
 
   it("hides management actions from an ordinary non-author member", () => {

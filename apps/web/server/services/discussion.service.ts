@@ -32,7 +32,7 @@ type RequestContext = {
 };
 
 function discussionByIdKey(discussionId: string): string {
-  return `discussion:${discussionId}`;
+  return `discussion:v2:${discussionId}`;
 }
 
 function workspaceDiscussionListKey(
@@ -40,7 +40,7 @@ function workspaceDiscussionListKey(
   cursor: string | undefined,
   take: number,
 ): string {
-  return `workspace:${workspaceId}:discussions:${cursor ?? "start"}:${take}`;
+  return `workspace:${workspaceId}:discussions:v2:${cursor ?? "start"}:${take}`;
 }
 
 async function invalidateDiscussionCaches(
@@ -121,11 +121,23 @@ export const discussionService = {
         workspaceId: string;
         title: string;
         body: string;
-        author: { id: string; name: string | null };
+        author: { id: string; name: string | null; username?: string };
         createdAt: Date;
         updatedAt: Date;
       }>(idempotencyResultKey);
       if (cachedResult) {
+        if (!cachedResult.author.username) {
+          const current = await prisma.discussion.findUnique({
+            where: { id: cachedResult.id },
+            select: { author: { select: { username: true } } },
+          });
+          if (current) {
+            return {
+              ...cachedResult,
+              author: { ...cachedResult.author, username: current.author.username },
+            };
+          }
+        }
         return cachedResult;
       }
     }
@@ -167,6 +179,7 @@ export const discussionService = {
             select: {
               id: true,
               name: true,
+              username: true,
             },
           },
           createdAt: true,
@@ -256,6 +269,7 @@ export const discussionService = {
         author: {
           id: string;
           name: string | null;
+          username: string;
         };
         createdAt: Date;
         updatedAt: Date;
@@ -299,6 +313,7 @@ export const discussionService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -342,6 +357,7 @@ export const discussionService = {
       author: {
         id: string;
         name: string | null;
+        username: string;
       };
       createdAt: Date;
       updatedAt: Date;
@@ -368,6 +384,7 @@ export const discussionService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -451,6 +468,7 @@ export const discussionService = {
             select: {
               id: true,
               name: true,
+              username: true,
             },
           },
           createdAt: true,

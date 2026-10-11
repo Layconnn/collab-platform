@@ -111,8 +111,8 @@ function resetState() {
   state.redisKeyValues.clear();
   state.nextSeq = 300;
 
-  state.users.set(userA, { id: userA, name: "User A", email: "a@test.local" });
-  state.users.set(userB, { id: userB, name: "User B", email: "b@test.local" });
+  state.users.set(userA, { id: userA, name: "User A", username: "user_a", email: "a@test.local" });
+  state.users.set(userB, { id: userB, name: "User B", username: "user_b", email: "b@test.local" });
 }
 
 beforeEach(() => {
@@ -274,7 +274,17 @@ prisma.workspaceMember.findUnique = async ({ where, select }) => {
     },
   });
 };
-prisma.workspaceMember.findMany = async () => [];
+prisma.workspaceMember.findMany = async ({ where, take, skip, cursor, select }) => {
+  let rows = [...state.workspaceMembers.values()].filter((member) => member.workspaceId === where.workspaceId);
+  rows.sort((a, b) => b.createdAt - a.createdAt || b.id.localeCompare(a.id));
+  if (cursor?.id) {
+    const index = rows.findIndex((row) => row.id === cursor.id);
+    if (index >= 0) rows = rows.slice(index + (skip ?? 0));
+  }
+  return rows.slice(0, take ?? rows.length).map((row) => projectSelect(row, select, {
+    user: (userSelect) => projectSelect(state.users.get(row.userId), userSelect.select),
+  }));
+};
 
 prisma.workspaceMember.update = async ({ where, data, select }) => {
   const key = membershipKey(where.workspaceId_userId.workspaceId, where.workspaceId_userId.userId);
@@ -537,25 +547,31 @@ test("workspace + discussion + comment integration flow", async () => {
       role: "ADMIN",
     });
     assert.equal(adminMembership.role, "ADMIN");
+    const roster = await callerB.workspace.listMembers({ workspaceId: workspace.id });
+    assert.equal(roster.items.length, 2);
+    assert.equal(roster.items.find((member) => member.userId === userA).user.username, "user_a");
+    assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["email", "id", "name", "username"]);
 
     // 3. User B creates discussion in workspace.
-    state.redisKeyValues.set(`workspace:${workspace.id}:discussions:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v2:start:20`, JSON.stringify({}));
     const discussion = await callerB.discussion.create({
       workspaceId: workspace.id,
       title: "Integration Discussion",
       body: "Discussion body",
     });
     assert.equal(discussion.workspaceId, workspace.id);
-    assert.equal(state.redisKeyValues.has(`workspace:${workspace.id}:discussions:start:20`), false);
+    assert.equal(discussion.author.username, "user_b");
+    assert.equal(state.redisKeyValues.has(`workspace:${workspace.id}:discussions:v2:start:20`), false);
 
     // 4. User A creates root comment.
-    state.redisKeyValues.set(`discussion:${discussion.id}:comments:root:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v2:root:start:20`, JSON.stringify({}));
     const rootComment = await callerA.comment.create({
       discussionId: discussion.id,
       body: "Root comment",
     });
     assert.equal(rootComment.author.id, userA);
-    assert.equal(state.redisKeyValues.has(`discussion:${discussion.id}:comments:root:start:20`), false);
+    assert.equal(rootComment.author.username, "user_a");
+    assert.equal(state.redisKeyValues.has(`discussion:${discussion.id}:comments:v2:root:start:20`), false);
 
     // 5. User B creates reply.
     const reply = await callerB.comment.create({
@@ -564,18 +580,19 @@ test("workspace + discussion + comment integration flow", async () => {
       body: "Reply from B",
     });
     assert.equal(reply.parentCommentId, rootComment.id);
+    assert.equal(reply.author.username, "user_b");
 
     // 6. User A edits their comment.
-    state.redisKeyValues.set(`comment:${rootComment.id}`, JSON.stringify({ id: rootComment.id }));
-    state.redisKeyValues.set(`discussion:${discussion.id}:comments:${rootComment.id}:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`comment:v2:${rootComment.id}`, JSON.stringify({ id: rootComment.id }));
+    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v2:${rootComment.id}:start:20`, JSON.stringify({}));
     const updatedRoot = await callerA.comment.update({
       commentId: rootComment.id,
       body: "Root comment edited",
     });
     assert.equal(updatedRoot.body, "Root comment edited");
-    assert.equal(state.redisKeyValues.has(`comment:${rootComment.id}`), false);
+    assert.equal(state.redisKeyValues.has(`comment:v2:${rootComment.id}`), false);
     assert.equal(
-      state.redisKeyValues.has(`discussion:${discussion.id}:comments:${rootComment.id}:start:20`),
+      state.redisKeyValues.has(`discussion:${discussion.id}:comments:v2:${rootComment.id}:start:20`),
       false,
     );
 
@@ -593,18 +610,22 @@ test("workspace + discussion + comment integration flow", async () => {
     );
 
     // 8. User A deletes User B's comment.
-    state.redisKeyValues.set(`comment:${reply.id}`, JSON.stringify({ id: reply.id }));
-    state.redisKeyValues.set(`discussion:${discussion.id}:comments:${rootComment.id}:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`comment:v2:${reply.id}`, JSON.stringify({ id: reply.id }));
+    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v2:${rootComment.id}:start:20`, JSON.stringify({}));
     const deleteReplyResult = await callerA.comment.remove({ commentId: reply.id });
     assert.equal(deleteReplyResult.success, true);
     assert.equal(state.comments.has(reply.id), false);
-    assert.equal(state.redisKeyValues.has(`comment:${reply.id}`), false);
+    assert.equal(state.redisKeyValues.has(`comment:v2:${reply.id}`), false);
 
     // 9. User B removed from workspace cannot see discussion/comments.
     await callerA.workspace.removeMember({
       workspaceId: workspace.id,
       userId: userB,
     });
+    await assert.rejects(
+      async () => callerB.workspace.listMembers({ workspaceId: workspace.id }),
+      (error) => error?.code === "FORBIDDEN",
+    );
     await assert.rejects(
       async () => callerB.discussion.getById({ discussionId: discussion.id }),
       (error) => error?.code === "FORBIDDEN",
@@ -628,6 +649,7 @@ test("workspace + discussion + comment integration flow", async () => {
       take: 2,
     });
     assert.equal(page1.items.length, 2);
+    assert.equal(page1.items[0].author.username, "user_a");
     assert.equal(typeof page1.nextCursor, "string");
     const page2 = await callerA.comment.listByDiscussion({
       discussionId: discussion.id,
