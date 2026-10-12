@@ -62,12 +62,20 @@ export function MentionTextarea({ as = "textarea", workspaceId, registration, va
       const left = viewport?.offsetLeft ?? 0;
       const bottom = top + (viewport?.height ?? window.innerHeight);
       const right = left + (viewport?.width ?? window.innerWidth);
+      if (rect.bottom <= top + 8 || rect.top >= bottom - 8) {
+        setPanelPlacement(null);
+        return;
+      }
       const anchorTop = Math.max(top + 8, Math.min(rect.top, bottom - 8));
       const anchorBottom = Math.max(top + 8, Math.min(rect.bottom, bottom - 8));
       const above = anchorTop - top - 12;
       const below = bottom - anchorBottom - 12;
       const placeAbove = below < 180 && above > below;
-      const maxHeight = Math.max(40, Math.min(256, placeAbove ? above : below));
+      const maxHeight = Math.min(256, placeAbove ? above : below);
+      if (maxHeight < 44) {
+        setPanelPlacement(null);
+        return;
+      }
       const width = Math.min(360, rect.width, right - left - 16);
       setPanelPlacement({
         top: placeAbove ? Math.max(top + 8, anchorTop - maxHeight - 4) : Math.min(bottom - maxHeight - 8, anchorBottom + 4),
@@ -139,7 +147,7 @@ export function MentionTextarea({ as = "textarea", workspaceId, registration, va
   };
 
   const onKeyDown = (event: KeyboardEvent<Editor>) => {
-    if (!open) return;
+    if (!open || !panelPlacement) return;
     if (event.key === "Escape") {
       event.preventDefault();
       setDismissed(true);
@@ -164,8 +172,8 @@ export function MentionTextarea({ as = "textarea", workspaceId, registration, va
     "aria-autocomplete": "list" as const,
     "aria-haspopup": "listbox" as const,
     "aria-expanded": open && Boolean(panelPlacement),
-    "aria-controls": open ? `${id}-list` : undefined,
-    "aria-activedescendant": open && options.length ? `${id}-option-${selectedIndex}` : undefined,
+    "aria-controls": open && panelPlacement ? `${id}-list` : undefined,
+    "aria-activedescendant": open && panelPlacement && options.length ? `${id}-option-${selectedIndex}` : undefined,
     onChange: (event: ChangeEvent<Editor>) => { void registration.onChange(event); updateToken(event.currentTarget, true); },
     onSelect: (event: SyntheticEvent<Editor>) => updateToken(event.currentTarget),
     onClick: (event: MouseEvent<Editor>) => updateToken(event.currentTarget),

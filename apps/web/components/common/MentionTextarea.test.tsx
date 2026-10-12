@@ -61,8 +61,14 @@ describe("MentionTextarea", () => {
   beforeEach(() => {
     mocks.refetch.mockReset();
     mocks.refetch.mockImplementation(async () => ({ data: mocks.members, isError: false }));
+    const editorRect = () => ({ top: 120, bottom: 220, left: 16, right: 300, width: 284, height: 100, x: 16, y: 120, toJSON: () => ({}) });
+    vi.spyOn(HTMLTextAreaElement.prototype, "getBoundingClientRect").mockImplementation(editorRect);
+    vi.spyOn(HTMLInputElement.prototype, "getBoundingClientRect").mockImplementation(editorRect);
   });
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   it("opens at @, filters by display name, and inserts with keyboard without submitting", async () => {
     const user = userEvent.setup();
@@ -167,5 +173,26 @@ describe("MentionTextarea", () => {
     } finally {
       Object.defineProperty(window, "visualViewport", { configurable: true, value: priorViewport });
     }
+  });
+
+  it("hides suggestions when the editor scrolls outside the visible viewport", async () => {
+    const user = userEvent.setup();
+    render(<Editor />);
+    const editor = screen.getByRole("combobox", { name: "Message" }) as HTMLTextAreaElement;
+    let top = 120;
+    editor.getBoundingClientRect = () => ({ top, bottom: top + 100, left: 16, right: 300, width: 284, height: 100, x: 16, y: top, toJSON: () => ({}) });
+    await user.type(editor, "@ma");
+    await screen.findByRole("listbox");
+
+    top = window.innerHeight + 20;
+    fireEvent.scroll(window);
+    await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
+    expect(editor.getAttribute("aria-expanded")).toBe("false");
+    expect(editor.hasAttribute("aria-controls")).toBe(false);
+    expect(editor.hasAttribute("aria-activedescendant")).toBe(false);
+
+    top = 120;
+    fireEvent.scroll(window);
+    expect(await screen.findByRole("listbox")).toBeTruthy();
   });
 });

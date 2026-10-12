@@ -24,7 +24,7 @@ export default function WorkspacesPage() {
       </section>
 
       <section id="new-workspace" aria-labelledby="new-workspace-heading" className="scroll-mt-20 border-t border-border-subtle pt-8 sm:pt-10">
-        <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-12">
+        <div className="grid min-w-0 items-start gap-7 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:gap-12">
           <div className="max-w-[42ch]">
             <p className="text-xs font-semibold uppercase text-brand-link">Begin together</p>
             <h2 id="new-workspace-heading" className="mt-2 text-xl font-semibold leading-snug text-text-primary sm:text-2xl">Create a workspace</h2>

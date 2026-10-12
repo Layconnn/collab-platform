@@ -281,7 +281,7 @@ export function WorkspaceMembersPanel({
           </button>
         </div>
       ) : (
-        <div className="grid min-w-0 items-start gap-9 lg:grid-cols-[minmax(0,1fr)_19rem] xl:gap-12">
+        <div className="grid min-w-0 items-start gap-9 xl:grid-cols-[minmax(0,1fr)_19rem] xl:gap-12">
           <section
             aria-labelledby="member-directory-heading"
             className="min-w-0"
@@ -512,7 +512,7 @@ export function WorkspaceMembersPanel({
               </button>
             ) : null}
           </section>
-          <aside className="min-w-0 space-y-6 border-t border-border-subtle pt-6 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+          <aside className="min-w-0 space-y-6 border-t border-border-subtle pt-6 xl:border-l xl:border-t-0 xl:pl-7 xl:pt-0">
             <div>
               <p className="text-xs font-semibold uppercase text-brand-link">
                 Participation

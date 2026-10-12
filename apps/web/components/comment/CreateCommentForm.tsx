@@ -58,7 +58,7 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
 
   const serverError = commentActionError(create.error, "Your comment could not be posted. Please try again.");
   return (
-    <form onSubmit={onSubmit} className="max-w-[44rem] space-y-3" noValidate>
+    <form onSubmit={onSubmit} className="min-w-0 max-w-[44rem] space-y-3" noValidate>
       <div>
         <label htmlFor={fieldId} className="mb-2 block text-sm font-semibold text-text-primary">
           {parentCommentId ? "Your reply" : "Your perspective"}
@@ -86,11 +86,11 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
       <div className="flex flex-wrap items-center justify-between gap-3">
         {busy ? <span role="status" className="sr-only">{parentCommentId ? "Posting reply..." : "Posting comment..."}</span> : null}
         <span className="text-xs text-text-muted">{form.watch("body").length}/5000</span>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex min-w-0 w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
           {onCancel ? (
-            <button type="button" onClick={onCancel} disabled={busy} className="min-h-11 rounded-sm px-3 text-sm font-medium text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">Cancel</button>
+            <button type="button" onClick={onCancel} disabled={busy} className="min-h-11 rounded-sm px-3 text-sm font-medium text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 max-[380px]:w-full">Cancel</button>
           ) : null}
-          <button type="submit" disabled={busy} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 motion-reduce:transition-none">
+          <button type="submit" disabled={busy} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 motion-reduce:transition-none max-[380px]:w-full">
             {busy ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <ArrowUp size={16} aria-hidden="true" />}
             {busy ? "Posting..." : parentCommentId ? "Post reply" : "Post comment"}
           </button>
