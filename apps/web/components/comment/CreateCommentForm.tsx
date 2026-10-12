@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { createCommentInputSchema, type CreateCommentInput } from "@repo/validators/comment";
 import { commentActionError } from "@/components/comment/commentErrors";
 import { useCommentActions } from "@/hooks/useComment";
+import { MentionTextarea } from "@/components/common/MentionTextarea";
 
 export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, active = true, onCancel, onCreated }: {
   discussionId: string;
@@ -62,7 +63,11 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
         <label htmlFor={fieldId} className="mb-2 block text-sm font-semibold text-text-primary">
           {parentCommentId ? "Your reply" : "Your perspective"}
         </label>
-        <textarea
+        <MentionTextarea
+          workspaceId={workspaceId}
+          registration={form.register("body")}
+          value={form.watch("body")}
+          onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })}
           id={fieldId}
           placeholder={parentCommentId ? "Add to this part of the conversation..." : "Share a thoughtful response..."}
           rows={parentCommentId ? 4 : 5}
@@ -71,7 +76,6 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
           aria-invalid={Boolean(form.formState.errors.body)}
           aria-describedby={form.formState.errors.body ? fieldErrorId : undefined}
           className="min-h-28 w-full resize-y rounded-sm border border-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
-          {...form.register("body")}
         />
         {form.formState.errors.body ? (
           <p id={fieldErrorId} role="alert" className="mt-1 text-sm text-danger">Write a {parentCommentId ? "reply" : "comment"} of up to 5,000 characters.</p>

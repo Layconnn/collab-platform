@@ -16,6 +16,7 @@
     "test:workspace-security": "node --test server/services/workspace.permissions.test.mjs server/middleware/rateLimit.test.mjs",
     "test:discussion-security": "node --test server/api/discussion.security.test.mjs",
     "test:comment-security": "node --test server/api/comment.security.test.mjs",
+    "test:notification-security": "node --test server/api/notification.security.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs"
   },
   "dependencies": {

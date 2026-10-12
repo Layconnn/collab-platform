@@ -4,13 +4,14 @@ import { Menu, Portal } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, CornerDownRight, Ellipsis, LoaderCircle, MessageCircle, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import type { inferRouterOutputs } from "@trpc/server";
 
 import { updateCommentInputSchema, type UpdateCommentInput } from "@repo/validators/comment";
 import { commentActionError } from "@/components/comment/commentErrors";
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
 import { MentionText } from "@/components/common/MentionText";
+import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { ErrorState } from "@/components/common/StateNotice";
 import { useCommentActions, useCommentList } from "@/hooks/useComment";
@@ -59,6 +60,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
     defaultValues: { commentId: comment.id, body: comment.body },
     shouldFocusError: true,
   });
+  const editBody = useWatch({ control: form.control, name: "body" });
   const { setFocus } = form;
   const author = resolveUserIdentity(comment.author);
   const authorName = author.label;
@@ -139,7 +141,11 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
             {editing && canManage ? (
               <form onSubmit={onSubmit} className="mt-3 space-y-2.5" noValidate>
                 <label htmlFor={`edit-comment-${comment.id}`} className="block text-sm font-semibold text-text-primary">Edit comment</label>
-                <textarea
+                <MentionTextarea
+                  workspaceId={workspaceId}
+                  registration={form.register("body")}
+                  value={editBody}
+                  onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })}
                   id={`edit-comment-${comment.id}`}
                   rows={4}
                   maxLength={5000}
@@ -147,7 +153,6 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                   aria-invalid={Boolean(form.formState.errors.body)}
                   aria-describedby={form.formState.errors.body ? `edit-comment-error-${comment.id}` : undefined}
                   className="min-h-28 w-full resize-y rounded-sm border border-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
-                  {...form.register("body")}
                 />
                 {form.formState.errors.body ? <p id={`edit-comment-error-${comment.id}`} role="alert" className="text-sm text-danger">Write a comment of up to 5,000 characters.</p> : null}
                 {editError ? <p role="alert" className="text-sm text-danger">{editError}</p> : null}

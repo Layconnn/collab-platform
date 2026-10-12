@@ -7,6 +7,7 @@ import type {
   ListWorkspaceMembersInput,
   ListWorkspacesInput,
   RemoveWorkspaceMemberInput,
+  SearchMentionMembersInput,
   TransferWorkspaceOwnershipInput,
   UpdateWorkspaceInput,
   UpdateWorkspaceMemberRoleInput,
@@ -373,6 +374,33 @@ export const workspaceService = {
     await redisCache.setJSON(cacheKey, paginated, MEMBER_LIST_TTL_SECONDS);
 
     return paginated;
+  },
+
+  async searchMentionMembers(userId: string, input: SearchMentionMembersInput, context: RequestContext) {
+    await requireRoleForAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ, context.requestId);
+
+    const query = input.query.toLowerCase();
+    const rows = await prisma.workspaceMember.findMany({
+      where: {
+        workspaceId: input.workspaceId,
+        userId: { not: userId },
+        ...(query ? {
+          user: {
+            OR: [
+              { username: { contains: query } },
+              { name: { contains: query, mode: "insensitive" as const } },
+            ],
+          },
+        } : {}),
+      },
+      orderBy: [{ user: { username: "asc" } }],
+      take: 8,
+      select: {
+        user: { select: { id: true, name: true, username: true } },
+      },
+    });
+
+    return rows.map(({ user }) => user);
   },
 
   async addMember(actorUserId: string, input: AddWorkspaceMemberInput, context: RequestContext) {

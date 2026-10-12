@@ -619,6 +619,7 @@ export const commentService = {
         workspaceId: true,
         authorId: true,
         parentCommentId: true,
+        body: true,
       },
     });
 
@@ -701,6 +702,19 @@ export const commentService = {
       action: "update",
       timestamp: new Date().toISOString(),
     });
+
+    try {
+      await notificationService.enqueueNewMentionsFromEdit({
+        requestId: context.requestId,
+        actorUserId: userId,
+        resource: { workspaceId: comment.workspaceId, discussionId: comment.discussionId, commentId: comment.id },
+        previousText: comment.body,
+        updatedText: updated.body,
+        updatedAt: updated.updatedAt,
+      });
+    } catch (error) {
+      console.error(JSON.stringify({ level: "ERROR", event: "notification.enqueue.failed", requestId: context.requestId, commentId: comment.id, error: String(error) }));
+    }
 
     return updated;
   },

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
@@ -12,6 +12,7 @@ import {
 } from "@repo/validators/discussion";
 
 import { useDiscussionActions } from "@/hooks/useDiscussion";
+import { MentionTextarea } from "@/components/common/MentionTextarea";
 
 export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { workspaceId: string; onCancel: () => void; open?: boolean }) {
   const form = useForm<CreateDiscussionInput>({
@@ -19,6 +20,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
     defaultValues: { workspaceId, title: "", body: "" },
     shouldFocusError: true,
   });
+  const title = useWatch({ control: form.control, name: "title" });
 
   const { create: createDiscussion } = useDiscussionActions(workspaceId);
   const submittingRef = useRef(false);
@@ -52,7 +54,12 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
     <form onSubmit={onSubmit} className="max-w-2xl space-y-4" noValidate>
       <div>
         <label htmlFor="discussion-title" className="block text-sm font-semibold text-text-primary">Title</label>
-        <input
+        <MentionTextarea
+          as="input"
+          workspaceId={workspaceId}
+          registration={form.register("title")}
+          value={title}
+          onInsert={(value) => form.setValue("title", value, { shouldDirty: true, shouldValidate: true })}
           id="discussion-title"
           className="mt-2 min-h-11 w-full rounded-sm border border-border bg-surface px-3.5 text-base text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
           placeholder="What needs a conversation?"
@@ -60,13 +67,16 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           aria-describedby={form.formState.errors.title ? "discussion-title-error" : undefined}
           disabled={busy}
           maxLength={120}
-          {...form.register("title")}
         />
         {form.formState.errors.title ? <p id="discussion-title-error" role="alert" className="mt-1.5 text-sm text-danger">Please add a clear title within the allowed length.</p> : null}
       </div>
       <div>
         <label htmlFor="discussion-body" className="block text-sm font-semibold text-text-primary">Context</label>
-        <textarea
+        <MentionTextarea
+          workspaceId={workspaceId}
+          registration={form.register("body")}
+          value={form.watch("body")}
+          onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })}
           id="discussion-body"
           className="mt-2 min-h-32 w-full resize-y rounded-sm border border-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
           placeholder="Share the background, question, or update so others can contribute."
@@ -75,7 +85,6 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           aria-describedby={form.formState.errors.body ? "discussion-body-error" : "discussion-body-help"}
           disabled={busy}
           maxLength={5000}
-          {...form.register("body")}
         />
         <div className="mt-1 flex flex-wrap items-start justify-between gap-2 text-xs text-text-muted">
           <p id="discussion-body-help">Plain text. Keep the important details together.</p>

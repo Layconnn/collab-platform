@@ -6,6 +6,7 @@ import {
   listWorkspaceMembersInputSchema,
   listWorkspacesInputSchema,
   removeWorkspaceMemberInputSchema,
+  searchMentionMembersInputSchema,
   transferWorkspaceOwnershipInputSchema,
   updateWorkspaceInputSchema,
   updateWorkspaceMemberRoleInputSchema,
@@ -91,6 +92,10 @@ export const workspaceRouter = createTRPCRouter({
 
   listMembers: protectedProcedure.input(listWorkspaceMembersInputSchema).query(({ ctx, input }) =>
     execute(() => workspaceService.listMembers(ctx.user.id, input, { requestId: ctx.requestId })),
+  ),
+
+  searchMentionMembers: protectedProcedure.input(searchMentionMembersInputSchema).query(({ ctx, input }) =>
+    execute(() => workspaceService.searchMentionMembers(ctx.user.id, input, { requestId: ctx.requestId })),
   ),
 
   addMember: addMemberProcedure.input(addWorkspaceMemberInputSchema).mutation(({ ctx, input }) =>

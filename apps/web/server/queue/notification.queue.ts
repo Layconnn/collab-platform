@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { NotificationType } from "../../app/generated/prisma/client";
 
 import { createQueue } from "./bullmq";
@@ -20,6 +21,6 @@ export const notificationQueue = createQueue<NotificationJobData>(NOTIFICATION_Q
 
 export async function enqueueNotificationJob(payload: NotificationJobData): Promise<void> {
   await notificationQueue.add("deliver", payload, {
-    jobId: payload.dedupeKey,
+    jobId: createHash("sha256").update(payload.dedupeKey).digest("hex"),
   });
 }

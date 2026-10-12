@@ -38,6 +38,9 @@ vi.mock("@/hooks/useComment", () => ({
 vi.mock("@/components/comment/CreateCommentForm", () => ({
   CreateCommentForm: ({ onCancel, active }: { onCancel: () => void; active: boolean }) => <div data-active={active}><label>Reply draft <input /></label><button type="button" onClick={onCancel}>Cancel draft</button></div>,
 }));
+vi.mock("@/hooks/useMentionMembers", () => ({
+  useMentionMembers: () => ({ data: [], isFetching: false, isError: false, refetch: vi.fn() }),
+}));
 
 import { CommentList } from "@/components/comment/CommentList";
 import type { useCommentList } from "@/hooks/useComment";
@@ -228,7 +231,7 @@ describe("CommentList", () => {
     const trigger = screen.getByRole("button", { name: "Actions for comment by Maya Chen" });
     await user.click(trigger);
     await user.click(await screen.findByRole("menuitem", { name: "Edit comment" }));
-    const field = screen.getByRole("textbox", { name: "Edit comment" });
+    const field = screen.getByRole("combobox", { name: "Edit comment" });
     await user.clear(field);
     await user.type(field, "Changed draft");
     await user.click(screen.getByRole("button", { name: "Cancel" }));
@@ -263,7 +266,7 @@ describe("CommentList", () => {
     const editItem = await screen.findByRole("menuitem", { name: "Edit comment" });
     editItem.focus();
     await user.keyboard("{Enter}");
-    expect(screen.getByRole("textbox", { name: "Edit comment" })).toBeTruthy();
+    expect(screen.getByRole("combobox", { name: "Edit comment" })).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     await waitFor(() => expect(screen.getByText(/Keep the setup context here/)).toBeTruthy());
     const restoredTrigger = screen.getByRole("button", { name: "Actions for comment by Maya Chen" });
@@ -284,7 +287,7 @@ describe("CommentList", () => {
     render(view([root], { id: "user-1", canAct: true, canManageOthers: false }));
     await user.click(screen.getByRole("button", { name: "Actions for comment by Maya Chen" }));
     await user.click(await screen.findByRole("menuitem", { name: "Edit comment" }));
-    const field = screen.getByRole("textbox", { name: "Edit comment" });
+    const field = screen.getByRole("combobox", { name: "Edit comment" });
     await user.clear(field);
     await user.click(screen.getByRole("button", { name: "Save comment" }));
     expect(await screen.findByText(/Write a comment of up to/)).toBeTruthy();

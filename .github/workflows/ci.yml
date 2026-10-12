@@ -54,6 +54,7 @@ jobs:
       - run: pnpm -C apps/web run test:workspace-security
       - run: pnpm -C apps/web run test:discussion-security
       - run: pnpm -C apps/web run test:comment-security
+      - run: pnpm -C apps/web run test:notification-security
       - run: pnpm -C apps/web run test:integration
       - run: pnpm -C apps/web run build
         env:

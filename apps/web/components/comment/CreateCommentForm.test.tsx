@@ -12,6 +12,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/hooks/useComment", () => ({
   useCommentActions: () => ({ create: { mutateAsync: mocks.mutateAsync, isPending: false, get error() { return mocks.error; } } }),
 }));
+vi.mock("@/hooks/useMentionMembers", () => ({
+  useMentionMembers: () => ({ data: [], isFetching: false, isError: false, refetch: vi.fn() }),
+}));
 
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
 
@@ -35,7 +38,7 @@ describe("CreateCommentForm", () => {
     await user.click(screen.getByRole("button", { name: "Post comment" }));
 
     expect(await screen.findByRole("alert")).toHaveProperty("textContent", expect.stringContaining("Write a comment"));
-    expect(screen.getByRole("textbox", { name: "Your perspective" }).getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByRole("combobox", { name: "Your perspective" }).getAttribute("aria-invalid")).toBe("true");
     expect(mocks.mutateAsync).not.toHaveBeenCalled();
   });
 
@@ -44,12 +47,12 @@ describe("CreateCommentForm", () => {
     mocks.mutateAsync.mockResolvedValue({ id: "c000000000000000000000004" });
     render(<CreateCommentForm discussionId={discussionId} workspaceId={workspaceId} onCreated={mocks.onCreated} />);
 
-    await user.type(screen.getByRole("textbox", { name: "Your perspective" }), "A clear next step would help new contributors.");
+    await user.type(screen.getByRole("combobox", { name: "Your perspective" }), "A clear next step would help new contributors.");
     await user.click(screen.getByRole("button", { name: "Post comment" }));
 
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledWith(expect.objectContaining({ discussionId, body: "A clear next step would help new contributors." })));
     expect(await screen.findByRole("status")).toHaveProperty("textContent", "Comment posted.");
-    expect(screen.getByRole("textbox", { name: "Your perspective" })).toHaveProperty("value", "");
+    expect(screen.getByRole("combobox", { name: "Your perspective" })).toHaveProperty("value", "");
     expect(mocks.onCreated).toHaveBeenCalledTimes(1);
   });
 
@@ -59,7 +62,7 @@ describe("CreateCommentForm", () => {
     mocks.mutateAsync.mockImplementation(async () => { mocks.error = denied; throw denied; });
     const { rerender } = render(<CreateCommentForm discussionId={discussionId} workspaceId={workspaceId} parentCommentId={parentCommentId} active={false} onCancel={mocks.onCancel} />);
     rerender(<CreateCommentForm discussionId={discussionId} workspaceId={workspaceId} parentCommentId={parentCommentId} active onCancel={mocks.onCancel} />);
-    const field = screen.getByRole("textbox", { name: "Your reply" });
+    const field = screen.getByRole("combobox", { name: "Your reply" });
     await waitFor(() => expect(document.activeElement).toBe(field));
 
     await user.type(field, "I can document that flow.");
@@ -74,7 +77,7 @@ describe("CreateCommentForm", () => {
     let resolve!: (value: { id: string }) => void;
     mocks.mutateAsync.mockReturnValue(new Promise((done) => { resolve = done; }));
     render(<CreateCommentForm discussionId={discussionId} workspaceId={workspaceId} />);
-    fireEvent.change(screen.getByRole("textbox", { name: "Your perspective" }), { target: { value: "Keep the setup instructions together." } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Your perspective" }), { target: { value: "Keep the setup instructions together." } });
     const form = screen.getByRole("button", { name: "Post comment" }).closest("form")!;
     fireEvent.submit(form);
     fireEvent.submit(form);

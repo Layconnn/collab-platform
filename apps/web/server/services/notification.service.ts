@@ -5,7 +5,6 @@ import type {
 } from "@repo/validators/notification";
 import type { NotificationType } from "../../app/generated/prisma/client";
 
-import { redisCache } from "../cache/redis";
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import {
@@ -26,17 +25,6 @@ type NotificationResource = {
   commentId: string | null;
 };
 
-const NOTIFICATION_LIST_TTL_SECONDS = 30;
-
-function notificationFeedCacheKey(
-  userId: string,
-  unreadOnly: boolean,
-  cursor: string | undefined,
-  take: number,
-): string {
-  return `notification:feed:${userId}:${unreadOnly ? "unread" : "all"}:${cursor ?? "start"}:${take}`;
-}
-
 function notificationDedupeKey(params: {
   type: NotificationType;
   recipientUserId: string;
@@ -52,10 +40,6 @@ function notificationDedupeKey(params: {
     params.discussionId ?? "none",
     params.commentId ?? "none",
   ].join(":");
-}
-
-async function invalidateNotificationFeed(userId: string): Promise<void> {
-  await redisCache.delByPattern(`notification:feed:${userId}:*`);
 }
 
 async function resolveMentionUserIds(
@@ -130,19 +114,21 @@ async function enqueueNotificationsForRecipients(params: {
   genericMessage: string;
   mentionMessage: string;
   metadata: Record<string, string | number | boolean | null>;
+  dedupeSuffix?: string;
 }): Promise<void> {
   for (const recipientUserId of params.recipients) {
     const isMention = params.mentions.has(recipientUserId);
     const type: NotificationType = isMention ? "MENTION" : params.genericType;
     const message = isMention ? params.mentionMessage : params.genericMessage;
 
-    const dedupeKey = notificationDedupeKey({
+    const baseDedupeKey = notificationDedupeKey({
       type,
       recipientUserId,
       workspaceId: params.resource.workspaceId,
       discussionId: params.resource.discussionId,
       commentId: params.resource.commentId,
     });
+    const dedupeKey = params.dedupeSuffix ? `${baseDedupeKey}:${params.dedupeSuffix}` : baseDedupeKey;
 
     try {
       await enqueueNotificationJob({
@@ -207,6 +193,42 @@ async function enqueueNotificationsForRecipients(params: {
 }
 
 export const notificationService = {
+  async enqueueNewMentionsFromEdit(params: {
+    requestId: string;
+    actorUserId: string;
+    resource: NotificationResource;
+    previousText: string;
+    updatedText: string;
+    updatedAt: Date;
+  }): Promise<void> {
+    if (params.previousText === params.updatedText) return;
+    const [previous, updated] = await Promise.all([
+      resolveMentionUserIds(params.resource.workspaceId, params.actorUserId, params.previousText),
+      resolveMentionUserIds(params.resource.workspaceId, params.actorUserId, params.updatedText),
+    ]);
+    const added = [...updated].filter((userId) => !previous.has(userId));
+    if (added.length === 0) return;
+
+    const message = params.resource.commentId
+      ? "You were mentioned in a comment."
+      : "You were mentioned in a discussion.";
+    await enqueueNotificationsForRecipients({
+      requestId: params.requestId,
+      actorUserId: params.actorUserId,
+      recipients: added,
+      mentions: new Set(added),
+      resource: params.resource,
+      genericType: "MENTION",
+      genericMessage: message,
+      mentionMessage: message,
+      metadata: {
+        discussionId: params.resource.discussionId,
+        commentId: params.resource.commentId,
+      },
+      dedupeSuffix: `edit:${params.updatedAt.toISOString()}`,
+    });
+  },
+
   async enqueueDiscussionCreated(params: {
     requestId: string;
     actorUserId: string;
@@ -300,27 +322,9 @@ export const notificationService = {
       commentId: string | null;
       readAt: Date | null;
       createdAt: Date;
-      actor: { id: string; name: string | null } | null;
+      actor: { id: string; name: string | null; username: string | null } | null;
     }>
   > {
-    const cacheKey = notificationFeedCacheKey(userId, input.unreadOnly, input.cursor, input.take);
-    const cached = await redisCache.getJSON<
-      PaginatedResult<{
-        id: string;
-        type: NotificationType;
-        message: string;
-        workspaceId: string;
-        discussionId: string | null;
-        commentId: string | null;
-        readAt: Date | null;
-        createdAt: Date;
-        actor: { id: string; name: string | null } | null;
-      }>
-    >(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
     const rows = await prisma.notification.findMany({
       where: {
         recipientUserId: userId,
@@ -350,13 +354,13 @@ export const notificationService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
       },
     });
 
     const paginated = toPaginatedResult(rows, input.take);
-    await redisCache.setJSON(cacheKey, paginated, NOTIFICATION_LIST_TTL_SECONDS);
     await recordNotificationOperation({
       requestId: context.requestId,
       actorUserId: userId,
@@ -400,7 +404,6 @@ export const notificationService = {
       throw new AppError("NOT_FOUND", "Notification not found.");
     }
 
-    await invalidateNotificationFeed(userId);
     await recordNotificationOperation({
       requestId: context.requestId,
       actorUserId: userId,
@@ -442,7 +445,6 @@ export const notificationService = {
       },
     });
 
-    await invalidateNotificationFeed(userId);
     await recordNotificationOperation({
       requestId: context.requestId,
       actorUserId: userId,

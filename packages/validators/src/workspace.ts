@@ -46,6 +46,11 @@ export const listWorkspaceMembersInputSchema = z.object({
   take: pageSizeSchema,
 });
 
+export const searchMentionMembersInputSchema = z.object({
+  workspaceId: workspaceIdSchema,
+  query: z.string().max(30).regex(/^[a-zA-Z0-9_]*$/).transform((value) => value.toLowerCase()),
+});
+
 export const addWorkspaceMemberInputSchema = z.object({
   workspaceId: workspaceIdSchema,
   userId: userIdSchema,
@@ -74,6 +79,7 @@ export type DeleteWorkspaceInput = z.infer<typeof deleteWorkspaceInputSchema>;
 export type GetWorkspaceByIdInput = z.infer<typeof getWorkspaceByIdInputSchema>;
 export type ListWorkspacesInput = z.infer<typeof listWorkspacesInputSchema>;
 export type ListWorkspaceMembersInput = z.infer<typeof listWorkspaceMembersInputSchema>;
+export type SearchMentionMembersInput = z.infer<typeof searchMentionMembersInputSchema>;
 export type AddWorkspaceMemberInput = z.infer<typeof addWorkspaceMemberInputSchema>;
 export type UpdateWorkspaceMemberRoleInput = z.infer<typeof updateWorkspaceMemberRoleInputSchema>;
 export type RemoveWorkspaceMemberInput = z.infer<typeof removeWorkspaceMemberInputSchema>;

@@ -418,6 +418,8 @@ export const discussionService = {
         id: true,
         workspaceId: true,
         authorId: true,
+        title: true,
+        body: true,
       },
     });
 
@@ -493,6 +495,19 @@ export const discussionService = {
         action: "update",
         timestamp: new Date().toISOString(),
       });
+
+      try {
+        await notificationService.enqueueNewMentionsFromEdit({
+          requestId: context.requestId,
+          actorUserId: userId,
+          resource: { workspaceId: updated.workspaceId, discussionId: updated.id, commentId: null },
+          previousText: `${discussion.title} ${discussion.body}`,
+          updatedText: `${updated.title} ${updated.body}`,
+          updatedAt: updated.updatedAt,
+        });
+      } catch (error) {
+        console.error(JSON.stringify({ level: "ERROR", event: "notification.enqueue.failed", requestId: context.requestId, discussionId: updated.id, error: String(error) }));
+      }
 
       return updated;
     } catch (error) {

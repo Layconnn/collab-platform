@@ -15,6 +15,9 @@ const { appRouter } = jiti("./root.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis, redisCache } = jiti("../cache/redis.ts");
 const { notificationQueue } = jiti("../queue/notification.queue.ts");
+const { notificationService } = jiti("../services/notification.service.ts");
+const { extractMentions } = jiti("../utils/mentions.ts");
+const originalNotificationQueueAdd = notificationQueue.add.bind(notificationQueue);
 
 const userA = "c200000000000000000000001";
 const userB = "c200000000000000000000002";
@@ -61,6 +64,7 @@ const state = {
   redisCounters: new Map(),
   redisKeyValues: new Map(),
   nextSeq: 300,
+  notificationJobs: [],
 };
 
 function makeCuid(seq) {
@@ -110,6 +114,7 @@ function resetState() {
   state.redisCounters.clear();
   state.redisKeyValues.clear();
   state.nextSeq = 300;
+  state.notificationJobs = [];
 
   state.users.set(userA, { id: userA, name: "User A", username: "user_a", email: "a@test.local" });
   state.users.set(userB, { id: userB, name: "User B", username: "user_b", email: "b@test.local" });
@@ -182,6 +187,11 @@ redisCache.delByPattern = async (pattern) => {
 };
 
 prisma.$transaction = async (cb) => cb(prisma);
+
+notificationQueue.add = async (name, payload, options) => {
+  state.notificationJobs.push({ name, payload, options });
+  return { id: options.jobId };
+};
 
 prisma.workspace.create = async ({ data, select }) => {
   const now = new Date();
@@ -276,7 +286,25 @@ prisma.workspaceMember.findUnique = async ({ where, select }) => {
 };
 prisma.workspaceMember.findMany = async ({ where, take, skip, cursor, select }) => {
   let rows = [...state.workspaceMembers.values()].filter((member) => member.workspaceId === where.workspaceId);
-  rows.sort((a, b) => b.createdAt - a.createdAt || b.id.localeCompare(a.id));
+  if (where.userId?.not) {
+    rows = rows.filter((member) => member.userId !== where.userId.not);
+  }
+  if (where.user?.username?.in) {
+    rows = rows.filter((member) => where.user.username.in.includes(state.users.get(member.userId)?.username));
+  }
+  if (where.user?.OR) {
+    rows = rows.filter((member) => {
+      const user = state.users.get(member.userId);
+      return where.user.OR.some((condition) =>
+        (condition.username?.contains && user?.username.includes(condition.username.contains)) ||
+        (condition.name?.contains && user?.name?.toLowerCase().includes(condition.name.contains.toLowerCase())));
+    });
+  }
+  if (select?.user && !select.id) {
+    rows.sort((a, b) => state.users.get(a.userId).username.localeCompare(state.users.get(b.userId).username));
+  } else {
+    rows.sort((a, b) => b.createdAt - a.createdAt || b.id.localeCompare(a.id));
+  }
   if (cursor?.id) {
     const index = rows.findIndex((row) => row.id === cursor.id);
     if (index >= 0) rows = rows.slice(index + (skip ?? 0));
@@ -517,9 +545,106 @@ after(async () => {
   prisma.comment.findMany = originalCommentFindMany;
   prisma.comment.update = originalCommentUpdate;
   prisma.comment.delete = originalCommentDelete;
+  notificationQueue.add = originalNotificationQueueAdd;
   await notificationQueue.close();
   await prisma.$disconnect();
   redis.disconnect();
+});
+
+test("mention search is bounded, member-accessible, and tenant-scoped", async () => {
+  const owner = createCaller(userA);
+  const member = createCaller(userB);
+  const first = await owner.workspace.create({ name: "Mention Space", slug: "mention-space" });
+  const second = await owner.workspace.create({ name: "Other Space", slug: "other-space" });
+
+  await assert.rejects(
+    () => member.workspace.searchMentionMembers({ workspaceId: first.id, query: "" }),
+    (error) => error?.code === "FORBIDDEN",
+  );
+  await owner.workspace.addMember({ workspaceId: first.id, userId: userB, role: "MEMBER" });
+  assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "USER_A" }), [
+    { id: userA, name: "User A", username: "user_a" },
+  ]);
+  assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "user a".replace(" ", "") }), []);
+  assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "A" }), [
+    { id: userA, name: "User A", username: "user_a" },
+  ]);
+  await assert.rejects(
+    () => member.workspace.searchMentionMembers({ workspaceId: second.id, query: "" }),
+    (error) => error?.code === "FORBIDDEN",
+  );
+
+  for (let index = 0; index < 20; index += 1) {
+    const id = makeCuid(500 + index);
+    state.users.set(id, { id, name: `Mention Person ${index}`, username: `mention_${index}`, email: `person${index}@test.local` });
+    state.workspaceMembers.set(membershipKey(first.id, id), {
+      id: makeCuid(600 + index), workspaceId: first.id, userId: id, role: "MEMBER", createdAt: new Date(), updatedAt: new Date(),
+    });
+  }
+  const matches = await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "mention" });
+  assert.equal(matches.length, 8);
+  assert.ok(matches.every((result) => Object.keys(result).sort().join(",") === "id,name,username"));
+  await owner.workspace.removeMember({ workspaceId: first.id, userId: userB });
+  await assert.rejects(
+    () => member.workspace.searchMentionMembers({ workspaceId: first.id, query: "mention" }),
+    (error) => error?.code === "FORBIDDEN",
+  );
+});
+
+test("edits notify only newly mentioned workspace members", async () => {
+  assert.deepEqual(extractMentions("mail dev@user_a.com, page /@user_b, ask @user_c @user_c"), ["user_c"]);
+  const userC = makeCuid(901);
+  const userD = makeCuid(902);
+  state.users.set(userC, { id: userC, name: null, username: "user_c", email: "c@test.local" });
+  state.users.set(userD, { id: userD, name: null, username: "user_d", email: "d@test.local" });
+  const owner = createCaller(userA);
+  const author = createCaller(userB);
+  const workspace = await owner.workspace.create({ name: "Edit Mentions", slug: "edit-mentions" });
+  await owner.workspace.addMember({ workspaceId: workspace.id, userId: userB, role: "MEMBER" });
+  await owner.workspace.addMember({ workspaceId: workspace.id, userId: userC, role: "MEMBER" });
+
+  const discussion = await author.discussion.create({ workspaceId: workspace.id, title: "Review @user_a", body: "Initial question" });
+  const beforeDiscussionEdit = state.notificationJobs.length;
+  await author.discussion.update({ discussionId: discussion.id, body: "Keep @user_a and add @user_c @user_c; ignore @user_b and @user_d" });
+  const discussionJobs = state.notificationJobs.slice(beforeDiscussionEdit);
+  assert.deepEqual(discussionJobs.map((job) => [job.payload.type, job.payload.recipientUserId]), [["MENTION", userC]]);
+  assert.match(discussionJobs[0].payload.dedupeKey, /:edit:/);
+  assert.equal(discussionJobs[0].payload.actorUserId, userB);
+
+  const afterAddition = state.notificationJobs.length;
+  await author.discussion.update({ discussionId: discussion.id, title: "Still reviewing @user_a", body: "Keep @user_c" });
+  await author.discussion.update({ discussionId: discussion.id, body: "Remove the mention" });
+  assert.equal(state.notificationJobs.length, afterAddition);
+  await assert.rejects(() => createCaller(userC).discussion.update({ discussionId: discussion.id, body: "Unauthorized @user_a" }), (error) => error?.code === "FORBIDDEN");
+  await assert.rejects(() => author.discussion.update({ discussionId: userD, body: "Missing @user_a" }));
+  assert.equal(state.notificationJobs.length, afterAddition);
+
+  const comment = await author.comment.create({ discussionId: discussion.id, body: "Start with @user_a" });
+  const beforeCommentEdit = state.notificationJobs.length;
+  await author.comment.update({ commentId: comment.id, body: "Keep @user_a; add @user_c @user_c and not @user_d or @user_b" });
+  const commentJobs = state.notificationJobs.slice(beforeCommentEdit);
+  assert.deepEqual(commentJobs.map((job) => [job.payload.type, job.payload.recipientUserId]), [["MENTION", userC]]);
+  assert.equal(commentJobs[0].payload.commentId, comment.id);
+  const afterCommentAddition = state.notificationJobs.length;
+  await author.comment.update({ commentId: comment.id, body: "@user_a and @user_c remain" });
+  await author.comment.update({ commentId: comment.id, body: "Neither name remains" });
+  assert.equal(state.notificationJobs.length, afterCommentAddition);
+  await assert.rejects(() => createCaller(userC).comment.update({ commentId: comment.id, body: "Unauthorized @user_a" }), (error) => error?.code === "FORBIDDEN");
+  assert.equal(state.notificationJobs.length, afterCommentAddition);
+
+  const sameRevision = {
+    requestId: "replayed-edit",
+    actorUserId: userB,
+    resource: { workspaceId: workspace.id, discussionId: discussion.id, commentId: comment.id },
+    previousText: "No mentions",
+    updatedText: "Please ask @user_c",
+    updatedAt: new Date("2026-10-12T00:00:00.000Z"),
+  };
+  await notificationService.enqueueNewMentionsFromEdit(sameRevision);
+  await notificationService.enqueueNewMentionsFromEdit(sameRevision);
+  const replayed = state.notificationJobs.slice(-2);
+  assert.equal(replayed[0].options.jobId, replayed[1].options.jobId);
+  assert.equal(replayed[0].payload.dedupeKey, replayed[1].payload.dedupeKey);
 });
 
 test("workspace + discussion + comment integration flow", async () => {
@@ -562,6 +687,7 @@ test("workspace + discussion + comment integration flow", async () => {
     assert.equal(discussion.workspaceId, workspace.id);
     assert.equal(discussion.author.username, "user_b");
     assert.equal(state.redisKeyValues.has(`workspace:${workspace.id}:discussions:v2:start:20`), false);
+    assert.ok(state.notificationJobs.some((job) => job.name === "deliver" && job.payload.type === "DISCUSSION_CREATED" && job.payload.recipientUserId === userA));
 
     // 4. User A creates root comment.
     state.redisKeyValues.set(`discussion:${discussion.id}:comments:v2:root:start:20`, JSON.stringify({}));
@@ -572,6 +698,8 @@ test("workspace + discussion + comment integration flow", async () => {
     assert.equal(rootComment.author.id, userA);
     assert.equal(rootComment.author.username, "user_a");
     assert.equal(state.redisKeyValues.has(`discussion:${discussion.id}:comments:v2:root:start:20`), false);
+    assert.ok(state.notificationJobs.some((job) => job.payload.type === "COMMENT_CREATED" && job.payload.recipientUserId === userB));
+    assert.ok(state.notificationJobs.every((job) => /^[0-9a-f]{64}$/.test(job.options.jobId)));
 
     // 5. User B creates reply.
     const reply = await callerB.comment.create({
@@ -581,6 +709,16 @@ test("workspace + discussion + comment integration flow", async () => {
     });
     assert.equal(reply.parentCommentId, rootComment.id);
     assert.equal(reply.author.username, "user_b");
+
+    const mentionedComment = await callerB.comment.create({
+      discussionId: discussion.id,
+      body: "@user_a please review this thread",
+    });
+    assert.ok(state.notificationJobs.some((job) =>
+      job.payload.type === "MENTION" &&
+      job.payload.recipientUserId === userA &&
+      job.payload.commentId === mentionedComment.id
+    ));
 
     // 6. User A edits their comment.
     state.redisKeyValues.set(`comment:v2:${rootComment.id}`, JSON.stringify({ id: rootComment.id }));
@@ -676,6 +814,8 @@ test("workspace + discussion + comment integration flow", async () => {
     assert.ok(parsed.some((l) => l?.event === "comment.audit" && l.action === "create"));
     assert.ok(parsed.some((l) => l?.event === "comment.audit" && l.action === "update"));
     assert.ok(parsed.some((l) => l?.event === "comment.audit" && l.action === "delete"));
+    assert.ok(parsed.some((l) => l?.event === "notification.operation.enqueue"));
+    assert.equal(parsed.some((l) => l?.event === "notification.operation.enqueue_failed"), false);
 
     // 13. Rate limiting works across operations (comment.update route).
     for (let i = 0; i < 49; i += 1) {

@@ -1,4 +1,4 @@
-const MENTION_REGEX = /@([a-zA-Z0-9_]{3,30})/g;
+const MENTION_REGEX = /(?:^|[\s([{,;:!?])@([a-zA-Z0-9_]{3,30})(?![a-zA-Z0-9_@])/g;
 
 export function normalizeUsername(value: string): string {
   return value.trim().toLowerCase();

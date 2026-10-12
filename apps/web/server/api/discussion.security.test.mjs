@@ -15,6 +15,8 @@ const { discussionRouter } = jiti("./routers/discussion.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis, redisCache } = jiti("../cache/redis.ts");
 const { notificationQueue } = jiti("../queue/notification.queue.ts");
+const originalNotificationQueueAdd = notificationQueue.add.bind(notificationQueue);
+notificationQueue.add = async (_name, _payload, options) => ({ id: options.jobId });
 
 const workspaceId = "c000000000000000000000001";
 const memberUserId = "c000000000000000000000002";
@@ -289,6 +291,7 @@ after(async () => {
   prisma.discussion.findUnique = originalDiscussionFindUnique;
   prisma.discussion.update = originalDiscussionUpdate;
   prisma.discussion.delete = originalDiscussionDelete;
+  notificationQueue.add = originalNotificationQueueAdd;
   await notificationQueue.close();
   await prisma.$disconnect();
   redis.disconnect();

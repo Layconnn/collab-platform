@@ -6,21 +6,24 @@ export function useAuth() {
   const utils = trpc.useUtils();
   const me = trpc.auth.me.useQuery(undefined, { retry: false });
   const login = trpc.auth.login.useMutation({
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       sessionStorage.setItem("csrf_token", result.csrfToken);
-      void utils.auth.me.invalidate();
+      await utils.notification.listForUser.reset();
+      await utils.auth.me.invalidate();
     },
   });
   const register = trpc.auth.register.useMutation({
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       sessionStorage.setItem("csrf_token", result.csrfToken);
-      void utils.auth.me.invalidate();
+      await utils.notification.listForUser.reset();
+      await utils.auth.me.invalidate();
     },
   });
   const logout = trpc.auth.logout.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       sessionStorage.removeItem("csrf_token");
-      void utils.auth.me.invalidate();
+      await utils.notification.listForUser.reset();
+      await utils.auth.me.invalidate();
     },
   });
   const changePassword = trpc.auth.changePassword.useMutation();
