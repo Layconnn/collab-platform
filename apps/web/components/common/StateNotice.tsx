@@ -18,11 +18,21 @@ export function EmptyState({ title, description }: { title: string; description?
   );
 }
 
-export function ErrorState({ title, description }: { title: string; description?: string }) {
+export function ErrorState({ title, description, onRetry, retrying = false }: {
+  title: string;
+  description?: string;
+  onRetry?: () => void;
+  retrying?: boolean;
+}) {
   return (
     <div role="alert" className="border border-border-subtle border-l-2 border-l-danger bg-surface p-4 text-text-primary">
       <p className="font-semibold">{title}</p>
       {description ? <p className="mt-1 text-sm text-text-secondary">{description}</p> : null}
+      {onRetry ? (
+        <button type="button" onClick={onRetry} disabled={retrying} className="mt-3 inline-flex min-h-10 items-center rounded-sm font-semibold text-brand-link hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-wait disabled:opacity-60">
+          {retrying ? "Trying again..." : "Try again"}
+        </button>
+      ) : null}
     </div>
   );
 }

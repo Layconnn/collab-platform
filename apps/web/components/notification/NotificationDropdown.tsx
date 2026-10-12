@@ -160,6 +160,8 @@ export function NotificationDropdown({
   const unread = useUnreadNotifications();
   const { markAsRead, markAllAsRead } = useNotificationActions();
   const unreadCount = unread.data?.items.length ?? 0;
+  const feedAccessDenied = [feed.error?.data?.code, unread.error?.data?.code]
+    .some((code) => code === "FORBIDDEN" || code === "UNAUTHORIZED");
   const hasMoreUnread = Boolean(unread.data?.nextCursor);
   const unreadLabel = hasMoreUnread ? `${unreadCount}+` : String(unreadCount);
   const badgeLabel = hasMoreUnread
@@ -167,13 +169,15 @@ export function NotificationDropdown({
     : unreadCount > 9
       ? "9+"
       : String(unreadCount);
-  const showUnread = !unread.isError && unreadCount > 0;
-  const accessibleLabel = unread.isPending
+  const showUnread = !feedAccessDenied && !unread.isError && unreadCount > 0;
+  const accessibleLabel = feedAccessDenied
+    ? "Notifications unavailable"
+    : unread.isPending
     ? "Notifications, unread count loading"
     : unread.isError
       ? "Notifications, unread count unavailable"
       : `Notifications, ${unreadLabel} unread`;
-  const items = feed.data?.pages.flatMap((page) => page.items) ?? [];
+  const items = feedAccessDenied ? [] : feed.data?.pages.flatMap((page) => page.items) ?? [];
 
   const markRead = (id: string) => {
     setActionError(null);
@@ -228,7 +232,9 @@ export function NotificationDropdown({
                   Notifications
                 </Popover.Title>
                 <p className="mt-0.5 text-xs text-text-muted">
-                  {unread.isError
+                  {feedAccessDenied
+                    ? "Access changed"
+                    : unread.isError
                     ? "Unread count unavailable"
                     : unread.isPending
                       ? "Checking activity..."
@@ -288,7 +294,13 @@ export function NotificationDropdown({
             ) : null}
             <div className="min-h-0 overflow-y-auto overscroll-contain">
               {feed.isPending ? <NotificationSkeleton /> : null}
-              {feed.isError && !feed.data ? (
+              {feedAccessDenied ? (
+                <div role="alert" className="px-4 py-8 text-center">
+                  <CircleAlert aria-hidden="true" className="mx-auto mb-2 text-danger" size={20} />
+                  <p className="text-sm font-medium">Notifications unavailable</p>
+                  <p className="mt-1 text-xs text-text-muted">Your access may have changed. Refresh the page to continue.</p>
+                </div>
+              ) : feed.isError && !feed.data ? (
                 <div role="alert" className="px-4 py-8 text-center">
                   <CircleAlert
                     aria-hidden="true"
@@ -344,13 +356,13 @@ export function NotificationDropdown({
                   ))}
                 </ul>
               ) : null}
-              {feed.isError && items.length > 0 ? (
+              {feed.isError && items.length > 0 && !feedAccessDenied ? (
                 <p role="alert" className="px-4 py-2 text-xs text-danger">
                   Could not refresh notifications. Showing previously loaded
                   activity.
                 </p>
               ) : null}
-              {feed.hasNextPage ? (
+              {feed.hasNextPage && !feedAccessDenied ? (
                 <div className="border-t border-border-subtle p-2">
                   <button
                     type="button"

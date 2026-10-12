@@ -225,9 +225,9 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               <button type="button" onClick={() => void replies.refetch()} className="min-h-10 text-sm font-semibold text-brand-link hover:text-brand-link-hover">Try again</button>
             </div>
           ) : null}
-          {replies.error && replies.data && !replyDenied ? <p role="alert" className="py-2 text-sm text-danger">Replies could not be refreshed.</p> : null}
+          {replies.error && replies.data && !replyDenied ? <div className="py-2"><ErrorState title="Could not refresh replies" description="Replies already loaded remain available." onRetry={() => void (replies.isFetchNextPageError ? replies.fetchNextPage() : replies.refetch())} retrying={replies.isFetching} /></div> : null}
           {replyItems.length ? <ul>{replyItems.map((reply) => <CommentThread key={reply.id} comment={reply} discussionId={discussionId} workspaceId={workspaceId} viewer={viewer} onAccessDenied={onAccessDenied} />)}</ul> : null}
-          {replies.hasNextPage && !replyDenied ? (
+          {replies.hasNextPage && !replyDenied && !replies.isFetchNextPageError ? (
             <button type="button" onClick={() => void replies.fetchNextPage()} disabled={replies.isFetchingNextPage} className="my-2 min-h-10 rounded-sm px-2 text-xs font-semibold text-brand-link hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">
               {replies.isFetchingNextPage ? "Loading replies..." : replies.isFetchNextPageError ? "Retry loading replies" : "Load more replies"}
             </button>
@@ -249,7 +249,7 @@ export function CommentList({ discussionId, workspaceId, viewer, query, onAccess
   const items = query.data?.pages.flatMap((page) => page.items) ?? [];
   return (
     <div>
-      {query.error && query.data ? <p role="alert" className="mb-3 text-sm text-danger">Comments could not be refreshed.</p> : null}
+      {query.error && query.data ? <div className="mb-3"><ErrorState title="Could not refresh comments" description="Comments already loaded remain available." onRetry={() => void (query.isFetchNextPageError ? query.fetchNextPage() : query.refetch())} retrying={query.isFetching} /></div> : null}
       {!items.length && !query.error ? (
         <div className="border-y border-border-subtle py-7">
           <MessageCircle size={22} className="text-brand-link" aria-hidden="true" />
@@ -258,7 +258,7 @@ export function CommentList({ discussionId, workspaceId, viewer, query, onAccess
         </div>
       ) : null}
       {items.length ? <ul className="border-t border-border-subtle">{items.map((comment) => <CommentThread key={comment.id} comment={comment} discussionId={discussionId} workspaceId={workspaceId} viewer={viewer} onAccessDenied={onAccessDenied} />)}</ul> : null}
-      {query.hasNextPage ? (
+      {query.hasNextPage && !query.isFetchNextPageError ? (
         <div className="border-b border-border-subtle py-4">
           <button type="button" onClick={() => void query.fetchNextPage()} disabled={query.isFetchingNextPage} className="min-h-11 rounded-sm border border-border bg-surface px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">
             {query.isFetchingNextPage ? "Loading comments..." : query.isFetchNextPageError ? "Retry loading comments" : "Load more comments"}

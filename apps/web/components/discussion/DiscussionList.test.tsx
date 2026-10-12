@@ -229,7 +229,7 @@ describe("DiscussionList", () => {
     mocks.removeError = new Error("Your permission to delete this discussion changed.");
     mocks.role = "MEMBER";
     rerender(view());
-    expect(screen.getByRole("alert").textContent).toContain("Your permission to delete this discussion changed.");
+    expect(screen.getByRole("alert").textContent).toContain("This discussion could not be deleted. Please try again.");
     expect(screen.queryByRole("button", { name: `Actions for ${discussion.title}` })).toBeNull();
     confirm.mockRestore();
   });
@@ -247,7 +247,7 @@ describe("DiscussionList", () => {
     await user.click(screen.getByRole("button", { name: "Save title" }));
 
     await waitFor(() => expect(mocks.update).toHaveBeenCalledTimes(1));
-    expect(await screen.findByRole("alert")).toHaveProperty("textContent", "You can no longer edit this discussion.");
+    expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Your workspace access changed. Refresh before trying again.");
     expect(screen.queryByRole("textbox", { name: "Edit discussion title" })).toBeNull();
   });
 });

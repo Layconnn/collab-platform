@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => ({
   update: vi.fn(),
   remove: vi.fn(),
   replace: vi.fn(),
+  refetchDiscussion: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -36,7 +37,7 @@ vi.mock("@/hooks/useWorkspace", () => ({
   useWorkspaceSwitcherList: () => ({ data: { pages: [{ items: mocks.role ? [{ workspaceId: "c000000000000000000000002", role: mocks.role }] : [] }] }, error: null }),
 }));
 vi.mock("@/hooks/useDiscussion", () => ({
-  useDiscussionDetail: () => ({ data: mocks.loading ? null : mocks.discussionData, isLoading: mocks.loading, error: mocks.discussionError }),
+  useDiscussionDetail: () => ({ data: mocks.loading || mocks.discussionError?.data.code === "INTERNAL_SERVER_ERROR" ? null : mocks.discussionData, isLoading: mocks.loading, isFetching: false, error: mocks.discussionError, refetch: mocks.refetchDiscussion }),
   useDiscussionActions: () => ({
     update: { mutateAsync: mocks.update, isPending: false, error: null, reset: vi.fn() },
     remove: { mutateAsync: mocks.remove, isPending: false, error: null },
@@ -71,6 +72,7 @@ describe("Discussion detail page", () => {
     mocks.update.mockReset();
     mocks.remove.mockReset();
     mocks.replace.mockReset();
+    mocks.refetchDiscussion.mockReset();
   });
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
@@ -108,6 +110,15 @@ describe("Discussion detail page", () => {
     mocks.discussionError = { data: { code: "NOT_FOUND" } };
     rerender(view());
     expect(screen.getByText("Discussion unavailable")).toBeTruthy();
+  });
+
+  it("offers retry on transient detail failure without showing cached discussion content", async () => {
+    mocks.discussionError = { data: { code: "INTERNAL_SERVER_ERROR" } };
+    render(view());
+    expect(screen.getByText("Could not load discussion")).toBeTruthy();
+    expect(screen.queryByText("How should first-time setup work?")).toBeNull();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
+    expect(mocks.refetchDiscussion).toHaveBeenCalledTimes(1);
   });
 
   it("does not render a discussion under the wrong workspace URL", () => {

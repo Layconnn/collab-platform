@@ -279,6 +279,25 @@ describe("NotificationDropdown", () => {
     expect(mocks.refetch).toHaveBeenCalledTimes(1);
   });
 
+  it("hides cached notification rows and unread actions after access is denied", async () => {
+    setFeed([notification], { isError: true, error: { data: { code: "FORBIDDEN" } }, hasNextPage: true });
+    renderDropdown();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Notifications unavailable" }));
+    expect(await screen.findByText("Notifications unavailable")).toBeTruthy();
+    expect(screen.queryByText(notification.message)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Mark read" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Mark all read" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Load more" })).toBeNull();
+  });
+
+  it("hides cached feed rows when only the unread query reports expired access", async () => {
+    mocks.unread = { data: { items: [notification], nextCursor: null }, isPending: false, isError: true, error: { data: { code: "UNAUTHORIZED" } } };
+    renderDropdown();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Notifications unavailable" }));
+    expect(await screen.findByText("Notifications unavailable")).toBeTruthy();
+    expect(screen.queryByText(notification.message)).toBeNull();
+  });
+
   it("reports failed bulk marking", async () => {
     renderDropdown();
     const user = userEvent.setup();

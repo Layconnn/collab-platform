@@ -13,6 +13,7 @@ import {
 
 import { useDiscussionActions } from "@/hooks/useDiscussion";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
+import { discussionActionError } from "@/components/discussion/discussionErrors";
 
 export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { workspaceId: string; onCancel: () => void; open?: boolean }) {
   const form = useForm<CreateDiscussionInput>({
@@ -92,13 +93,14 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
         </div>
         {form.formState.errors.body ? <p id="discussion-body-error" role="alert" className="mt-1.5 text-sm text-danger">Please add some context within the allowed length.</p> : null}
       </div>
-      {createDiscussion.error ? <p role="alert" className="border-l-2 border-danger bg-surface px-3 py-2.5 text-sm text-danger">{createDiscussion.error.message}</p> : null}
+      {createDiscussion.error ? <p role="alert" className="border-l-2 border-danger bg-surface px-3 py-2.5 text-sm text-danger">{discussionActionError(createDiscussion.error, "Your discussion could not be published. Your draft is still here; please try again.")}</p> : null}
       {posted ? (
         <p role="status" className="border-l-2 border-success bg-surface px-3 py-2.5 text-sm text-text-secondary">
           Discussion published. <Link href={`/workspace/${workspaceId}/discussions/${posted.id}`} className="font-semibold text-brand-link hover:text-brand-link-hover">Open {posted.title}</Link>
         </p>
       ) : null}
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+        {busy ? <span role="status" className="sr-only">Publishing discussion...</span> : null}
         <button type="button" onClick={onCancel} disabled={busy} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover hover:text-text-primary disabled:opacity-60">Cancel</button>
         <button type="submit" disabled={busy} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm bg-brand-action px-5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none">
           {busy ? <LoaderCircle size={17} className="animate-spin" aria-hidden="true" /> : <ArrowRight size={17} aria-hidden="true" />}

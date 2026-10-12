@@ -17,6 +17,7 @@ export function CreateWorkspaceForm() {
   const router = useRouter();
   const createWorkspace = useCreateWorkspace();
   const submittingRef = useRef(false);
+  const rootErrorRef = useRef<HTMLParagraphElement>(null);
   const [manuallyEditedSlug, setManuallyEditedSlug] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const form = useForm<CreateWorkspaceInput>({
@@ -116,6 +117,10 @@ export function CreateWorkspaceForm() {
   const slugError = form.formState.errors.slug?.message;
   const rootError = form.formState.errors.root?.message;
 
+  useEffect(() => {
+    if (rootError) rootErrorRef.current?.focus();
+  }, [rootError]);
+
   return (
     <form onSubmit={onSubmit} className="space-y-5" noValidate>
       <div>
@@ -203,13 +208,16 @@ export function CreateWorkspaceForm() {
       </div>
       {rootError ? (
         <p
+          ref={rootErrorRef}
+          tabIndex={-1}
           role="alert"
-          className="border-l-2 border-danger bg-surface-subtle px-3 py-2.5 text-sm text-danger"
+          className="border-l-2 border-danger bg-surface-subtle px-3 py-2.5 text-sm text-danger outline-none focus-visible:ring-2 focus-visible:ring-focus-ring"
         >
           {rootError}
         </p>
       ) : null}
       <div className="border-t border-border-subtle pt-5">
+        {busy ? <span role="status" className="sr-only">{redirecting ? "Opening workspace..." : "Creating workspace..."}</span> : null}
         <button
           type="submit"
           disabled={busy}

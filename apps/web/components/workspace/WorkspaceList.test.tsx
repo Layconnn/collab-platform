@@ -65,4 +65,15 @@ describe("WorkspaceList", () => {
         .getAttribute("href"),
     ).toBe("#new-workspace");
   });
+
+  it("does not mistake a failed refresh of an empty cache for a genuine empty directory", () => {
+    const query = mocks.query as Record<string, unknown>;
+    query.data = { pages: [{ items: [], nextCursor: null }] };
+    query.error = new Error("Connection unavailable");
+    render(<WorkspaceList />);
+    expect(screen.getByText("Could not refresh workspaces")).toBeTruthy();
+    expect(screen.queryByText("Your first workspace starts here.")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(query.refetch).toHaveBeenCalledTimes(1);
+  });
 });

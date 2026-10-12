@@ -11,6 +11,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { updateDiscussionInputSchema, type UpdateDiscussionInput } from "@repo/validators/discussion";
 import { CommentList } from "@/components/comment/CommentList";
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
+import { discussionActionError } from "@/components/discussion/discussionErrors";
 import { useCommentList } from "@/hooks/useComment";
 import { MentionText } from "@/components/common/MentionText";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
@@ -23,13 +24,6 @@ import { resolveUserIdentity } from "@/lib/user-identity";
 
 function dateLabel(value: Date | string) {
   return new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(value));
-}
-
-function actionError(error: { data?: { code?: string } | null } | null, fallback: string) {
-  if (!error) return null;
-  if (error.data?.code === "FORBIDDEN" || error.data?.code === "UNAUTHORIZED") return "Your workspace access changed. Refresh before trying again.";
-  if (error.data?.code === "NOT_FOUND") return "This discussion is no longer available.";
-  return fallback;
 }
 
 function DiscussionSkeleton() {
@@ -80,7 +74,7 @@ export default function DiscussionDetailPage() {
   const role = workspace.data?.ownerId === user?.id ? "OWNER" : listedRole;
   const canManageOthers = role === "OWNER" || role === "ADMIN";
   const denied = threadAccessDenied || discussionDenied || comments.error?.data?.code === "FORBIDDEN" || comments.error?.data?.code === "UNAUTHORIZED";
-  const missing = workspaceMismatch || discussion.error?.data?.code === "NOT_FOUND";
+  const missing = workspaceMismatch || workspace.error?.data?.code === "NOT_FOUND" || discussion.error?.data?.code === "NOT_FOUND";
   const canAct = Boolean(user && workspace.data && !workspace.error && !denied && !missing);
   const canManage = Boolean(canAct && discussion.data && (discussion.data.author?.id === user?.id || canManageOthers));
 
@@ -123,7 +117,7 @@ export default function DiscussionDetailPage() {
   if (denied) return <div className="mx-auto max-w-[52rem] py-8"><ErrorState title="Discussion access restricted" description="You may no longer have access to this conversation." /></div>;
   if (discussion.isLoading && !discussion.data) return <DiscussionSkeleton />;
   if (missing || (!discussion.data && !discussion.isLoading)) {
-    return <div className="mx-auto max-w-[52rem] space-y-4 py-8"><ErrorState title={missing ? "Discussion unavailable" : "Could not load discussion"} description={missing ? "This conversation may have been removed." : "Please try again in a moment."} /><Link href={`/workspace/${workspaceId}/discussions`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-brand-link hover:text-brand-link-hover"><ArrowLeft size={16} aria-hidden="true" /> Back to discussions</Link></div>;
+    return <div className="mx-auto max-w-[52rem] space-y-4 py-8"><ErrorState title={missing ? "Discussion unavailable" : "Could not load discussion"} description={missing ? "This conversation may have been removed." : "Please try again in a moment."} onRetry={missing ? undefined : () => void discussion.refetch()} retrying={discussion.isFetching} /><Link href={`/workspace/${workspaceId}/discussions`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-brand-link hover:text-brand-link-hover"><ArrowLeft size={16} aria-hidden="true" /> Back to discussions</Link></div>;
   }
   if (!discussion.data) return null;
 
@@ -131,8 +125,8 @@ export default function DiscussionDetailPage() {
   const createdAt = new Date(discussion.data.createdAt);
   const updatedAt = new Date(discussion.data.updatedAt);
   const wasUpdated = updatedAt.getTime() > createdAt.getTime() + 1000;
-  const updateError = actionError(update.error, "Your changes could not be saved. Please try again.");
-  const removeError = actionError(remove.error, "This discussion could not be deleted. Please try again.");
+  const updateError = discussionActionError(update.error, "Your changes could not be saved. Please try again.");
+  const removeError = discussionActionError(remove.error, "This discussion could not be deleted. Please try again.");
 
   return (
     <main className="mx-auto w-full min-w-0 max-w-[52rem] pb-16">

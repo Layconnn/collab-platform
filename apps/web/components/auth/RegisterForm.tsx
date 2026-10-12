@@ -54,6 +54,7 @@ export function RegisterForm() {
       <AuthField id="register-username" label="Username" autoComplete="username" registration={form.register("username")} error={form.formState.errors.username} hint="3-30 letters, numbers, or underscores." disabled={busy} />
       <AuthField id="register-password" label="Password" type="password" autoComplete="new-password" registration={form.register("password")} error={form.formState.errors.password} hint="Use 8-128 characters." disabled={busy} />
       {rootError ? <p ref={errorRef} tabIndex={-1} role="alert" className="rounded-sm border border-danger/30 bg-surface-subtle px-3.5 py-3 text-sm text-danger outline-none focus-visible:ring-2 focus-visible:ring-focus-ring">{rootError}</p> : null}
+      {busy ? <span role="status" className="sr-only">{redirecting ? "Opening workspace..." : "Creating account..."}</span> : null}
       <button type="submit" disabled={busy} className="flex h-12 w-full items-center justify-center gap-2 rounded-sm bg-brand-action px-5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:opacity-65">
         {busy ? <LoaderCircle size={17} className="animate-spin" aria-hidden="true" /> : null}
         {redirecting ? "Opening workspace..." : busy ? "Creating account..." : "Create account"}

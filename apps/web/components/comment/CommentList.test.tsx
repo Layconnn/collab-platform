@@ -316,10 +316,18 @@ describe("CommentList", () => {
   });
 
   it("retries cursor pagination without losing the loaded comments", () => {
-    const result = query([root], { hasNextPage: true, isFetchNextPageError: true });
+    const result = query([root], { hasNextPage: true, isFetchNextPageError: true, error: new Error("Temporary failure") });
     render(<CommentList discussionId={discussionId} workspaceId={workspaceId} viewer={{ id: "user-2", canAct: true, canManageOthers: false }} query={result} />);
-    fireEvent.click(screen.getByRole("button", { name: "Retry loading comments" }));
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(result.fetchNextPage).toHaveBeenCalledTimes(1);
     expect(screen.getByText(/Keep the setup context here/)).toBeTruthy();
+  });
+
+  it("retries a background refresh while keeping previously loaded comments", () => {
+    const result = query([root], { error: new Error("Temporary failure") });
+    render(<CommentList discussionId={discussionId} workspaceId={workspaceId} viewer={{ id: "user-2", canAct: true, canManageOthers: false }} query={result} />);
+    expect(screen.getByText(/Keep the setup context here/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(result.refetch).toHaveBeenCalledTimes(1);
   });
 });

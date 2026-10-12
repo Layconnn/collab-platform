@@ -71,7 +71,8 @@ describe("CreateDiscussionForm", () => {
     await user.type(screen.getByRole("combobox", { name: "Context" }), "Add a clear first step for contributors.");
     await user.click(screen.getByRole("button", { name: "Publish discussion" }));
 
-    expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Connection unavailable");
+    expect(await screen.findByRole("alert")).toHaveProperty("textContent", expect.stringContaining("Your draft is still here"));
+    expect(screen.queryByText("Connection unavailable")).toBeNull();
     expect(screen.getByRole("combobox", { name: "Title" })).toHaveProperty("value", "Improve onboarding");
   });
 

@@ -36,6 +36,7 @@ function SidebarContent({
   workspaces,
   workspacesLoading,
   workspacesError,
+  onRetryWorkspaces,
   hasMoreWorkspaces,
   loadingMoreWorkspaces,
   onLoadMoreWorkspaces,
@@ -51,6 +52,7 @@ function SidebarContent({
   workspaces: WorkspaceItems;
   workspacesLoading: boolean;
   workspacesError: boolean;
+  onRetryWorkspaces: () => void;
   hasMoreWorkspaces: boolean;
   loadingMoreWorkspaces: boolean;
   onLoadMoreWorkspaces: () => void;
@@ -82,6 +84,7 @@ function SidebarContent({
           workspaces={workspaces}
           isLoading={workspacesLoading}
           hasError={workspacesError}
+          onRetry={onRetryWorkspaces}
           hasMore={hasMoreWorkspaces}
           isFetchingMore={loadingMoreWorkspaces}
           onLoadMore={onLoadMoreWorkspaces}
@@ -192,6 +195,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
       workspaces={workspaces}
       workspacesLoading={workspacesQuery.isLoading}
       workspacesError={workspacesQuery.isError}
+      onRetryWorkspaces={() => void workspacesQuery.refetch()}
       hasMoreWorkspaces={Boolean(workspacesQuery.hasNextPage)}
       loadingMoreWorkspaces={workspacesQuery.isFetchingNextPage}
       onLoadMoreWorkspaces={() => void workspacesQuery.fetchNextPage()}
@@ -282,6 +286,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
                 workspaces={workspaces}
                 workspacesLoading={workspacesQuery.isLoading}
                 workspacesError={workspacesQuery.isError}
+                onRetryWorkspaces={() => void workspacesQuery.refetch()}
                 hasMoreWorkspaces={Boolean(workspacesQuery.hasNextPage)}
                 loadingMoreWorkspaces={workspacesQuery.isFetchingNextPage}
                 onLoadMoreWorkspaces={() => void workspacesQuery.fetchNextPage()}

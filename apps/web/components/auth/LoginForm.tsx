@@ -54,6 +54,7 @@ export function LoginForm() {
       <AuthField id="login-email" label="Email" type="email" autoComplete="email" registration={form.register("email")} error={form.formState.errors.email} disabled={busy} />
       <AuthField id="login-password" label="Password" type="password" autoComplete="current-password" registration={form.register("password")} error={form.formState.errors.password} disabled={busy} />
       {rootError ? <p ref={errorRef} tabIndex={-1} role="alert" className="rounded-sm border border-danger/30 bg-surface-subtle px-3.5 py-3 text-sm text-danger outline-none focus-visible:ring-2 focus-visible:ring-focus-ring">{rootError}</p> : null}
+      {busy ? <span role="status" className="sr-only">{redirecting ? "Opening workspace..." : "Signing in..."}</span> : null}
       <button type="submit" disabled={busy} className="flex h-12 w-full items-center justify-center gap-2 rounded-sm bg-brand-action px-5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:opacity-65">
         {busy ? <LoaderCircle size={17} className="animate-spin" aria-hidden="true" /> : null}
         {redirecting ? "Opening workspace..." : busy ? "Signing in..." : "Sign in"}

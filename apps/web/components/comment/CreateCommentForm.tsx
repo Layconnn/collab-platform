@@ -84,6 +84,7 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
       {serverError ? <p role="alert" className="border-l-2 border-danger bg-surface px-3 py-2 text-sm text-danger">{serverError}</p> : null}
       {posted && !parentCommentId ? <p role="status" className="text-sm font-medium text-success">Comment posted.</p> : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
+        {busy ? <span role="status" className="sr-only">{parentCommentId ? "Posting reply..." : "Posting comment..."}</span> : null}
         <span className="text-xs text-text-muted">{form.watch("body").length}/5000</span>
         <div className="ml-auto flex items-center gap-2">
           {onCancel ? (

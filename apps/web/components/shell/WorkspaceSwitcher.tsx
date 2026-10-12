@@ -23,6 +23,7 @@ export function WorkspaceSwitcher({
   workspaces,
   isLoading,
   hasError,
+  onRetry,
   hasMore,
   isFetchingMore,
   onLoadMore,
@@ -35,6 +36,7 @@ export function WorkspaceSwitcher({
   workspaces: WorkspaceSummary[];
   isLoading: boolean;
   hasError: boolean;
+  onRetry: () => void;
   hasMore: boolean;
   isFetchingMore: boolean;
   onLoadMore: () => void;
@@ -78,7 +80,10 @@ export function WorkspaceSwitcher({
               <span className="block h-3 w-1/2 animate-pulse rounded bg-surface-active" />
             </div>
           ) : hasError ? (
-            <p className="px-3 py-2 text-sm text-text-secondary">Workspaces could not be loaded.</p>
+            <div className="px-3 py-2">
+              <p role="alert" className="text-sm text-text-secondary">Workspaces could not be loaded.</p>
+              <button type="button" onClick={onRetry} className="min-h-10 text-sm font-semibold text-brand-link hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Try again</button>
+            </div>
           ) : workspaces.length ? (
             <nav aria-label="Available workspaces">
               {workspaces.map((workspace) => (

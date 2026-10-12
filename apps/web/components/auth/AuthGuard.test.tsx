@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
-  auth: { me: { isLoading: true, isError: false, error: null as null | { message: string; data?: { code?: string } }, data: undefined as unknown } },
+  refetch: vi.fn(),
+  auth: { me: { isLoading: true, isFetching: false, isError: false, error: null as null | { message: string; data?: { code?: string } }, data: undefined as unknown, refetch: vi.fn() } },
 }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: mocks.replace }) }));
@@ -15,10 +17,11 @@ describe("AuthGuard", () => {
   afterEach(() => {
     cleanup();
     mocks.replace.mockReset();
+    mocks.refetch.mockReset();
   });
 
   it("does not render protected content while checking the session", () => {
-    mocks.auth.me = { isLoading: true, isError: false, error: null, data: undefined };
+    mocks.auth.me = { isLoading: true, isFetching: false, isError: false, error: null, data: undefined, refetch: mocks.refetch };
     render(<AuthGuard><p>Protected content</p></AuthGuard>);
 
     expect(screen.getByText("Checking your session...")).toBeTruthy();
@@ -28,21 +31,25 @@ describe("AuthGuard", () => {
   it("redirects unauthenticated users to sign in", async () => {
     mocks.auth.me = {
       isLoading: false,
+      isFetching: false,
       isError: true,
       error: { message: "Authentication required", data: { code: "UNAUTHORIZED" } },
       data: undefined,
+      refetch: mocks.refetch,
     };
     render(<AuthGuard><p>Protected content</p></AuthGuard>);
 
     await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/login"));
   });
 
-  it("shows a service error without redirecting when session lookup is unavailable", () => {
+  it("shows a safe service error with retry without rendering protected content", async () => {
     mocks.auth.me = {
       isLoading: false,
+      isFetching: false,
       isError: true,
       error: { message: "Database unavailable", data: { code: "INTERNAL_SERVER_ERROR" } },
       data: undefined,
+      refetch: mocks.refetch,
     };
     render(<AuthGuard><p>Protected content</p></AuthGuard>);
 
@@ -50,5 +57,7 @@ describe("AuthGuard", () => {
     expect(screen.queryByText("Database unavailable")).toBeNull();
     expect(screen.queryByText("Protected content")).toBeNull();
     expect(mocks.replace).not.toHaveBeenCalled();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
+    expect(mocks.refetch).toHaveBeenCalledTimes(1);
   });
 });

@@ -10,6 +10,7 @@ import { Menu, Portal } from "@chakra-ui/react";
 import { updateDiscussionInputSchema, type UpdateDiscussionInput } from "@repo/validators/discussion";
 import { ErrorState } from "@/components/common/StateNotice";
 import { DiscussionRow, type DiscussionSummary } from "@/components/discussion/DiscussionRow";
+import { discussionActionError } from "@/components/discussion/discussionErrors";
 import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionActions, useDiscussionList } from "@/hooks/useDiscussion";
 import { useWorkspaceDetail, useWorkspaceSwitcherList } from "@/hooks/useWorkspace";
@@ -62,7 +63,7 @@ function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: D
             {...form.register("title")}
           />
           {form.formState.errors.title ? <p id={`edit-discussion-error-${discussion.id}`} role="alert" className="text-sm text-danger">Please add a clear title within the allowed length.</p> : null}
-          {update.error ? <p role="alert" className="text-sm text-danger">{update.error.message}</p> : null}
+          {update.error ? <p role="alert" className="text-sm text-danger">{discussionActionError(update.error, "Your changes could not be saved. Please try again.")}</p> : null}
           <div className="flex flex-wrap gap-2">
             <button type="submit" disabled={update.isPending || form.formState.isSubmitting} className="inline-flex min-h-10 items-center rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover disabled:opacity-60">{update.isPending ? "Saving..." : "Save title"}</button>
             <button type="button" disabled={update.isPending} onClick={cancelEdit} className="min-h-10 rounded-sm px-3 text-sm font-medium text-text-secondary hover:bg-surface-hover disabled:opacity-60">Cancel</button>
@@ -76,7 +77,7 @@ function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: D
     <DiscussionRow
       discussion={discussion}
       workspaceId={workspaceId}
-      error={remove.error?.message ?? update.error?.message}
+      error={discussionActionError(remove.error, "This discussion could not be deleted. Please try again.") ?? discussionActionError(update.error, "Your changes could not be saved. Please try again.") ?? undefined}
       actions={canManage ? (
         <Menu.Root positioning={{ placement: "bottom-end", strategy: "fixed" }}>
           <Menu.Trigger asChild>

@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc/api-client";
 
 export function useAuth() {
   const utils = trpc.useUtils();
-  const me = trpc.auth.me.useQuery(undefined, { retry: false });
+  const me = trpc.auth.me.useQuery(undefined, { retry: false, staleTime: 0, refetchOnWindowFocus: true });
   const login = trpc.auth.login.useMutation({
     onSuccess: async (result) => {
       sessionStorage.setItem("csrf_token", result.csrfToken);

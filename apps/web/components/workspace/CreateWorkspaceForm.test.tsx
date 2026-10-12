@@ -110,6 +110,19 @@ describe("CreateWorkspaceForm", () => {
     ).toBe("true");
   });
 
+  it("focuses a safe server error and preserves the workspace draft", async () => {
+    mocks.create.mockRejectedValue(new Error("internal database detail"));
+    render(<CreateWorkspaceForm />);
+    const name = screen.getByRole("textbox", { name: "Workspace name" }) as HTMLInputElement;
+    fireEvent.change(name, { target: { value: "Open Atlas" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create workspace" }));
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).toContain("Workspace could not be created. Please try again.");
+    expect(document.activeElement).toBe(alert);
+    expect(name.value).toBe("Open Atlas");
+    expect(screen.queryByText("internal database detail")).toBeNull();
+  });
+
   it("opens the newly created workspace once", async () => {
     mocks.create.mockResolvedValue({ id: "workspace-1" });
     render(<CreateWorkspaceForm />);

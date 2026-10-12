@@ -55,6 +55,17 @@ export function WorkspaceList() {
     );
   }
 
+  if (query.error && !workspaces.length) {
+    return (
+      <ErrorState
+        title="Could not refresh workspaces"
+        description="Your workspace list is temporarily unavailable."
+        onRetry={() => void query.refetch()}
+        retrying={query.isFetching}
+      />
+    );
+  }
+
   if (!workspaces.length) {
     return (
       <div className="border-y border-border-subtle bg-surface-subtle px-5 py-9 sm:px-7">
