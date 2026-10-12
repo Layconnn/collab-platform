@@ -613,7 +613,7 @@ export function WorkspaceMembersPanel({
                 type="button"
                 onClick={() => void confirmMutation()}
                 disabled={removeMember.isPending || transferOwnership.isPending}
-                className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 ${confirm.kind === "remove" ? "bg-danger text-white hover:opacity-90" : "bg-brand-action text-on-brand-action hover:bg-brand-action-hover"}`}
+                className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 ${confirm.kind === "remove" ? "bg-danger-action text-on-danger-action hover:opacity-90" : "bg-brand-action text-on-brand-action hover:bg-brand-action-hover"}`}
               >
                 {removeMember.isPending || transferOwnership.isPending ? (
                   <LoaderCircle

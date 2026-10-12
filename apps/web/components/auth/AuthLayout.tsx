@@ -28,7 +28,7 @@ export function AuthLayout({
         </Link>
         <div className={`mx-auto flex w-full max-w-[440px] flex-1 flex-col justify-center ${registering ? "py-10 sm:py-12 lg:py-5" : "py-12 sm:py-16 lg:py-10"}`}>
           <p className="text-xs font-semibold uppercase text-brand-link">{eyebrow}</p>
-          <h1 className={`mt-4 text-[2.35rem] leading-[1.12] font-semibold text-text-primary text-balance sm:text-[2.75rem] ${registering ? "lg:text-[2.5rem] xl:text-[2.75rem]" : ""}`}>{title}</h1>
+          <h1 className={`type-editorial-display mt-4 text-[2.35rem] leading-[1.12] font-bold text-text-primary text-balance sm:text-[2.75rem] ${registering ? "lg:text-[2.5rem] xl:text-[2.75rem]" : ""}`}>{title}</h1>
           <p className={`max-w-[39ch] text-[0.95rem] leading-7 text-text-secondary ${registering ? "mt-4" : "mt-5"}`}>{description}</p>
           <div className={`border-t border-border-subtle ${registering ? "mt-7 pt-6" : "mt-9 pt-8"}`}>{children}</div>
           <div className={`border-t border-border-subtle text-sm text-text-secondary ${registering ? "mt-6 pt-5" : "mt-7 pt-6"}`}>{footer}</div>
@@ -39,10 +39,10 @@ export function AuthLayout({
       <aside className="relative hidden min-w-0 overflow-hidden bg-auth-stage px-8 py-12 text-auth-stage-text lg:flex lg:flex-col lg:justify-center xl:px-16" aria-hidden="true">
         <div className="mx-auto w-full max-w-[570px]">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase text-auth-stage-muted">
-            <span className="size-1.5 rounded-full bg-brand-400" />
+            <span className="size-1.5 rounded-full bg-editorial-coral" />
             {registering ? "A place to begin together" : "A place for lasting conversations"}
           </div>
-          <h2 className="mt-5 max-w-[17ch] text-[2.4rem] leading-[1.16] font-semibold xl:text-[3rem]">{registering ? "Start a workspace. Start a conversation." : "Keep the question. Keep the context."}</h2>
+          <h2 className="type-editorial-display mt-5 max-w-[17ch] text-[3rem] text-auth-stage-text xl:text-[3.75rem]">{registering ? "Start a workspace. Start a conversation." : "Keep the question. Keep the context."}</h2>
           <p className="mt-4 max-w-[43ch] text-sm leading-6 text-auth-stage-muted">{registering ? "Bring contributors and the first important questions into one shared place." : "Give project conversations a home where every reply adds to the story."}</p>
 
           <div className="mt-10 overflow-hidden rounded-md border border-auth-stage-border bg-auth-stage-surface shadow-lg shadow-black/10">

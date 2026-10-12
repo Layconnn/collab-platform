@@ -18,7 +18,7 @@ export function ProductPreview() {
         aria-hidden="true"
         className="grid md:min-h-[560px] md:grid-cols-[4.5rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)]"
       >
-        <aside className="hidden min-w-0 flex-col border-r border-border-subtle bg-[#f8faf9] md:flex">
+        <aside className="hidden min-w-0 flex-col border-r border-border-subtle bg-surface-subtle md:flex">
           <div className="flex h-14 items-center justify-center border-b border-border-subtle px-3 xl:justify-start xl:gap-2.5">
             <span className="grid size-8 shrink-0 place-items-center rounded bg-brand-accent text-sm font-bold text-on-brand-accent">
               C
@@ -161,7 +161,7 @@ export function ProductPreview() {
                   </p>
                 </div>
               </div>
-              <div className="mt-5 flex min-h-12 items-center justify-between gap-3 rounded border border-border bg-[#fbfcfb] px-3 text-xs text-text-muted">
+              <div className="mt-5 flex min-h-12 items-center justify-between gap-3 rounded border border-border bg-surface px-3 text-xs text-text-muted">
                 <span>Add your perspective...</span>
                 <span className="shrink-0 rounded bg-brand-action px-2.5 py-1.5 font-semibold text-on-brand-action">
                   Reply

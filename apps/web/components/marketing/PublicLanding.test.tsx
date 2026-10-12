@@ -1,11 +1,19 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { ChakraProvider } from "@chakra-ui/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import Home from "@/app/page";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { uiSystem } from "@/lib/ui-system";
 
 describe("public landing page", () => {
+  beforeEach(() => {
+    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
   it("shows the product and links only to existing public routes", () => {
-    const { container } = render(<Home />);
+    const { container } = render(<ChakraProvider value={uiSystem}><ThemeProvider><Home /></ThemeProvider></ChakraProvider>);
 
     expect(
       screen.getByRole("heading", {
@@ -35,5 +43,6 @@ describe("public landing page", () => {
     expect(
       routeLinks.some((link) => link.getAttribute("href") === "/register"),
     ).toBe(true);
+    expect(screen.getByRole("button", { name: "Appearance: System" })).toBeTruthy();
   });
 });

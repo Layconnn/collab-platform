@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
+import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -13,6 +14,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const cormorantDisplay = Cormorant_Garamond({
+  variable: "--font-cormorant-display",
+  subsets: ["latin"],
+  weight: "600",
+  display: "swap",
+  preload: false,
+});
+
 export const metadata: Metadata = {
   title: "Commons | Open-source communities",
   description: "A welcoming place for open-source communities to share ideas, ask questions, and build together.",
@@ -24,8 +33,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeInitScript }} /></head>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${cormorantDisplay.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

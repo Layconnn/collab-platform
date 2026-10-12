@@ -6,6 +6,7 @@ import { SignOutButton } from "@/components/auth/SignOutButton";
 import { AppIcon } from "@/components/common/AppIcon";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { resolveUserIdentity } from "@/lib/user-identity";
+import { ThemeModePicker } from "@/components/theme/ThemeModePicker";
 
 export function AccountMenu({
   user,
@@ -41,6 +42,7 @@ export function AccountMenu({
           <p className="truncate text-sm font-medium text-text-primary">{label}</p>
           <p className="truncate text-xs text-text-muted">{user.email}</p>
         </div>
+        <ThemeModePicker className="border-b border-border-subtle px-2 py-3" />
         <div className="pt-2">
           <SignOutButton />
         </div>

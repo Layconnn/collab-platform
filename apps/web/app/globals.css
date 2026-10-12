@@ -34,6 +34,8 @@
   --color-brand-900: var(--brand-900);
   --color-brand-950: var(--brand-950);
   --color-danger: var(--danger);
+  --color-danger-action: var(--danger-action);
+  --color-on-danger-action: var(--on-danger-action);
   --color-warning: var(--warning);
   --color-success: var(--success);
   --color-info: var(--info);
@@ -44,6 +46,20 @@
   --color-auth-stage-text: var(--auth-stage-text);
   --color-auth-stage-muted: var(--auth-stage-muted);
   --color-auth-stage-avatar: var(--auth-stage-avatar);
+  --color-editorial-forest: var(--editorial-forest);
+  --color-editorial-cream: var(--editorial-cream);
+  --color-editorial-stage-muted: var(--editorial-stage-muted);
+  --color-editorial-stage-border: var(--editorial-stage-border);
+  --color-editorial-stage-surface: var(--editorial-stage-surface);
+  --color-editorial-paper: var(--editorial-paper);
+  --color-editorial-soft: var(--editorial-soft);
+  --color-editorial-coral: var(--editorial-coral);
+  --color-editorial-coral-text: var(--editorial-coral-text);
+  --color-editorial-coral-on-dark: var(--editorial-coral-on-dark);
+  --color-editorial-action: var(--editorial-action);
+  --color-editorial-action-hover: var(--editorial-action-hover);
+  --color-on-editorial-action: var(--on-editorial-action);
+  --font-display: var(--font-cormorant-display);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

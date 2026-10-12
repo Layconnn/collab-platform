@@ -9,6 +9,7 @@ import { useMemo, useState } from "react";
 import { trpc } from "@/lib/trpc/api-client";
 import { createQueryClient } from "@/lib/trpc/query-client";
 import { uiSystem } from "@/lib/ui-system";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => createQueryClient());
@@ -38,7 +39,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <ChakraProvider value={uiSystem}>{children}</ChakraProvider>
+        <ChakraProvider value={uiSystem}><ThemeProvider>{children}</ThemeProvider></ChakraProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { ProductPreview } from "@/components/marketing/ProductPreview";
+import { PublicThemeControl } from "@/components/theme/PublicThemeControl";
 
 export const metadata: Metadata = {
   title: "Commons | Conversations worth keeping",
@@ -64,9 +65,6 @@ const workflow = [
 
 const primaryAction =
   "inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-brand-action px-5 py-3 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
-const secondaryAction =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-border bg-surface px-5 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-hover active:bg-surface-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring";
-
 export default function Home() {
   return (
     <div className="min-w-0 bg-surface text-text-primary">
@@ -121,33 +119,33 @@ export default function Home() {
       <main id="main-content">
         <section
           aria-labelledby="hero-title"
-          className="border-b border-border-subtle bg-[#f7f9f8]"
+          className="border-b border-editorial-stage-border bg-editorial-forest text-editorial-cream"
         >
           <div className="mx-auto max-w-[1280px] px-4 pb-12 pt-14 text-center sm:px-6 sm:pb-16 sm:pt-20 lg:px-8 lg:pt-24">
-            <p className="flex items-center justify-center gap-2 text-[11px] font-semibold uppercase text-brand-700">
+            <p className="flex items-center justify-center gap-2 font-mono text-[11px] uppercase text-editorial-coral-on-dark">
               <span
                 aria-hidden="true"
-                className="size-1.5 rounded-full bg-brand-600"
+                className="size-1.5 rounded-full bg-editorial-coral"
               />{" "}
               Commons for teams building in the open
             </p>
             <h1
               id="hero-title"
-              className="mx-auto mt-6 max-w-[900px] text-[36px] font-semibold leading-[1.1] text-text-primary sm:text-[46px] lg:text-[58px]"
+              className="type-editorial-display mx-auto mt-6 max-w-[900px] text-[46px] text-editorial-cream sm:text-[60px] lg:text-[72px]"
             >
               A workspace for conversations worth keeping.
             </h1>
-            <p className="mx-auto mt-5 max-w-[600px] text-[15px] leading-7 text-text-secondary sm:text-[17px]">
+            <p className="mx-auto mt-5 max-w-[600px] text-[15px] leading-7 text-editorial-stage-muted sm:text-[17px]">
               Give questions, decisions, and the replies that shape them a clear
               place to live, beyond the noise of real-time chat.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 max-[360px]:mt-6">
-              <Link href="/register" className={primaryAction}>
+              <Link href="/register" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-editorial-action px-5 py-3 text-sm font-semibold text-on-editorial-action transition-colors hover:bg-editorial-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-editorial-cream">
                 Get started <ArrowRight aria-hidden="true" size={16} />
               </Link>
               <Link
                 href="#product"
-                className={`${secondaryAction} max-[360px]:hidden`}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-editorial-stage-border px-5 py-3 text-sm font-semibold text-editorial-cream transition-colors hover:bg-editorial-stage-surface active:bg-editorial-stage-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-editorial-cream max-[360px]:hidden"
               >
                 Explore the product <ArrowDown aria-hidden="true" size={16} />
               </Link>
@@ -158,7 +156,7 @@ export default function Home() {
         <section
           id="product"
           aria-label="Commons product preview"
-          className="border-b border-border-subtle bg-[#eaf0ec]"
+          className="border-b border-border-subtle bg-editorial-soft"
         >
           <div className="mx-auto max-w-[1280px] px-3 pb-10 pt-5 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8 lg:pb-20">
             <ProductPreview />
@@ -184,7 +182,7 @@ export default function Home() {
               </p>
               <h2
                 id="organized-title"
-                className="mt-5 text-[30px] font-semibold leading-[1.16] text-text-primary sm:text-[38px]"
+                className="type-editorial-display mt-5 text-[42px] text-text-primary sm:text-[52px]"
               >
                 Give every project a place to think.
               </h2>
@@ -249,7 +247,7 @@ export default function Home() {
 
         <section
           aria-labelledby="conversation-title"
-          className="border-b border-border-subtle bg-[#f2f5f3] py-20 sm:py-24 lg:py-28"
+          className="border-b border-border-subtle bg-editorial-paper py-20 sm:py-24 lg:py-28"
         >
           <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-20 lg:px-8">
             <div
@@ -330,7 +328,7 @@ export default function Home() {
               </p>
               <h2
                 id="conversation-title"
-                className="mt-5 text-[30px] font-semibold leading-[1.16] text-text-primary sm:text-[38px]"
+                className="type-editorial-display mt-5 text-[42px] text-text-primary sm:text-[52px]"
               >
                 Keep the answer attached to the question.
               </h2>
@@ -345,30 +343,30 @@ export default function Home() {
 
         <section
           aria-labelledby="workflow-title"
-          className="bg-[#1c2621] py-20 text-white sm:py-24 lg:py-28"
+          className="bg-editorial-forest py-20 text-editorial-cream sm:py-24 lg:py-28"
         >
           <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
             <div className="max-w-[680px]">
-              <p className="font-mono text-xs uppercase text-[#86d0aa]">
+              <p className="font-mono text-xs uppercase text-editorial-coral-on-dark">
                 The collaboration path
               </p>
               <h2
                 id="workflow-title"
-                className="mt-5 text-[30px] font-semibold leading-[1.16] sm:text-[38px]"
+                className="type-editorial-display mt-5 text-[42px] sm:text-[52px]"
               >
                 A clear path back to what matters.
               </h2>
-              <p className="mt-5 text-[15px] leading-7 text-white/70">
+              <p className="mt-5 text-[15px] leading-7 text-editorial-stage-muted">
                 Each step adds context instead of burying the last one.
               </p>
             </div>
-            <ol className="mt-10 border-t border-white/15">
+            <ol className="mt-10 border-t border-editorial-stage-border">
               {workflow.map((step) => (
                 <li
                   key={step.number}
-                  className="grid grid-cols-[36px_minmax(0,1fr)] gap-x-4 gap-y-2 border-b border-white/15 py-5 sm:grid-cols-[56px_minmax(0,1fr)_minmax(0,1fr)] sm:items-center sm:gap-x-6 sm:py-6"
+                  className="grid grid-cols-[36px_minmax(0,1fr)] gap-x-4 gap-y-2 border-b border-editorial-stage-border py-5 sm:grid-cols-[56px_minmax(0,1fr)_minmax(0,1fr)] sm:items-center sm:gap-x-6 sm:py-6"
                 >
-                  <span className="font-mono text-xs text-[#86d0aa]">
+                  <span className="font-mono text-xs text-editorial-coral-on-dark">
                     {step.number}
                   </span>
                   <div className="flex min-w-0 items-center gap-3 text-sm font-semibold sm:text-base">
@@ -376,11 +374,11 @@ export default function Home() {
                     <ArrowRight
                       aria-hidden="true"
                       size={16}
-                      className="shrink-0 text-[#86d0aa]"
+                      className="shrink-0 text-editorial-coral-on-dark"
                     />
                     <span>{step.to}</span>
                   </div>
-                  <p className="col-start-2 text-xs leading-5 text-white/65 sm:col-auto sm:text-sm">
+                  <p className="col-start-2 text-xs leading-5 text-editorial-stage-muted sm:col-auto sm:text-sm">
                     {step.detail}
                   </p>
                 </li>
@@ -391,7 +389,7 @@ export default function Home() {
 
         <section
           aria-labelledby="cta-title"
-          className="border-b border-border-subtle bg-[#eaf0ec] py-20 sm:py-24 lg:py-28"
+          className="border-b border-border-subtle bg-editorial-soft py-20 sm:py-24 lg:py-28"
         >
           <div className="mx-auto grid max-w-[1280px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:px-8">
             <div className="max-w-[720px]">
@@ -400,7 +398,7 @@ export default function Home() {
               </p>
               <h2
                 id="cta-title"
-                className="mt-5 text-[32px] font-semibold leading-[1.15] sm:text-[42px]"
+                className="type-editorial-display mt-5 text-[44px] sm:text-[56px]"
               >
                 Make room for conversations worth keeping.
               </h2>
@@ -458,6 +456,7 @@ export default function Home() {
           </nav>
         </div>
       </footer>
+      <PublicThemeControl />
     </div>
   );
 }
