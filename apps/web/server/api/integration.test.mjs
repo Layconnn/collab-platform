@@ -13,6 +13,7 @@ const jiti = createJiti(import.meta.url);
 
 const { appRouter } = jiti("./root.ts");
 const { prisma } = jiti("../db/prisma.ts");
+const { Prisma } = jiti("../../app/generated/prisma/client.ts");
 const { redis, redisCache } = jiti("../cache/redis.ts");
 const { notificationQueue } = jiti("../queue/notification.queue.ts");
 const { notificationService } = jiti("../services/notification.service.ts");
@@ -35,6 +36,7 @@ const originalCacheDel = redisCache.del.bind(redisCache);
 const originalCacheDelByPattern = redisCache.delByPattern.bind(redisCache);
 
 const originalPrismaTransaction = prisma.$transaction.bind(prisma);
+const originalUserFindUnique = prisma.user.findUnique.bind(prisma.user);
 const originalWorkspaceCreate = prisma.workspace.create.bind(prisma.workspace);
 const originalWorkspaceFindUnique = prisma.workspace.findUnique.bind(prisma.workspace);
 const originalWorkspaceUpdate = prisma.workspace.update.bind(prisma.workspace);
@@ -65,6 +67,7 @@ const state = {
   redisKeyValues: new Map(),
   nextSeq: 300,
   notificationJobs: [],
+  userLookups: 0,
 };
 
 function makeCuid(seq) {
@@ -115,6 +118,7 @@ function resetState() {
   state.redisKeyValues.clear();
   state.nextSeq = 300;
   state.notificationJobs = [];
+  state.userLookups = 0;
 
   state.users.set(userA, { id: userA, name: "User A", username: "user_a", email: "a@test.local" });
   state.users.set(userB, { id: userB, name: "User B", username: "user_b", email: "b@test.local" });
@@ -188,6 +192,12 @@ redisCache.delByPattern = async (pattern) => {
 
 prisma.$transaction = async (cb) => cb(prisma);
 
+prisma.user.findUnique = async ({ where, select }) => {
+  state.userLookups += 1;
+  const user = [...state.users.values()].find((item) => item.username === where.username);
+  return user ? projectSelect(user, select) : null;
+};
+
 notificationQueue.add = async (name, payload, options) => {
   state.notificationJobs.push({ name, payload, options });
   return { id: options.jobId };
@@ -250,9 +260,7 @@ prisma.workspace.delete = async ({ where }) => {
 prisma.workspaceMember.create = async ({ data, select }) => {
   const key = membershipKey(data.workspaceId, data.userId);
   if (state.workspaceMembers.has(key)) {
-    const err = new Error("duplicate");
-    err.code = "P2002";
-    throw err;
+    throw new Prisma.PrismaClientKnownRequestError("duplicate", { code: "P2002", clientVersion: "7.4.1" });
   }
   const now = new Date();
   const rec = {
@@ -526,6 +534,7 @@ after(async () => {
   redisCache.delByPattern = originalCacheDelByPattern;
 
   prisma.$transaction = originalPrismaTransaction;
+  prisma.user.findUnique = originalUserFindUnique;
   prisma.workspace.create = originalWorkspaceCreate;
   prisma.workspace.findUnique = originalWorkspaceFindUnique;
   prisma.workspace.update = originalWorkspaceUpdate;
@@ -589,6 +598,95 @@ test("mention search is bounded, member-accessible, and tenant-scoped", async ()
     () => member.workspace.searchMentionMembers({ workspaceId: first.id, query: "mention" }),
     (error) => error?.code === "FORBIDDEN",
   );
+});
+
+test("username member onboarding is exact, manager-only, and returns public identity only", async () => {
+  const owner = createCaller(userA);
+  const member = createCaller(userB);
+  const workspace = await owner.workspace.create({ name: "Onboarding Space", slug: "onboarding-space" });
+
+  const found = await owner.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: " USER_B " });
+  assert.deepEqual(found, { status: "ready", user: { name: "User B", username: "user_b" } });
+  assert.equal("id" in found, false);
+  assert.equal(JSON.stringify(found).includes("@test.local"), false);
+  assert.deepEqual(await owner.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: "user" }), { status: "unavailable" });
+
+  const lookupsBefore = state.userLookups;
+  await assert.rejects(
+    () => member.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: "user_a" }),
+    (error) => error?.code === "FORBIDDEN",
+  );
+  await assert.rejects(
+    () => member.workspace.addMemberByUsername({ workspaceId: workspace.id, username: "user_a", role: "MEMBER" }),
+    (error) => error?.code === "FORBIDDEN",
+  );
+  assert.equal(state.userLookups, lookupsBefore);
+
+  await owner.workspace.addMemberByUsername({ workspaceId: workspace.id, username: " UsEr_B ", role: "MEMBER" });
+  assert.equal(state.workspaceMembers.get(membershipKey(workspace.id, userB)).role, "MEMBER");
+  assert.deepEqual(await owner.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: "user_b" }), { status: "already_member" });
+  const memberLookupsBefore = state.userLookups;
+  await assert.rejects(
+    () => member.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: "user_a" }),
+    (error) => error?.code === "FORBIDDEN",
+  );
+  assert.equal(state.userLookups, memberLookupsBefore);
+  await assert.rejects(
+    () => owner.workspace.addMemberByUsername({ workspaceId: workspace.id, username: "missing_user", role: "MEMBER" }),
+    (error) => error?.code === "NOT_FOUND",
+  );
+  await assert.rejects(
+    () => owner.workspace.addMemberByUsername({ workspaceId: workspace.id, username: "user_b", role: "OWNER" }),
+    (error) => error?.code === "BAD_REQUEST",
+  );
+});
+
+test("username additions refresh the roster, recheck permissions, and tolerate concurrent requests", async () => {
+  const owner = createCaller(userA);
+  const admin = createCaller(userB);
+  const workspace = await owner.workspace.create({ name: "Concurrent Space", slug: "concurrent-space" });
+  const firstRoster = await owner.workspace.listMembers({ workspaceId: workspace.id });
+  assert.equal(firstRoster.items.length, 1);
+
+  await owner.workspace.addMember({ workspaceId: workspace.id, userId: userB, role: "ADMIN" });
+  const userC = makeCuid(701);
+  state.users.set(userC, { id: userC, name: null, username: "third_person", email: "third@test.local" });
+  assert.equal((await admin.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: "third_person" })).status, "ready");
+
+  const results = await Promise.allSettled([
+    admin.workspace.addMemberByUsername({ workspaceId: workspace.id, username: "third_person", role: "MEMBER" }),
+    admin.workspace.addMemberByUsername({ workspaceId: workspace.id, username: "third_person", role: "MEMBER" }),
+  ]);
+  assert.equal(results.filter((item) => item.status === "fulfilled").length, 1);
+  assert.equal(results.filter((item) => item.status === "rejected" && item.reason?.code === "CONFLICT").length, 1);
+  assert.equal([...state.workspaceMembers.values()].filter((member) => member.workspaceId === workspace.id && member.userId === userC).length, 1);
+  const refreshedRoster = await owner.workspace.listMembers({ workspaceId: workspace.id });
+  assert.equal(refreshedRoster.items.length, 3);
+
+  const userD = makeCuid(702);
+  state.users.set(userD, { id: userD, name: "Fourth", username: "fourth_person", email: "fourth@test.local" });
+  assert.equal((await admin.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: "fourth_person" })).status, "ready");
+  await owner.workspace.removeMember({ workspaceId: workspace.id, userId: userB });
+  const lookupsBefore = state.userLookups;
+  await assert.rejects(
+    () => admin.workspace.addMemberByUsername({ workspaceId: workspace.id, username: "fourth_person", role: "MEMBER" }),
+    (error) => error?.code === "FORBIDDEN",
+  );
+  assert.equal(state.userLookups, lookupsBefore);
+});
+
+test("candidate lookup is bounded to limit account probing", async () => {
+  const owner = createCaller(userA);
+  const workspace = await owner.workspace.create({ name: "Bounded Space", slug: "bounded-space" });
+  for (let index = 0; index < 10; index += 1) {
+    assert.equal((await owner.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: `unknown_${index}` })).status, "unavailable");
+  }
+  const lookupsBefore = state.userLookups;
+  await assert.rejects(
+    () => owner.workspace.resolveMemberCandidate({ workspaceId: workspace.id, username: "user_b" }),
+    (error) => error?.code === "TOO_MANY_REQUESTS",
+  );
+  assert.equal(state.userLookups, lookupsBefore);
 });
 
 test("edits notify only newly mentioned workspace members", async () => {
@@ -675,7 +773,7 @@ test("workspace + discussion + comment integration flow", async () => {
     const roster = await callerB.workspace.listMembers({ workspaceId: workspace.id });
     assert.equal(roster.items.length, 2);
     assert.equal(roster.items.find((member) => member.userId === userA).user.username, "user_a");
-    assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["email", "id", "name", "username"]);
+    assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["id", "name", "username"]);
 
     // 3. User B creates discussion in workspace.
     state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v2:start:20`, JSON.stringify({}));

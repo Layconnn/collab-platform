@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const emailSchema = z.string().trim().email().max(320);
-const usernameSchema = z
+export const usernameSchema = z
   .string()
   .trim()
   .min(3)

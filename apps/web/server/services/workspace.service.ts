@@ -1,12 +1,14 @@
 import type { WorkspaceRole } from "../../app/generated/prisma/client";
 import type {
   AddWorkspaceMemberInput,
+  AddWorkspaceMemberByUsernameInput,
   CreateWorkspaceInput,
   DeleteWorkspaceInput,
   GetWorkspaceByIdInput,
   ListWorkspaceMembersInput,
   ListWorkspacesInput,
   RemoveWorkspaceMemberInput,
+  ResolveWorkspaceMemberCandidateInput,
   SearchMentionMembersInput,
   TransferWorkspaceOwnershipInput,
   UpdateWorkspaceInput,
@@ -47,7 +49,7 @@ function workspaceByIdCacheKey(workspaceId: string): string {
 }
 
 function membersCacheKey(workspaceId: string, cursor: string | undefined, take: number): string {
-  return `workspace:${workspaceId}:members:v2:${cursor ?? "start"}:${take}`;
+  return `workspace:${workspaceId}:members:v3:${cursor ?? "start"}:${take}`;
 }
 
 type MembershipRoleRecord = {
@@ -340,7 +342,7 @@ export const workspaceService = {
 
     const cacheKey = membersCacheKey(input.workspaceId, input.cursor, input.take);
     const cached = await redisCache.getJSON<
-      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; email: string; name: string | null; username: string } }>
+      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; name: string | null; username: string } }>
     >(cacheKey);
     if (cached) {
       return cached;
@@ -362,7 +364,6 @@ export const workspaceService = {
         user: {
           select: {
             id: true,
-            email: true,
             name: true,
             username: true,
           },
@@ -401,6 +402,37 @@ export const workspaceService = {
     });
 
     return rows.map(({ user }) => user);
+  },
+
+  async resolveMemberCandidate(actorUserId: string, input: ResolveWorkspaceMemberCandidateInput, context: RequestContext) {
+    await requireRoleForAction(input.workspaceId, actorUserId, WORKSPACE_ACTIONS.ADD_MEMBER, context.requestId);
+
+    const user = await prisma.user.findUnique({
+      where: { username: input.username },
+      select: { id: true, name: true, username: true },
+    });
+    if (!user) return { status: "unavailable" as const };
+
+    const existing = await getMembershipRole(input.workspaceId, user.id);
+    if (existing) return { status: "already_member" as const };
+
+    return { status: "ready" as const, user: { name: user.name, username: user.username } };
+  },
+
+  async addMemberByUsername(actorUserId: string, input: AddWorkspaceMemberByUsernameInput, context: RequestContext) {
+    await requireRoleForAction(input.workspaceId, actorUserId, WORKSPACE_ACTIONS.ADD_MEMBER, context.requestId);
+
+    const user = await prisma.user.findUnique({
+      where: { username: input.username },
+      select: { id: true },
+    });
+    if (!user) throw new AppError("NOT_FOUND", "Account is unavailable.");
+
+    return workspaceService.addMember(actorUserId, {
+      workspaceId: input.workspaceId,
+      userId: user.id,
+      role: input.role,
+    }, context);
   },
 
   async addMember(actorUserId: string, input: AddWorkspaceMemberInput, context: RequestContext) {

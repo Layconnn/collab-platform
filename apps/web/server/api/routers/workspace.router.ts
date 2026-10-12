@@ -1,11 +1,13 @@
 import {
   addWorkspaceMemberInputSchema,
+  addWorkspaceMemberByUsernameInputSchema,
   createWorkspaceInputSchema,
   deleteWorkspaceInputSchema,
   getWorkspaceByIdInputSchema,
   listWorkspaceMembersInputSchema,
   listWorkspacesInputSchema,
   removeWorkspaceMemberInputSchema,
+  resolveWorkspaceMemberCandidateInputSchema,
   searchMentionMembersInputSchema,
   transferWorkspaceOwnershipInputSchema,
   updateWorkspaceInputSchema,
@@ -37,6 +39,12 @@ const addMemberRateLimit = createRateLimitGuard({
   windowSeconds: 60,
 });
 
+const resolveMemberCandidateRateLimit = createRateLimitGuard({
+  routeKey: "workspace.resolveMemberCandidate",
+  limit: 10,
+  windowSeconds: 60,
+});
+
 const updateMemberRoleRateLimit = createRateLimitGuard({
   routeKey: "workspace.updateMemberRole",
   limit: 20,
@@ -56,6 +64,11 @@ const getByIdProcedure = protectedProcedure.use(async ({ ctx, next }) => {
 
 const addMemberProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   await addMemberRateLimit(ctx.user.id, ctx.requestId);
+  return next();
+});
+
+const resolveMemberCandidateProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  await resolveMemberCandidateRateLimit(ctx.user.id, ctx.requestId);
   return next();
 });
 
@@ -100,6 +113,14 @@ export const workspaceRouter = createTRPCRouter({
 
   addMember: addMemberProcedure.input(addWorkspaceMemberInputSchema).mutation(({ ctx, input }) =>
     execute(() => workspaceService.addMember(ctx.user.id, input, { requestId: ctx.requestId })),
+  ),
+
+  resolveMemberCandidate: resolveMemberCandidateProcedure.input(resolveWorkspaceMemberCandidateInputSchema).mutation(({ ctx, input }) =>
+    execute(() => workspaceService.resolveMemberCandidate(ctx.user.id, input, { requestId: ctx.requestId })),
+  ),
+
+  addMemberByUsername: addMemberProcedure.input(addWorkspaceMemberByUsernameInputSchema).mutation(({ ctx, input }) =>
+    execute(() => workspaceService.addMemberByUsername(ctx.user.id, input, { requestId: ctx.requestId })),
   ),
 
   updateMemberRole: updateMemberRoleProcedure.input(updateWorkspaceMemberRoleInputSchema).mutation(({ ctx, input }) =>

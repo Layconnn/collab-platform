@@ -22,18 +22,10 @@ import {
 } from "@/hooks/useWorkspace";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 import { resolveUserIdentity } from "@/lib/user-identity";
+import { workspaceInitials } from "@/lib/workspace-identity";
 
 type Member =
   inferRouterOutputs<AppRouter>["workspace"]["listMembers"]["items"][number];
-
-function initials(value: string) {
-  const words = value.trim().split(/\s+/).filter(Boolean);
-  return (
-    words.length > 1
-      ? `${words[0][0]}${words[1][0]}`
-      : (words[0]?.slice(0, 2) ?? "?")
-  ).toUpperCase();
-}
 
 function dateLabel(value: Date | string) {
   return new Intl.DateTimeFormat("en", {
@@ -204,7 +196,7 @@ export function WorkspaceHome({ workspaceId }: { workspaceId: string }) {
             aria-hidden="true"
             className="grid size-12 shrink-0 place-items-center rounded-sm bg-brand-action text-lg font-semibold text-on-brand-action sm:size-14"
           >
-            {initials(workspace.data.name)}
+            {workspaceInitials(workspace.data.name)}
           </span>
           <div className="min-w-0 flex-1">
             <h1 className="wrap-anywhere text-[1.7rem] leading-tight font-semibold text-text-primary sm:text-[2rem]">

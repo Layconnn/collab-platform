@@ -6,15 +6,9 @@ import type { inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "@/server/api/root";
 import { AppIcon } from "@/components/common/AppIcon";
+import { workspaceInitials } from "@/lib/workspace-identity";
 
 type WorkspaceSummary = inferRouterOutputs<AppRouter>["workspace"]["listForUser"]["items"][number];
-
-function initials(name: string) {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  return words.length > 1
-    ? `${words[0][0]}${words[1][0]}`.toUpperCase()
-    : (words[0]?.slice(0, 2) ?? "W").toUpperCase();
-}
 
 function targetForWorkspace(pathname: string, workspaceId: string) {
   if (pathname.includes("/members")) return `/workspace/${workspaceId}/members`;
@@ -63,7 +57,7 @@ export function WorkspaceSwitcher({
         className={`flex min-h-11 w-full cursor-pointer list-none items-center gap-2 rounded-md text-left outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center px-1" : "px-2"}`}
       >
         <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-100 text-xs font-semibold text-brand-800">
-          {currentWorkspace?.name || selected?.name ? initials(label) : <AppIcon name="workspaces" />}
+          {currentWorkspace?.name || selected?.name ? workspaceInitials(label) : <AppIcon name="workspaces" />}
         </span>
         {!collapsed ? (
           <>
@@ -95,7 +89,7 @@ export function WorkspaceSwitcher({
                   onClick={closeMenu}
                   className="flex min-h-10 items-center gap-3 rounded px-2 text-sm text-text-secondary hover:bg-surface-subtle hover:text-text-primary focus-visible:bg-surface-subtle"
                 >
-                  <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded bg-surface-subtle text-[10px] font-semibold text-brand-700">{initials(workspace.name)}</span>
+                  <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded bg-surface-subtle text-[10px] font-semibold text-brand-700">{workspaceInitials(workspace.name)}</span>
                   <span className="min-w-0 flex-1 truncate">{workspace.name}</span>
                   {workspace.workspaceId === currentId ? <span aria-hidden="true" className="size-1.5 rounded-full bg-brand" /> : null}
                 </Link>

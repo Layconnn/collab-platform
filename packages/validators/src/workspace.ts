@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { usernameSchema } from "./auth";
 
 export const workspaceRoleSchema = z.enum(["OWNER", "ADMIN", "MEMBER"]);
 
@@ -57,6 +58,15 @@ export const addWorkspaceMemberInputSchema = z.object({
   role: workspaceRoleSchema.default("MEMBER"),
 });
 
+export const resolveWorkspaceMemberCandidateInputSchema = z.object({
+  workspaceId: workspaceIdSchema,
+  username: usernameSchema,
+});
+
+export const addWorkspaceMemberByUsernameInputSchema = resolveWorkspaceMemberCandidateInputSchema.extend({
+  role: z.enum(["ADMIN", "MEMBER"]).default("MEMBER"),
+});
+
 export const updateWorkspaceMemberRoleInputSchema = z.object({
   workspaceId: workspaceIdSchema,
   userId: userIdSchema,
@@ -81,6 +91,8 @@ export type ListWorkspacesInput = z.infer<typeof listWorkspacesInputSchema>;
 export type ListWorkspaceMembersInput = z.infer<typeof listWorkspaceMembersInputSchema>;
 export type SearchMentionMembersInput = z.infer<typeof searchMentionMembersInputSchema>;
 export type AddWorkspaceMemberInput = z.infer<typeof addWorkspaceMemberInputSchema>;
+export type ResolveWorkspaceMemberCandidateInput = z.infer<typeof resolveWorkspaceMemberCandidateInputSchema>;
+export type AddWorkspaceMemberByUsernameInput = z.infer<typeof addWorkspaceMemberByUsernameInputSchema>;
 export type UpdateWorkspaceMemberRoleInput = z.infer<typeof updateWorkspaceMemberRoleInputSchema>;
 export type RemoveWorkspaceMemberInput = z.infer<typeof removeWorkspaceMemberInputSchema>;
 export type TransferWorkspaceOwnershipInput = z.infer<typeof transferWorkspaceOwnershipInputSchema>;
