@@ -116,9 +116,12 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const workspacesQuery = useWorkspaceSwitcherList(Boolean(user));
   const workspaceDetail = useWorkspaceDetail(workspaceId ?? "", Boolean(user && workspaceId));
-  const workspaces = workspacesQuery.data?.pages.flatMap((page) => page.items) ?? [];
-  const selectedWorkspace = workspaces.find((item) => item.workspaceId === workspaceId);
-  const workspaceName = selectedWorkspace?.name ?? workspaceDetail.data?.name;
+  const workspaceUnavailable = ["FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(workspaceDetail.error?.data?.code ?? "");
+  const visibleWorkspaceId = workspaceUnavailable ? undefined : workspaceId;
+  const workspaces = (workspacesQuery.data?.pages.flatMap((page) => page.items) ?? [])
+    .filter((item) => !workspaceUnavailable || item.workspaceId !== workspaceId);
+  const selectedWorkspace = workspaces.find((item) => item.workspaceId === visibleWorkspaceId);
+  const workspaceName = selectedWorkspace?.name ?? (workspaceUnavailable ? undefined : workspaceDetail.data?.name);
 
   const sidebarExpanded = useUiStore((state) => state.isSidebarOpen);
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
@@ -191,7 +194,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
     <SidebarContent
       collapsed={sidebarExpanded === false}
       pathname={pathname}
-      workspaceId={workspaceId}
+      workspaceId={visibleWorkspaceId}
       workspaceName={workspaceName}
       workspaces={workspaces}
       workspacesLoading={workspacesQuery.isLoading}
@@ -206,7 +209,9 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
   );
 
   const context = pageContext(pathname);
-  const contextName = workspaceName ?? (workspaceId ? "Loading workspace" : "Workspaces");
+  const contextName = workspaceUnavailable
+    ? "Workspace unavailable"
+    : workspaceName ?? (workspaceId ? "Loading workspace" : "Workspaces");
 
   return (
     <div className={`min-h-screen bg-canvas text-text-primary md:grid md:transition-[grid-template-columns] md:duration-150 motion-reduce:transition-none ${sidebarExpanded ? "md:grid-cols-[16rem_minmax(0,1fr)]" : "md:grid-cols-[4.5rem_minmax(0,1fr)]"}`}>
@@ -242,8 +247,8 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
           </div>
           <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-xs text-text-muted md:flex">
             <Link href="/workspace" className="shrink-0 hover:text-text-primary">Workspaces</Link>
-            {workspaceId ? <><span aria-hidden="true">/</span><Link href={`/workspace/${workspaceId}`} className="max-w-64 truncate hover:text-text-primary">{contextName}</Link></> : null}
-            {workspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span><span aria-current="page" className="text-text-secondary">{context}</span></> : null}
+            {visibleWorkspaceId ? <><span aria-hidden="true">/</span><Link href={`/workspace/${visibleWorkspaceId}`} className="max-w-64 truncate hover:text-text-primary">{contextName}</Link></> : null}
+            {visibleWorkspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span><span aria-current="page" className="text-text-secondary">{context}</span></> : null}
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-2">
             <NotificationDropdown compact />
@@ -282,7 +287,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
                 showBrandHeader={false}
                 onNavigate={() => setMobileNavOpen(false)}
                 pathname={pathname}
-                workspaceId={workspaceId}
+                workspaceId={visibleWorkspaceId}
                 workspaceName={workspaceName}
                 workspaces={workspaces}
                 workspacesLoading={workspacesQuery.isLoading}

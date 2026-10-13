@@ -770,6 +770,10 @@ test("workspace + discussion + comment integration flow", async () => {
       role: "ADMIN",
     });
     assert.equal(adminMembership.role, "ADMIN");
+    const ownerView = await callerA.workspace.getById({ workspaceId: workspace.id });
+    const adminView = await callerB.workspace.getById({ workspaceId: workspace.id });
+    assert.equal(ownerView.viewerRole, "OWNER");
+    assert.equal(adminView.viewerRole, "ADMIN");
     const roster = await callerB.workspace.listMembers({ workspaceId: workspace.id });
     assert.equal(roster.items.length, 2);
     assert.equal(roster.items.find((member) => member.userId === userA).user.username, "user_a");
@@ -838,6 +842,7 @@ test("workspace + discussion + comment integration flow", async () => {
       userId: userB,
       role: "MEMBER",
     });
+    assert.equal((await callerB.workspace.getById({ workspaceId: workspace.id })).viewerRole, "MEMBER");
 
     // 7. User B tries to delete User A comment -> 403.
     await assert.rejects(
@@ -860,6 +865,10 @@ test("workspace + discussion + comment integration flow", async () => {
     });
     await assert.rejects(
       async () => callerB.workspace.listMembers({ workspaceId: workspace.id }),
+      (error) => error?.code === "FORBIDDEN",
+    );
+    await assert.rejects(
+      async () => callerB.workspace.getById({ workspaceId: workspace.id }),
       (error) => error?.code === "FORBIDDEN",
     );
     await assert.rejects(

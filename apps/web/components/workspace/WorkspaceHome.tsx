@@ -14,12 +14,8 @@ import type { AppRouter } from "@/server/api/root";
 import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { DiscussionRow } from "@/components/discussion/DiscussionRow";
-import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionList } from "@/hooks/useDiscussion";
-import {
-  useWorkspaceDetail,
-  useWorkspaceSwitcherList,
-} from "@/hooks/useWorkspace";
+import { useWorkspaceDetail } from "@/hooks/useWorkspace";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 import { resolveUserIdentity } from "@/lib/user-identity";
 import { workspaceInitials } from "@/lib/workspace-identity";
@@ -108,15 +104,9 @@ function MemberRow({ member }: { member: Member }) {
 }
 
 export function WorkspaceHome({ workspaceId }: { workspaceId: string }) {
-  const { user } = useAuth();
   const workspace = useWorkspaceDetail(workspaceId);
   const discussions = useDiscussionList(workspaceId);
-  const workspaces = useWorkspaceSwitcherList(Boolean(user));
-  const listedMembership = workspaces.data?.pages
-    .flatMap((page) => page.items)
-    .find((item) => item.workspaceId === workspaceId);
-  const role =
-    workspace.data?.ownerId === user?.id ? "OWNER" : listedMembership?.role;
+  const role = workspace.data?.viewerRole;
   const canViewMembers = role === "OWNER" || role === "ADMIN";
   const { members } = useWorkspaceMembers(workspaceId, canViewMembers);
   const workspaceDenied =

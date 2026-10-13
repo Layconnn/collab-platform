@@ -13,7 +13,7 @@ import { DiscussionRow, type DiscussionSummary } from "@/components/discussion/D
 import { discussionActionError } from "@/components/discussion/discussionErrors";
 import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionActions, useDiscussionList } from "@/hooks/useDiscussion";
-import { useWorkspaceDetail, useWorkspaceSwitcherList } from "@/hooks/useWorkspace";
+import { useWorkspaceDetail } from "@/hooks/useWorkspace";
 
 function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: DiscussionSummary; workspaceId: string; canManage: boolean }) {
   const { update, remove } = useDiscussionActions(workspaceId);
@@ -128,11 +128,7 @@ export function DiscussionList({ workspaceId, query, onCreate, accessDenied = fa
 }) {
   const { user } = useAuth();
   const workspace = useWorkspaceDetail(workspaceId, Boolean(user));
-  const workspaces = useWorkspaceSwitcherList(Boolean(user));
-  const listedRole = !workspaces.error && workspaces.data?.pages
-    .flatMap((page) => page.items)
-    .find((item) => item.workspaceId === workspaceId)?.role;
-  const role = workspace.data?.ownerId === user?.id ? "OWNER" : listedRole;
+  const role = workspace.data?.viewerRole;
   const canManageOthers = role === "OWNER" || role === "ADMIN";
   const denied = accessDenied || workspace.error?.data?.code === "FORBIDDEN" || workspace.error?.data?.code === "UNAUTHORIZED" || query.error?.data?.code === "FORBIDDEN" || query.error?.data?.code === "UNAUTHORIZED";
   if (denied) {

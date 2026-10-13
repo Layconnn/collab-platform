@@ -5,7 +5,6 @@ const mocks = vi.hoisted(() => ({
   user: { id: "user-1" } as { id: string } | null,
   workspace: null as unknown,
   discussions: null as unknown,
-  workspaces: null as unknown,
   members: null as unknown,
   memberEnabled: vi.fn(),
 }));
@@ -13,7 +12,6 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: mocks.user }) }));
 vi.mock("@/hooks/useWorkspace", () => ({
   useWorkspaceDetail: () => mocks.workspace,
-  useWorkspaceSwitcherList: () => mocks.workspaces,
 }));
 vi.mock("@/hooks/useDiscussion", () => ({
   useDiscussionList: () => mocks.discussions,
@@ -49,6 +47,7 @@ describe("WorkspaceHome", () => {
         name: "Open Atlas",
         slug: "open-atlas",
         ownerId: "user-2",
+        viewerRole: "MEMBER",
         createdAt,
       },
       isLoading: false,
@@ -62,11 +61,6 @@ describe("WorkspaceHome", () => {
       error: null,
       hasNextPage: false,
       refetch: vi.fn(),
-    };
-    mocks.workspaces = {
-      data: {
-        pages: [{ items: [{ workspaceId: "workspace-1", role: "MEMBER" }] }],
-      },
     };
     mocks.members = {
       data: undefined,
@@ -90,6 +84,26 @@ describe("WorkspaceHome", () => {
     ).toBe("/workspace/workspace-1/discussions#new-discussion");
     expect(screen.queryByRole("heading", { name: "Contributors" })).toBeNull();
     expect(mocks.memberEnabled).toHaveBeenCalledWith(false);
+  });
+
+  it("shows the contributor section to an admin without a loaded workspace switcher entry", () => {
+    mocks.workspace = {
+      data: {
+        id: "workspace-1",
+        name: "Open Atlas",
+        slug: "open-atlas",
+        ownerId: "user-2",
+        viewerRole: "ADMIN",
+        createdAt,
+      },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    };
+    render(<WorkspaceHome workspaceId="workspace-1" />);
+
+    expect(mocks.memberEnabled).toHaveBeenCalledWith(true);
+    expect(screen.getByRole("heading", { name: "Contributors" })).toBeTruthy();
   });
 
   it("shows only the six most recent rows and marks paginated counts as lower bounds", () => {
@@ -129,6 +143,7 @@ describe("WorkspaceHome", () => {
         name: "Open Atlas",
         slug: "open-atlas",
         ownerId: "user-1",
+        viewerRole: "OWNER",
         createdAt,
       },
       isLoading: false,
@@ -227,6 +242,7 @@ describe("WorkspaceHome", () => {
         name: "Open Atlas",
         slug: "open-atlas",
         ownerId: "user-1",
+        viewerRole: "OWNER",
         createdAt,
       },
       isLoading: false,

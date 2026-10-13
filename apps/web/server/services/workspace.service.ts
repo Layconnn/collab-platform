@@ -247,7 +247,7 @@ export const workspaceService = {
   },
 
   async getById(userId: string, input: GetWorkspaceByIdInput, context: RequestContext) {
-    await requireRoleForAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ, context.requestId);
+    const membership = await requireRoleForAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ, context.requestId);
 
     const cacheKey = workspaceByIdCacheKey(input.workspaceId);
     const cached = await redisCache.getJSON<{
@@ -259,7 +259,7 @@ export const workspaceService = {
       updatedAt: Date;
     }>(cacheKey);
     if (cached) {
-      return cached;
+      return { ...cached, viewerRole: membership.role };
     }
 
     const workspace = await prisma.workspace.findUnique({
@@ -279,7 +279,7 @@ export const workspaceService = {
     }
 
     await redisCache.setJSON(cacheKey, workspace, WORKSPACE_TTL_SECONDS);
-    return workspace;
+    return { ...workspace, viewerRole: membership.role };
   },
 
   async update(userId: string, input: UpdateWorkspaceInput, context: RequestContext) {

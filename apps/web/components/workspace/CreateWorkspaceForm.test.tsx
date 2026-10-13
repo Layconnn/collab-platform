@@ -118,7 +118,7 @@ describe("CreateWorkspaceForm", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create workspace" }));
     const alert = await screen.findByRole("alert");
     expect(alert.textContent).toContain("Workspace could not be created. Please try again.");
-    expect(document.activeElement).toBe(alert);
+    await waitFor(() => expect(document.activeElement).toBe(alert));
     expect(name.value).toBe("Open Atlas");
     expect(screen.queryByText("internal database detail")).toBeNull();
   });

@@ -7,7 +7,6 @@ import { uiSystem } from "@/lib/ui-system";
 const mocks = vi.hoisted(() => ({
   userId: "user-1" as string | null,
   role: "MEMBER" as "MEMBER" | "ADMIN" | "OWNER" | null,
-  ownerId: "user-3",
   workspaceError: null as null | { data: { code: string } },
   removeError: null as Error | null,
   remove: vi.fn(),
@@ -17,8 +16,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: mocks.userId ? { id: mocks.userId } : null }) }));
 vi.mock("@/hooks/useWorkspace", () => ({
-  useWorkspaceDetail: () => ({ data: mocks.workspaceError ? null : { ownerId: mocks.ownerId }, error: mocks.workspaceError }),
-  useWorkspaceSwitcherList: () => ({ data: { pages: [{ items: mocks.role ? [{ workspaceId: "c000000000000000000000001", role: mocks.role }] : [] }] }, error: null }),
+  useWorkspaceDetail: () => ({ data: mocks.workspaceError ? null : { viewerRole: mocks.role }, error: mocks.workspaceError }),
 }));
 vi.mock("@/hooks/useDiscussion", () => ({
   useDiscussionActions: () => ({
@@ -137,7 +135,7 @@ describe("DiscussionList", () => {
   });
 
   it.each([
-    ["owner", "user-3", "MEMBER"],
+    ["owner", "user-3", "OWNER"],
     ["admin", "user-4", "ADMIN"],
   ] as const)("shows discussion actions to a workspace %s", async (_label, userId, role) => {
     const user = userEvent.setup();
@@ -148,6 +146,14 @@ describe("DiscussionList", () => {
     await user.click(screen.getByRole("button", { name: `Actions for ${discussion.title}` }));
     expect(await screen.findByRole("menuitem", { name: "Edit title" })).toBeTruthy();
     expect(screen.getByRole("menuitem", { name: "Delete discussion" })).toBeTruthy();
+  });
+
+  it("shows admin controls even when the workspace switcher has not loaded that workspace", () => {
+    mocks.userId = "user-4";
+    mocks.role = "ADMIN";
+    render(<ChakraProvider value={uiSystem}><DiscussionList workspaceId={workspaceId} query={query()} onCreate={vi.fn()} /></ChakraProvider>);
+
+    expect(screen.getByRole("button", { name: `Actions for ${discussion.title}` })).toBeTruthy();
   });
 
   it("does not assume an unknown membership grants management access", () => {

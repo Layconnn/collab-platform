@@ -7,7 +7,6 @@ import { uiSystem } from "@/lib/ui-system";
 const mocks = vi.hoisted(() => ({
   userId: "user-2" as string | null,
   role: "MEMBER" as "MEMBER" | "ADMIN" | "OWNER" | null,
-  ownerId: "user-3",
   discussionError: null as null | { data: { code: string } },
   commentError: null as null | { data: { code: string } },
   commentEnabled: false,
@@ -33,8 +32,7 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: mocks.userId ? { id: mocks.userId } : null }) }));
 vi.mock("@/hooks/useWorkspace", () => ({
-  useWorkspaceDetail: () => ({ data: { name: "Open Atlas", ownerId: mocks.ownerId }, error: null }),
-  useWorkspaceSwitcherList: () => ({ data: { pages: [{ items: mocks.role ? [{ workspaceId: "c000000000000000000000002", role: mocks.role }] : [] }] }, error: null }),
+  useWorkspaceDetail: () => ({ data: { name: "Open Atlas", viewerRole: mocks.role }, error: null }),
 }));
 vi.mock("@/hooks/useDiscussion", () => ({
   useDiscussionDetail: () => ({ data: mocks.loading || mocks.discussionError?.data.code === "INTERNAL_SERVER_ERROR" ? null : mocks.discussionData, isLoading: mocks.loading, isFetching: false, error: mocks.discussionError, refetch: mocks.refetchDiscussion }),
@@ -131,7 +129,7 @@ describe("Discussion detail page", () => {
 
   it.each([
     ["author", "user-1", "MEMBER"],
-    ["owner", "user-3", "MEMBER"],
+    ["owner", "user-3", "OWNER"],
     ["admin", "user-4", "ADMIN"],
   ] as const)("allows the %s to access real discussion actions", async (_label, userId, role) => {
     const user = userEvent.setup();

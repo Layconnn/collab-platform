@@ -19,7 +19,7 @@ import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionActions, useDiscussionDetail } from "@/hooks/useDiscussion";
-import { useWorkspaceDetail, useWorkspaceSwitcherList } from "@/hooks/useWorkspace";
+import { useWorkspaceDetail } from "@/hooks/useWorkspace";
 import { resolveUserIdentity } from "@/lib/user-identity";
 
 function dateLabel(value: Date | string) {
@@ -52,7 +52,6 @@ export default function DiscussionDetailPage() {
   const discussion = useDiscussionDetail(discussionId);
   const workspace = useWorkspaceDetail(workspaceId);
   const { user } = useAuth();
-  const workspaces = useWorkspaceSwitcherList(Boolean(user));
   const { update, remove } = useDiscussionActions(workspaceId);
   const discussionDenied = [discussion.error?.data?.code, workspace.error?.data?.code]
     .some((code) => code === "FORBIDDEN" || code === "UNAUTHORIZED");
@@ -68,10 +67,7 @@ export default function DiscussionDetailPage() {
     shouldFocusError: true,
   });
   const editBody = useWatch({ control: form.control, name: "body" });
-  const listedRole = !workspaces.error && workspaces.data?.pages
-    .flatMap((page) => page.items)
-    .find((item) => item.workspaceId === workspaceId)?.role;
-  const role = workspace.data?.ownerId === user?.id ? "OWNER" : listedRole;
+  const role = workspace.data?.viewerRole;
   const canManageOthers = role === "OWNER" || role === "ADMIN";
   const denied = threadAccessDenied || discussionDenied || comments.error?.data?.code === "FORBIDDEN" || comments.error?.data?.code === "UNAUTHORIZED";
   const missing = workspaceMismatch || workspace.error?.data?.code === "NOT_FOUND" || discussion.error?.data?.code === "NOT_FOUND";
