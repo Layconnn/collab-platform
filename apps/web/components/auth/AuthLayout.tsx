@@ -33,7 +33,7 @@ export function AuthLayout({
           className="inline-flex w-fit items-center gap-2.5 rounded-sm text-text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-ring"
           aria-label="Commons home"
         >
-          <span className="grid size-8 place-items-center rounded-sm bg-brand-accent text-sm font-bold text-on-brand-accent">
+          <span className="grid size-8 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent">
             C
           </span>
           <span className="text-base font-semibold">Commons</span>
