@@ -154,7 +154,7 @@ describe("NotificationDropdown", () => {
     expect(screen.getByText("Unread")).toBeTruthy();
     expect(screen.getByText("Read")).toBeTruthy();
 
-    await user.click(screen.getByRole("button", { name: "Mark read" }));
+    await user.click(screen.getByRole("button", { name: /Mark mention notification from Maya Chen.*as read/ }));
     mocks.markRead.mock.calls[0][1].onSettled();
     setFeed([
       { ...notification, readAt: new Date("2026-10-02T11:00:00.000Z") },
@@ -173,7 +173,8 @@ describe("NotificationDropdown", () => {
     expect(
       screen.getByRole("button", { name: "Notifications, 0 unread" }),
     ).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Mark read" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Mark mention notification.*as read/ })).toBeNull();
+    expect(document.activeElement).toBe(screen.getAllByRole("link", { name: /Open discussion for mention notification/ })[0]);
   });
 
   it("uses contextual rows while the feed is loading", async () => {
@@ -198,7 +199,7 @@ describe("NotificationDropdown", () => {
     expect(await screen.findByText("Maya Chen")).toBeTruthy();
     expect(screen.getByText("Read")).toBeTruthy();
     expect(screen.getByRole("time")).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "Mark read" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Mark mention notification.*as read/ })).toBeNull();
   });
 
   it("uses the actor username when a display name is unavailable", async () => {
@@ -213,7 +214,7 @@ describe("NotificationDropdown", () => {
     renderDropdown();
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: /Notifications, / }));
-    await user.click(await screen.findByRole("button", { name: "Mark read" }));
+    await user.click(await screen.findByRole("button", { name: /Mark mention notification.*as read/ }));
     expect(mocks.markRead).toHaveBeenCalledWith(
       { notificationId: notification.id },
       expect.any(Object),
@@ -230,7 +231,7 @@ describe("NotificationDropdown", () => {
     renderDropdown();
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: /Notifications, / }));
-    const link = await screen.findByRole("link", { name: "Open discussion" });
+    const link = await screen.findByRole("link", { name: /Open discussion for mention notification/ });
     expect(link.getAttribute("href")).toBe(
       `/workspace/${workspaceId}/discussions/${discussionId}`,
     );
@@ -251,7 +252,7 @@ describe("NotificationDropdown", () => {
       .click(screen.getByRole("button", { name: /Notifications, / }));
     expect(await screen.findByText(longMessage.trim())).toBeTruthy();
     expect(screen.getByText("Conversation unavailable")).toBeTruthy();
-    expect(screen.queryByRole("link", { name: "Open discussion" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Open discussion for mention notification/ })).toBeNull();
   });
 
   it("shows pagination failure with a retry action", async () => {
@@ -285,7 +286,7 @@ describe("NotificationDropdown", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Notifications unavailable" }));
     expect(await screen.findByText("Notifications unavailable")).toBeTruthy();
     expect(screen.queryByText(notification.message)).toBeNull();
-    expect(screen.queryByRole("button", { name: "Mark read" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Mark mention notification.*as read/ })).toBeNull();
     expect(screen.queryByRole("button", { name: "Mark all read" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Load more" })).toBeNull();
   });
@@ -311,5 +312,16 @@ describe("NotificationDropdown", () => {
       "textContent",
       "Could not mark all notifications as read. Try again.",
     );
+  });
+
+  it("moves focus to the close control after all unread notifications are marked", async () => {
+    const { rerender } = renderDropdown();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /Notifications, / }));
+    await user.click(await screen.findByRole("button", { name: "Mark all read" }));
+    mocks.unread = { data: { items: [], nextCursor: null }, isPending: false, isError: false };
+    setFeed([{ ...notification, readAt: new Date("2026-10-02T11:00:00.000Z") }]);
+    rerender(<ChakraProvider value={uiSystem}><NotificationDropdown compact /></ChakraProvider>);
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("button", { name: "Close notifications" })));
   });
 });

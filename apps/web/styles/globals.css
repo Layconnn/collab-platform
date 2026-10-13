@@ -10,6 +10,7 @@
   --text-secondary: #34443c;
   --text-muted: #63716a;
   --border: #cbd8d0;
+  --control-border: #87958a;
   --border-subtle: #dce6e0;
   --brand-50: #f0f5f0;
   --brand-100: #e2ece3;
@@ -70,6 +71,7 @@
   --text-secondary: #c5d2c9;
   --text-muted: #9aa99f;
   --border: #405147;
+  --control-border: #647d6b;
   --border-subtle: #2e3c33;
   --brand-50: #0d2a20;
   --brand-100: #113d2d;

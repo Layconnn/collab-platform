@@ -191,7 +191,7 @@ export function MentionTextarea({ as = "textarea", workspaceId, registration, va
     <div ref={containerRef} className="relative min-w-0">
       {as === "input" ? <input {...editorProps} /> : <textarea {...editorProps} rows={rows} />}
       {open && panelPlacement ? createPortal(
-        <div id={`${id}-list`} role="listbox" aria-label="Workspace members" style={panelPlacement} className="fixed z-50 min-w-0 overflow-y-auto rounded-sm border border-border bg-surface p-1 shadow-lg">
+        <div id={`${id}-list`} role="listbox" aria-label="Workspace members" style={panelPlacement} className="fixed z-50 min-w-0 overflow-y-auto rounded-sm border border-control-border bg-surface p-1 shadow-lg">
           <p className="px-2 py-1 text-[0.7rem] font-semibold uppercase text-text-muted">Mention a workspace member</p>
           {!ready || members.isFetching ? <p role="status" className="px-2 py-2 text-sm text-text-secondary">Searching members...</p> : null}
           {ready && members.isError ? <p role="alert" className="px-2 py-2 text-sm text-danger">Members unavailable. Try typing again.</p> : null}

@@ -75,7 +75,7 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
           disabled={busy}
           aria-invalid={Boolean(form.formState.errors.body)}
           aria-describedby={form.formState.errors.body ? fieldErrorId : undefined}
-          className="min-h-28 w-full resize-y rounded-sm border border-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+          className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
         />
         {form.formState.errors.body ? (
           <p id={fieldErrorId} role="alert" className="mt-1 text-sm text-danger">Write a {parentCommentId ? "reply" : "comment"} of up to 5,000 characters.</p>

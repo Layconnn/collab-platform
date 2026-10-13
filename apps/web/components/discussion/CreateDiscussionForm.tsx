@@ -62,7 +62,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           value={title}
           onInsert={(value) => form.setValue("title", value, { shouldDirty: true, shouldValidate: true })}
           id="discussion-title"
-          className="mt-2 min-h-11 w-full rounded-sm border border-border bg-surface px-3.5 text-base text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
+          className="mt-2 min-h-11 w-full rounded-sm border border-control-border bg-surface px-3.5 text-base text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
           placeholder="What needs a conversation?"
           aria-invalid={Boolean(form.formState.errors.title)}
           aria-describedby={form.formState.errors.title ? "discussion-title-error" : undefined}
@@ -79,7 +79,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           value={form.watch("body")}
           onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })}
           id="discussion-body"
-          className="mt-2 min-h-32 w-full resize-y rounded-sm border border-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
+          className="mt-2 min-h-32 w-full resize-y rounded-sm border border-control-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
           placeholder="Share the background, question, or update so others can contribute."
           rows={5}
           aria-invalid={Boolean(form.formState.errors.body)}

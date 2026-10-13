@@ -144,7 +144,7 @@ export function CreateWorkspaceForm() {
           placeholder="Open Atlas"
           aria-invalid={Boolean(nameError)}
           aria-describedby={`new-workspace-name-help${nameError ? " new-workspace-name-error" : ""}`}
-          className="mt-2 h-12 w-full min-w-0 rounded-sm border border-border bg-surface px-3.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-text-muted focus-visible:border-focus-ring focus-visible:ring-2 focus-visible:ring-focus-ring/25 disabled:opacity-60 motion-reduce:transition-none"
+          className="mt-2 h-12 w-full min-w-0 rounded-sm border border-control-border bg-surface px-3.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus-visible:border-focus-ring focus-visible:ring-2 focus-visible:ring-focus-ring/25 disabled:opacity-60 motion-reduce:transition-none"
           {...form.register("name")}
         />
         {nameError ? (
@@ -171,7 +171,7 @@ export function CreateWorkspaceForm() {
           A short, readable identifier for your workspace. You can edit the
           suggestion.
         </p>
-        <div className="mt-2 flex h-12 min-w-0 items-center rounded-sm border border-border bg-surface focus-within:border-focus-ring focus-within:ring-2 focus-within:ring-focus-ring/25 hover:border-text-muted">
+        <div className="mt-2 flex h-12 min-w-0 items-center rounded-sm border border-control-border bg-surface focus-within:border-focus-ring focus-within:ring-2 focus-within:ring-focus-ring/25 hover:border-text-muted">
           <span
             className="shrink-0 border-r border-border-subtle px-3 text-xs text-text-muted"
             aria-hidden="true"

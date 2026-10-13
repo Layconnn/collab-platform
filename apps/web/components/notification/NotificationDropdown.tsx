@@ -10,7 +10,7 @@ import {
   MessageSquare,
   RotateCw,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AppIcon } from "@/components/common/AppIcon";
 import { UserAvatar } from "@/components/common/UserAvatar";
@@ -75,9 +75,23 @@ function NotificationRow({
         timeStyle: "short",
       }).format(date);
   const unread = !item.readAt;
+  const rowRef = useRef<HTMLLIElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const markRequested = useRef(false);
+
+  useEffect(() => {
+    if (!unread && markRequested.current) {
+      markRequested.current = false;
+      (linkRef.current ?? rowRef.current)?.focus();
+    } else if (unread && !pending) {
+      markRequested.current = false;
+    }
+  }, [unread, pending]);
 
   return (
     <li
+      ref={rowRef}
+      tabIndex={-1}
       className={`border-b border-border-subtle transition-colors motion-reduce:transition-none ${unread ? "bg-surface-subtle/70" : "bg-surface"}`}
     >
       <div className="flex min-w-0 gap-3 px-4 py-3.5 hover:bg-surface-hover/70 focus-within:bg-surface-hover/70">
@@ -123,7 +137,9 @@ function NotificationRow({
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
             {href ? (
               <Link
+                ref={linkRef}
                 href={href}
+                aria-label={`Open discussion for ${titles[item.type].toLowerCase()} notification${actor ? ` from ${actor.label}` : ""}${formattedDate ? `, ${formattedDate}` : ""}`}
                 onClick={() => onNavigate(item)}
                 className="inline-flex min-h-11 items-center gap-1 rounded text-xs font-semibold text-brand-link hover:text-brand-link-hover focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
@@ -133,8 +149,9 @@ function NotificationRow({
             {unread ? (
               <button
                 type="button"
+                aria-label={`Mark ${titles[item.type].toLowerCase()} notification${actor ? ` from ${actor.label}` : ""}${formattedDate ? `, ${formattedDate}` : ""} as read`}
                 disabled={pending}
-                onClick={() => onMarkRead(item.id)}
+                onClick={() => { markRequested.current = true; onMarkRead(item.id); }}
                 className="inline-flex min-h-11 items-center gap-1 rounded text-xs font-medium text-text-secondary hover:text-text-primary focus-visible:ring-2 focus-visible:ring-focus-ring disabled:cursor-wait disabled:opacity-50"
               >
                 <Check aria-hidden="true" size={13} />
@@ -156,6 +173,8 @@ export function NotificationDropdown({
   const [open, setOpen] = useState(false);
   const [markingId, setMarkingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const markAllRequested = useRef(false);
   const feed = useNotificationsFeed(open);
   const unread = useUnreadNotifications();
   const { markAsRead, markAllAsRead } = useNotificationActions();
@@ -178,6 +197,13 @@ export function NotificationDropdown({
       ? "Notifications, unread count unavailable"
       : `Notifications, ${unreadLabel} unread`;
   const items = feedAccessDenied ? [] : feed.data?.pages.flatMap((page) => page.items) ?? [];
+
+  useEffect(() => {
+    if (open && !showUnread && !markAllAsRead.isPending && markAllRequested.current) {
+      markAllRequested.current = false;
+      closeButtonRef.current?.focus();
+    }
+  }, [open, showUnread, markAllAsRead.isPending]);
 
   const markRead = (id: string) => {
     setActionError(null);
@@ -249,14 +275,17 @@ export function NotificationDropdown({
                     type="button"
                     disabled={markAllAsRead.isPending}
                     onClick={() => {
+                      markAllRequested.current = true;
                       setActionError(null);
                       markAllAsRead.mutate(
                         {},
                         {
-                          onError: () =>
+                          onError: () => {
+                            markAllRequested.current = false;
                             setActionError(
                               "Could not mark all notifications as read. Try again.",
-                            ),
+                            );
+                          },
                         },
                       );
                     }}
@@ -268,6 +297,7 @@ export function NotificationDropdown({
                 ) : null}
                 <Popover.CloseTrigger asChild>
                   <IconButton
+                    ref={closeButtonRef}
                     type="button"
                     aria-label="Close notifications"
                     title="Close notifications"

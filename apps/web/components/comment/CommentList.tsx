@@ -152,7 +152,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                   disabled={update.isPending}
                   aria-invalid={Boolean(form.formState.errors.body)}
                   aria-describedby={form.formState.errors.body ? `edit-comment-error-${comment.id}` : undefined}
-                  className="min-h-28 w-full resize-y rounded-sm border border-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+                  className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                 />
                 {form.formState.errors.body ? <p id={`edit-comment-error-${comment.id}`} role="alert" className="text-sm text-danger">Write a comment of up to 5,000 characters.</p> : null}
                 {editError ? <p role="alert" className="text-sm text-danger">{editError}</p> : null}

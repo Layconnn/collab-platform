@@ -139,6 +139,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (mobilePanelRef.current?.querySelector("details[open]")) return;
         event.preventDefault();
         setMobileNavOpen(false);
         return;

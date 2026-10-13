@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
 import type { inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "@/server/api/root";
 import { AppIcon } from "@/components/common/AppIcon";
 import { workspaceInitials } from "@/lib/workspace-identity";
+import { useDismissibleDetails } from "@/components/shell/useDismissibleDetails";
 
 type WorkspaceSummary = inferRouterOutputs<AppRouter>["workspace"]["listForUser"]["items"][number];
 
@@ -43,7 +43,7 @@ export function WorkspaceSwitcher({
   collapsed?: boolean;
   onNavigate?: () => void;
 }) {
-  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const { detailsRef, summaryRef } = useDismissibleDetails();
   const selected = workspaces.find((workspace) => workspace.workspaceId === currentId);
   const label = currentWorkspace?.name ?? selected?.name ?? (currentId ? "Loading workspace..." : "Your workspaces");
   const closeMenu = () => {
@@ -54,6 +54,7 @@ export function WorkspaceSwitcher({
   return (
     <details ref={detailsRef} className="group relative">
       <summary
+        ref={summaryRef}
         aria-label={`Switch workspace. Current: ${label}`}
         title={collapsed ? label : undefined}
         className={`flex min-h-11 w-full cursor-pointer list-none items-center gap-2 rounded-md text-left outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center px-1" : "px-2"}`}

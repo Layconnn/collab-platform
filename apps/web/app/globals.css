@@ -11,6 +11,7 @@
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-border: var(--border);
+  --color-control-border: var(--control-border);
   --color-border-subtle: var(--border-subtle);
   --color-brand: var(--brand-accent);
   --color-brand-hover: var(--brand-action-hover);

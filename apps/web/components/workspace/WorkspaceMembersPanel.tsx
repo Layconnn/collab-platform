@@ -402,7 +402,7 @@ export function WorkspaceMembersPanel({
                                 event.target.value as "ADMIN" | "MEMBER",
                               )
                             }
-                            className="h-10 rounded-sm border border-border bg-surface px-2 text-xs font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+                            className="h-10 rounded-sm border border-control-border bg-surface px-2 text-xs font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                           >
                             <option value="MEMBER">Member</option>
                             <option value="ADMIN">Admin</option>

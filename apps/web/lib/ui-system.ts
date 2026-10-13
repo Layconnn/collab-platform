@@ -33,6 +33,7 @@ export const uiSystem = createSystem(
           textSecondary: { value: "var(--text-secondary)" },
           textMuted: { value: "var(--text-muted)" },
           border: { value: "var(--border)" },
+          controlBorder: { value: "var(--control-border)" },
           borderSubtle: { value: "var(--border-subtle)" },
           danger: { value: "var(--danger)" },
           dangerAction: { value: "var(--danger-action)" },

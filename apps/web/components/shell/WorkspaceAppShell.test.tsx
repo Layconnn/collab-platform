@@ -82,4 +82,14 @@ describe("WorkspaceAppShell mobile navigation", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(mocks.closeMobileNav).toHaveBeenCalledWith(false);
   });
+
+  it("lets an expanded menu inside the drawer handle Escape first", () => {
+    render(<WorkspaceAppShell><p>Workspace content</p></WorkspaceAppShell>);
+    const drawer = screen.getByRole("dialog", { name: "Workspace navigation" });
+    const menu = document.createElement("details");
+    menu.open = true;
+    drawer.append(menu);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(mocks.closeMobileNav).not.toHaveBeenCalled();
+  });
 });

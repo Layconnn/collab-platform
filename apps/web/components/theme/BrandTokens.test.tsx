@@ -85,6 +85,9 @@ describe("Commons brand tokens", () => {
       expect(
         contrast(token("--danger", mode), token("--surface", mode)),
       ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrast(token("--control-border", mode), token("--surface", mode)),
+      ).toBeGreaterThanOrEqual(3);
     }
 
     expect(

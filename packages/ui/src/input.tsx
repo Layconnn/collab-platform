@@ -6,7 +6,7 @@ import type { InputProps } from "@chakra-ui/react/input";
 export function Input(props: InputProps) {
   return (
     <ChakraInput
-      borderColor="border"
+      borderColor="controlBorder"
       bg="surface"
       color="textPrimary"
       _placeholder={{ color: "textMuted" }}

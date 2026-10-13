@@ -44,4 +44,26 @@ describe("WorkspaceSwitcher", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
     expect(props.onRetry).toHaveBeenCalledTimes(1);
   });
+
+  it("closes on Escape and restores focus to the switcher", async () => {
+    const { container } = render(<WorkspaceSwitcher {...props} />);
+    const trigger = screen.getByText("Open Atlas").closest("summary")!;
+    const details = container.querySelector("details")!;
+    await userEvent.setup().click(trigger);
+    expect(details.open).toBe(true);
+    await userEvent.setup().keyboard("{Escape}");
+    expect(details.open).toBe(false);
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it("closes when focus moves outside without stealing that focus", async () => {
+    const { container } = render(<><WorkspaceSwitcher {...props} /><button>Outside</button></>);
+    const trigger = screen.getByText("Open Atlas").closest("summary")!;
+    const outside = screen.getByRole("button", { name: "Outside" });
+    const details = container.querySelector("details")!;
+    await userEvent.setup().click(trigger);
+    outside.focus();
+    expect(details.open).toBe(false);
+    expect(document.activeElement).toBe(outside);
+  });
 });

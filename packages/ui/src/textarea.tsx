@@ -6,7 +6,7 @@ import type { TextareaProps } from "@chakra-ui/react/textarea";
 export function Textarea(props: TextareaProps) {
   return (
     <ChakraTextarea
-      borderColor="border"
+      borderColor="controlBorder"
       bg="surface"
       color="textPrimary"
       _placeholder={{ color: "textMuted" }}

@@ -58,7 +58,7 @@ function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: D
             id={`edit-discussion-${discussion.id}`}
             aria-invalid={Boolean(form.formState.errors.title)}
             aria-describedby={form.formState.errors.title ? `edit-discussion-error-${discussion.id}` : undefined}
-            className="min-h-11 w-full rounded-sm border border-border bg-surface px-3 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"
+            className="min-h-11 w-full rounded-sm border border-control-border bg-surface px-3 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"
             maxLength={120}
             {...form.register("title")}
           />

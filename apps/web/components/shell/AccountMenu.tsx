@@ -1,12 +1,11 @@
 "use client";
 
-import { useRef } from "react";
-
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { AppIcon } from "@/components/common/AppIcon";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { resolveUserIdentity } from "@/lib/user-identity";
 import { ThemeModePicker } from "@/components/theme/ThemeModePicker";
+import { useDismissibleDetails } from "@/components/shell/useDismissibleDetails";
 
 export function AccountMenu({
   user,
@@ -15,13 +14,14 @@ export function AccountMenu({
   user: { name: string | null; username: string; email: string };
   collapsed?: boolean;
 }) {
-  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const { detailsRef, summaryRef } = useDismissibleDetails();
   const identity = resolveUserIdentity(user);
   const label = identity.label;
 
   return (
     <details ref={detailsRef} className="group relative">
       <summary
+        ref={summaryRef}
         aria-label={`Account menu for ${label}`}
         title={collapsed ? label : undefined}
         className={`flex min-h-11 w-full cursor-pointer list-none items-center gap-3 rounded-md px-2 text-left hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center" : ""}`}

@@ -36,7 +36,7 @@ export function AuthField({ id, label, type = "text", autoComplete, registration
           disabled={disabled}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className={`h-12 w-full rounded-sm border bg-surface px-3.5 text-[0.95rem] text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-text-muted focus-visible:border-focus-ring focus-visible:ring-2 focus-visible:ring-focus-ring/25 disabled:cursor-not-allowed disabled:opacity-60 ${isPassword ? "pr-12" : ""} ${error ? "border-danger" : "border-border"}`}
+          className={`h-12 w-full rounded-sm border bg-surface px-3.5 text-[0.95rem] text-text-primary outline-none transition-colors placeholder:text-text-muted hover:border-text-muted focus-visible:border-focus-ring focus-visible:ring-2 focus-visible:ring-focus-ring/25 disabled:cursor-not-allowed disabled:opacity-60 ${isPassword ? "pr-12" : ""} ${error ? "border-danger" : "border-control-border"}`}
           {...registration}
         />
         {isPassword ? (
