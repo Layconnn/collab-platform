@@ -11,7 +11,7 @@ export function Input(props: InputProps) {
       color="textPrimary"
       _placeholder={{ color: "textMuted" }}
       _hover={{ borderColor: "textMuted" }}
-      _focusVisible={{ borderColor: "brand.600", boxShadow: "0 0 0 1px var(--focus-ring)" }}
+      _focusVisible={{ borderColor: "focusRing", boxShadow: "0 0 0 1px var(--focus-ring)" }}
       {...props}
     />
   );

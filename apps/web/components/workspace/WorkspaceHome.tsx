@@ -194,7 +194,7 @@ export function WorkspaceHome({ workspaceId }: { workspaceId: string }) {
         <div className="mt-5 flex min-w-0 flex-wrap items-start gap-4 sm:gap-5">
           <span
             aria-hidden="true"
-            className="grid size-12 shrink-0 place-items-center rounded-sm bg-brand-action text-lg font-semibold text-on-brand-action sm:size-14"
+            className="grid size-12 shrink-0 place-items-center rounded-sm bg-brand-accent text-lg font-semibold text-on-brand-accent sm:size-14"
           >
             {workspaceInitials(workspace.data.name)}
           </span>

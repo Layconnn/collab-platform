@@ -94,9 +94,9 @@ export function WorkspaceSwitcher({
                   onClick={closeMenu}
                   className="flex min-h-10 items-center gap-3 rounded px-2 text-sm text-text-secondary hover:bg-surface-subtle hover:text-text-primary focus-visible:bg-surface-subtle"
                 >
-                  <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded bg-surface-subtle text-[10px] font-semibold text-brand-700">{workspaceInitials(workspace.name)}</span>
+                  <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded bg-surface-subtle text-[10px] font-semibold text-brand-link">{workspaceInitials(workspace.name)}</span>
                   <span className="min-w-0 flex-1 truncate">{workspace.name}</span>
-                  {workspace.workspaceId === currentId ? <span aria-hidden="true" className="size-1.5 rounded-full bg-brand" /> : null}
+                  {workspace.workspaceId === currentId ? <span aria-hidden="true" className="size-1.5 rounded-full bg-brand-accent" /> : null}
                 </Link>
               ))}
             </nav>
@@ -104,7 +104,7 @@ export function WorkspaceSwitcher({
             <p className="px-3 py-2 text-sm text-text-secondary">No workspaces yet.</p>
           )}
           {!isLoading && hasMore ? (
-            <button type="button" onClick={onLoadMore} disabled={isFetchingMore} className="flex min-h-10 w-full items-center justify-center rounded px-2 text-xs font-medium text-brand-700 hover:bg-surface-subtle disabled:opacity-60">
+            <button type="button" onClick={onLoadMore} disabled={isFetchingMore} className="flex min-h-10 w-full items-center justify-center rounded px-2 text-xs font-medium text-brand-link hover:bg-surface-subtle disabled:opacity-60">
               {isFetchingMore ? "Loading more..." : "Load more workspaces"}
             </button>
           ) : null}

@@ -12,8 +12,9 @@
   --color-text-muted: var(--text-muted);
   --color-border: var(--border);
   --color-border-subtle: var(--border-subtle);
-  --color-brand: var(--brand-600);
-  --color-brand-hover: var(--brand-700);
+  --color-brand: var(--brand-accent);
+  --color-brand-hover: var(--brand-action-hover);
+  --color-brand-primary: var(--brand-primary);
   --color-brand-accent: var(--brand-accent);
   --color-on-brand-accent: var(--on-brand-accent);
   --color-brand-link: var(--brand-link);

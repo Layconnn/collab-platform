@@ -44,7 +44,7 @@ export function WorkspaceNavigation({
           aria-current={item.active ? "page" : undefined}
           title={collapsed ? item.label : undefined}
           onClick={onNavigate}
-          className={`flex min-h-10 items-center gap-3 border-l-2 px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center" : ""} ${item.active ? "border-brand bg-surface-subtle text-brand-800" : "border-transparent text-text-secondary hover:bg-surface-hover hover:text-text-primary"}`}
+          className={`flex min-h-10 items-center gap-3 border-l-2 px-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center" : ""} ${item.active ? "border-brand-accent bg-surface-subtle text-brand-link" : "border-transparent text-text-secondary hover:bg-surface-hover hover:text-text-primary"}`}
         >
           <AppIcon name={item.icon} />
           {!collapsed ? <span className="truncate">{item.label}</span> : null}

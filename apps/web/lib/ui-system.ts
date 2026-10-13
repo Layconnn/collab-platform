@@ -41,6 +41,7 @@ export const uiSystem = createSystem(
           success: { value: "var(--success)" },
           info: { value: "var(--info)" },
           focusRing: { value: "var(--focus-ring)" },
+          brandPrimary: { value: "var(--brand-primary)" },
           editorialForest: { value: "var(--editorial-forest)" },
           editorialCream: { value: "var(--editorial-cream)" },
           editorialPaper: { value: "var(--editorial-paper)" },

@@ -12,7 +12,7 @@ export function ProductPreview() {
     <div
       role="img"
       aria-label="Illustrative Commons application showing an Open Atlas discussion with nested replies, a mention, and an unread notification"
-      className="overflow-hidden rounded-md border border-border bg-surface shadow-[0_28px_70px_-48px_rgba(15,35,27,0.5)]"
+      className="marketing-preview overflow-hidden rounded-md border border-border bg-surface shadow-[0_28px_70px_-48px_rgba(15,35,27,0.5)]"
     >
       <div
         aria-hidden="true"
@@ -49,7 +49,7 @@ export function ProductPreview() {
               <Building2 size={16} className="shrink-0" />
               <span className="hidden xl:inline">Overview</span>
             </div>
-            <div className="flex h-10 items-center justify-center gap-3 border-l-2 border-brand bg-surface-subtle px-2.5 text-brand-800 xl:justify-start">
+            <div className="flex h-10 items-center justify-center gap-3 border-l-2 border-brand-accent bg-surface-subtle px-2.5 text-brand-link xl:justify-start">
               <MessageSquare size={16} className="shrink-0" />
               <span className="hidden xl:inline">Discussions</span>
             </div>
@@ -91,7 +91,7 @@ export function ProductPreview() {
           </div>
 
           <div className="mx-auto max-w-[760px] px-4 py-6 sm:px-7 sm:py-8 lg:px-8">
-            <p className="mb-5 text-xs font-semibold text-brand-700">
+            <p className="mb-5 text-xs font-semibold text-brand-link">
               &larr; All discussions
             </p>
             <div className="border-b border-border-subtle pb-6">

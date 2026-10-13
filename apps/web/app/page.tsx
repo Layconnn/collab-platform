@@ -4,12 +4,14 @@ import {
   ArrowDown,
   ArrowRight,
   Bell,
+  ChevronDown,
   CornerDownRight,
   MessageSquare,
   Users,
 } from "lucide-react";
 
 import { ProductPreview } from "@/components/marketing/ProductPreview";
+import { TextReveal } from "@/components/marketing/TextReveal";
 import { PublicThemeControl } from "@/components/theme/PublicThemeControl";
 
 export const metadata: Metadata = {
@@ -96,6 +98,12 @@ export default function Home() {
             className="flex shrink-0 items-center gap-1 sm:gap-2"
           >
             <Link
+              href="#how-it-works"
+              className="hidden min-h-10 items-center rounded-md px-3 text-sm font-medium text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring md:inline-flex"
+            >
+              How it works
+            </Link>
+            <Link
               href="/login"
               className="inline-flex min-h-10 items-center rounded-md px-2.5 text-xs font-semibold text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring sm:px-3 sm:text-sm"
             >
@@ -121,7 +129,7 @@ export default function Home() {
           aria-labelledby="hero-title"
           className="border-b border-editorial-stage-border bg-editorial-forest text-editorial-cream"
         >
-          <div className="mx-auto max-w-[1280px] px-4 pb-12 pt-14 text-center sm:px-6 sm:pb-16 sm:pt-20 lg:px-8 lg:pt-24">
+          <div className="mx-auto max-w-[1280px] px-4 pb-14 pt-16 text-center sm:px-6 sm:pb-20 sm:pt-24 lg:px-8 lg:pt-28">
             <p className="flex items-center justify-center gap-2 font-mono text-[11px] uppercase text-editorial-coral-on-dark">
               <span
                 aria-hidden="true"
@@ -129,23 +137,28 @@ export default function Home() {
               />{" "}
               Commons for teams building in the open
             </p>
-            <h1
+            <TextReveal
+              as="h1"
               id="hero-title"
-              className="type-editorial-display mx-auto mt-6 max-w-[900px] text-[46px] text-editorial-cream sm:text-[60px] lg:text-[72px]"
-            >
-              A workspace for conversations worth keeping.
-            </h1>
-            <p className="mx-auto mt-5 max-w-[600px] text-[15px] leading-7 text-editorial-stage-muted sm:text-[17px]">
+              text="A workspace for conversations worth keeping."
+              phrases={["A workspace", "for", "conversations", "worth", "keeping."]}
+              emphasisIndex={4}
+              className="type-editorial-display mx-auto mt-7 max-w-[860px] text-[46px] text-editorial-cream sm:text-[64px] lg:text-[76px]"
+            />
+            <p className="mx-auto mt-6 max-w-[570px] text-[15px] leading-7 text-editorial-stage-muted sm:text-[17px]">
               Give questions, decisions, and the replies that shape them a clear
               place to live, beyond the noise of real-time chat.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 max-[360px]:mt-6">
-              <Link href="/register" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-editorial-action px-5 py-3 text-sm font-semibold text-on-editorial-action transition-colors hover:bg-editorial-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-editorial-cream">
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3 max-[360px]:mt-7">
+              <Link
+                href="/register"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-editorial-action px-6 py-3 text-sm font-semibold text-on-editorial-action transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-editorial-action-hover active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-editorial-cream motion-reduce:transition-none"
+              >
                 Get started <ArrowRight aria-hidden="true" size={16} />
               </Link>
               <Link
                 href="#product"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-editorial-stage-border px-5 py-3 text-sm font-semibold text-editorial-cream transition-colors hover:bg-editorial-stage-surface active:bg-editorial-stage-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-editorial-cream max-[360px]:hidden"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-editorial-stage-border px-6 py-3 text-sm font-semibold text-editorial-cream transition-colors hover:bg-editorial-stage-surface active:bg-editorial-stage-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-editorial-cream"
               >
                 Explore the product <ArrowDown aria-hidden="true" size={16} />
               </Link>
@@ -158,7 +171,7 @@ export default function Home() {
           aria-label="Commons product preview"
           className="border-b border-border-subtle bg-editorial-soft"
         >
-          <div className="mx-auto max-w-[1280px] px-3 pb-10 pt-5 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8 lg:pb-20">
+          <div className="mx-auto max-w-[1280px] px-3 pb-12 pt-7 sm:px-6 sm:pb-18 sm:pt-10 lg:px-8 lg:pb-24">
             <ProductPreview />
             <div className="mt-4 flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] text-text-muted">
               <span>
@@ -177,7 +190,7 @@ export default function Home() {
         >
           <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:px-8">
             <div className="max-w-[470px]">
-              <p className="font-mono text-xs font-medium uppercase text-brand-700">
+              <p className="font-mono text-xs font-medium uppercase text-brand-link">
                 01 / Workspaces and discussions
               </p>
               <h2
@@ -195,7 +208,7 @@ export default function Home() {
                 <Users
                   aria-hidden="true"
                   size={17}
-                  className="text-brand-700"
+                  className="text-brand-link"
                 />{" "}
                 Workspace membership stays visible
               </div>
@@ -250,15 +263,8 @@ export default function Home() {
           className="border-b border-border-subtle bg-editorial-paper py-20 sm:py-24 lg:py-28"
         >
           <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-20 lg:px-8">
-            <div
-              role="img"
-              aria-label="Illustrative threaded replies with a username mention and unread notification"
-              className="order-2 min-w-0 lg:order-1"
-            >
-              <div
-                aria-hidden="true"
-                className="border-l-2 border-brand-300 pl-4 sm:pl-7"
-              >
+            <figure className="order-2 min-w-0 lg:order-1">
+              <div className="border-l-2 border-brand-300 pl-4 sm:pl-7">
                 <div className="border-b border-border pb-6">
                   <div className="flex items-center gap-3">
                     <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-100 text-[11px] font-semibold text-brand-800">
@@ -278,52 +284,67 @@ export default function Home() {
                     environment notes next to the first command.
                   </p>
                 </div>
-                <div className="ml-3 border-l-2 border-border py-6 pl-4 sm:ml-6 sm:pl-6">
-                  <div className="flex items-center gap-3">
-                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-active text-[11px] font-semibold text-brand-800">
-                      SK
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-text-primary">
-                        Sam Kim
-                      </p>
-                      <p className="text-xs text-text-muted">Reply to Lina</p>
-                    </div>
-                    <CornerDownRight
+                <details className="marketing-thread ml-3 border-l-2 border-border pl-4 sm:ml-6 sm:pl-6">
+                  <summary className="flex min-h-12 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-semibold text-brand-link transition-colors hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
+                    See the reply and mention
+                    <ChevronDown
                       aria-hidden="true"
-                      size={15}
-                      className="ml-auto text-text-muted"
+                      size={17}
+                      className="marketing-thread__chevron shrink-0"
                     />
-                  </div>
-                  <p className="mt-4 max-w-[480px] text-sm leading-7 text-text-secondary">
-                    <span className="font-semibold text-info">@maya</span> I can
-                    draft that flow and bring it back here for review.
-                  </p>
-                </div>
-                <div className="flex items-start gap-3 border-t border-border bg-surface px-4 py-4">
-                  <Bell
-                    aria-hidden="true"
-                    size={17}
-                    className="mt-0.5 shrink-0 text-brand-700"
-                  />
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-text-primary">
-                      Mention in a discussion
+                  </summary>
+                  <div className="marketing-thread__content pb-5">
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-surface-active text-[11px] font-semibold text-brand-800">
+                        SK
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-text-primary">
+                          Sam Kim
+                        </p>
+                        <p className="text-xs text-text-muted">Reply to Lina</p>
+                      </div>
+                      <CornerDownRight
+                        aria-hidden="true"
+                        size={15}
+                        className="ml-auto text-text-muted"
+                      />
+                    </div>
+                    <p className="mt-4 max-w-[480px] text-sm leading-7 text-text-secondary">
+                      <span className="font-semibold text-brand-link">
+                        @maya
+                      </span>{" "}
+                      I can draft that flow and bring it back here for review.
                     </p>
-                    <p className="mt-1 text-xs leading-5 text-text-secondary">
-                      Sam mentioned you in &quot;How should first-time setup
-                      work?&quot;
-                    </p>
+                    <div className="mt-5 flex items-start gap-3 border-t border-border bg-surface px-4 py-4">
+                      <Bell
+                        aria-hidden="true"
+                        size={17}
+                        className="mt-0.5 shrink-0 text-brand-link"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-text-primary">
+                          Mention in a discussion
+                        </p>
+                        <p className="mt-1 text-xs leading-5 text-text-secondary">
+                          Sam mentioned you in &quot;How should first-time setup
+                          work?&quot;
+                        </p>
+                      </div>
+                      <span
+                        aria-hidden="true"
+                        className="mt-1 size-2 shrink-0 rounded-full bg-brand-accent"
+                      />
+                    </div>
                   </div>
-                  <span
-                    aria-hidden="true"
-                    className="mt-1 size-2 shrink-0 rounded-full bg-brand-600"
-                  />
-                </div>
+                </details>
               </div>
-            </div>
+              <figcaption className="mt-3 text-xs text-text-muted">
+                Illustrative conversation. Names and content are examples.
+              </figcaption>
+            </figure>
             <div className="order-1 max-w-[460px] lg:order-2">
-              <p className="font-mono text-xs font-medium uppercase text-brand-700">
+              <p className="font-mono text-xs font-medium uppercase text-brand-link">
                 02 / Replies and mentions
               </p>
               <h2
@@ -342,6 +363,7 @@ export default function Home() {
         </section>
 
         <section
+          id="how-it-works"
           aria-labelledby="workflow-title"
           className="bg-editorial-forest py-20 text-editorial-cream sm:py-24 lg:py-28"
         >
@@ -393,7 +415,7 @@ export default function Home() {
         >
           <div className="mx-auto grid max-w-[1280px] gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:px-8">
             <div className="max-w-[720px]">
-              <p className="font-mono text-xs font-medium uppercase text-brand-700">
+              <p className="font-mono text-xs font-medium uppercase text-brand-link">
                 Start with a workspace
               </p>
               <h2
