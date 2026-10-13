@@ -2,7 +2,9 @@
 
 **For: Workspace + Discussion + Comment MVP**
 
-This guide walks you through deploying to staging environment before production.
+This guide documents deployment, validation, and operational readiness for the current application.
+
+**Current status (October 10, 2026):** The project owner reports that hosted CI passes and that core workflows have been thoroughly tested in development and production. This is an owner-reported status, not an independent audit. Load testing, backup/rollback drills, and external email/push delivery should be tracked separately; BullMQ supports in-app notification jobs, but email/push delivery is not implemented.
 
 ---
 
@@ -36,6 +38,8 @@ This guide walks you through deploying to staging environment before production.
   ```bash
   pnpm -C apps/web run build
   ```
+
+- [ ] GitHub Actions clean-database migration and worker-image checks pass.
 
 ### Security Audit
 
@@ -109,6 +113,8 @@ Visit `http://localhost:3000`
    - Create Redis instance
    - Get connection string
    - Add to Vercel environment: `REDIS_URL`
+
+5. **Deploy the notification worker separately** using `apps/web/Dockerfile.worker`. Configure production `DATABASE_URL` and `REDIS_URL`; do not use the local fallback JWT secrets from Docker Compose in production.
 
 ---
 
@@ -307,9 +313,6 @@ DATABASE_URL="<staging-db>" pnpm exec prisma migrate deploy
 # Check app is running
 curl https://staging.yourdomain.com/health
 
-# Run integration tests against staging
-TEST_URL="https://staging.yourdomain.com" pnpm -C apps/web run test:integration
-
 # Check logs
 # Vercel: Dashboard → Logs
 # Self-hosted: docker-compose logs
@@ -379,17 +382,17 @@ Before deploying to production:
 - [ ] Gather performance metrics
 - [ ] Identify optimization opportunities
 - [ ] Collect user feedback
-- [ ] Plan Phase 2 (Notifications)
+- [ ] Verify notification delivery and retries with the deployed worker
 
 ---
 
 ## 🎯 Next Steps
 
-1. ✅ **Local validation**: All tests passing
-2. → **Staging deployment**: Deploy to staging environment
-3. → **Staging validation**: Run checklist above
-4. → **Production deployment**: Deploy to production
-5. → **Phase 2**: Build Notifications module
+1. ✅ **Local validation**: Reported passing
+2. ✅ **Hosted CI**: Reported passing
+3. ✅ **Development and production workflows**: Reported thoroughly tested by the project owner
+4. → **Operate and improve**: Monitor production, collect feedback, and prioritize UX improvements
+5. → **Future capabilities**: Consider load testing, analytics, real-time updates, and external notification delivery when needed
 
 ---
 

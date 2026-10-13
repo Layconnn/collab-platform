@@ -1,12 +1,15 @@
 import type { WorkspaceRole } from "../../app/generated/prisma/client";
 import type {
   AddWorkspaceMemberInput,
+  AddWorkspaceMemberByUsernameInput,
   CreateWorkspaceInput,
   DeleteWorkspaceInput,
   GetWorkspaceByIdInput,
   ListWorkspaceMembersInput,
   ListWorkspacesInput,
   RemoveWorkspaceMemberInput,
+  ResolveWorkspaceMemberCandidateInput,
+  SearchMentionMembersInput,
   TransferWorkspaceOwnershipInput,
   UpdateWorkspaceInput,
   UpdateWorkspaceMemberRoleInput,
@@ -31,7 +34,7 @@ import {
   assertCanUpdateMemberRole,
   assertExactlyOneOwner,
 } from "./workspace.permissions";
-import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
+import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 
 const WORKSPACE_TTL_SECONDS = 120;
 const WORKSPACE_LIST_TTL_SECONDS = 60;
@@ -46,7 +49,7 @@ function workspaceByIdCacheKey(workspaceId: string): string {
 }
 
 function membersCacheKey(workspaceId: string, cursor: string | undefined, take: number): string {
-  return `workspace:${workspaceId}:members:${cursor ?? "start"}:${take}`;
+  return `workspace:${workspaceId}:members:v3:${cursor ?? "start"}:${take}`;
 }
 
 type MembershipRoleRecord = {
@@ -244,7 +247,7 @@ export const workspaceService = {
   },
 
   async getById(userId: string, input: GetWorkspaceByIdInput, context: RequestContext) {
-    await requireRoleForAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ, context.requestId);
+    const membership = await requireRoleForAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ, context.requestId);
 
     const cacheKey = workspaceByIdCacheKey(input.workspaceId);
     const cached = await redisCache.getJSON<{
@@ -256,7 +259,7 @@ export const workspaceService = {
       updatedAt: Date;
     }>(cacheKey);
     if (cached) {
-      return cached;
+      return { ...cached, viewerRole: membership.role };
     }
 
     const workspace = await prisma.workspace.findUnique({
@@ -276,7 +279,7 @@ export const workspaceService = {
     }
 
     await redisCache.setJSON(cacheKey, workspace, WORKSPACE_TTL_SECONDS);
-    return workspace;
+    return { ...workspace, viewerRole: membership.role };
   },
 
   async update(userId: string, input: UpdateWorkspaceInput, context: RequestContext) {
@@ -339,7 +342,7 @@ export const workspaceService = {
 
     const cacheKey = membersCacheKey(input.workspaceId, input.cursor, input.take);
     const cached = await redisCache.getJSON<
-      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; email: string; name: string | null } }>
+      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; name: string | null; username: string } }>
     >(cacheKey);
     if (cached) {
       return cached;
@@ -361,8 +364,8 @@ export const workspaceService = {
         user: {
           select: {
             id: true,
-            email: true,
             name: true,
+            username: true,
           },
         },
       },
@@ -372,6 +375,64 @@ export const workspaceService = {
     await redisCache.setJSON(cacheKey, paginated, MEMBER_LIST_TTL_SECONDS);
 
     return paginated;
+  },
+
+  async searchMentionMembers(userId: string, input: SearchMentionMembersInput, context: RequestContext) {
+    await requireRoleForAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ, context.requestId);
+
+    const query = input.query.toLowerCase();
+    const rows = await prisma.workspaceMember.findMany({
+      where: {
+        workspaceId: input.workspaceId,
+        userId: { not: userId },
+        ...(query ? {
+          user: {
+            OR: [
+              { username: { contains: query } },
+              { name: { contains: query, mode: "insensitive" as const } },
+            ],
+          },
+        } : {}),
+      },
+      orderBy: [{ user: { username: "asc" } }],
+      take: 8,
+      select: {
+        user: { select: { id: true, name: true, username: true } },
+      },
+    });
+
+    return rows.map(({ user }) => user);
+  },
+
+  async resolveMemberCandidate(actorUserId: string, input: ResolveWorkspaceMemberCandidateInput, context: RequestContext) {
+    await requireRoleForAction(input.workspaceId, actorUserId, WORKSPACE_ACTIONS.ADD_MEMBER, context.requestId);
+
+    const user = await prisma.user.findUnique({
+      where: { username: input.username },
+      select: { id: true, name: true, username: true },
+    });
+    if (!user) return { status: "unavailable" as const };
+
+    const existing = await getMembershipRole(input.workspaceId, user.id);
+    if (existing) return { status: "already_member" as const };
+
+    return { status: "ready" as const, user: { name: user.name, username: user.username } };
+  },
+
+  async addMemberByUsername(actorUserId: string, input: AddWorkspaceMemberByUsernameInput, context: RequestContext) {
+    await requireRoleForAction(input.workspaceId, actorUserId, WORKSPACE_ACTIONS.ADD_MEMBER, context.requestId);
+
+    const user = await prisma.user.findUnique({
+      where: { username: input.username },
+      select: { id: true },
+    });
+    if (!user) throw new AppError("NOT_FOUND", "Account is unavailable.");
+
+    return workspaceService.addMember(actorUserId, {
+      workspaceId: input.workspaceId,
+      userId: user.id,
+      role: input.role,
+    }, context);
   },
 
   async addMember(actorUserId: string, input: AddWorkspaceMemberInput, context: RequestContext) {

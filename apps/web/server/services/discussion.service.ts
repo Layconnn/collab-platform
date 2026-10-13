@@ -17,7 +17,7 @@ import {
   recordDiscussionPermissionDenied,
 } from "../observability/security-events";
 import { notificationService } from "./notification.service";
-import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
+import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
@@ -32,7 +32,7 @@ type RequestContext = {
 };
 
 function discussionByIdKey(discussionId: string): string {
-  return `discussion:${discussionId}`;
+  return `discussion:v2:${discussionId}`;
 }
 
 function workspaceDiscussionListKey(
@@ -40,7 +40,7 @@ function workspaceDiscussionListKey(
   cursor: string | undefined,
   take: number,
 ): string {
-  return `workspace:${workspaceId}:discussions:${cursor ?? "start"}:${take}`;
+  return `workspace:${workspaceId}:discussions:v2:${cursor ?? "start"}:${take}`;
 }
 
 async function invalidateDiscussionCaches(
@@ -121,11 +121,23 @@ export const discussionService = {
         workspaceId: string;
         title: string;
         body: string;
-        author: { id: string; name: string | null };
+        author: { id: string; name: string | null; username?: string };
         createdAt: Date;
         updatedAt: Date;
       }>(idempotencyResultKey);
       if (cachedResult) {
+        if (!cachedResult.author.username) {
+          const current = await prisma.discussion.findUnique({
+            where: { id: cachedResult.id },
+            select: { author: { select: { username: true } } },
+          });
+          if (current) {
+            return {
+              ...cachedResult,
+              author: { ...cachedResult.author, username: current.author.username },
+            };
+          }
+        }
         return cachedResult;
       }
     }
@@ -167,6 +179,7 @@ export const discussionService = {
             select: {
               id: true,
               name: true,
+              username: true,
             },
           },
           createdAt: true,
@@ -256,6 +269,7 @@ export const discussionService = {
         author: {
           id: string;
           name: string | null;
+          username: string;
         };
         createdAt: Date;
         updatedAt: Date;
@@ -299,6 +313,7 @@ export const discussionService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -342,6 +357,7 @@ export const discussionService = {
       author: {
         id: string;
         name: string | null;
+        username: string;
       };
       createdAt: Date;
       updatedAt: Date;
@@ -368,6 +384,7 @@ export const discussionService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -401,6 +418,8 @@ export const discussionService = {
         id: true,
         workspaceId: true,
         authorId: true,
+        title: true,
+        body: true,
       },
     });
 
@@ -451,6 +470,7 @@ export const discussionService = {
             select: {
               id: true,
               name: true,
+              username: true,
             },
           },
           createdAt: true,
@@ -475,6 +495,19 @@ export const discussionService = {
         action: "update",
         timestamp: new Date().toISOString(),
       });
+
+      try {
+        await notificationService.enqueueNewMentionsFromEdit({
+          requestId: context.requestId,
+          actorUserId: userId,
+          resource: { workspaceId: updated.workspaceId, discussionId: updated.id, commentId: null },
+          previousText: `${discussion.title} ${discussion.body}`,
+          updatedText: `${updated.title} ${updated.body}`,
+          updatedAt: updated.updatedAt,
+        });
+      } catch (error) {
+        console.error(JSON.stringify({ level: "ERROR", event: "notification.enqueue.failed", requestId: context.requestId, discussionId: updated.id, error: String(error) }));
+      }
 
       return updated;
     } catch (error) {

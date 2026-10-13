@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const emailSchema = z.string().trim().email().max(320);
-const usernameSchema = z
+export const usernameSchema = z
   .string()
   .trim()
   .min(3)
@@ -30,7 +30,15 @@ export const changePasswordInputSchema = z.object({
   newPassword: passwordSchema,
 });
 
+export const currentUserSchema = z.object({
+  id: z.string().cuid(),
+  email: emailSchema,
+  username: z.string(),
+  name: z.string().nullable(),
+});
+
 export type RegisterInput = z.infer<typeof registerInputSchema>;
 export type LoginInput = z.infer<typeof loginInputSchema>;
 export type LogoutInput = z.infer<typeof logoutInputSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordInputSchema>;
+export type CurrentUser = z.infer<typeof currentUserSchema>;

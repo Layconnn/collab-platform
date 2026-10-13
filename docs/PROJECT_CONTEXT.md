@@ -2,15 +2,17 @@
 
 ## Overview
 
-This project is a production-grade fullstack SaaS collaboration platform
+This project is an in-progress fullstack SaaS collaboration platform
 built as a **TypeScript monorepo** using modern scalable architecture
-principles.
+principles. Production readiness and the stated scale targets are goals, not validated operating results.
 
 The architecture is **intentionally designed** to support **10k–100k users**
-before requiring structural changes. Every decision prioritizes clarity,
+before requiring structural changes; this scale has not been load-tested. Every decision prioritizes clarity,
 maintainability, and production readiness from day one.
 
 ### Core Features
+
+Feature bullets below describe the intended product scope, not proof of production readiness. Notification jobs have a worker implementation, but external delivery and production operation are not verified. The architecture has not been load-tested at the stated scale.
 
 - 🔐 **Authentication** — Email + OAuth-ready with JWT sessions
 - 👥 **Workspaces** — Multi-tenant collaboration spaces
@@ -178,7 +180,7 @@ pnpm dev
 
 ### Services
 
-- **PostgreSQL**: `localhost:5432` (user: `postgres`, password: `postgres`)
+- **PostgreSQL**: `localhost:5433` (host port; container port 5432; user/password: `postgres`)
 - **Redis**: `localhost:6379`
 - **Next.js App**: `http://localhost:3000`
 - **Prisma Studio**: `pnpm -C apps/web exec prisma studio`
@@ -569,7 +571,9 @@ The platform is being built deliberately—not rushed.
 
 **Goal**: Ship a stable, usable MVP with clean architecture.
 
-**Status**: In Progress
+**Status**: Core workflows are implemented. The project owner reports that hosted CI passes and that the application has been thoroughly tested in development and production. Load testing and broader operational readiness are not established by this status.
+
+The CI workflow is defined in `.github/workflows/ci.yml` and hosted checks are reported passing. Production is deployed and core workflows are reported tested. The architecture has not been load-tested at the stated scale; external email/push delivery is not implemented.
 
 #### Deliverables
 
@@ -581,8 +585,9 @@ The platform is being built deliberately—not rushed.
 - ✅ Prisma schema finalized (v1)
 - ✅ Redis caching (initial read-heavy endpoints)
 - ✅ BullMQ background jobs (email + notifications)
-- ✅ CI pipeline (lint, typecheck, test)
-- ✅ Production deployment (Vercel + Managed DB + Redis)
+- ✅ Hosted CI checks pass (owner-reported)
+- ✅ Development and production core workflows tested (owner-reported)
+- ⏳ Load testing and external email/push delivery remain future work
 
 #### Focus
 
@@ -803,11 +808,7 @@ export const discussionRouter = router({
 
 - [Development Setup Guide](./DEVELOPMENT.md) — Local Docker development environment
 - [Master Codex Prompt Framework](./CODEX_PROMPT_FRAMEWORK.md) — How to prompt Codex effectively
-- [Architecture Decisions](./architecture.md)
-- [Database Decisions](./database-decisions.md)
-- [API Decisions](./api-decisions.md)
-- [Scaling Plan](./scaling-plan.md)
 
 ---
 
-**Last Updated**: February 27, 2026
+**Last Updated**: September 30, 2026

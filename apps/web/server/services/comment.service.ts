@@ -16,7 +16,7 @@ import {
   recordCommentPermissionDenied,
 } from "../observability/security-events";
 import { notificationService } from "./notification.service";
-import { toPaginatedResult, type PaginatedResult } from "@/src/common/utils/pagination";
+import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
@@ -45,6 +45,7 @@ type PublicComment = {
   author: {
     id: string;
     name: string | null;
+    username: string;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -60,7 +61,7 @@ type CreateIdempotencyResult = {
 };
 
 function commentByIdKey(commentId: string): string {
-  return `comment:${commentId}`;
+  return `comment:v2:${commentId}`;
 }
 
 function discussionCommentListKey(
@@ -69,7 +70,7 @@ function discussionCommentListKey(
   cursor: string | undefined,
   take: number,
 ): string {
-  return `discussion:${discussionId}:comments:${parentCommentId ?? "root"}:${cursor ?? "start"}:${take}`;
+  return `discussion:${discussionId}:comments:v2:${parentCommentId ?? "root"}:${cursor ?? "start"}:${take}`;
 }
 
 async function invalidateCommentCaches(
@@ -194,6 +195,7 @@ async function getCommentByIdWithWorkspace(
         select: {
           id: true,
           name: true,
+          username: true,
         },
       },
       createdAt: true,
@@ -305,6 +307,7 @@ export const commentService = {
             select: {
               id: true,
               name: true,
+              username: true,
             },
           },
           createdAt: true,
@@ -445,6 +448,7 @@ export const commentService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -615,6 +619,7 @@ export const commentService = {
         workspaceId: true,
         authorId: true,
         parentCommentId: true,
+        body: true,
       },
     });
 
@@ -669,6 +674,7 @@ export const commentService = {
           select: {
             id: true,
             name: true,
+            username: true,
           },
         },
         createdAt: true,
@@ -696,6 +702,19 @@ export const commentService = {
       action: "update",
       timestamp: new Date().toISOString(),
     });
+
+    try {
+      await notificationService.enqueueNewMentionsFromEdit({
+        requestId: context.requestId,
+        actorUserId: userId,
+        resource: { workspaceId: comment.workspaceId, discussionId: comment.discussionId, commentId: comment.id },
+        previousText: comment.body,
+        updatedText: updated.body,
+        updatedAt: updated.updatedAt,
+      });
+    } catch (error) {
+      console.error(JSON.stringify({ level: "ERROR", event: "notification.enqueue.failed", requestId: context.requestId, commentId: comment.id, error: String(error) }));
+    }
 
     return updated;
   },

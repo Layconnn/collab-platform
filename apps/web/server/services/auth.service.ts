@@ -47,6 +47,17 @@ function generateTokenPair(userId: string) {
 }
 
 export const authService = {
+  async getCurrentUser(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, username: true, name: true },
+    });
+    if (!user) {
+      throw new AppError("UNAUTHORIZED", "Authentication required.");
+    }
+    return user;
+  },
+
   async register(input: RegisterInput, context: RequestContext): Promise<AuthTokens> {
     const username = input.username.toLowerCase();
     const email = input.email.toLowerCase();
@@ -107,6 +118,16 @@ export const authService = {
       throw new AppError("UNAUTHORIZED", "Invalid credentials.");
     }
 
+    if (!user.passwordHash) {
+      await recordAuthFailure({
+        requestId: context.requestId,
+        userId: user.id,
+        reason: "login_password_not_configured",
+        timestamp: new Date().toISOString(),
+      });
+      throw new AppError("UNAUTHORIZED", "Invalid credentials.");
+    }
+
     const validPassword = await argon2.verify(user.passwordHash, input.password);
     if (!validPassword) {
       await recordAuthFailure({
@@ -151,6 +172,10 @@ export const authService = {
 
     if (!user) {
       throw new AppError("NOT_FOUND", "User not found.");
+    }
+
+    if (!user.passwordHash) {
+      throw new AppError("BAD_REQUEST", "Password is not configured for this account.");
     }
 
     const validPassword = await argon2.verify(user.passwordHash, input.currentPassword);

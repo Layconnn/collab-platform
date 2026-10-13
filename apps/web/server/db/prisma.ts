@@ -1,4 +1,6 @@
 import { PrismaClient as GeneratedPrismaClient } from "../../app/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import { env } from "../env";
 
 type DBPrismaClient = InstanceType<typeof GeneratedPrismaClient>;
@@ -11,7 +13,7 @@ declare global {
 export const prisma: DBPrismaClient =
   globalThis.__prisma ??
   new GeneratedPrismaClient({
-    accelerateUrl: env.DATABASE_URL,
+    adapter: new PrismaPg(new Pool({ connectionString: env.DATABASE_URL })),
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
   });
 

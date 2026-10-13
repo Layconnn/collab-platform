@@ -13,6 +13,7 @@ const queueConnection = {
   ...(redisUrl.password
     ? { password: decodeURIComponent(redisUrl.password) }
     : {}),
+  ...(redisUrl.protocol === "rediss:" ? { tls: {} } : {}),
   ...(redisUrl.pathname && redisUrl.pathname !== "/"
     ? { db: Number(redisUrl.pathname.replace("/", "")) || 0 }
     : {}),
