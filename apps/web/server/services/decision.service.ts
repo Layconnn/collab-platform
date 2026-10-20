@@ -3,11 +3,12 @@ import { createHash } from "node:crypto";
 import type {
   CreateDecisionInput,
   DecisionByIdInput,
+  DecisionRevisionsInput,
   EditDecisionInput,
   FinalizeDecisionInput,
   ListDecisionsInput,
 } from "@repo/validators/decision";
-import { Prisma } from "../../app/generated/prisma/client";
+import { Prisma, type WorkspaceRole } from "../../app/generated/prisma/client";
 
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
@@ -61,6 +62,18 @@ async function requireMember(db: Tx | typeof prisma, workspaceId: string, userId
   return member.role;
 }
 
+async function requireMutationMember(tx: Tx, workspaceId: string, userId: string): Promise<WorkspaceRole> {
+  // Hold the membership row through commit so removal and a decision mutation
+  // have a clear order; an already removed member cannot commit a mutation.
+  const rows = await tx.$queryRaw<Array<{ role: WorkspaceRole }>>`
+    SELECT "role" FROM "WorkspaceMember"
+    WHERE "workspaceId" = ${workspaceId} AND "userId" = ${userId}
+    FOR SHARE
+  `;
+  if (!rows[0]) throw new AppError("NOT_FOUND", "Decision not found.");
+  return rows[0].role;
+}
+
 function isManager(role: string) {
   return role === "OWNER" || role === "ADMIN";
 }
@@ -96,8 +109,12 @@ export const decisionService = {
     const fingerprint = creationFingerprint(input);
 
     const replay = async () => {
-      const existing = await prisma.decision.findUnique({
-        where: { idempotencyKey: storedKey },
+      const existing = await prisma.decision.findFirst({
+        where: {
+          idempotencyKey: storedKey,
+          workspaceId: input.workspaceId,
+          workspace: { members: { some: { userId } } },
+        },
         select: { ...decisionSelect, creationPayloadHash: true, deletedAt: true },
       });
       if (!existing) return null;
@@ -118,7 +135,7 @@ export const decisionService = {
 
     try {
       return await prisma.$transaction(async (tx) => {
-        await requireMember(tx, input.workspaceId, userId);
+        await requireMutationMember(tx, input.workspaceId, userId);
         const [source, user] = await Promise.all([
           tx.discussion.findFirst({
             where: { id: input.sourceDiscussionId, workspaceId: input.workspaceId },
@@ -177,9 +194,8 @@ export const decisionService = {
   },
 
   async getById(userId: string, input: DecisionByIdInput) {
-    await requireMember(prisma, input.workspaceId, userId);
     const decision = await prisma.decision.findFirst({
-      where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null },
+      where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null, workspace: { members: { some: { userId } } } },
       select: decisionSelect,
     });
     if (!decision) throw new AppError("NOT_FOUND", "Decision not found.");
@@ -192,6 +208,7 @@ export const decisionService = {
       where: {
         workspaceId: input.workspaceId,
         deletedAt: null,
+        workspace: { members: { some: { userId } } },
         status: input.status,
         id: input.cursor ? { lt: input.cursor } : undefined,
       },
@@ -202,32 +219,39 @@ export const decisionService = {
     return toPaginatedResult(rows, input.take);
   },
 
-  async revisions(userId: string, input: DecisionByIdInput) {
-    await requireMember(prisma, input.workspaceId, userId);
+  async revisions(userId: string, input: DecisionRevisionsInput) {
     const decision = await prisma.decision.findFirst({
-      where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null },
+      where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null, workspace: { members: { some: { userId } } } },
       select: { id: true },
     });
     if (!decision) throw new AppError("NOT_FOUND", "Decision not found.");
-    return prisma.decisionRevision.findMany({
-      where: { decisionId: decision.id },
+    const rows = await prisma.decisionRevision.findMany({
+      where: {
+        decisionId: decision.id,
+        version: input.cursor ? { gt: input.cursor } : undefined,
+        decision: { workspaceId: input.workspaceId, deletedAt: null, workspace: { members: { some: { userId } } } },
+      },
       orderBy: { version: "asc" },
       select: revisionSelect,
+      take: input.take + 1,
     });
+    const items = rows.slice(0, input.take);
+    return { items, nextCursor: rows.length > input.take ? items[items.length - 1]?.version ?? null : null };
   },
 
   async edit(userId: string, input: EditDecisionInput) {
     return prisma.$transaction(async (tx) => {
-      const role = await requireMember(tx, input.workspaceId, userId);
+      const role = await requireMutationMember(tx, input.workspaceId, userId);
       const current = await tx.decision.findFirst({
         where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null },
-        select: { status: true, createdById: true },
+        select: { status: true, createdById: true, version: true },
       });
       if (!current) throw new AppError("NOT_FOUND", "Decision not found.");
       if (current.status !== "PROPOSED") throw new AppError("CONFLICT", "Finalized decisions cannot be edited.");
       if (current.createdById !== userId && !isManager(role)) {
         throw new AppError("FORBIDDEN", "Only the proposal author or a workspace manager can edit it.");
       }
+      if (current.version !== input.expectedVersion) throw new AppError("CONFLICT", "Decision changed. Reload and try again.");
       const updatedCount = await tx.decision.updateMany({
         where: { id: input.decisionId, workspaceId: input.workspaceId, status: "PROPOSED", deletedAt: null, version: input.expectedVersion },
         data: {
@@ -265,14 +289,15 @@ export const decisionService = {
 
   async finalize(userId: string, input: FinalizeDecisionInput) {
     return prisma.$transaction(async (tx) => {
-      const role = await requireMember(tx, input.workspaceId, userId);
+      const role = await requireMutationMember(tx, input.workspaceId, userId);
       const current = await tx.decision.findFirst({
         where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null },
-        select: { status: true, outcome: true, rationale: true },
+        select: { status: true, outcome: true, rationale: true, version: true },
       });
       if (!current) throw new AppError("NOT_FOUND", "Decision not found.");
       if (!isManager(role)) throw new AppError("FORBIDDEN", "Only a workspace manager can finalize decisions.");
       if (current.status !== "PROPOSED") throw new AppError("CONFLICT", "Only proposals can be finalized.");
+      if (current.version !== input.expectedVersion) throw new AppError("CONFLICT", "Decision changed. Reload and try again.");
       if (!current.outcome?.trim() || !current.rationale?.trim()) {
         throw new AppError("BAD_REQUEST", "Outcome and rationale are required before finalization.");
       }

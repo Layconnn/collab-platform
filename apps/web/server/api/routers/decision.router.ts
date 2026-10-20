@@ -1,6 +1,7 @@
 import {
   createDecisionInputSchema,
   decisionByIdInputSchema,
+  decisionRevisionsInputSchema,
   editDecisionInputSchema,
   finalizeDecisionInputSchema,
   listDecisionsInputSchema,
@@ -43,7 +44,7 @@ export const decisionRouter = createTRPCRouter({
   finalize: limited("decision.finalize", 20).input(finalizeDecisionInputSchema).mutation(({ ctx, input }) =>
     execute(() => decisionService.finalize(ctx.user.id, input)),
   ),
-  revisions: limited("decision.revisions", 80).input(decisionByIdInputSchema).query(({ ctx, input }) =>
+  revisions: limited("decision.revisions", 80).input(decisionRevisionsInputSchema).query(({ ctx, input }) =>
     execute(() => decisionService.revisions(ctx.user.id, input)),
   ),
 });
