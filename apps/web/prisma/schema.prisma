@@ -184,6 +184,7 @@ model Decision {
   status                   DecisionStatus @default(PROPOSED)
   version                  Int            @default(1)
   idempotencyKey           String         @unique
+  creationPayloadHash      String?
   decidedAt                DateTime?
   supersededAt             DateTime?
   deletedAt                DateTime?

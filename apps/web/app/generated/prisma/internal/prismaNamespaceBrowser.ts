@@ -56,7 +56,10 @@ export const ModelName = {
   Discussion: 'Discussion',
   Comment: 'Comment',
   Notification: 'Notification',
-  WorkspaceMember: 'WorkspaceMember'
+  WorkspaceMember: 'WorkspaceMember',
+  Decision: 'Decision',
+  DecisionRevision: 'DecisionRevision',
+  DecisionSupersession: 'DecisionSupersession'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -157,6 +160,68 @@ export const WorkspaceMemberScalarFieldEnum = {
 } as const
 
 export type WorkspaceMemberScalarFieldEnum = (typeof WorkspaceMemberScalarFieldEnum)[keyof typeof WorkspaceMemberScalarFieldEnum]
+
+
+export const DecisionScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  sourceWorkspaceId: 'sourceWorkspaceId',
+  sourceDiscussionId: 'sourceDiscussionId',
+  sourceDiscussionTitle: 'sourceDiscussionTitle',
+  createdById: 'createdById',
+  createdByLabel: 'createdByLabel',
+  deletedById: 'deletedById',
+  question: 'question',
+  outcome: 'outcome',
+  rationale: 'rationale',
+  alternatives: 'alternatives',
+  followUp: 'followUp',
+  status: 'status',
+  version: 'version',
+  idempotencyKey: 'idempotencyKey',
+  creationPayloadHash: 'creationPayloadHash',
+  decidedAt: 'decidedAt',
+  supersededAt: 'supersededAt',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DecisionScalarFieldEnum = (typeof DecisionScalarFieldEnum)[keyof typeof DecisionScalarFieldEnum]
+
+
+export const DecisionRevisionScalarFieldEnum = {
+  id: 'id',
+  decisionId: 'decisionId',
+  version: 'version',
+  action: 'action',
+  actorUserId: 'actorUserId',
+  actorLabel: 'actorLabel',
+  reason: 'reason',
+  question: 'question',
+  outcome: 'outcome',
+  rationale: 'rationale',
+  alternatives: 'alternatives',
+  followUp: 'followUp',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type DecisionRevisionScalarFieldEnum = (typeof DecisionRevisionScalarFieldEnum)[keyof typeof DecisionRevisionScalarFieldEnum]
+
+
+export const DecisionSupersessionScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  previousDecisionId: 'previousDecisionId',
+  replacementDecisionId: 'replacementDecisionId',
+  reason: 'reason',
+  authorizedById: 'authorizedById',
+  authorizedByLabel: 'authorizedByLabel',
+  createdAt: 'createdAt'
+} as const
+
+export type DecisionSupersessionScalarFieldEnum = (typeof DecisionSupersessionScalarFieldEnum)[keyof typeof DecisionSupersessionScalarFieldEnum]
 
 
 export const SortOrder = {
