@@ -11,9 +11,9 @@ export function DecisionDate({ value }: { value: Date | string }) {
 }
 
 export function DecisionSection({ title, children }: { title: string; children: ReactNode }) {
-  return <section className="border-t border-border-subtle py-6 sm:py-8">
-    <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-link">{title}</h2>
-    <div className="mt-3 whitespace-pre-wrap wrap-anywhere text-[0.96rem] leading-7 text-text-primary sm:text-base">{children}</div>
+  return <section className="border-t border-border-subtle py-5 sm:py-6">
+    <h2 className="text-xs font-semibold uppercase text-brand-link">{title}</h2>
+    <div className="mt-2 whitespace-pre-wrap wrap-anywhere text-[0.96rem] leading-7 text-text-primary sm:text-base">{children}</div>
   </section>;
 }
 

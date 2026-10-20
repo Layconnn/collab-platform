@@ -45,12 +45,12 @@ export function CreateDecisionForm({ workspaceId, discussionId, discussionTitle,
     }, () => { inFlight.current = false; })(event);
   };
 
-  return <form onSubmit={onSubmit} noValidate className="space-y-6">
-    <p className="text-sm leading-6 text-text-secondary">This proposal will stay linked to <strong className="wrap-anywhere text-text-primary">{discussionTitle}</strong>. Workspace managers can finalize it after the outcome and rationale are ready.</p>
+  return <form onSubmit={onSubmit} noValidate className="max-w-[44rem] space-y-4">
+    <p className="text-sm leading-6 text-text-secondary">Linked to <strong className="wrap-anywhere text-text-primary">{discussionTitle}</strong>. Add an outcome and rationale now or before a workspace manager finalizes it.</p>
     <DecisionFields prefix="propose-decision" register={form.register} errors={form.formState.errors} disabled={busy} />
     {create.error ? <div role="alert" className="border-l-2 border-danger bg-surface px-4 py-3 text-sm text-danger">{decisionError(create.error, "Could not save the proposal. Your draft is still here; please try again.")}{["FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(create.error.data?.code ?? "") ? <Link href={`/workspace/${workspaceId}/decisions`} className="mt-2 block font-semibold underline">Open decisions</Link> : null}</div> : null}
     {createdId ? <p role="status" className="text-sm text-text-secondary">Proposal saved. <Link href={`/workspace/${workspaceId}/decisions/${createdId}`} className="font-semibold text-brand-link underline">Open decision</Link></p> : null}
-    <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+    <div className="flex flex-col-reverse gap-2 border-t border-border-subtle pt-4 sm:flex-row sm:justify-end">
       <button type="button" onClick={onCancel} disabled={busy} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">Cancel</button>
       <button type="submit" disabled={busy} className="min-h-11 rounded-sm bg-brand-action px-5 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{createdId ? "Proposal saved" : busy ? "Saving proposal..." : "Save proposal"}</button>
     </div>
