@@ -25,6 +25,20 @@ enum NotificationType {
   MENTION
 }
 
+enum DecisionStatus {
+  PROPOSED
+  DECIDED
+  SUPERSEDED
+}
+
+enum DecisionRevisionAction {
+  CREATE
+  EDIT
+  FINALIZE
+  SUPERSEDE
+  SOFT_DELETE
+}
+
 model User {
   id            String            @id @default(cuid())
   email         String            @unique
@@ -37,6 +51,10 @@ model User {
   memberships   WorkspaceMember[]
   discussions   Discussion[]
   comments      Comment[]
+  decisionsCreated Decision[] @relation("DecisionCreator")
+  decisionsDeleted Decision[] @relation("DecisionDeleter")
+  decisionRevisions DecisionRevision[] @relation("DecisionRevisionActor")
+  supersessionsAuthorized DecisionSupersession[] @relation("DecisionSupersessionAuthorizer")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
 }
@@ -52,6 +70,7 @@ model Workspace {
   members     WorkspaceMember[]
   discussions Discussion[]
   comments    Comment[]
+  decisions   Decision[]
   notifications Notification[]
 
   @@index([ownerId, createdAt])
@@ -69,10 +88,11 @@ model Discussion {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments    Comment[]
+  sourceDecisions Decision[]
   notifications Notification[]
 
   @@index([workspaceId, createdAt])
-  @@index([workspaceId, id])
+  @@unique([workspaceId, id])
   @@index([authorId, createdAt])
   // Recommended (optional): @@index([workspaceId, updatedAt]) for active-discussion sort views.
 }
@@ -141,4 +161,81 @@ model WorkspaceMember {
   @@index([workspaceId, role])
   @@index([userId, createdAt])
   // Recommended (optional): @@index([userId, workspaceId, role]) for permission-heavy joins.
+}
+
+// Decisions remain workspace records when their source discussion is deleted.
+// The source-pair CHECK constraint and three deferred FK checks on revision
+// and supersession rows are kept in the reviewed SQL migration because Prisma
+// cannot express them. CASCADE and SET NULL actions themselves remain immediate.
+model Decision {
+  id                       String         @id @default(cuid())
+  workspaceId              String
+  sourceWorkspaceId        String?
+  sourceDiscussionId       String?
+  sourceDiscussionTitle    String
+  createdById              String?
+  createdByLabel           String
+  deletedById              String?
+  question                 String
+  outcome                  String?
+  rationale                String?
+  alternatives             String?
+  followUp                 String?
+  status                   DecisionStatus @default(PROPOSED)
+  version                  Int            @default(1)
+  idempotencyKey           String         @unique
+  decidedAt                DateTime?
+  supersededAt             DateTime?
+  deletedAt                DateTime?
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+  workspace                Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sourceDiscussion         Discussion?    @relation(fields: [sourceWorkspaceId, sourceDiscussionId], references: [workspaceId, id], onDelete: SetNull)
+  createdBy                User?          @relation("DecisionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  deletedBy                User?          @relation("DecisionDeleter", fields: [deletedById], references: [id], onDelete: SetNull)
+  revisions                DecisionRevision[]
+  replacementLink          DecisionSupersession? @relation("PreviousDecision")
+  predecessorLink          DecisionSupersession? @relation("ReplacementDecision")
+
+  @@unique([workspaceId, id])
+  @@index([workspaceId, status, id(sort: Desc)])
+  @@index([sourceWorkspaceId, sourceDiscussionId])
+}
+
+model DecisionRevision {
+  id            String                 @id @default(cuid())
+  decisionId    String
+  version       Int
+  action        DecisionRevisionAction
+  actorUserId   String?
+  actorLabel    String
+  reason        String?
+  question      String
+  outcome       String?
+  rationale     String?
+  alternatives  String?
+  followUp      String?
+  status        DecisionStatus
+  createdAt     DateTime               @default(now())
+  decision      Decision               @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  actor         User?                  @relation("DecisionRevisionActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@unique([decisionId, version])
+}
+
+model DecisionSupersession {
+  id                    String   @id @default(cuid())
+  workspaceId           String
+  previousDecisionId    String
+  replacementDecisionId String
+  reason                String
+  authorizedById        String?
+  authorizedByLabel     String
+  createdAt             DateTime @default(now())
+  previousDecision      Decision @relation("PreviousDecision", fields: [workspaceId, previousDecisionId], references: [workspaceId, id], onDelete: Cascade)
+  replacementDecision   Decision @relation("ReplacementDecision", fields: [workspaceId, replacementDecisionId], references: [workspaceId, id], onDelete: Cascade)
+  authorizedBy          User?    @relation("DecisionSupersessionAuthorizer", fields: [authorizedById], references: [id], onDelete: SetNull)
+
+  @@unique([workspaceId, previousDecisionId])
+  @@unique([workspaceId, replacementDecisionId])
 }
