@@ -6,6 +6,7 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  BookOpen,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
@@ -18,6 +19,7 @@ export type AppIconName =
   | "home"
   | "workspaces"
   | "discussions"
+  | "decisions"
   | "members"
   | "plus"
   | "bell"
@@ -32,6 +34,7 @@ const icons: Record<AppIconName, LucideIcon> = {
   home: House,
   workspaces: Building2,
   discussions: MessageSquare,
+  decisions: BookOpen,
   members: Users,
   plus: Plus,
   bell: Bell,

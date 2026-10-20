@@ -1,0 +1,53 @@
+"use client";
+
+import { trpc } from "@/lib/trpc/api-client";
+
+export function useDecisionList(workspaceId: string, status?: "PROPOSED" | "DECIDED" | "SUPERSEDED") {
+  return trpc.decision.listByWorkspace.useInfiniteQuery(
+    { workspaceId, status, take: 20 },
+    { getNextPageParam: (page) => page.nextCursor ?? undefined, enabled: Boolean(workspaceId) },
+  );
+}
+
+export function useDecisionDetail(workspaceId: string, decisionId: string) {
+  return trpc.decision.getById.useQuery({ workspaceId, decisionId }, { enabled: Boolean(workspaceId && decisionId) });
+}
+
+export function useDecisionRevisions(workspaceId: string, decisionId: string, enabled = true) {
+  return trpc.decision.revisions.useInfiniteQuery(
+    { workspaceId, decisionId, take: 20 },
+    { getNextPageParam: (page) => page.nextCursor ?? undefined, enabled: enabled && Boolean(workspaceId && decisionId) },
+  );
+}
+
+export function useDecisionActions(workspaceId: string) {
+  const utils = trpc.useUtils();
+  const refresh = async (decisionId: string) => {
+    await Promise.all([
+      utils.decision.listByWorkspace.invalidate({ workspaceId }),
+      utils.decision.getById.invalidate({ workspaceId, decisionId }),
+      utils.decision.revisions.invalidate({ workspaceId, decisionId }),
+    ]);
+  };
+  const refreshAccess = async (error: { data?: { code?: string } | null }) => {
+    if (["FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(error.data?.code ?? "")) {
+      await Promise.allSettled([
+        utils.workspace.getById.invalidate({ workspaceId }),
+        utils.decision.listByWorkspace.invalidate({ workspaceId }),
+      ]);
+    }
+  };
+  const create = trpc.decision.create.useMutation({
+    onSuccess: (decision) => refresh(decision.id),
+    onError: refreshAccess,
+  });
+  const edit = trpc.decision.edit.useMutation({
+    onSuccess: (decision) => refresh(decision.id),
+    onError: refreshAccess,
+  });
+  const finalize = trpc.decision.finalize.useMutation({
+    onSuccess: (decision) => refresh(decision.id),
+    onError: refreshAccess,
+  });
+  return { create, edit, finalize };
+}
