@@ -6,20 +6,12 @@ import {
   registerInputSchema,
 } from "@repo/validators/auth";
 
-import { toTRPCError } from "../../errors/app-error";
+import { execute } from "../../errors/app-error";
 import { getSessionCookieToken } from "../../middleware/auth";
 import { createRateLimitGuardByKey } from "../../middleware/rateLimit";
 import { authService } from "../../services/auth.service";
 import { buildAuthCookies, buildLogoutCookies } from "../../utils/auth-cookies";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-
-const execute = async <T>(operation: () => Promise<T>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    throw toTRPCError(error);
-  }
-};
 
 const loginRateLimit = createRateLimitGuardByKey({
   routeKey: "auth.login",
@@ -27,9 +19,21 @@ const loginRateLimit = createRateLimitGuardByKey({
   windowSeconds: 60,
 });
 
+const registerRateLimit = createRateLimitGuardByKey({
+  routeKey: "auth.register",
+  limit: 5,
+  windowSeconds: 600,
+});
+
 const loginProcedure = publicProcedure.use(async ({ ctx, next }) => {
   const ip = ctx.ip ?? "unknown";
   await loginRateLimit(ip, ctx.requestId);
+  return next();
+});
+
+const registerProcedure = publicProcedure.use(async ({ ctx, next }) => {
+  const ip = ctx.ip ?? "unknown";
+  await registerRateLimit(ip, ctx.requestId);
   return next();
 });
 
@@ -44,7 +48,7 @@ export const authRouter = createTRPCRouter({
     execute(() => authService.getCurrentUser(ctx.user.id)),
   ),
 
-  register: publicProcedure.input(registerInputSchema).mutation(({ ctx, input }) =>
+  register: registerProcedure.input(registerInputSchema).mutation(({ ctx, input }) =>
     execute(async () => {
       const result = await authService.register(input, { requestId: ctx.requestId });
       appendSetCookies(ctx.responseHeaders, buildAuthCookies(result));
@@ -83,6 +87,7 @@ export const authRouter = createTRPCRouter({
       execute(() =>
         authService.changePassword(ctx.user.id, input, {
           requestId: ctx.requestId,
+          sessionToken: getSessionCookieToken(ctx.headers),
         }),
       ),
     ),

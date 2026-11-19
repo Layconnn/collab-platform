@@ -73,6 +73,24 @@ describe("CreateCommentForm", () => {
     expect(field).toHaveProperty("value", "I can document that flow.");
   });
 
+  it("reuses one idempotency key when the same draft is retried", async () => {
+    const user = userEvent.setup();
+    mocks.mutateAsync
+      .mockRejectedValueOnce(Object.assign(new Error("timeout"), { data: { code: "INTERNAL_SERVER_ERROR" } }))
+      .mockResolvedValueOnce({ id: "c000000000000000000000004" });
+    render(<CreateCommentForm discussionId={discussionId} workspaceId={workspaceId} />);
+
+    await user.type(screen.getByRole("combobox", { name: "Your perspective" }), "Retry this exact comment.");
+    await user.click(screen.getByRole("button", { name: "Post comment" }));
+    await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByRole("button", { name: "Post comment" }));
+    await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledTimes(2));
+
+    const [first, second] = mocks.mutateAsync.mock.calls.map(([input]) => input.idempotencyKey);
+    expect(first).toEqual(expect.any(String));
+    expect(second).toBe(first);
+  });
+
   it("blocks duplicate submissions while a request is in flight", async () => {
     let resolve!: (value: { id: string }) => void;
     mocks.mutateAsync.mockReturnValue(new Promise((done) => { resolve = done; }));

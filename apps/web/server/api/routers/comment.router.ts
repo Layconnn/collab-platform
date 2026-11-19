@@ -7,18 +7,10 @@ import {
 } from "@repo/validators/comment";
 
 import { redis } from "../../cache/redis";
-import { toTRPCError } from "../../errors/app-error";
+import { execute } from "../../errors/app-error";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { commentService } from "../../services/comment.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-
-const execute = async <T>(operation: () => Promise<T>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    throw toTRPCError(error);
-  }
-};
 
 const createCommentRateLimit = createRateLimitGuard({
   routeKey: "comment.create",
