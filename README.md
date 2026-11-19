@@ -123,7 +123,7 @@ pnpm -C apps/web run test:integration
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20.9+
 - Docker + Docker Compose
 - pnpm
 

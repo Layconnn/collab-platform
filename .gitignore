@@ -70,3 +70,5 @@ pnpm-debug.log*
 
 
 trpc-prompts.txt
+# === LOCAL DATABASE SNAPSHOTS ===
+.tmp/

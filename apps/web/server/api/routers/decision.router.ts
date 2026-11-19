@@ -9,18 +9,10 @@ import {
   supersedeDecisionInputSchema,
 } from "@repo/validators/decision";
 
-import { toTRPCError } from "../../errors/app-error";
+import { execute } from "../../errors/app-error";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { decisionService } from "../../services/decision.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-
-const execute = async <T>(operation: () => Promise<T>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    throw toTRPCError(error);
-  }
-};
 
 function limited(routeKey: string, limit: number) {
   const guard = createRateLimitGuard({ routeKey, limit, windowSeconds: 60 });

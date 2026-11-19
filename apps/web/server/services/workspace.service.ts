@@ -21,15 +21,14 @@ import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import {
   recordOwnershipTransfer,
-  recordPermissionDenied,
   recordPermissionEscalationAttempt,
   recordWorkspacePermissionAudit,
 } from "../observability/security-events";
+import { getMembershipRole, requireWorkspaceAction } from "./workspace.access";
 import {
   WORKSPACE_ACTIONS,
-  canPerformWorkspaceAction,
+  type WorkspaceAction,
   assertCanAssignRoleOnAddMember,
-  assertCanPerformWorkspaceAction,
   assertCanRemoveMember,
   assertCanUpdateMemberRole,
   assertExactlyOneOwner,
@@ -68,52 +67,13 @@ type RequestContext = {
   requestId: string;
 };
 
-async function getMembershipRole(workspaceId: string, userId: string): Promise<MembershipRoleRecord | null> {
-  return prisma.workspaceMember.findUnique({
-    where: {
-      workspaceId_userId: {
-        workspaceId,
-        userId,
-      },
-    },
-    select: {
-      role: true,
-    },
-  });
-}
-
 async function requireRoleForAction(
   workspaceId: string,
   userId: string,
-  action: (typeof WORKSPACE_ACTIONS)[keyof typeof WORKSPACE_ACTIONS],
+  action: WorkspaceAction,
   requestId: string,
-) {
-  const membership = await getMembershipRole(workspaceId, userId);
-  if (!membership) {
-    await recordPermissionDenied({
-      requestId,
-      userId,
-      workspaceId,
-      action,
-      reason: "not_workspace_member",
-      timestamp: new Date().toISOString(),
-    });
-    throw new AppError("FORBIDDEN", "You are not a member of this workspace.");
-  }
-
-  if (!canPerformWorkspaceAction(membership.role, action)) {
-    await recordPermissionDenied({
-      requestId,
-      userId,
-      workspaceId,
-      action,
-      reason: `role_${membership.role.toLowerCase()}_not_allowed`,
-      timestamp: new Date().toISOString(),
-    });
-    throw new AppError("FORBIDDEN", "Insufficient permissions for this action.");
-  }
-
-  return membership;
+): Promise<MembershipRoleRecord> {
+  return { role: await requireWorkspaceAction(workspaceId, userId, action, requestId) };
 }
 
 async function readWorkspaceOwnerState(workspaceId: string, dbClient: typeof prisma): Promise<WorkspaceOwnerState> {
@@ -449,23 +409,27 @@ export const workspaceService = {
     assertCanAssignRoleOnAddMember(actor.role, input.role);
 
     try {
-      const membership = await prisma.workspaceMember.create({
-        data: {
-          workspaceId: input.workspaceId,
-          userId: input.userId,
-          role: input.role,
-        },
-        select: {
-          id: true,
-          workspaceId: true,
-          userId: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+      // The owner check runs in the same transaction so a violation rolls the change back.
+      const membership = await prisma.$transaction(async (tx) => {
+        const created = await tx.workspaceMember.create({
+          data: {
+            workspaceId: input.workspaceId,
+            userId: input.userId,
+            role: input.role,
+          },
+          select: {
+            id: true,
+            workspaceId: true,
+            userId: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+        await enforceOwnerInvariant(input.workspaceId, tx as unknown as typeof prisma);
+        return created;
       });
 
-      await enforceOwnerInvariant(input.workspaceId, prisma);
       await invalidateWorkspaceCache(input.workspaceId);
       await invalidateUserWorkspaceLists(input.userId);
       await invalidateUserWorkspaceLists(actorUserId);
@@ -500,8 +464,8 @@ export const workspaceService = {
       context.requestId,
     );
 
-    const targetMembership = await getMembershipRole(input.workspaceId, input.userId);
-    if (!targetMembership) {
+    const targetRole = await getMembershipRole(input.workspaceId, input.userId);
+    if (!targetRole) {
       throw new AppError("NOT_FOUND", "Workspace member not found.");
     }
 
@@ -514,28 +478,31 @@ export const workspaceService = {
         timestamp: new Date().toISOString(),
       });
     }
-    assertCanUpdateMemberRole(actor.role, targetMembership.role, input.role);
+    assertCanUpdateMemberRole(actor.role, targetRole, input.role);
 
-    const updated = await prisma.workspaceMember.update({
-      where: {
-        workspaceId_userId: {
-          workspaceId: input.workspaceId,
-          userId: input.userId,
+    const updated = await prisma.$transaction(async (tx) => {
+      const changed = await tx.workspaceMember.update({
+        where: {
+          workspaceId_userId: {
+            workspaceId: input.workspaceId,
+            userId: input.userId,
+          },
         },
-      },
-      data: {
-        role: input.role,
-      },
-      select: {
-        id: true,
-        workspaceId: true,
-        userId: true,
-        role: true,
-        updatedAt: true,
-      },
+        data: {
+          role: input.role,
+        },
+        select: {
+          id: true,
+          workspaceId: true,
+          userId: true,
+          role: true,
+          updatedAt: true,
+        },
+      });
+      await enforceOwnerInvariant(input.workspaceId, tx as unknown as typeof prisma);
+      return changed;
     });
 
-    await enforceOwnerInvariant(input.workspaceId, prisma);
     await invalidateWorkspaceCache(input.workspaceId);
     await invalidateUserWorkspaceLists(input.userId);
     await invalidateUserWorkspaceLists(actorUserId);
@@ -545,7 +512,7 @@ export const workspaceService = {
       actorUserId,
       workspaceId: input.workspaceId,
       targetUserId: input.userId,
-      oldRole: targetMembership.role,
+      oldRole: targetRole,
       newRole: input.role,
       timestamp: new Date().toISOString(),
     });
@@ -560,24 +527,26 @@ export const workspaceService = {
       WORKSPACE_ACTIONS.REMOVE_MEMBER,
       context.requestId,
     );
-    const targetMembership = await getMembershipRole(input.workspaceId, input.userId);
+    const targetRole = await getMembershipRole(input.workspaceId, input.userId);
 
-    if (!targetMembership) {
+    if (!targetRole) {
       throw new AppError("NOT_FOUND", "Workspace member not found.");
     }
 
-    assertCanRemoveMember(actor.role, targetMembership.role);
+    assertCanRemoveMember(actor.role, targetRole);
 
-    await prisma.workspaceMember.delete({
-      where: {
-        workspaceId_userId: {
-          workspaceId: input.workspaceId,
-          userId: input.userId,
+    await prisma.$transaction(async (tx) => {
+      await tx.workspaceMember.delete({
+        where: {
+          workspaceId_userId: {
+            workspaceId: input.workspaceId,
+            userId: input.userId,
+          },
         },
-      },
+      });
+      await enforceOwnerInvariant(input.workspaceId, tx as unknown as typeof prisma);
     });
 
-    await enforceOwnerInvariant(input.workspaceId, prisma);
     await invalidateWorkspaceCache(input.workspaceId);
     await invalidateUserWorkspaceLists(input.userId);
     await invalidateUserWorkspaceLists(actorUserId);
@@ -587,7 +556,7 @@ export const workspaceService = {
       actorUserId,
       workspaceId: input.workspaceId,
       targetUserId: input.userId,
-      oldRole: targetMembership.role,
+      oldRole: targetRole,
       newRole: null,
       timestamp: new Date().toISOString(),
     });
@@ -611,8 +580,8 @@ export const workspaceService = {
       throw new AppError("BAD_REQUEST", "New owner must be different from current owner.");
     }
 
-    const targetMembership = await getMembershipRole(input.workspaceId, input.newOwnerUserId);
-    if (!targetMembership) {
+    const targetRole = await getMembershipRole(input.workspaceId, input.newOwnerUserId);
+    if (!targetRole) {
       throw new AppError("NOT_FOUND", "Target member not found in workspace.");
     }
 
@@ -658,7 +627,7 @@ export const workspaceService = {
       actorUserId,
       workspaceId: input.workspaceId,
       targetUserId: input.newOwnerUserId,
-      oldRole: targetMembership.role,
+      oldRole: targetRole,
       newRole: "OWNER",
       timestamp: new Date().toISOString(),
     });

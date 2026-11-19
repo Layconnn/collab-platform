@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 
 import argon2 from "argon2";
-import jwt from "jsonwebtoken";
 
 import type {
   ChangePasswordInput,
@@ -11,12 +10,15 @@ import type {
 
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
-import { env } from "../env";
-import { invalidateSession, persistSession } from "../middleware/auth";
+import {
+  invalidateSession,
+  invalidateUserSessions,
+  persistSession,
+  signAccessToken,
+} from "../middleware/auth";
 import { recordAuthFailure } from "../observability/security-events";
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
-const ACCESS_TOKEN_TTL = "15m";
 
 type RequestContext = {
   requestId: string;
@@ -29,21 +31,18 @@ type AuthTokens = {
   csrfToken: string;
 };
 
-function generateTokenPair(userId: string) {
+async function startSession(userId: string): Promise<AuthTokens> {
   const sessionId = randomUUID();
   const sessionToken = randomUUID();
 
-  const accessToken = jwt.sign(
-    {
-      sub: userId,
-      sid: sessionId,
-      tokenType: "access",
-    },
-    env.JWT_SECRET,
-    { expiresIn: ACCESS_TOKEN_TTL },
-  );
+  await persistSession(sessionToken, userId, sessionId, SESSION_TTL_SECONDS);
 
-  return { accessToken, sessionToken };
+  return {
+    accessToken: signAccessToken(userId, sessionId),
+    sessionToken,
+    expiresInSeconds: SESSION_TTL_SECONDS,
+    csrfToken: randomUUID(),
+  };
 }
 
 export const authService = {
@@ -88,17 +87,7 @@ export const authService = {
       },
     });
 
-    const { accessToken, sessionToken } = generateTokenPair(user.id);
-    const csrfToken = randomUUID();
-
-    await persistSession(sessionToken, user.id, SESSION_TTL_SECONDS);
-
-    return {
-      accessToken,
-      sessionToken,
-      expiresInSeconds: SESSION_TTL_SECONDS,
-      csrfToken,
-    };
+    return startSession(user.id);
   },
 
   async login(input: LoginInput, context: RequestContext): Promise<AuthTokens> {
@@ -139,17 +128,7 @@ export const authService = {
       throw new AppError("UNAUTHORIZED", "Invalid credentials.");
     }
 
-    const { accessToken, sessionToken } = generateTokenPair(user.id);
-    const csrfToken = randomUUID();
-
-    await persistSession(sessionToken, user.id, SESSION_TTL_SECONDS);
-
-    return {
-      accessToken,
-      sessionToken,
-      expiresInSeconds: SESSION_TTL_SECONDS,
-      csrfToken,
-    };
+    return startSession(user.id);
   },
 
   async logout(sessionToken: string | null): Promise<{ success: true }> {
@@ -163,7 +142,7 @@ export const authService = {
   async changePassword(
     userId: string,
     input: ChangePasswordInput,
-    context: RequestContext,
+    context: RequestContext & { sessionToken: string | null },
   ): Promise<{ success: true }> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -197,6 +176,9 @@ export const authService = {
       where: { id: userId },
       data: { passwordHash },
     });
+
+    // Every other signed-in device loses access; the current session stays.
+    await invalidateUserSessions(userId, context.sessionToken);
 
     return { success: true as const };
   },

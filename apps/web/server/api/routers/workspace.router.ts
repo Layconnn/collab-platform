@@ -14,18 +14,10 @@ import {
   updateWorkspaceMemberRoleInputSchema,
 } from "@repo/validators/workspace";
 
-import { toTRPCError } from "../../errors/app-error";
+import { execute } from "../../errors/app-error";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { workspaceService } from "../../services/workspace.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-
-const execute = async <T>(operation: () => Promise<T>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    throw toTRPCError(error);
-  }
-};
 
 const getByIdRateLimit = createRateLimitGuard({
   routeKey: "workspace.getById",
