@@ -131,6 +131,9 @@ describe("NotificationDropdown", () => {
     trigger.focus();
     await user.keyboard("{Enter}");
     expect(await screen.findByText("No notifications yet")).toBeTruthy();
+    // The popover handles Escape only once it has taken focus; on fast machines a key sent earlier is lost.
+    const popover = screen.getByRole("dialog");
+    await waitFor(() => expect(popover.contains(document.activeElement)).toBe(true));
     await user.keyboard("{Escape}");
     await waitFor(() =>
       expect(trigger.getAttribute("aria-expanded")).not.toBe("true"),
