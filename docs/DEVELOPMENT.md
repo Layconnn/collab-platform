@@ -338,3 +338,44 @@ docker-compose logs
 docker-compose logs postgres
 docker-compose logs redis
 ```
+
+---
+
+## Continuous Integration
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request and on pushes to `dev` and `main`. Jobs run in parallel:
+
+| Job | What it checks |
+| --- | --- |
+| Lint, types and schema | ESLint and TypeScript for `apps/web` and `packages/validators`; `prisma validate`; migrations applied to a clean database must match `schema.prisma` exactly |
+| Backend tests | Auth/session, workspace permissions and rate limits, discussion, comment and notification security, API integration, and the decision suites against a real PostgreSQL database |
+| Frontend tests | All Vitest component tests |
+| Production build and worker image | `next build` and the notification worker Docker image |
+| Dependency audit and secret scan | Fails on critical advisories in production dependencies; scans history for committed secrets with gitleaks (`.gitleaks.toml`) |
+
+Dependabot (`.github/dependabot.yml`) opens weekly update pull requests against `dev`.
+
+Run the decision suites locally against a separate, disposable database whose name ends in `_decision_test`:
+
+```bash
+createdb -h localhost -p 5433 -U postgres my_platform_decision_test
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_decision_test pnpm -C apps/web exec prisma migrate deploy
+export DECISION_TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_decision_test
+pnpm -C apps/web run test:decision-db
+pnpm -C apps/web run test:decision-api
+```
+
+---
+
+## Notification Delivery
+
+Notification jobs go through one of two queues, chosen by `server/queue/notification.queue.ts`:
+
+| Where | Queue | Who delivers |
+| --- | --- | --- |
+| Vercel (`VERCEL` is set) | Vercel Queues topic `notification-delivery` | `app/api/queues/notifications/route.ts`, registered in `apps/web/vercel.json`; only Vercel's queue service can invoke it |
+| Everywhere else | BullMQ on Redis | The in-API worker (`RUN_WORKER_IN_API=1`, development only) or the separate worker (`Dockerfile.worker`) |
+
+Set `NOTIFICATION_QUEUE_DRIVER=vercel` or `bullmq` to override the choice. Both paths call `deliverNotification` in `server/queue/notification.processor.ts`, which upserts by `dedupeKey`, so a message delivered twice still creates one notification. Vercel retries a failed delivery with backoff and gives up after 6 attempts, logging `notification.queue.delivery_failed`.
+
+To publish to Vercel Queues from a local machine, link the project (`vercel link`) and pull credentials (`vercel env pull`); the token they write expires and must be pulled again.
