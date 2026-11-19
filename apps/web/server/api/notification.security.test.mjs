@@ -15,6 +15,7 @@ const { notificationRouter } = jiti("./routers/notification.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis, redisCache } = jiti("../cache/redis.ts");
 const { notificationQueue, enqueueNotificationJob, resolveNotificationQueueDriver } = jiti("../queue/notification.queue.ts");
+const { deliverFanout } = jiti("../queue/notification.processor.ts");
 
 const userA = "c000000000000000000000001";
 const userB = "c000000000000000000000002";
@@ -148,6 +149,45 @@ test("notifications use Vercel Queues on Vercel and BullMQ everywhere else", () 
   } finally {
     if (previous === undefined) delete process.env.VERCEL;
     else process.env.VERCEL = previous;
+  }
+});
+
+test("a fan-out job writes every recipient in one statement and replays without duplicates", async () => {
+  const originalMemberFindMany = prisma.workspaceMember.findMany.bind(prisma.workspaceMember);
+  const originalCreateMany = prisma.notification.createMany.bind(prisma.notification);
+  const stored = new Map();
+  const calls = [];
+  prisma.workspaceMember.findMany = async ({ where }) =>
+    where.user ? [] : [{ userId: userA }, { userId: userB }].filter((member) => member.userId !== where.userId.not);
+  prisma.notification.createMany = async ({ data, skipDuplicates }) => {
+    calls.push({ rows: data.length, skipDuplicates });
+    let count = 0;
+    for (const row of data) {
+      if (!stored.has(row.dedupeKey)) {
+        stored.set(row.dedupeKey, row);
+        count += 1;
+      }
+    }
+    return { count };
+  };
+  try {
+    const event = {
+      kind: "comment_created",
+      requestId: "fanout-test",
+      actorUserId: "c000000000000000000000009",
+      workspaceId: workspaceA,
+      discussionId: discussionA,
+      commentId: "c000000000000000000000010",
+      body: "No mentions here",
+      parentCommentId: null,
+    };
+    assert.equal(await deliverFanout(event), 2);
+    assert.equal(await deliverFanout(event), 0);
+    assert.deepEqual(calls, [{ rows: 2, skipDuplicates: true }, { rows: 2, skipDuplicates: true }]);
+    assert.deepEqual([...stored.values()].map((row) => row.recipientUserId).sort(), [userA, userB].sort());
+  } finally {
+    prisma.workspaceMember.findMany = originalMemberFindMany;
+    prisma.notification.createMany = originalCreateMany;
   }
 });
 

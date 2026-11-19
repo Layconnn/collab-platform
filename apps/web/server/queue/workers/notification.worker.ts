@@ -2,13 +2,13 @@ import { captureError } from "../../observability/sentry";
 import { createWorker } from "../bullmq";
 import {
   NOTIFICATION_QUEUE_NAME,
-  type NotificationJobData,
+  type NotificationQueuePayload,
 } from "../notification.queue";
-import { deliverNotification } from "../notification.processor";
+import { processNotificationJob } from "../notification.processor";
 
-export const notificationWorker = createWorker<NotificationJobData>(
+export const notificationWorker = createWorker<NotificationQueuePayload>(
   NOTIFICATION_QUEUE_NAME,
-  async (job) => deliverNotification(job.data),
+  async (job) => processNotificationJob(job.name, job.data),
 );
 
 notificationWorker.on("completed", (job) => {
