@@ -1,8 +1,16 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 
-import { resolveAuthenticatedUser, resolveRequestId, trackAuthFailure, isCookieAuth } from "../middleware/auth";
+import { toTRPCError } from "../errors/app-error";
+import {
+  isCookieAuth,
+  resolveAuthenticatedUser,
+  resolveRequestId,
+  signAccessToken,
+  trackAuthFailure,
+} from "../middleware/auth";
 import { requireCsrfToken } from "../middleware/csrf";
+import { buildAccessTokenCookie } from "../utils/auth-cookies";
 
 export type RequestUser = {
   id: string;
@@ -36,11 +44,20 @@ export async function createTRPCContext(opts: {
   request: Request;
 }): Promise<TRPCContext> {
   const requestId = resolveRequestId(opts.headers);
-  const user = await resolveAuthenticatedUser(opts.headers);
+  const authenticated = await resolveAuthenticatedUser(opts.headers);
   const responseHeaders = new Headers();
 
+  // The session cookie authenticated a request whose access token was missing or
+  // stale: issue a fresh access token so later requests skip the fallback.
+  if (authenticated?.via === "session" && authenticated.sessionId) {
+    responseHeaders.append(
+      "set-cookie",
+      buildAccessTokenCookie(signAccessToken(authenticated.id, authenticated.sessionId)),
+    );
+  }
+
   return {
-    user,
+    user: authenticated ? { id: authenticated.id } : null,
     requestId,
     headers: opts.headers,
     requestMethod: opts.request.method,
@@ -65,7 +82,11 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   }
 
   if (isCookieAuth(ctx.headers)) {
-    requireCsrfToken(ctx.headers, ctx.requestMethod);
+    try {
+      requireCsrfToken(ctx.headers, ctx.requestMethod);
+    } catch (error) {
+      throw toTRPCError(error);
+    }
   }
 
   return next({

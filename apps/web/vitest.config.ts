@@ -6,6 +6,7 @@ export default defineConfig({
     alias: [
       { find: "@repo/validators/auth", replacement: fileURLToPath(new URL("../../packages/validators/src/auth.ts", import.meta.url)) },
       { find: "@repo/validators/discussion", replacement: fileURLToPath(new URL("../../packages/validators/src/discussion.ts", import.meta.url)) },
+      { find: "@repo/validators/decision", replacement: fileURLToPath(new URL("../../packages/validators/src/decision.ts", import.meta.url)) },
       { find: "@repo/validators/comment", replacement: fileURLToPath(new URL("../../packages/validators/src/comment.ts", import.meta.url)) },
       { find: "@repo/validators/workspace", replacement: fileURLToPath(new URL("../../packages/validators/src/workspace.ts", import.meta.url)) },
       { find: "@repo/validators", replacement: fileURLToPath(new URL("../../packages/validators/src/index.ts", import.meta.url)) },

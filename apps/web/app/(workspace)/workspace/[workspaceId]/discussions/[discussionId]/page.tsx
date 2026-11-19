@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionActions, useDiscussionDetail } from "@/hooks/useDiscussion";
 import { useWorkspaceDetail } from "@/hooks/useWorkspace";
 import { resolveUserIdentity } from "@/lib/user-identity";
+import { CreateDecisionForm } from "@/components/decision/CreateDecisionForm";
 
 function dateLabel(value: Date | string) {
   return new Intl.DateTimeFormat("en", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(value));
@@ -58,6 +59,8 @@ export default function DiscussionDetailPage() {
   const workspaceMismatch = Boolean(discussion.data && discussion.data.workspaceId !== workspaceId);
   const comments = useCommentList(discussionId, undefined, Boolean(discussion.data && !discussionDenied && !workspaceMismatch && discussion.error?.data?.code !== "NOT_FOUND"));
   const [editing, setEditing] = useState(false);
+  const [proposing, setProposing] = useState(false);
+  const proposeButtonRef = useRef<HTMLButtonElement>(null);
   const [threadAccessDenied, setThreadAccessDenied] = useState(false);
   const handleThreadAccessDenied = useCallback(() => setThreadAccessDenied(true), []);
   const menuTriggerRef = useRef<HTMLButtonElement>(null);
@@ -181,6 +184,16 @@ export default function DiscussionDetailPage() {
         {removeError ? <p role="alert" className="mt-5 text-sm text-danger">{removeError}</p> : null}
         {discussion.error && discussion.data ? <p role="alert" className="mt-5 text-sm text-danger">This discussion could not be refreshed.</p> : null}
       </article>
+
+      {canAct ? <section aria-labelledby="decision-proposal-heading" className="border-b border-border-subtle bg-surface-subtle px-4 py-6 sm:px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div><p className="text-xs font-semibold uppercase text-brand-link">Carry the reasoning forward</p><h2 id="decision-proposal-heading" className="mt-1 text-lg font-semibold text-text-primary">A decision emerging?</h2><p className="mt-1 max-w-[55ch] text-sm leading-6 text-text-secondary">Capture the question, proposed outcome, and why it matters while this conversation is fresh.</p></div>
+          <button ref={proposeButtonRef} type="button" aria-expanded={proposing} aria-controls="decision-proposal-form" onClick={() => setProposing((value) => !value)} className="min-h-11 shrink-0 rounded-sm border border-brand-accent px-4 text-sm font-semibold text-brand-link hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">{proposing ? "Close proposal" : "Propose decision"}</button>
+        </div>
+        <div id="decision-proposal-form" hidden={!proposing} className="mt-6 border-t border-border-subtle pt-6">
+          <CreateDecisionForm workspaceId={workspaceId} discussionId={discussionId} discussionTitle={discussion.data.title} onCancel={() => { setProposing(false); requestAnimationFrame(() => proposeButtonRef.current?.focus()); }} />
+        </div>
+      </section> : null}
 
       <section aria-labelledby="conversation-heading" className="pt-8 sm:pt-10">
         <div className="mb-5 flex items-end justify-between gap-4 border-b border-border-subtle pb-4">

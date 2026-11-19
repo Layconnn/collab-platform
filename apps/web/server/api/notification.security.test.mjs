@@ -14,7 +14,7 @@ const { notificationService } = jiti("../services/notification.service.ts");
 const { notificationRouter } = jiti("./routers/notification.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis, redisCache } = jiti("../cache/redis.ts");
-const { notificationQueue, enqueueNotificationJob } = jiti("../queue/notification.queue.ts");
+const { notificationQueue, enqueueNotificationJob, resolveNotificationQueueDriver } = jiti("../queue/notification.queue.ts");
 
 const userA = "c000000000000000000000001";
 const userB = "c000000000000000000000002";
@@ -136,6 +136,19 @@ test("queue job IDs are stable and BullMQ-safe while preserving the database ded
   assert.match(calls[0][2].jobId, /^[0-9a-f]{64}$/);
   assert.equal(calls[0][2].jobId, calls[1][2].jobId);
   assert.equal(calls[0][1].dedupeKey, payload.dedupeKey);
+});
+
+test("notifications use Vercel Queues on Vercel and BullMQ everywhere else", () => {
+  const previous = process.env.VERCEL;
+  try {
+    delete process.env.VERCEL;
+    assert.equal(resolveNotificationQueueDriver(), "bullmq");
+    process.env.VERCEL = "1";
+    assert.equal(resolveNotificationQueueDriver(), "vercel");
+  } finally {
+    if (previous === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = previous;
+  }
 });
 
 test("a revoked member cannot receive stale Redis data or another recipient's notifications", async () => {

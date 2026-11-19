@@ -6,6 +6,7 @@
     ".": "./src/index.ts",
     "./workspace": "./src/workspace.ts",
     "./discussion": "./src/discussion.ts",
+    "./decision": "./src/decision.ts",
     "./comment": "./src/comment.ts",
     "./notification": "./src/notification.ts",
     "./auth": "./src/auth.ts"
@@ -20,6 +21,6 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
-    "zod": "^4.3.6"
+    "zod": "^4.6.7"
   }
 }

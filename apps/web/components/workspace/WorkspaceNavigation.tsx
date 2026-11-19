@@ -30,6 +30,7 @@ export function WorkspaceNavigation({
     items.push(
       { label: "Overview", href: `/workspace/${workspaceId}`, icon: "home", active: pathname === `/workspace/${workspaceId}` },
       { label: "Discussions", href: `/workspace/${workspaceId}/discussions`, icon: "discussions", active: pathname.startsWith(`/workspace/${workspaceId}/discussions`) },
+      { label: "Decisions", href: `/workspace/${workspaceId}/decisions`, icon: "decisions", active: pathname.startsWith(`/workspace/${workspaceId}/decisions`) },
       { label: "Members", href: `/workspace/${workspaceId}/members`, icon: "members", active: pathname.startsWith(`/workspace/${workspaceId}/members`) },
     );
   }

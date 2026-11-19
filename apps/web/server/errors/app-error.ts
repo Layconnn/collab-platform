@@ -47,3 +47,12 @@ export function toTRPCError(error: unknown): TRPCError {
     cause: error,
   });
 }
+
+// Runs a service call from a tRPC resolver and converts domain errors to tRPC errors.
+export async function execute<T>(operation: () => Promise<T>): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    throw toTRPCError(error);
+  }
+}

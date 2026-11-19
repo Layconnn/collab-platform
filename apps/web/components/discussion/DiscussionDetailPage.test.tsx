@@ -49,6 +49,7 @@ vi.mock("@/hooks/useComment", () => ({
 }));
 vi.mock("@/components/comment/CommentList", () => ({ CommentList: ({ onAccessDenied }: { onAccessDenied: () => void }) => <div>Comment region<button type="button" onClick={onAccessDenied}>Simulate nested access denial</button></div> }));
 vi.mock("@/components/comment/CreateCommentForm", () => ({ CreateCommentForm: () => <div>Comment composer</div> }));
+vi.mock("@/components/decision/CreateDecisionForm", () => ({ CreateDecisionForm: () => <div>Decision proposal form</div> }));
 
 import DiscussionDetailPage from "@/app/(workspace)/workspace/[workspaceId]/discussions/[discussionId]/page";
 

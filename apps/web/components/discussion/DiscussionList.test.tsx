@@ -214,7 +214,9 @@ describe("DiscussionList", () => {
     const trigger = screen.getByRole("button", { name: `Actions for ${discussion.title}` });
     trigger.focus();
     await user.keyboard("{Enter}");
-    expect(await screen.findByRole("menu")).toBeTruthy();
+    const menu = await screen.findByRole("menu");
+    // The menu handles Escape only once it has taken focus; on fast machines a key sent earlier is lost.
+    await waitFor(() => expect(menu.contains(document.activeElement)).toBe(true));
     await user.keyboard("{Escape}");
     await waitFor(() => expect(trigger.getAttribute("aria-expanded")).not.toBe("true"));
   });

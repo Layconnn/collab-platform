@@ -39,7 +39,6 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-local-worker-secret-change-this-123456}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-worker-refresh-change-123456}
       NODE_ENV: production
     depends_on:
       postgres:

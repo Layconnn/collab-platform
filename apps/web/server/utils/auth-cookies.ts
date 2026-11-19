@@ -1,6 +1,7 @@
 import { env } from "../env";
 import { serializeCookie } from "./cookies";
 import { csrfCookieName } from "../middleware/csrf";
+import { ACCESS_TOKEN_TTL_SECONDS } from "../middleware/auth";
 
 type AuthCookieParams = {
   accessToken: string;
@@ -16,12 +17,18 @@ const AUTH_COOKIE_OPTIONS = {
   path: "/",
 } as const;
 
+// The access cookie lives exactly as long as its token; the session cookie then
+// authenticates the next request and a new access token is issued.
+export function buildAccessTokenCookie(accessToken: string): string {
+  return serializeCookie("access_token", accessToken, {
+    ...AUTH_COOKIE_OPTIONS,
+    maxAge: ACCESS_TOKEN_TTL_SECONDS,
+  });
+}
+
 export function buildAuthCookies(params: AuthCookieParams): string[] {
   return [
-    serializeCookie("access_token", params.accessToken, {
-      ...AUTH_COOKIE_OPTIONS,
-      maxAge: params.expiresInSeconds,
-    }),
+    buildAccessTokenCookie(params.accessToken),
     serializeCookie("session_token", params.sessionToken, {
       ...AUTH_COOKIE_OPTIONS,
       maxAge: params.expiresInSeconds,

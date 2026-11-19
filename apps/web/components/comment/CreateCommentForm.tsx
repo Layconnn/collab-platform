@@ -25,6 +25,8 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
   });
   const { create } = useCommentActions(discussionId, workspaceId);
   const submittingRef = useRef(false);
+  // One key per draft: a retry of the same content replays instead of duplicating.
+  const submissionRef = useRef<{ fingerprint: string; key: string } | null>(null);
   const [posted, setPosted] = useState(false);
   const busy = form.formState.isSubmitting || create.isPending;
   const fieldId = `comment-body-${parentCommentId ?? "root"}`;
@@ -44,7 +46,11 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
     void form.handleSubmit(async (values) => {
       setPosted(false);
       try {
-        await create.mutateAsync(values);
+        if (submissionRef.current?.fingerprint !== values.body) {
+          submissionRef.current = { fingerprint: values.body, key: crypto.randomUUID() };
+        }
+        await create.mutateAsync({ ...values, idempotencyKey: submissionRef.current.key });
+        submissionRef.current = null;
         form.reset({ discussionId, parentCommentId, body: "" });
         setPosted(true);
         onCreated?.();

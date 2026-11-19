@@ -25,3 +25,23 @@ export const NotificationType = {
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const DecisionStatus = {
+  PROPOSED: 'PROPOSED',
+  DECIDED: 'DECIDED',
+  SUPERSEDED: 'SUPERSEDED'
+} as const
+
+export type DecisionStatus = (typeof DecisionStatus)[keyof typeof DecisionStatus]
+
+
+export const DecisionRevisionAction = {
+  CREATE: 'CREATE',
+  EDIT: 'EDIT',
+  FINALIZE: 'FINALIZE',
+  SUPERSEDE: 'SUPERSEDE',
+  SOFT_DELETE: 'SOFT_DELETE'
+} as const
+
+export type DecisionRevisionAction = (typeof DecisionRevisionAction)[keyof typeof DecisionRevisionAction]

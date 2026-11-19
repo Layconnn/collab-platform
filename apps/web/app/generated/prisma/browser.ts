@@ -47,3 +47,18 @@ export type Notification = Prisma.NotificationModel
  * 
  */
 export type WorkspaceMember = Prisma.WorkspaceMemberModel
+/**
+ * Model Decision
+ * 
+ */
+export type Decision = Prisma.DecisionModel
+/**
+ * Model DecisionRevision
+ * 
+ */
+export type DecisionRevision = Prisma.DecisionRevisionModel
+/**
+ * Model DecisionSupersession
+ * 
+ */
+export type DecisionSupersession = Prisma.DecisionSupersessionModel

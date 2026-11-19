@@ -26,10 +26,3 @@ export function useCreateWorkspace() {
 export function useWorkspaceDetail(workspaceId: string, enabled = true) {
   return trpc.workspace.getById.useQuery({ workspaceId }, { enabled: enabled && Boolean(workspaceId) });
 }
-
-export function useWorkspaceMembers(workspaceId: string) {
-  return trpc.workspace.listMembers.useQuery(
-    { workspaceId, cursor: undefined, take: 20 },
-    { enabled: Boolean(workspaceId) },
-  );
-}
