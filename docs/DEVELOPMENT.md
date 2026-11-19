@@ -338,3 +338,18 @@ docker-compose logs
 docker-compose logs postgres
 docker-compose logs redis
 ```
+
+---
+
+## Notification Delivery
+
+Notification jobs go through one of two queues, chosen by `server/queue/notification.queue.ts`:
+
+| Where | Queue | Who delivers |
+| --- | --- | --- |
+| Vercel (`VERCEL` is set) | Vercel Queues topic `notification-delivery` | `app/api/queues/notifications/route.ts`, registered in `apps/web/vercel.json`; only Vercel's queue service can invoke it |
+| Everywhere else | BullMQ on Redis | The in-API worker (`RUN_WORKER_IN_API=1`, development only) or the separate worker (`Dockerfile.worker`) |
+
+Set `NOTIFICATION_QUEUE_DRIVER=vercel` or `bullmq` to override the choice. Both paths call `deliverNotification` in `server/queue/notification.processor.ts`, which upserts by `dedupeKey`, so a message delivered twice still creates one notification. Vercel retries a failed delivery with backoff and gives up after 6 attempts, logging `notification.queue.delivery_failed`.
+
+To publish to Vercel Queues from a local machine, link the project (`vercel link`) and pull credentials (`vercel env pull`); the token they write expires and must be pulled again.
