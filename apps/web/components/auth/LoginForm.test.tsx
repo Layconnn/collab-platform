@@ -23,6 +23,27 @@ describe("LoginForm", () => {
   });
   afterEach(cleanup);
 
+  it("returns to a same-site next path and ignores external ones", async () => {
+    const user = userEvent.setup();
+    const signIn = async () => {
+      render(<LoginForm />);
+      await user.type(screen.getByLabelText("Email"), "person@example.com");
+      await user.type(screen.getByLabelText("Password"), "correct-horse-42");
+      await user.click(screen.getByRole("button", { name: "Sign in" }));
+    };
+
+    window.history.replaceState(null, "", "/login?next=%2Fworkspace%2Fabc%2Fdiscussions");
+    await signIn();
+    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/workspace/abc/discussions"));
+    cleanup();
+
+    mocks.replace.mockReset();
+    window.history.replaceState(null, "", "/login?next=%2F%2Fevil.example");
+    await signIn();
+    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/workspace"));
+    window.history.replaceState(null, "", "/");
+  });
+
   it("validates fields and opens the workspace after successful sign in", async () => {
     const user = userEvent.setup();
     render(<LoginForm />);

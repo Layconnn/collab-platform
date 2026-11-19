@@ -150,7 +150,7 @@ root/
 
 ### Prerequisites
 
-- **Node.js** 18+ with pnpm
+- **Node.js** 20.9+ with pnpm
 - **Docker** and **Docker Compose**
 
 ### Quick Start

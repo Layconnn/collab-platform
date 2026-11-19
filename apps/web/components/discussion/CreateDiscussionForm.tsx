@@ -25,6 +25,8 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
 
   const { create: createDiscussion } = useDiscussionActions(workspaceId);
   const submittingRef = useRef(false);
+  // One key per draft: a retry of the same content replays instead of duplicating.
+  const submissionRef = useRef<{ fingerprint: string; key: string } | null>(null);
   const [posted, setPosted] = useState<{ id: string; title: string } | null>(null);
   const busy = form.formState.isSubmitting || createDiscussion.isPending;
 
@@ -40,7 +42,12 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
     void form.handleSubmit(async (values) => {
       setPosted(null);
       try {
-        const discussion = await createDiscussion.mutateAsync(values);
+        const fingerprint = JSON.stringify([values.title, values.body]);
+        if (submissionRef.current?.fingerprint !== fingerprint) {
+          submissionRef.current = { fingerprint, key: crypto.randomUUID() };
+        }
+        const discussion = await createDiscussion.mutateAsync({ ...values, idempotencyKey: submissionRef.current.key });
+        submissionRef.current = null;
         form.reset({ workspaceId, title: "", body: "" });
         setPosted({ id: discussion.id, title: discussion.title });
       } catch {

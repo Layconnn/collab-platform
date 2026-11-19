@@ -35,7 +35,6 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/my_platform_ci
       REDIS_URL: redis://localhost:6379
       JWT_SECRET: ci-jwt-secret-change-me-123456
-      JWT_REFRESH_SECRET: ci-refresh-secret-change-me-123456
       NODE_ENV: test
 
     steps:

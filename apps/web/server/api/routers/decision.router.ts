@@ -5,20 +5,14 @@ import {
   editDecisionInputSchema,
   finalizeDecisionInputSchema,
   listDecisionsInputSchema,
+  replacementCandidatesInputSchema,
+  supersedeDecisionInputSchema,
 } from "@repo/validators/decision";
 
-import { toTRPCError } from "../../errors/app-error";
+import { execute } from "../../errors/app-error";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { decisionService } from "../../services/decision.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-
-const execute = async <T>(operation: () => Promise<T>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    throw toTRPCError(error);
-  }
-};
 
 function limited(routeKey: string, limit: number) {
   const guard = createRateLimitGuard({ routeKey, limit, windowSeconds: 60 });
@@ -46,5 +40,14 @@ export const decisionRouter = createTRPCRouter({
   ),
   revisions: limited("decision.revisions", 80).input(decisionRevisionsInputSchema).query(({ ctx, input }) =>
     execute(() => decisionService.revisions(ctx.user.id, input)),
+  ),
+  replacementCandidates: limited("decision.replacementCandidates", 80).input(replacementCandidatesInputSchema).query(({ ctx, input }) =>
+    execute(() => decisionService.replacementCandidates(ctx.user.id, input)),
+  ),
+  replacementHistory: limited("decision.replacementHistory", 80).input(decisionByIdInputSchema).query(({ ctx, input }) =>
+    execute(() => decisionService.replacementHistory(ctx.user.id, input)),
+  ),
+  supersede: limited("decision.supersede", 20).input(supersedeDecisionInputSchema).mutation(({ ctx, input }) =>
+    execute(() => decisionService.supersede(ctx.user.id, input)),
   ),
 });

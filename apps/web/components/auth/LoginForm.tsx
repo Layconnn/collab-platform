@@ -12,6 +12,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { AuthField } from "@/components/auth/AuthField";
 import { authErrorMessage } from "@/components/auth/authError";
 
+// Only same-site paths are followed, so the login page cannot be used as an open redirect.
+function safeNextPath(): string {
+  const next = new URLSearchParams(window.location.search).get("next");
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) {
+    return "/workspace";
+  }
+  return next;
+}
+
 export function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
@@ -35,7 +44,7 @@ export function LoginForm() {
       try {
         await login.mutateAsync(values);
         setRedirecting(true);
-        router.replace("/workspace");
+        router.replace(safeNextPath());
       } catch (error) {
         form.setError("root", { type: "server", message: authErrorMessage(error, "login") });
         submittingRef.current = false;

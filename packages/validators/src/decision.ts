@@ -47,9 +47,27 @@ export const decisionRevisionsInputSchema = decisionByIdInputSchema.extend({
   take: z.number().int().min(1).max(100).default(20),
 });
 
+export const supersedeDecisionInputSchema = z.object({
+  workspaceId: id,
+  oldDecisionId: id,
+  replacementDecisionId: id,
+  expectedOldVersion: z.number().int().positive(),
+  expectedReplacementVersion: z.number().int().positive(),
+  reason: z.string().trim().min(10).max(2000),
+});
+
+export const replacementCandidatesInputSchema = z.object({
+  workspaceId: id,
+  oldDecisionId: id,
+  cursor: id.optional(),
+  take: z.number().int().min(1).max(30).default(20),
+});
+
 export type CreateDecisionInput = z.infer<typeof createDecisionInputSchema>;
 export type DecisionByIdInput = z.infer<typeof decisionByIdInputSchema>;
 export type ListDecisionsInput = z.infer<typeof listDecisionsInputSchema>;
 export type EditDecisionInput = z.infer<typeof editDecisionInputSchema>;
 export type FinalizeDecisionInput = z.infer<typeof finalizeDecisionInputSchema>;
 export type DecisionRevisionsInput = z.infer<typeof decisionRevisionsInputSchema>;
+export type SupersedeDecisionInput = z.infer<typeof supersedeDecisionInputSchema>;
+export type ReplacementCandidatesInput = z.infer<typeof replacementCandidatesInputSchema>;

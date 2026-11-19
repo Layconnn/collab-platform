@@ -7,18 +7,10 @@ import {
 } from "@repo/validators/discussion";
 
 import { redis } from "../../cache/redis";
-import { toTRPCError } from "../../errors/app-error";
+import { execute } from "../../errors/app-error";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { discussionService } from "../../services/discussion.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-
-const execute = async <T>(operation: () => Promise<T>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    throw toTRPCError(error);
-  }
-};
 
 const createDiscussionRateLimit = createRateLimitGuard({
   routeKey: "discussion.create",
