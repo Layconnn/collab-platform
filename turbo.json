@@ -13,6 +13,8 @@
         "TRUSTED_PROXY_TOKEN",
         "SENTRY_DSN",
         "RUN_WORKER_IN_API",
+        "NOTIFICATION_QUEUE_DRIVER",
+        "VERCEL",
         "NEXT_PUBLIC_APP_URL",
         "NODE_ENV"
       ]
