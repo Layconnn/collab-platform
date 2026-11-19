@@ -1,6 +1,6 @@
 # Commons — Instructions for Codex
 
-Before planning code changes, read `docs/COMMONS_PROJECT_HANDOFF.md` and, where available, `docs/PROJECT_CONTEXT.md`, `docs/FRONTEND_CONTEXT.md`, `docs/DESIGN_SYSTEM.md`, `docs/DEVELOPMENT.md`, `docs/CODEX_PROMPT_FRAMEWORK.md`, and `docs/MARKETING_ARCHITECTURE.md`.
+Before planning code changes, read `apps/web/documentation/commons-spec-map.md`, `docs/COMMONS_PROJECT_HANDOFF.md` and, where available, `docs/PROJECT_CONTEXT.md`, `docs/FRONTEND_CONTEXT.md`, `docs/DESIGN_SYSTEM.md`, `docs/DEVELOPMENT.md`, `docs/CODEX_PROMPT_FRAMEWORK.md`, and `docs/MARKETING_ARCHITECTURE.md`.
 
 **Repository source code and tests are authoritative.** The handoff is a summary of earlier discussions, not a claim that pending features exist or have passed live acceptance.
 
@@ -22,10 +22,10 @@ Before planning code changes, read `docs/COMMONS_PROJECT_HANDOFF.md` and, where 
 5. Explain migration/rollout risks, note unresolved issues, and stop. Never auto-start another phase.
 
 ## Git workflow
-- Never commit directly to `main` or `dev`. Every new change gets its own branch, created from the latest `dev`.
-- Name branches by the kind of change: `feat/…`, `fix/…`, `chore/…`, `docs/…`, `ci/…`, `refactor/…` (for example `fix/session-refresh`).
-- Keep one concern per branch; open a pull request into `dev` and merge only after CI passes. `dev` is promoted to `main` through a pull request.
-- Use Conventional Commit messages (`fix(auth): …`, `feat(decisions): …`), matching the existing history.
-- Never commit secrets, `.env` files, database dumps or local snapshots (`.tmp/` is git-ignored for this reason).
+Follow [`docs/how-to-work-with-git-github.md`](./how-to-work-with-git-github.md). In short:
+- Never commit, push or merge directly to `main` or `dev`. Every change gets its own branch from the latest `dev` (`<issue>-<slug>`, or `feat/`, `fix/`, `chore/`, `docs/`, `ci/`, `refactor/` without an issue) and reaches `dev` through a pull request after CI passes.
+- Stage files by name; never `git add .` or `git add -A`. Check `git status` and `git diff --cached --stat` before every commit.
+- Pull request titles use product language, `Product: Subdomain: task` (subdomains in [`apps/web/documentation/ARCHITECTURE-commons.md`](../apps/web/documentation/ARCHITECTURE-commons.md)), because squash merges make the title the commit on `main`. Descriptions follow `.github/pull_request_template.md`.
+- Never commit secrets, `.env*` files, database dumps or local snapshots (`.tmp/` is git-ignored for this reason).
 
 **Upcoming direction (proposal, not shipped):** position Commons around durable team decisions and the context behind them. Begin with a decision record linked to a discussion and a workspace decision index; validate value before adding broad Notion/GitHub-style capabilities.
