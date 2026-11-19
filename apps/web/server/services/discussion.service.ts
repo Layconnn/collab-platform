@@ -18,9 +18,11 @@ import {
 } from "../observability/security-events";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
+import { requireWorkspaceAction as requireMemberAction } from "./workspace.access";
 import {
   WORKSPACE_ACTIONS,
   canPerformWorkspaceAction,
+  type WorkspaceAction,
 } from "./workspace.permissions";
 
 const DISCUSSION_TTL_SECONDS = 120;
@@ -53,53 +55,12 @@ async function invalidateDiscussionCaches(
   await redisCache.delByPattern(`workspace:${workspaceId}:discussions:*`);
 }
 
-async function getWorkspaceRole(workspaceId: string, userId: string) {
-  return prisma.workspaceMember.findUnique({
-    where: {
-      workspaceId_userId: {
-        workspaceId,
-        userId,
-      },
-    },
-    select: {
-      role: true,
-    },
-  });
-}
-
-async function requireWorkspaceAction(
+const requireWorkspaceAction = (
   workspaceId: string,
   userId: string,
-  action: (typeof WORKSPACE_ACTIONS)[keyof typeof WORKSPACE_ACTIONS],
+  action: WorkspaceAction,
   requestId: string,
-) {
-  const membership = await getWorkspaceRole(workspaceId, userId);
-  if (!membership) {
-    await recordDiscussionPermissionDenied({
-      requestId,
-      userId,
-      workspaceId,
-      action,
-      reason: "not_workspace_member",
-      timestamp: new Date().toISOString(),
-    });
-    throw new AppError("FORBIDDEN", "You are not a member of this workspace.");
-  }
-
-  if (!canPerformWorkspaceAction(membership.role, action)) {
-    await recordDiscussionPermissionDenied({
-      requestId,
-      userId,
-      workspaceId,
-      action,
-      reason: `role_${membership.role.toLowerCase()}_not_allowed`,
-      timestamp: new Date().toISOString(),
-    });
-    throw new AppError("FORBIDDEN", "Insufficient permissions for this action.");
-  }
-
-  return membership.role;
-}
+) => requireMemberAction(workspaceId, userId, action, requestId, recordDiscussionPermissionDenied);
 
 export const discussionService = {
   async create(

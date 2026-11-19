@@ -21,4 +21,11 @@ Before planning code changes, read `docs/COMMONS_PROJECT_HANDOFF.md` and, where 
 4. Verify typecheck, lint, tests/build; distinguish tested from untested browser/live operations.
 5. Explain migration/rollout risks, note unresolved issues, and stop. Never auto-start another phase.
 
+## Git workflow
+- Never commit directly to `main` or `dev`. Every new change gets its own branch, created from the latest `dev`.
+- Name branches by the kind of change: `feat/…`, `fix/…`, `chore/…`, `docs/…`, `ci/…`, `refactor/…` (for example `fix/session-refresh`).
+- Keep one concern per branch; open a pull request into `dev` and merge only after CI passes. `dev` is promoted to `main` through a pull request.
+- Use Conventional Commit messages (`fix(auth): …`, `feat(decisions): …`), matching the existing history.
+- Never commit secrets, `.env` files, database dumps or local snapshots (`.tmp/` is git-ignored for this reason).
+
 **Upcoming direction (proposal, not shipped):** position Commons around durable team decisions and the context behind them. Begin with a decision record linked to a discussion and a workspace decision index; validate value before adding broad Notion/GitHub-style capabilities.

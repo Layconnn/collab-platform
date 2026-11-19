@@ -1,0 +1,15 @@
+# Secret scanning for CI. Extends the default gitleaks rules and allowlists the
+# throwaway credentials that tests, CI and local Docker use on purpose.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Non-secret test and local-development credentials"
+paths = [
+  '''apps/web/server/.*\.test\.mjs''',
+  '''apps/web/components/.*\.test\.tsx''',
+  '''\.github/workflows/.*\.yml''',
+  '''docker-compose\.yml''',
+  '''apps/web/app/generated/.*''',
+  '''pnpm-lock\.yaml''',
+]

@@ -4,18 +4,10 @@ import {
   markNotificationReadInputSchema,
 } from "@repo/validators/notification";
 
-import { toTRPCError } from "../../errors/app-error";
+import { execute } from "../../errors/app-error";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { notificationService } from "../../services/notification.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-
-const execute = async <T>(operation: () => Promise<T>) => {
-  try {
-    return await operation();
-  } catch (error) {
-    throw toTRPCError(error);
-  }
-};
 
 const listNotificationsRateLimit = createRateLimitGuard({
   routeKey: "notification.listForUser",

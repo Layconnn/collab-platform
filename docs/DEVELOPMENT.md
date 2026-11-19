@@ -119,7 +119,7 @@ In the alternative Docker PostgreSQL setup, start `postgres redis` and use the i
 
 For a separate-container worker, disable `RUN_WORKER_IN_API` and run `docker-compose up -d --build notification-worker` only after verifying that its `DATABASE_URL` targets the same development database as the web app. The Compose worker defaults to `postgres:5432` and `redis:6379` inside Docker; it does not inherit `apps/web/.env`. Do not use this mode with the current Windows database until the worker's database connectivity has been deliberately aligned.
 
-Register two local accounts. In a workspace owned by the first account, add the second account on the Members page using its user ID (find it in `pnpm -C apps/web exec prisma studio` if needed). Confirm the member appears in that workspace, then create a discussion or comment mentioning the other account's `@username`. Open the recipient's notification bell. The author does not receive a notification for their own action. In the separate-container mode, check delivery with `docker-compose logs --tail=50 notification-worker`; in API-worker mode, inspect the `pnpm dev` output.
+Register two local accounts. In a workspace owned by the first account, add the second account on the Members page by its exact username. Confirm the member appears in that workspace, then create a discussion or comment mentioning the other account's `@username`. Open the recipient's notification bell. The author does not receive a notification for their own action. In the separate-container mode, check delivery with `docker-compose logs --tail=50 notification-worker`; in API-worker mode, inspect the `pnpm dev` output.
 
 ---
 
@@ -337,6 +337,32 @@ docker-compose logs
 # Specific service
 docker-compose logs postgres
 docker-compose logs redis
+```
+
+---
+
+## Continuous Integration
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request and on pushes to `dev` and `main`. Jobs run in parallel:
+
+| Job | What it checks |
+| --- | --- |
+| Lint, types and schema | ESLint and TypeScript for `apps/web` and `packages/validators`; `prisma validate`; migrations applied to a clean database must match `schema.prisma` exactly |
+| Backend tests | Auth/session, workspace permissions and rate limits, discussion, comment and notification security, API integration, and the decision suites against a real PostgreSQL database |
+| Frontend tests | All Vitest component tests |
+| Production build and worker image | `next build` and the notification worker Docker image |
+| Dependency audit and secret scan | Fails on critical advisories in production dependencies; scans history for committed secrets with gitleaks (`.gitleaks.toml`) |
+
+Dependabot (`.github/dependabot.yml`) opens weekly update pull requests against `dev`.
+
+Run the decision suites locally against a separate, disposable database whose name ends in `_decision_test`:
+
+```bash
+createdb -h localhost -p 5433 -U postgres my_platform_decision_test
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_decision_test pnpm -C apps/web exec prisma migrate deploy
+export DECISION_TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_decision_test
+pnpm -C apps/web run test:decision-db
+pnpm -C apps/web run test:decision-api
 ```
 
 ---

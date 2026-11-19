@@ -264,9 +264,11 @@ describe("CommentList", () => {
     trigger.focus();
     await user.keyboard("{Enter}");
     const editItem = await screen.findByRole("menuitem", { name: "Edit comment" });
+    // The menu handles keys only once it has taken focus; on fast machines a key sent earlier is lost.
+    await waitFor(() => expect(screen.getByRole("menu").contains(document.activeElement)).toBe(true));
     editItem.focus();
     await user.keyboard("{Enter}");
-    expect(screen.getByRole("combobox", { name: "Edit comment" })).toBeTruthy();
+    expect(await screen.findByRole("combobox", { name: "Edit comment" })).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     await waitFor(() => expect(screen.getByText(/Keep the setup context here/)).toBeTruthy());
     const restoredTrigger = screen.getByRole("button", { name: "Actions for comment by Maya Chen" });
@@ -274,6 +276,7 @@ describe("CommentList", () => {
 
     await user.keyboard("{Enter}");
     expect(await screen.findByRole("menuitem", { name: "Delete comment" })).toBeTruthy();
+    await waitFor(() => expect(screen.getByRole("menu").contains(document.activeElement)).toBe(true));
     await user.keyboard("{ArrowDown}{Enter}");
     await waitFor(() => expect(confirm).toHaveBeenCalledOnce());
     expect(mocks.remove).not.toHaveBeenCalled();

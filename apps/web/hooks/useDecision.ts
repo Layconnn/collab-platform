@@ -20,6 +20,20 @@ export function useDecisionRevisions(workspaceId: string, decisionId: string, en
   );
 }
 
+export function useReplacementHistory(workspaceId: string, decisionId: string, enabled = true) {
+  return trpc.decision.replacementHistory.useQuery(
+    { workspaceId, decisionId },
+    { enabled: enabled && Boolean(workspaceId && decisionId) },
+  );
+}
+
+export function useReplacementCandidates(workspaceId: string, oldDecisionId: string, enabled: boolean) {
+  return trpc.decision.replacementCandidates.useInfiniteQuery(
+    { workspaceId, oldDecisionId, take: 20 },
+    { getNextPageParam: (page) => page.nextCursor ?? undefined, enabled: enabled && Boolean(workspaceId && oldDecisionId) },
+  );
+}
+
 export function useDecisionActions(workspaceId: string) {
   const utils = trpc.useUtils();
   const refresh = async (decisionId: string) => {
@@ -49,5 +63,15 @@ export function useDecisionActions(workspaceId: string) {
     onSuccess: (decision) => refresh(decision.id),
     onError: refreshAccess,
   });
-  return { create, edit, finalize };
+  const supersede = trpc.decision.supersede.useMutation({
+    onSuccess: async ({ oldDecisionId, replacementDecisionId }) => {
+      await Promise.all([
+        refresh(oldDecisionId), refresh(replacementDecisionId),
+        utils.decision.replacementHistory.invalidate({ workspaceId }),
+        utils.decision.replacementCandidates.invalidate({ workspaceId }),
+      ]);
+    },
+    onError: refreshAccess,
+  });
+  return { create, edit, finalize, supersede };
 }
