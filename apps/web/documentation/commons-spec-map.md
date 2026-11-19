@@ -26,6 +26,10 @@ Multi-pull-request work lives in `projects/YYYY-MM-DD-<name>/` with a `PRD.md` (
 - [Development setup, CI and notification delivery](../../../docs/DEVELOPMENT.md)
 - [Deployment](../../../docs/DEPLOYMENT.md)
 - [How to work with Git & GitHub](../../../docs/how-to-work-with-git-github.md)
+- [How to finish a pull request](../../../docs/how-to-finish-pr.md)
+- [How to do DevOps on Vercel](../../../docs/how-to-do-devops.md)
+- [How to add an entity](../../../docs/how-to-add-an-entity.md)
+- Agent skills, commands and hooks: [`CLAUDE.md`](../../../CLAUDE.md) and `.claude/`
 
 ## Design
 
