@@ -3,11 +3,27 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, dev]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/my_platform_ci
+  REDIS_URL: redis://localhost:6379
+  JWT_SECRET: ci-jwt-secret-change-me-123456
+  NODE_ENV: test
 
 jobs:
-  verify:
+  quality:
+    name: Lint, types and schema
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:16
@@ -19,43 +35,144 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd "pg_isready -U postgres -d my_platform_ci"
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Lint shared validators
+        run: pnpm -C packages/validators run lint
+      - name: Typecheck shared validators
+        run: pnpm -C packages/validators run check-types
+      - name: Lint web app
+        run: pnpm -C apps/web run lint
+      - name: Typecheck web app
+        run: pnpm -C apps/web run check-types
+      - name: Validate Prisma schema
+        run: pnpm -C apps/web exec prisma validate
+      - name: Apply migrations to a clean database
+        run: pnpm -C apps/web exec prisma migrate deploy
+      - name: Migrations match the Prisma schema
+        run: pnpm -C apps/web exec prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: my_platform_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d my_platform_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
       redis:
         image: redis:7
         ports:
           - 6379:6379
         options: >-
           --health-cmd "redis-cli ping"
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/my_platform_ci
-      REDIS_URL: redis://localhost:6379
-      JWT_SECRET: ci-jwt-secret-change-me-123456
-      NODE_ENV: test
-
+      # The decision suites refuse any database whose name does not end in _decision_test.
+      DECISION_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/my_platform_decision_test
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -C apps/web run lint
-      - run: pnpm -C apps/web run check-types
-      - run: pnpm -C apps/web exec prisma migrate deploy
-      - run: pnpm -C apps/web run test:auth
+      - name: Migrate the main test database
+        run: pnpm -C apps/web exec prisma migrate deploy
+      - name: Create and migrate the decision test database
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d my_platform_ci -c "CREATE DATABASE my_platform_decision_test"
+          DATABASE_URL="$DECISION_TEST_DATABASE_URL" pnpm -C apps/web exec prisma migrate deploy
+      - name: Auth and session
+        run: pnpm -C apps/web run test:auth
+      - name: Workspace permissions and rate limits
+        run: pnpm -C apps/web run test:workspace-security
+      - name: Discussion security
+        run: pnpm -C apps/web run test:discussion-security
+      - name: Comment security
+        run: pnpm -C apps/web run test:comment-security
+      - name: Notification security
+        run: pnpm -C apps/web run test:notification-security
+      - name: API integration
+        run: pnpm -C apps/web run test:integration
+      - name: Decision schema constraints (real database)
+        run: pnpm -C apps/web run test:decision-db
+      - name: Decision API (real database, includes a multi-process race)
+        run: pnpm -C apps/web run test:decision-api
+
+  frontend-tests:
+    name: Frontend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm -C apps/web run test:frontend
-      - run: pnpm -C apps/web run test:workspace-security
-      - run: pnpm -C apps/web run test:discussion-security
-      - run: pnpm -C apps/web run test:comment-security
-      - run: pnpm -C apps/web run test:notification-security
-      - run: pnpm -C apps/web run test:integration
-      - run: pnpm -C apps/web run build
+
+  build:
+    name: Production build and worker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [quality]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Next.js production build
+        run: pnpm -C apps/web run build
         env:
           NODE_ENV: production
-      - run: docker build -f apps/web/Dockerfile.worker -t my-platform-notification-worker:ci .
+      - name: Notification worker image
+        run: docker build -f apps/web/Dockerfile.worker -t my-platform-notification-worker:ci .
+
+  security:
+    name: Dependency audit and secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Fail on critical advisories in production dependencies
+        run: pnpm audit --prod --audit-level=critical
+      - name: Report high advisories
+        run: pnpm audit --prod --audit-level=high || true
+      - name: Scan history for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

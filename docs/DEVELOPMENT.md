@@ -338,3 +338,29 @@ docker-compose logs
 docker-compose logs postgres
 docker-compose logs redis
 ```
+
+---
+
+## Continuous Integration
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every pull request and on pushes to `dev` and `main`. Jobs run in parallel:
+
+| Job | What it checks |
+| --- | --- |
+| Lint, types and schema | ESLint and TypeScript for `apps/web` and `packages/validators`; `prisma validate`; migrations applied to a clean database must match `schema.prisma` exactly |
+| Backend tests | Auth/session, workspace permissions and rate limits, discussion, comment and notification security, API integration, and the decision suites against a real PostgreSQL database |
+| Frontend tests | All Vitest component tests |
+| Production build and worker image | `next build` and the notification worker Docker image |
+| Dependency audit and secret scan | Fails on critical advisories in production dependencies; scans history for committed secrets with gitleaks (`.gitleaks.toml`) |
+
+Dependabot (`.github/dependabot.yml`) opens weekly update pull requests against `dev`.
+
+Run the decision suites locally against a separate, disposable database whose name ends in `_decision_test`:
+
+```bash
+createdb -h localhost -p 5433 -U postgres my_platform_decision_test
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_decision_test pnpm -C apps/web exec prisma migrate deploy
+export DECISION_TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_decision_test
+pnpm -C apps/web run test:decision-db
+pnpm -C apps/web run test:decision-api
+```
