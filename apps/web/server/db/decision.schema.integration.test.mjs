@@ -266,20 +266,25 @@ test("deleting only a revision actor nulls its user reference and retains the re
   assert.equal((await client.query('SELECT count(*)::int AS count FROM "Decision" WHERE "id" = $1', [decisionId])).rows[0].count, 1);
 }));
 
-test("deleting a workspace owner cascades through the owned workspace and decision history", async () => inRollback(async (client) => {
+test("a workspace owner cannot be deleted while they still own a workspace", async () => inRollback(async (client) => {
   const ownerId = await user(client, "Owner to remove");
   const workspaceId = await workspace(client, ownerId);
   const discussionId = await discussion(client, workspaceId, ownerId);
   const decisionId = await decision(client, { workspaceId, discussionId, creatorId: ownerId, status: "DECIDED" });
   await revision(client, decisionId, 1, ownerId, "DECIDED");
 
-  await client.query('DELETE FROM "User" WHERE "id" = $1', [ownerId]);
-  assert.equal((await client.query('SELECT count(*)::int AS count FROM "Workspace" WHERE "id" = $1', [workspaceId])).rows[0].count, 0);
-  assert.equal((await client.query('SELECT count(*)::int AS count FROM "Decision" WHERE "id" = $1', [decisionId])).rows[0].count, 0);
-  assert.equal((await client.query('SELECT count(*)::int AS count FROM "DecisionRevision" WHERE "decisionId" = $1', [decisionId])).rows[0].count, 0);
+  await client.query("SAVEPOINT owner_delete");
+  // Newer PostgreSQL reports restrict_violation (23001); older versions report
+  // foreign_key_violation (23503). Either way the delete is refused.
+  await assert.rejects(client.query('DELETE FROM "User" WHERE "id" = $1', [ownerId]), (error) => ["23001", "23503"].includes(error.code));
+  await client.query("ROLLBACK TO SAVEPOINT owner_delete");
+  assert.equal((await client.query('SELECT count(*)::int AS count FROM "User" WHERE "id" = $1', [ownerId])).rows[0].count, 1);
+  assert.equal((await client.query('SELECT count(*)::int AS count FROM "Workspace" WHERE "id" = $1', [workspaceId])).rows[0].count, 1);
+  assert.equal((await client.query('SELECT count(*)::int AS count FROM "Decision" WHERE "id" = $1', [decisionId])).rows[0].count, 1);
+  assert.equal((await client.query('SELECT count(*)::int AS count FROM "DecisionRevision" WHERE "decisionId" = $1', [decisionId])).rows[0].count, 1);
 }));
 
-test("owner deletion removes an owned replacement chain and preserves another workspace", async () => inRollback(async (client) => {
+test("an owner can be deleted after their workspace is, and other workspaces keep their history", async () => inRollback(async (client) => {
   const departingOwnerId = await user(client, "Departing owner");
   const survivingOwnerId = await user(client, "Surviving owner");
   const ownedWorkspaceId = await workspace(client, departingOwnerId);
@@ -294,6 +299,7 @@ test("owner deletion removes an owned replacement chain and preserves another wo
   await supersession(client, ownedWorkspaceId, a, b, departingOwnerId);
   await supersession(client, ownedWorkspaceId, b, c, departingOwnerId);
 
+  await client.query('DELETE FROM "Workspace" WHERE "id" = $1', [ownedWorkspaceId]);
   await client.query('DELETE FROM "User" WHERE "id" = $1', [departingOwnerId]);
   assert.equal((await client.query('SELECT count(*)::int AS count FROM "Workspace" WHERE "id" = $1', [ownedWorkspaceId])).rows[0].count, 0);
   assert.equal((await client.query('SELECT count(*)::int AS count FROM "Decision" WHERE "workspaceId" = $1', [ownedWorkspaceId])).rows[0].count, 0);
