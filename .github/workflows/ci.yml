@@ -185,8 +185,6 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      # The smoke tests drive a production build, as users see it.
-      NODE_ENV: production
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/my_platform_e2e
     steps:
       - uses: actions/checkout@v7
@@ -200,10 +198,16 @@ jobs:
         run: pnpm -C apps/web exec prisma migrate deploy
       - name: Install Chromium
         run: pnpm -C apps/web exec playwright install --with-deps chromium
+      # NODE_ENV=production only for these steps: on the install step it
+      # would make pnpm skip dev dependencies such as Playwright.
       - name: Next.js production build
         run: pnpm -C apps/web run build
+        env:
+          NODE_ENV: production
       - name: Smoke tests
         run: pnpm -C apps/web run test:e2e
+        env:
+          NODE_ENV: production
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
