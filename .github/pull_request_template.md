@@ -21,6 +21,8 @@ What changes for users or developers, and why, in two or three sentences.
 
 ## Review notes
 
+- [ ] If this changes the shape of the system (a service, store, queue, provider or deployment step), the diagram in `apps/web/documentation/ARCHITECTURE-commons.md` is updated.
+
 - <!-- Decisions, risks, follow-ups, anything a reviewer must look at explicitly. -->
 
 ## Screenshots
