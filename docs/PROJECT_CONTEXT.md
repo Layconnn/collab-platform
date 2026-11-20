@@ -102,7 +102,6 @@ root/
 | `apps/web/server/services` | Business logic (fat layer)             |
 | `apps/web/server/queue`    | BullMQ workers for async jobs          |
 | `packages/validators`      | Shared Zod validation schemas          |
-| `packages/ui`              | Reusable React components              |
 
 ---
 
