@@ -517,7 +517,8 @@ type NotificationAction =
 export async function recordNotificationOperation(data: BaseEvent & {
   action: NotificationAction;
   actorUserId: string | null;
-  recipientUserId: string;
+  // Null for a fan-out event that has not been expanded into recipients yet.
+  recipientUserId: string | null;
   workspaceId: string | null;
   notificationId: string | null;
 }): Promise<void> {
@@ -529,7 +530,7 @@ export async function recordNotificationOperation(data: BaseEvent & {
     } catch (error) {
       await trackCounterWriteFailure({
         requestId: data.requestId,
-        userId: data.recipientUserId,
+        userId: data.recipientUserId ?? data.actorUserId ?? undefined,
         reason: "notification_operation_metric_write_failed",
         error,
         timestamp: data.timestamp,
