@@ -13,6 +13,45 @@ Commons is a modular monolith: one Next.js 16 App Router application (`apps/web`
 
 Every request follows the same path: client hook → tRPC route → `protectedProcedure` (authentication, CSRF) → per-route rate limit → Zod input → service (membership and role check, Prisma, Redis cache) → optional notification job.
 
+## System Diagram
+
+This diagram is the living picture of Commons. Update it in the same pull request as any change to its shape: a new service, store, queue, external provider or deployment step.
+
+```mermaid
+flowchart TB
+  UI["Browser<br/>Next.js pages and components<br/>React Query (server state) · Zustand (UI state)"]
+
+  subgraph Vercel["Vercel · apps/web"]
+    direction TB
+    TRPC["/api/trpc · tRPC routers"]
+    MW["protectedProcedure<br/>access token or session refresh · CSRF<br/>per-route rate limit · Zod input"]
+    SVC["Services<br/>workspace · discussion · comment · decision · notification"]
+    PERM["Permission matrix<br/>workspace.permissions.ts"]
+    CONS["/api/queues/notifications<br/>queue consumer"]
+  end
+
+  RD[("Redis · Upstash<br/>sessions · rate limits · cache · security metrics")]
+  PG[("PostgreSQL · Neon<br/>Prisma 7")]
+  VQ[["Vercel Queues<br/>topic notification-delivery"]]
+  SEN["Sentry (optional)"]
+  CI["GitHub Actions CI<br/>lint · types · schema drift · tests · build · audit"]
+  MIG["GitHub Actions: migrate production<br/>approval required"]
+
+  UI -->|"HTTPS, cookies"| TRPC --> MW --> SVC
+  SVC --> PERM
+  MW --> RD
+  SVC --> RD
+  SVC --> PG
+  SVC -->|"one fan-out job per event"| VQ
+  VQ --> CONS
+  CONS -->|"plan recipients, createMany skipDuplicates"| PG
+  CONS -.->|"failed deliveries"| SEN
+  CI -.->|"checks every pull request"| Vercel
+  MIG -.->|"prisma migrate deploy"| PG
+```
+
+Locally, BullMQ on Redis replaces Vercel Queues and the notification worker runs inside the dev server (`RUN_WORKER_IN_API=1`); see [Notification delivery](../../../docs/DEVELOPMENT.md#notification-delivery).
+
 ## Subdomains
 
 These names are the subdomains used in pull request titles (`Commons: <Subdomain>: …`).
