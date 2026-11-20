@@ -116,6 +116,8 @@ function supersedeInProcess(userId, input) {
 }
 
 after(async () => {
+  // Owners cannot be deleted while they own a workspace, so remove those first.
+  await prisma.workspace.deleteMany({ where: { ownerId: { in: createdUserIds } } });
   for (const id of createdUserIds.reverse()) {
     await prisma.user.deleteMany({ where: { id } });
   }
