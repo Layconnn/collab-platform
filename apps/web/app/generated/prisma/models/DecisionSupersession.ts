@@ -179,7 +179,7 @@ export type DecisionSupersessionGroupByOutputType = {
   _max: DecisionSupersessionMaxAggregateOutputType | null
 }
 
-type GetDecisionSupersessionGroupByPayload<T extends DecisionSupersessionGroupByArgs> = Prisma.PrismaPromise<
+export type GetDecisionSupersessionGroupByPayload<T extends DecisionSupersessionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DecisionSupersessionGroupByOutputType, T['by']> &
       {
@@ -1427,6 +1427,11 @@ export type DecisionSupersessionFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Skip the first `n` DecisionSupersessions.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of DecisionSupersessions.
+   */
   distinct?: Prisma.DecisionSupersessionScalarFieldEnum | Prisma.DecisionSupersessionScalarFieldEnum[]
 }
 
