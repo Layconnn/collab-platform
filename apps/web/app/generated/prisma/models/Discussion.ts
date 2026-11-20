@@ -172,7 +172,7 @@ export type DiscussionGroupByOutputType = {
   _max: DiscussionMaxAggregateOutputType | null
 }
 
-type GetDiscussionGroupByPayload<T extends DiscussionGroupByArgs> = Prisma.PrismaPromise<
+export type GetDiscussionGroupByPayload<T extends DiscussionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DiscussionGroupByOutputType, T['by']> &
       {
@@ -1684,6 +1684,11 @@ export type DiscussionFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` Discussions.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Discussions.
+   */
   distinct?: Prisma.DiscussionScalarFieldEnum | Prisma.DiscussionScalarFieldEnum[]
 }
 

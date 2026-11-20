@@ -3,7 +3,10 @@ import createJiti from "jiti";
 process.env.NODE_ENV = "test";
 process.env.DATABASE_URL = process.env.DECISION_TEST_DATABASE_URL;
 
-const jiti = createJiti(import.meta.url);
+// Load Prisma's runtime with Node's own loader. jiti marks built-ins such as
+// node:path as ES modules without a real default export, and Prisma's bundled
+// interop then reads path.default.sep as undefined while formatting errors.
+const jiti = createJiti(import.meta.url, { nativeModules: ["@prisma/client"] });
 const { decisionService } = jiti("../services/decision.service.ts");
 const { prisma } = jiti("../db/prisma.ts");
 
