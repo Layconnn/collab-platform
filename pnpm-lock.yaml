@@ -72,8 +72,8 @@ importers:
         specifier: ^5.67.3
         version: 5.70.1
       dotenv:
-        specifier: ^17.3.1
-        version: 17.3.1
+        specifier: ^18.0.10
+        version: 18.0.10
       framer-motion:
         specifier: ^12.34.0
         version: 12.34.3(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -2786,9 +2786,10 @@ packages:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
-  dotenv@17.3.1:
-    resolution: {integrity: sha512-IO8C/dzEb6O3F9/twg6ZLXz164a2fhTnEWb95H23Dm4OuN+92NmEAlTrupP9VW6Jm3sO26tQlqyvyi4CsnY9GA==}
+  dotenv@18.0.10:
+    resolution: {integrity: sha512-89FAA1xchzK2mxVWdr5F/0rldwiueXs6zJM86rO66EzekR1iBdiXRthyG+m5GvkJaFH3C2LESzamTkgndmLT2A==}
     engines: {node: '>=12'}
+    hasBin: true
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -7644,7 +7645,7 @@ snapshots:
 
   dotenv@16.6.1: {}
 
-  dotenv@17.3.1: {}
+  dotenv@18.0.10: {}
 
   dunder-proto@1.0.1:
     dependencies:

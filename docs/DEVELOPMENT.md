@@ -376,6 +376,8 @@ Notification jobs go through one of two queues, chosen by `server/queue/notifica
 | Vercel (`VERCEL` is set) | Vercel Queues topic `notification-delivery` | `app/api/queues/notifications/route.ts`, registered in `apps/web/vercel.json`; only Vercel's queue service can invoke it |
 | Everywhere else | BullMQ on Redis | The in-API worker (`RUN_WORKER_IN_API=1`, development only) or the separate worker (`Dockerfile.worker`) |
 
+A request publishes **one fan-out job per event** (discussion created, comment created, mentions added by an edit), never one job per member, so a write takes the same time in a 2-member and a 500-member workspace. The consumer plans the recipients from current membership and writes all notifications in one `createMany` that skips existing dedupe keys, so a retried job never duplicates. Jobs named `deliver` (the older per-recipient shape) are still processed.
+
 Set `NOTIFICATION_QUEUE_DRIVER=vercel` or `bullmq` to override the choice. Both paths call `deliverNotification` in `server/queue/notification.processor.ts`, which upserts by `dedupeKey`, so a message delivered twice still creates one notification. Vercel retries a failed delivery with backoff and gives up after 6 attempts, logging `notification.queue.delivery_failed`.
 
 To publish to Vercel Queues from a local machine, link the project (`vercel link`) and pull credentials (`vercel env pull`); the token they write expires and must be pulled again.
