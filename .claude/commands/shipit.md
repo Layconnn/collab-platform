@@ -9,5 +9,5 @@ Then, following `docs/how-to-work-with-git-github.md`:
 3. Push the branch.
 4. Check for an existing pull request (`gh pr view --json url`):
    - **Exists:** report its URL. Done.
-   - **Missing:** create it against `dev` (or the stacked base) with a `Product: Subdomain: task` title and a description that follows `.github/pull_request_template.md`. When the branch starts with an issue number (`<N>-slug`), the description's first line is `Closes #N`. Validation lists only checks you actually ran. Report the URL.
+   - **Missing:** create it against `dev` (or the stacked base) with a `Product: Subdomain: task` title and a description that follows `.github/pull_request_template.md`. When the branch starts with an issue number (`<N>-slug`), the description's first line is `Closes #N`, and the squash commit body must end with `Closes #N` when the pull request is merged (GitHub closes the issue when that commit reaches `main`). Validation lists only checks you actually ran. Report the URL.
 5. Watch the checks in the background (`gh pr checks <pr> --watch`). If a check fails, investigate with the `ci-workflow` skill and propose a fix, but do not commit it without the user's go-ahead.

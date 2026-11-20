@@ -15,7 +15,7 @@ Every pull request starts from a GitHub issue, which records why the work exists
 
 - Open it with the `/issue` command or the templates in `.github/ISSUE_TEMPLATE/` (feature, bug, chore). The title uses the same product language as the pull request.
 - The branch starts with the issue number, and the pull request description starts with `Closes #N`.
-- `Closes #N` takes effect when the change reaches `main`, so issues close at release time and the board then moves them to Done.
+- Pull requests target `dev`, and GitHub only links closing keywords in pull requests that target the default branch. So the squash commit message must also end with `Closes #N`: when that commit reaches `main` at release, GitHub closes the issue and the board moves it to Done.
 - A project planned with `/prd` gets one issue per pull request in its delivery plan.
 
 ### Branch Naming
