@@ -16,7 +16,10 @@ process.env.REDIS_URL ??= "redis://localhost:6379";
 process.env.JWT_SECRET ??= "test-jwt-secret-123456789";
 process.env.JWT_REFRESH_SECRET ??= "test-jwt-refresh-secret-123456789";
 
-const jiti = createJiti(import.meta.url);
+// Load Prisma's runtime with Node's own loader. jiti marks built-ins such as
+// node:path as ES modules without a real default export, and Prisma's bundled
+// interop then reads path.default.sep as undefined while formatting errors.
+const jiti = createJiti(import.meta.url, { nativeModules: ["@prisma/client"] });
 const { decisionRouter } = jiti("./routers/decision.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis } = jiti("../cache/redis.ts");
