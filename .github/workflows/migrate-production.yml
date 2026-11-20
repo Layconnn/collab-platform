@@ -1,0 +1,51 @@
+name: Migrate production database
+
+# Applies committed Prisma migrations to the production database when they
+# reach main. The job uses the production-migrations environment, which holds
+# the connection string and requires a reviewer to approve each run.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/web/prisma/migrations/**
+  workflow_dispatch:
+
+# Never run two migrations at once, and never cancel one that has started.
+concurrency:
+  group: migrate-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    name: Apply migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production-migrations
+    env:
+      DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+    steps:
+      - name: Require the connection string
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::PRODUCTION_DATABASE_URL is not set in the production-migrations environment."
+            exit 1
+          fi
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Lists pending migrations; exits non-zero while any are pending.
+      - name: Migration status before
+        run: pnpm -C apps/web exec prisma migrate status
+        continue-on-error: true
+      - name: Apply migrations
+        run: pnpm -C apps/web exec prisma migrate deploy
+      - name: Migration status after
+        run: pnpm -C apps/web exec prisma migrate status
