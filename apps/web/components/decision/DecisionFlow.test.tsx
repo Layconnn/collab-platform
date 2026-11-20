@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const mocks = vi.hoisted(() => ({
   workspaceId: "c000000000000000000000001",
@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   editError: null as null | { data: { code: string } },
   finalizeError: null as null | { data: { code: string } },
   supersedeError: null as null | { data: { code: string } },
+  removeError: null as null | { data: { code: string } },
   supersedePending: false,
   listNext: false,
   revisionNext: false,
@@ -27,7 +28,7 @@ const mocks = vi.hoisted(() => ({
   },
   replacementItems: [] as Array<{ id: string; question: string; status: "DECIDED" | "SUPERSEDED"; replacement: null | { replacementDecisionId: string; reason: string; authorizedByLabel: string; createdAt: Date } }>,
   effectiveDecisionId: null as string | null,
-  create: vi.fn(), edit: vi.fn(), finalize: vi.fn(), supersede: vi.fn(), push: vi.fn(), listNextPage: vi.fn(), revisionNextPage: vi.fn(), refetch: vi.fn(),
+  create: vi.fn(), edit: vi.fn(), finalize: vi.fn(), supersede: vi.fn(), remove: vi.fn(), push: vi.fn(), listNextPage: vi.fn(), revisionNextPage: vi.fn(), refetch: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({ useParams: () => ({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId }), useRouter: () => ({ push: mocks.push }) }));
@@ -39,7 +40,7 @@ vi.mock("@/hooks/useDecision", () => ({
   useDecisionRevisions: () => ({ data: { pages: [{ items: [{ id: "revision-1", version: 1, action: "CREATE", status: "PROPOSED", actorLabel: "Maya", createdAt: new Date("2026-10-20T09:00:00Z"), question: "Which stack?", outcome: "Use TypeScript", rationale: "Shared types", alternatives: null, followUp: null, reason: null }] }] }, error: mocks.revisionError, isLoading: false, hasNextPage: mocks.revisionNext, isFetchingNextPage: false, isFetching: false, fetchNextPage: mocks.revisionNextPage, refetch: mocks.refetch }),
   useReplacementHistory: () => ({ data: { items: mocks.replacementItems, truncated: false, effectiveDecisionId: mocks.effectiveDecisionId }, error: null, isLoading: false, isFetching: false, refetch: mocks.refetch }),
   useReplacementCandidates: () => ({ data: { pages: [{ items: [{ id: "c000000000000000000000004", question: "Use a different stack?", outcome: "Use Rust", sourceDiscussionTitle: "Follow-up discussion", version: 2, decidedAt: new Date("2026-10-20T11:00:00Z") }] }] }, error: null, isLoading: false, hasNextPage: false, isFetchingNextPage: false, refetch: mocks.refetch }),
-  useDecisionActions: () => ({ create: { mutateAsync: mocks.create, isPending: false, error: null }, edit: { mutateAsync: mocks.edit, isPending: false, error: mocks.editError, reset: vi.fn() }, finalize: { mutateAsync: mocks.finalize, isPending: false, error: mocks.finalizeError, reset: vi.fn() }, supersede: { mutateAsync: mocks.supersede, isPending: mocks.supersedePending, error: mocks.supersedeError, reset: vi.fn() } }),
+  useDecisionActions: () => ({ create: { mutateAsync: mocks.create, isPending: false, error: null }, edit: { mutateAsync: mocks.edit, isPending: false, error: mocks.editError, reset: vi.fn() }, finalize: { mutateAsync: mocks.finalize, isPending: false, error: mocks.finalizeError, reset: vi.fn() }, supersede: { mutateAsync: mocks.supersede, isPending: mocks.supersedePending, error: mocks.supersedeError, reset: vi.fn() }, remove: { mutateAsync: mocks.remove, isPending: false, error: mocks.removeError, reset: vi.fn() } }),
 }));
 
 import DecisionsPage from "@/app/(workspace)/workspace/[workspaceId]/decisions/page";
@@ -48,12 +49,12 @@ import { CreateDecisionForm } from "./CreateDecisionForm";
 
 describe("decision frontend flow", () => {
   beforeEach(() => {
-    mocks.role = "MEMBER"; mocks.userId = "user-1"; mocks.workspaceError = null; mocks.decisionError = null; mocks.listError = null; mocks.revisionError = null; mocks.editError = null; mocks.finalizeError = null; mocks.supersedeError = null; mocks.supersedePending = false;
+    mocks.role = "MEMBER"; mocks.userId = "user-1"; mocks.workspaceError = null; mocks.decisionError = null; mocks.listError = null; mocks.revisionError = null; mocks.editError = null; mocks.finalizeError = null; mocks.supersedeError = null; mocks.supersedePending = false; mocks.removeError = null;
     mocks.decision.sourceDiscussionId = "c000000000000000000000003"; mocks.decision.status = "PROPOSED"; mocks.decision.version = 1;
     mocks.decision.previousDecision = null; mocks.decision.replacementDecision = null; mocks.decision.supersession = null; mocks.replacementItems = []; mocks.effectiveDecisionId = null;
     mocks.decision.outcome = "Use TypeScript"; mocks.decision.rationale = "Shared types";
     mocks.listNext = false; mocks.revisionNext = false;
-    mocks.create.mockReset(); mocks.edit.mockReset(); mocks.finalize.mockReset(); mocks.supersede.mockReset(); mocks.push.mockReset(); mocks.refetch.mockReset(); mocks.listNextPage.mockReset(); mocks.revisionNextPage.mockReset();
+    mocks.create.mockReset(); mocks.edit.mockReset(); mocks.finalize.mockReset(); mocks.supersede.mockReset(); mocks.remove.mockReset(); mocks.push.mockReset(); mocks.refetch.mockReset(); mocks.listNextPage.mockReset(); mocks.revisionNextPage.mockReset();
     vi.stubGlobal("requestAnimationFrame", (fn: FrameRequestCallback) => { fn(0); return 1; });
     vi.stubGlobal("crypto", { randomUUID: vi.fn().mockReturnValueOnce("key-11111111").mockReturnValueOnce("key-22222222") });
   });
@@ -260,5 +261,45 @@ describe("decision frontend flow", () => {
     expect(screen.getByRole("heading", { name: "Revision history" })).toBeTruthy();
     expect(screen.getAllByText(/Authorized by Owner/).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("link", { name: "Use Rust?" }).length).toBeGreaterThan(0);
+  });
+
+  it("offers deletion to the proposal author and to managers, never for linked records", () => {
+    const view = render(<DecisionDetailPage />);
+    expect(screen.getByRole("button", { name: "Delete proposal" })).toBeTruthy();
+    mocks.userId = "user-2";
+    view.rerender(<DecisionDetailPage />);
+    expect(screen.queryByRole("button", { name: "Delete proposal" })).toBeNull();
+    mocks.userId = "user-1"; mocks.decision.status = "DECIDED";
+    view.rerender(<DecisionDetailPage />);
+    expect(screen.queryByRole("button", { name: "Delete decision" })).toBeNull();
+    mocks.role = "ADMIN";
+    view.rerender(<DecisionDetailPage />);
+    expect(screen.getByRole("button", { name: "Delete decision" })).toBeTruthy();
+    mocks.decision.previousDecision = { id: "c000000000000000000000005", question: "Earlier choice" };
+    view.rerender(<DecisionDetailPage />);
+    expect(screen.queryByRole("button", { name: "Delete decision" })).toBeNull();
+  });
+
+  it("confirms deletion with the expected version and returns to the list", async () => {
+    mocks.decision.version = 3;
+    mocks.remove.mockResolvedValue({ id: mocks.decisionId, workspaceId: mocks.workspaceId });
+    render(<DecisionDetailPage />);
+    fireEvent.click(screen.getByRole("button", { name: "Delete proposal" }));
+    const dialog = screen.getByRole("alertdialog", { name: "Delete this proposal?" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith(`/workspace/${mocks.workspaceId}/decisions`));
+    expect(mocks.remove).toHaveBeenCalledWith({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId, expectedVersion: 3 });
+  });
+
+  it("explains a deletion conflict and closes on Escape", () => {
+    mocks.removeError = { data: { code: "CONFLICT" } };
+    render(<DecisionDetailPage />);
+    const trigger = screen.getByRole("button", { name: "Delete proposal" });
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole("alertdialog", { name: "Delete this proposal?" });
+    expect(within(dialog).getByRole("alert").textContent).toContain("replacement history");
+    fireEvent.keyDown(dialog, { key: "Escape" });
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Delete proposal" }));
   });
 });

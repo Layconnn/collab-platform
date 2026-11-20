@@ -1,0 +1,38 @@
+name: Bug
+description: Something behaves differently from what it should
+title: "Commons: <Subdomain>: <what is wrong>"
+labels: [bug]
+body:
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happens
+      description: The observed behaviour, with exact error text if any.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1. 
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options: [Production, Preview, Local development, CI]
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Logs, request IDs, screenshots. Never paste secrets or connection strings.

@@ -365,6 +365,24 @@ pnpm -C apps/web run test:decision-db
 pnpm -C apps/web run test:decision-api
 ```
 
+### End-to-end smoke tests
+
+`apps/web/e2e/` holds Playwright tests that drive a production build in Chromium: the landing page, the sign-in redirect, and one journey from registration through a workspace, a discussion and a decision proposal to sign-out. CI runs them in the "End-to-end smoke tests" job and uploads the report when they fail.
+
+Run them locally against a separate database and Redis index so development data is untouched:
+
+```bash
+export DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_e2e
+export REDIS_URL=redis://localhost:6379/1
+export JWT_SECRET=e2e-local-jwt-secret-123456
+pnpm -C apps/web exec prisma migrate deploy      # once the database exists
+pnpm -C apps/web exec playwright install chromium # first time only
+pnpm -C apps/web run build
+pnpm -C apps/web run test:e2e
+```
+
+Each run registers a new, uniquely named user, so tests never depend on existing data.
+
 ---
 
 ## Notification Delivery
@@ -375,6 +393,8 @@ Notification jobs go through one of two queues, chosen by `server/queue/notifica
 | --- | --- | --- |
 | Vercel (`VERCEL` is set) | Vercel Queues topic `notification-delivery` | `app/api/queues/notifications/route.ts`, registered in `apps/web/vercel.json`; only Vercel's queue service can invoke it |
 | Everywhere else | BullMQ on Redis | The in-API worker (`RUN_WORKER_IN_API=1`, development only) or the separate worker (`Dockerfile.worker`) |
+
+A request publishes **one fan-out job per event** (discussion created, comment created, mentions added by an edit), never one job per member, so a write takes the same time in a 2-member and a 500-member workspace. The consumer plans the recipients from current membership and writes all notifications in one `createMany` that skips existing dedupe keys, so a retried job never duplicates. Jobs named `deliver` (the older per-recipient shape) are still processed.
 
 Set `NOTIFICATION_QUEUE_DRIVER=vercel` or `bullmq` to override the choice. Both paths call `deliverNotification` in `server/queue/notification.processor.ts`, which upserts by `dedupeKey`, so a message delivered twice still creates one notification. Vercel retries a failed delivery with backoff and gives up after 6 attempts, logging `notification.queue.delivery_failed`.
 

@@ -73,5 +73,16 @@ export function useDecisionActions(workspaceId: string) {
     },
     onError: refreshAccess,
   });
-  return { create, edit, finalize, supersede };
+  // The page navigates away after a delete, so only the list views refresh;
+  // refetching the deleted record would flash a "not found" state first.
+  const remove = trpc.decision.delete.useMutation({
+    onSuccess: async () => {
+      await Promise.all([
+        utils.decision.listByWorkspace.invalidate({ workspaceId }),
+        utils.decision.replacementCandidates.invalidate({ workspaceId }),
+      ]);
+    },
+    onError: refreshAccess,
+  });
+  return { create, edit, finalize, supersede, remove };
 }

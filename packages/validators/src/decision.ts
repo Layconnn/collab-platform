@@ -42,6 +42,10 @@ export const finalizeDecisionInputSchema = decisionByIdInputSchema.extend({
   expectedVersion: z.number().int().positive(),
 });
 
+export const deleteDecisionInputSchema = decisionByIdInputSchema.extend({
+  expectedVersion: z.number().int().positive(),
+});
+
 export const decisionRevisionsInputSchema = decisionByIdInputSchema.extend({
   cursor: z.number().int().positive().optional(),
   take: z.number().int().min(1).max(100).default(20),
@@ -68,6 +72,7 @@ export type DecisionByIdInput = z.infer<typeof decisionByIdInputSchema>;
 export type ListDecisionsInput = z.infer<typeof listDecisionsInputSchema>;
 export type EditDecisionInput = z.infer<typeof editDecisionInputSchema>;
 export type FinalizeDecisionInput = z.infer<typeof finalizeDecisionInputSchema>;
+export type DeleteDecisionInput = z.infer<typeof deleteDecisionInputSchema>;
 export type DecisionRevisionsInput = z.infer<typeof decisionRevisionsInputSchema>;
 export type SupersedeDecisionInput = z.infer<typeof supersedeDecisionInputSchema>;
 export type ReplacementCandidatesInput = z.infer<typeof replacementCandidatesInputSchema>;

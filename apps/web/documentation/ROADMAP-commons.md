@@ -10,6 +10,10 @@
 | 3. The document layer | Write the specs that produce decisions | Block-editor pages, templates (RFC, ADR), backlinks, table and board views, then collaborative editing on a self-hosted Hocuspocus server | Teams write proposals in Commons instead of an external editor |
 | 4. The work layer | Turn decisions into tracked work | Issues created from decision follow-ups, boards, deeper GitHub sync, ADR export, an API | Follow-up work is tracked in Commons and links back to its decision |
 
+## Brand
+
+- An official Commons logo at an enterprise, top-tier standard: a mark and wordmark that work from a 16px favicon to a landing-page hero, in light and dark themes, built on the Commons palette (forest `#192D20`, cream `#EEE5D2`, coral `#CD6055`, mint `#9FD3B4`). Delivered as SVG with usage rules, then applied to the app, the landing page, the README and social cards.
+
 ## Beyond the current milestone
 
 - Move notification delivery to a dedicated worker (Railway) once budget allows; Vercel Queues stays as the fallback.

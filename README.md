@@ -1,233 +1,110 @@
-# 🏗️ Collab Platform
+# Commons
 
-> A production-grade collaboration platform built in public. Learning what it takes to build systems that scale, not just features that ship.
+> Conversations worth keeping. A workspace where small teams discuss, decide, and can still find out *why* months later.
 
-## What This Is
+**Live:** [collab-platform-web.vercel.app](https://collab-platform-web.vercel.app) · **Built in public** on [LinkedIn](https://www.linkedin.com/in/jinadu-olamilekan-5b8a15285/)
 
-A **monorepo** containing a fullstack SaaS platform with:
-
-- **Authentication** (JWT + Redis session validation)
-- **Workspaces** (multi-tenant collaboration spaces)
-- **Discussions** (threaded conversations)
-- **Comments** (nested replies with depth limits)
-- **Security by default** (38 backend security/integration tests, plus 6 frontend tests, permission matrix, rate limiting)
-- **Observability from day 1** (audit logs, metrics, alerts)
-
-**Not microservices. Not premature optimization. Just clean fundamentals.**
+Chat moves fast and forgets. Documents get written once and go stale. Commons sits between them: discussions happen in a workspace, and when a discussion reaches a conclusion it becomes a **decision record** with its outcome, rationale, alternatives and full revision history. When a decision is later replaced, the old one stays readable and links to what replaced it and why.
 
 ---
 
-## 🎯 Why This Repo Exists
+## What works today
 
-I'm learning what **senior engineering** means:
+| Area | What it does |
+| --- | --- |
+| **Workspaces and roles** | Multi-tenant workspaces with OWNER, ADMIN and MEMBER roles, member onboarding by username, ownership transfer. One permission matrix decides who can do what. |
+| **Discussions and comments** | Workspace discussions with threaded replies (up to 8 levels, loaded per parent) and `@mentions` limited to workspace members. |
+| **Decision records** | Turn a discussion into a proposal, edit it, finalize it (owners and admins), supersede it with a linear replacement history, or delete it (authors while it is a proposal, managers otherwise). Every change is an immutable revision. |
+| **Notifications** | One queue message per event; the consumer works out recipients and writes notifications idempotently. Production uses Vercel Queues; local development uses BullMQ. |
+| **Sessions** | 15-minute access tokens tied to a live server-side session, silent refresh from a 7-day session, real revocation on logout and password change, CSRF protection. |
 
-- Security-first, not security-last
-- Testing as architecture, not QA
-- Observability built-in, not bolted-on
-- Systems thinking, not feature-counting
-
-My goal: Show that I think deliberately about scale, security, and maintainability.
+What is **not** built yet is on the [roadmap](apps/web/documentation/ROADMAP-commons.md): search, real-time updates, email digests, the document layer and more.
 
 ---
 
-## 📊 Architecture
+## Architecture
 
-### Design Principles
+A modular monolith: one Next.js 16 App Router app serving the pages and a single tRPC API, backed by PostgreSQL and Redis.
 
-**Thin Routers, Fat Services**
-
-```typescript
-// ✅ Router: validation + delegation only
-export const workspaceRouter = router({
-  create: protectedProcedure
-    .input(createSchema)
-    .mutation(({ ctx, input }) => workspaceService.create(ctx.userId, input)),
-});
-
-// ✅ Service: all business logic
-export async function create(userId: string, input: CreateInput) {
-  // Validation, authorization, DB queries, audit logging
-}
+```mermaid
+flowchart LR
+  UI["Browser<br/>Next.js pages · React Query"] -->|"HTTPS, cookies"| API["tRPC API<br/>auth · CSRF · rate limit · Zod"]
+  API --> SVC["Services<br/>workspaces · discussions · comments<br/>decisions · notifications"]
+  SVC --> PG[("PostgreSQL<br/>Prisma 7")]
+  API --> RD[("Redis<br/>sessions · rate limits · cache")]
+  SVC -->|"one job per event"| Q[["Vercel Queues"]]
+  Q --> C["Queue consumer"] --> PG
 ```
 
-**Centralized Permission Matrix**
+The full picture, with subdomains and request flow, is in [ARCHITECTURE-commons.md](apps/web/documentation/ARCHITECTURE-commons.md).
 
-```typescript
-// One place to update what roles can do
-const WORKSPACE_PERMISSIONS = {
-  MEMBER: [READ_DISCUSSION, CREATE_COMMENT],
-  ADMIN: [READ_DISCUSSION, MANAGE_DISCUSSION, MANAGE_MEMBER],
-  OWNER: [ALL],
-};
-```
+Principles the code follows:
 
-**Security by Default**
-
-- No header-based auth (JWT only)
-- Normalized error codes (no resource enumeration)
-- Adaptive rate limiting (stricter after repeated denials)
-- Idempotent retries (safe to replay requests)
-- Audit logs for every permission change
+- **Thin routers, services own the rules.** Routers validate and delegate; services check membership and role, then touch the database.
+- **One permission matrix.** `server/services/workspace.permissions.ts` is the single answer to "can this role do this?".
+- **Safe by default.** Cross-workspace IDs return NOT_FOUND rather than revealing that something exists; creates are idempotent; concurrent edits are rejected with version checks instead of overwriting each other.
+- **History is kept, not rewritten.** Decisions are versioned, deletions are soft, and deleting a user cannot take a workspace with it.
 
 ---
 
-## 🧪 Testing (44 Automated Tests)
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| App | Next.js 16 (App Router), React 19, TypeScript |
+| API | tRPC 11, Zod 4 (schemas shared in `packages/validators`) |
+| Data | PostgreSQL (Neon in production) with Prisma 7, Redis (Upstash in production) |
+| Jobs | Vercel Queues in production, BullMQ locally |
+| UI | Tailwind CSS 4, Chakra UI 3, React Hook Form, Zustand |
+| Tooling | pnpm workspaces, Turborepo, Vitest, `node:test`, GitHub Actions, Dependabot |
+
+---
+
+## Testing and CI
+
+Around 270 automated tests, all run on every pull request:
+
+| Suite | Covers |
+| --- | --- |
+| `test:auth` | Session refresh, revocation, spoofed headers, CSRF |
+| `test:workspace-security` | The permission matrix and rate limiting |
+| `test:discussion-security`, `test:comment-security`, `test:notification-security` | Tenant isolation, thread limits, notification delivery |
+| `test:integration` | End-to-end API flows |
+| `test:decision-db`, `test:decision-api` | Decision records against a real PostgreSQL database, including multi-process races |
+| `test:frontend` | Around 185 component tests (Vitest) |
+| `test:e2e` | Playwright smoke tests in Chromium against a production build: registration through a decision proposal to sign-out |
+
+CI also checks lint and types, verifies that migrations match the Prisma schema exactly, builds the production app, audits dependencies and scans for committed secrets. Production database migrations run from GitHub Actions behind a manual approval.
+
+---
+
+## Running it locally
+
+Prerequisites: Node.js 20.9+ (CI uses 24), pnpm 9, PostgreSQL and Redis.
 
 ```bash
-# Auth spoof rejection
-pnpm -C apps/web run test:auth
-
-# Workspace permission enforcement
-pnpm -C apps/web run test:workspace-security
-
-# Discussion multi-tenant isolation
-pnpm -C apps/web run test:discussion-security
-
-# Comment thread safety
-pnpm -C apps/web run test:comment-security
-
-# End-to-end integration
-pnpm -C apps/web run test:integration
-```
-
-**What Tests Catch**
-
-❌ Spoofed auth headers  
-❌ Permission escalation (MEMBER → OWNER)  
-❌ Multi-tenant data leaks  
-❌ Resource enumeration attacks  
-❌ Thread depth DOS  
-❌ Stale cache after delete  
-❌ Rate limiting bypasses  
-❌ Idempotency collisions
-
----
-
-## 🛠️ Tech Stack
-
-| Layer              | Technology                   | Why                                                |
-| ------------------ | ---------------------------- | -------------------------------------------------- |
-| **Frontend**       | Next.js (App Router) + React | Server rendering + type safety                     |
-|                    | TypeScript                   | Eliminate entire classes of bugs                   |
-|                    | Tailwind + Chakra UI         | Component consistency                              |
-| **Backend**        | tRPC                         | Type-safe RPC layer                                |
-|                    | Prisma                       | ORM with migrations, no N+1 surprises              |
-|                    | PostgreSQL                   | Boring, proven, scales horizontally                |
-| **Cache**          | Redis                        | Session storage, rate limiting, short-lived caches |
-| **Infrastructure** | Docker                       | Local dev matches production                       |
-|                    | Monorepo (pnpm)              | Shared code, unified build                         |
-
----
-
-## 🚀 Getting Started (Local)
-
-### Prerequisites
-
-- Node.js 20.9+
-- Docker + Docker Compose
-- pnpm
-
-### Setup
-
-```bash
-# 1. Clone
-git clone https://github.com/yourusername/collab-platform.git
-cd my-platform
-
-# 2. Install dependencies
+git clone https://github.com/Layconnn/collab-platform.git
+cd collab-platform
 pnpm install
-
-# 3. Start services (PostgreSQL + Redis)
-docker-compose up -d
-
-# 4. Run migrations
-cd apps/web
-pnpm exec prisma migrate dev
-
-# 5. Start dev server
-pnpm dev
+cp .env.example apps/web/.env   # then fill in DATABASE_URL, REDIS_URL and JWT_SECRET
+pnpm -C apps/web exec prisma migrate dev
+pnpm -C apps/web dev
 ```
 
-Visit `http://localhost:3000`
+Then open `http://localhost:3000`. [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) covers the details, including notification delivery and running the decision suites.
 
 ---
 
-## 🔐 Security
+## How the work is done
 
-### What's Implemented
-
-✅ JWT + Redis session validation (no header trust)  
-✅ Permission matrix (centralized, testable)  
-✅ Role-based access control (MEMBER, ADMIN, OWNER)  
-✅ Normalized HTTP responses (no resource enumeration)  
-✅ Adaptive rate limiting (stricter after denials)  
-✅ Audit logging (every permission change)  
-✅ Idempotent retries (safe replays)  
-✅ Thread depth limits (DOS prevention)  
-✅ PII minimization (author DTO: id + name only)
+- Every change is its own branch and pull request into `dev`, merged after CI passes; `dev` is released to `main`. See [docs/how-to-work-with-git-github.md](docs/how-to-work-with-git-github.md).
+- Product and engineering documents live in [`apps/web/documentation`](apps/web/documentation): product, architecture, roadmap and investigations.
+- AI agents (Claude Code) work from shared skills and commands in [`.claude/`](.claude), with hooks that block unsafe git operations.
 
 ---
 
-## 📈 Observability
+## About
 
-### Built-In
+I'm Jinadu Olamilekan, building Commons in public to learn what it takes to make software that lasts: security first, tests as architecture, and honest notes about what broke.
 
-- **Structured logging** (with correlation IDs)
-- **Audit logs** (every permission change)
-- **Metrics** (operations, denials, rate limits, cache hits/misses)
-- **Error tracking** (with stack traces and context)
-
----
-
-## 🎨 What I'm Learning
-
-### Systems Thinking
-
-- Permission matrices scale better than scattered checks
-- Cursor pagination beats offset pagination at scale
-- Rate limiting prevents abuse patterns early
-
-### Clean Architecture
-
-- Service layer owns business logic (not routers)
-- Permission checks in one place (not three)
-- Tests prove security assumptions
-
-### Production Engineering
-
-- Observability isn't optional
-- Idempotency matters for reliability
-- Audit logs enable forensics
-
-### Tech Depth
-
-- **tRPC**: Type safety end-to-end, eliminates API contract bugs
-- **Prisma**: Migrations versioned with code
-- **PostgreSQL**: Scales with proper indexing + replication
-- **Redis**: Cache + session store + rate limiter
-
----
-
-## 🚀 What's Next
-
-**Current status:** Hosted CI passes, and the core workflows have been thoroughly tested in local development and production. Continue with post-launch monitoring, user feedback, and focused UX improvements. Load testing, analytics, real-time updates, and external email/push delivery remain future work.
-
-Each phase builds on proven fundamentals.
-
----
-
-## 💼 For Recruiters
-
-If you're looking for engineers who:
-
-- ✅ Think in systems, not features
-- ✅ Sweat security + observability details
-- ✅ Test assumptions, not just ship code
-- ✅ Learn by building in public
-- ✅ Care about things lasting
-
-Let's talk. [LinkedIn](https://www.linkedin.com/in/jinadu-olamilekan-5b8a15285/)
-
----
-
-**Built in public. Learning what senior engineering means.**
+I'm open to engineering roles on small European teams. [Let's talk on LinkedIn](https://www.linkedin.com/in/jinadu-olamilekan-5b8a15285/).
