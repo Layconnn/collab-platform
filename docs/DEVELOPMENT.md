@@ -365,6 +365,24 @@ pnpm -C apps/web run test:decision-db
 pnpm -C apps/web run test:decision-api
 ```
 
+### End-to-end smoke tests
+
+`apps/web/e2e/` holds Playwright tests that drive a production build in Chromium: the landing page, the sign-in redirect, and one journey from registration through a workspace, a discussion and a decision proposal to sign-out. CI runs them in the "End-to-end smoke tests" job and uploads the report when they fail.
+
+Run them locally against a separate database and Redis index so development data is untouched:
+
+```bash
+export DATABASE_URL=postgresql://postgres:postgres@localhost:5433/my_platform_e2e
+export REDIS_URL=redis://localhost:6379/1
+export JWT_SECRET=e2e-local-jwt-secret-123456
+pnpm -C apps/web exec prisma migrate deploy      # once the database exists
+pnpm -C apps/web exec playwright install chromium # first time only
+pnpm -C apps/web run build
+pnpm -C apps/web run test:e2e
+```
+
+Each run registers a new, uniquely named user, so tests never depend on existing data.
+
 ---
 
 ## Notification Delivery

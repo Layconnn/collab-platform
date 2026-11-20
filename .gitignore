@@ -72,3 +72,7 @@ pnpm-debug.log*
 trpc-prompts.txt
 # === LOCAL DATABASE SNAPSHOTS ===
 .tmp/
+
+# Playwright
+/apps/web/test-results/
+/apps/web/playwright-report/

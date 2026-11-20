@@ -19,7 +19,8 @@
     "test:notification-security": "node --test server/api/notification.security.test.mjs",
     "test:decision-db": "node --test server/db/decision.schema.integration.test.mjs",
     "test:decision-api": "node --test server/api/decision.integration.test.mjs",
-    "test:integration": "node --test server/api/integration.test.mjs"
+    "test:integration": "node --test server/api/integration.test.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.38.0",
@@ -55,6 +56,7 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "^4.3.5",
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.12",
