@@ -25,7 +25,7 @@ These names are the subdomains used in pull request titles (`Commons: <Subdomain
 | Threaded Comments | Nested replies up to depth 8 with lazy per-parent loading | `server/services/comment.service.ts`, `components/comment/*` |
 | Mentions | `@username` parsing, member-scoped suggestions, notifications for newly added mentions | `server/utils/mentions.ts`, `components/common/MentionTextarea.tsx` |
 | Notifications | Fan-out of notification jobs, delivery through Vercel Queues or BullMQ, the in-app feed | `server/services/notification.service.ts`, `server/queue/*`, `app/api/queues/notifications`, `components/notification/*` |
-| Decision Records | Proposals linked to discussions, finalization, linear supersession, immutable revision history | `server/services/decision.service.ts`, `components/decision/*` |
+| Decision Records | Proposals linked to discussions, finalization, linear supersession, soft deletion (authors while proposed, owners and admins any time, never inside a replacement history), immutable revision history; decision rights come from the workspace permission matrix | `server/services/decision.service.ts`, `components/decision/*` |
 | Marketing Site | The public landing, sign-in and registration pages | `app/page.tsx`, `components/marketing/*` |
 | Design System | Theme tokens, light/dark/system modes, shared UI states | `styles/globals.css`, `lib/ui-system.ts`, `components/theme/*`, `components/common/*` |
 
