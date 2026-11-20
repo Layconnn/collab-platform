@@ -9,8 +9,20 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Major versions are planned upgrades, not weekly bumps. Security updates
+      # are separate from version updates and still arrive for any version.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+      # argon2 0.42+ fails to build on Windows (no prebuilt binary for this
+      # setup), which breaks local installs. Lift once a release builds there.
+      - dependency-name: "argon2"
+        versions: [">=0.42.0"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     target-branch: dev
+    groups:
+      github-actions:
+        patterns: ["*"]
