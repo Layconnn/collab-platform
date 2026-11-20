@@ -12,6 +12,7 @@ Create a product requirements document for a new multi-pull-request project.
    - **Data and permissions** — new entities, tenant scoping, roles allowed per action.
    - **Risks and open questions.**
    - **Delivery plan** — the pull requests, each with a `Commons: Subdomain: task (FR-n)` title.
-3. Add the project to `apps/web/documentation/commons-spec-map.md` under Projects and to `ROADMAP-commons.md` if it changes a phase.
+3. After the author approves the delivery plan, create one issue per pull request with `/issue` (steps 1–4, without creating branches), and write each issue number next to its pull request in the plan.
+4. Add the project to `apps/web/documentation/commons-spec-map.md` under Projects and to `ROADMAP-commons.md` if it changes a phase.
 
 Once implementation starts the PRD is author-owned: the plan-guard hook asks before it is edited.

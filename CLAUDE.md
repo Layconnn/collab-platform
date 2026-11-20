@@ -14,6 +14,7 @@ Read [`docs/AGENTS.md`](docs/AGENTS.md) and the [Commons spec map](apps/web/docu
 
 | Need | Use |
 |---|---|
+| Start a task: issue, board entry and branch | `/issue` |
 | Ship the current task as a pull request | `/shipit` |
 | One-pass cleanup of a pull request | `/check-pr-status` |
 | Review-and-fix loop until clean | `/finish-pr` |
