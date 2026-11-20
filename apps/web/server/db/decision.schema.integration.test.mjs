@@ -274,7 +274,9 @@ test("a workspace owner cannot be deleted while they still own a workspace", asy
   await revision(client, decisionId, 1, ownerId, "DECIDED");
 
   await client.query("SAVEPOINT owner_delete");
-  await assert.rejects(client.query('DELETE FROM "User" WHERE "id" = $1', [ownerId]), (error) => error.code === "23001");
+  // Newer PostgreSQL reports restrict_violation (23001); older versions report
+  // foreign_key_violation (23503). Either way the delete is refused.
+  await assert.rejects(client.query('DELETE FROM "User" WHERE "id" = $1', [ownerId]), (error) => ["23001", "23503"].includes(error.code));
   await client.query("ROLLBACK TO SAVEPOINT owner_delete");
   assert.equal((await client.query('SELECT count(*)::int AS count FROM "User" WHERE "id" = $1', [ownerId])).rows[0].count, 1);
   assert.equal((await client.query('SELECT count(*)::int AS count FROM "Workspace" WHERE "id" = $1', [workspaceId])).rows[0].count, 1);
