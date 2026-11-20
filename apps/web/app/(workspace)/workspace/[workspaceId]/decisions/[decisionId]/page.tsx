@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 
 import { editDecisionInputSchema } from "@repo/validators/decision";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateNotice";
+import { DeleteDecisionDialog } from "@/components/decision/DeleteDecisionDialog";
 import { DecisionDate, DecisionSection, DecisionStatus, decisionError } from "@/components/decision/decisionUI";
 import { decisionDraftSchema, DecisionFields, optionalEdit, type DecisionDraft } from "@/components/decision/decisionFields";
 import { ReplacementHistory } from "@/components/decision/ReplacementHistory";
@@ -51,10 +52,12 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
   const [editing, setEditing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [superseding, setSuperseding] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [editVersion, setEditVersion] = useState<number | null>(null);
   const editButton = useRef<HTMLButtonElement>(null);
   const finalizeButton = useRef<HTMLButtonElement>(null);
   const supersedeButton = useRef<HTMLButtonElement>(null);
+  const deleteButton = useRef<HTMLButtonElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const confirmationRef = useRef<HTMLDivElement>(null);
   const saving = useRef(false);
@@ -72,6 +75,9 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
   const canEdit = Boolean(user && workspace.data && !workspace.error && decision.data?.status === "PROPOSED" && (manager || decision.data.createdById === user.id));
   const canFinalize = Boolean(user && workspace.data && !workspace.error && decision.data?.status === "PROPOSED" && manager);
   const canSupersede = Boolean(user && workspace.data && !workspace.error && decision.data?.status === "DECIDED" && manager);
+  // Records in a replacement history stay; the server enforces the same rule.
+  const linked = Boolean(decision.data?.previousDecision || decision.data?.supersession);
+  const canDelete = Boolean(user && workspace.data && !workspace.error && decision.data && !linked && (manager || (decision.data.status === "PROPOSED" && decision.data.createdById === user.id)));
 
   if (denied || actionAccessLost) return <div className="mx-auto max-w-[52rem] space-y-4"><ErrorState title="Decision access restricted" description="You may no longer have access to this workspace's decisions." /><Link href="/workspace" className="font-semibold text-brand-link">All workspaces</Link></div>;
   if (decision.isLoading && !decision.data) return <div className="mx-auto max-w-[52rem] py-8"><LoadingState label="Loading decision..." /></div>;
@@ -123,10 +129,11 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
         <div className="flex flex-wrap gap-2 border-t border-border-subtle pt-4"><button type="submit" disabled={edit.isPending || form.formState.isSubmitting} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{edit.isPending ? "Saving..." : "Save revision"}</button><button type="button" disabled={edit.isPending} onClick={stopEdit} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Cancel</button></div>
       </form> : <>
         <div className="mt-8"><DecisionSection title={record.status === "PROPOSED" ? "Proposed outcome" : "Outcome"}>{record.outcome || <span className="text-text-muted">Not recorded yet.</span>}</DecisionSection><DecisionSection title="Rationale">{record.rationale || <span className="text-text-muted">Not recorded yet.</span>}</DecisionSection>{record.alternatives ? <DecisionSection title="Alternatives considered">{record.alternatives}</DecisionSection> : null}{record.followUp ? <DecisionSection title="Follow-up notes">{record.followUp}</DecisionSection> : null}</div>
-        {canEdit || canFinalize || canSupersede ? <div className="flex flex-wrap gap-2 border-t border-border-subtle pt-5">{canEdit ? <button ref={editButton} type="button" onClick={startEdit} className="min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Edit proposal</button> : null}{canFinalize ? <button ref={finalizeButton} type="button" onClick={() => { finalize.reset(); setConfirming(true); }} disabled={!record.outcome?.trim() || !record.rationale?.trim()} title={!record.outcome?.trim() || !record.rationale?.trim() ? "Add an outcome and rationale before finalizing" : undefined} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">Finalize decision</button> : null}{canSupersede ? <button ref={supersedeButton} type="button" onClick={() => setSuperseding(true)} className="min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Supersede decision</button> : null}</div> : null}
+        {canEdit || canFinalize || canSupersede || canDelete ? <div className="flex flex-wrap gap-2 border-t border-border-subtle pt-5">{canEdit ? <button ref={editButton} type="button" onClick={startEdit} className="min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Edit proposal</button> : null}{canFinalize ? <button ref={finalizeButton} type="button" onClick={() => { finalize.reset(); setConfirming(true); }} disabled={!record.outcome?.trim() || !record.rationale?.trim()} title={!record.outcome?.trim() || !record.rationale?.trim() ? "Add an outcome and rationale before finalizing" : undefined} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">Finalize decision</button> : null}{canSupersede ? <button ref={supersedeButton} type="button" onClick={() => setSuperseding(true)} className="min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Supersede decision</button> : null}{canDelete ? <button ref={deleteButton} type="button" onClick={() => setDeleting(true)} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-danger hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring sm:ml-auto">{record.status === "PROPOSED" ? "Delete proposal" : "Delete decision"}</button> : null}</div> : null}
       </>}
     </article>
     {superseding && canSupersede ? <SupersedeDecisionDialog workspaceId={workspaceId} oldDecision={{ id: record.id, question: record.question, version: record.version }} onClose={() => { setSuperseding(false); requestAnimationFrame(() => supersedeButton.current?.focus()); }} /> : null}
+    {deleting && canDelete ? <DeleteDecisionDialog workspaceId={workspaceId} decision={{ id: record.id, question: record.question, version: record.version, status: record.status }} onClose={() => { setDeleting(false); requestAnimationFrame(() => deleteButton.current?.focus()); }} /> : null}
     {confirming && canFinalize ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onKeyDown={(event) => {
       if (event.key === "Escape" && !finalize.isPending) { setConfirming(false); requestAnimationFrame(() => finalizeButton.current?.focus()); }
       if (event.key === "Tab" && confirmationRef.current) {

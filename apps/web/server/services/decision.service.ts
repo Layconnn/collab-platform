@@ -4,6 +4,7 @@ import type {
   CreateDecisionInput,
   DecisionByIdInput,
   DecisionRevisionsInput,
+  DeleteDecisionInput,
   EditDecisionInput,
   FinalizeDecisionInput,
   ListDecisionsInput,
@@ -15,6 +16,7 @@ import { Prisma, type WorkspaceRole } from "../../app/generated/prisma/client";
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import { toPaginatedResult } from "../../src/common/utils/pagination";
+import { assertCanDeleteDecision, assertCanEditDecision, canManageDecisions } from "./workspace.permissions";
 
 const decisionSelect = {
   id: true,
@@ -76,10 +78,6 @@ async function requireMutationMember(tx: Tx, workspaceId: string, userId: string
   `;
   if (!rows[0]) throw new AppError("NOT_FOUND", "Decision not found.");
   return rows[0].role;
-}
-
-function isManager(role: string) {
-  return role === "OWNER" || role === "ADMIN";
 }
 
 function hash(parts: unknown[]) {
@@ -222,7 +220,7 @@ export const decisionService = {
 
   async replacementCandidates(userId: string, input: ReplacementCandidatesInput) {
     const role = await requireMember(prisma, input.workspaceId, userId);
-    if (!isManager(role)) throw new AppError("FORBIDDEN", "Only workspace managers can replace decisions.");
+    if (!canManageDecisions(role)) throw new AppError("FORBIDDEN", "Only workspace managers can replace decisions.");
     const old = await prisma.decision.findFirst({
       where: { id: input.oldDecisionId, workspaceId: input.workspaceId, deletedAt: null, workspace: { members: { some: { userId, role: { in: ["OWNER", "ADMIN"] } } } } },
       select: { id: true, status: true, replacementLink: { select: { id: true } } },
@@ -340,9 +338,7 @@ export const decisionService = {
       });
       if (!current) throw new AppError("NOT_FOUND", "Decision not found.");
       if (current.status !== "PROPOSED") throw new AppError("CONFLICT", "Finalized decisions cannot be edited.");
-      if (current.createdById !== userId && !isManager(role)) {
-        throw new AppError("FORBIDDEN", "Only the proposal author or a workspace manager can edit it.");
-      }
+      assertCanEditDecision(role, current.createdById === userId);
       if (current.version !== input.expectedVersion) throw new AppError("CONFLICT", "Decision changed. Reload and try again.");
       const updatedCount = await tx.decision.updateMany({
         where: { id: input.decisionId, workspaceId: input.workspaceId, status: "PROPOSED", deletedAt: null, version: input.expectedVersion },
@@ -387,7 +383,7 @@ export const decisionService = {
         select: { status: true, outcome: true, rationale: true, version: true },
       });
       if (!current) throw new AppError("NOT_FOUND", "Decision not found.");
-      if (!isManager(role)) throw new AppError("FORBIDDEN", "Only a workspace manager can finalize decisions.");
+      if (!canManageDecisions(role)) throw new AppError("FORBIDDEN", "Only a workspace manager can finalize decisions.");
       if (current.status !== "PROPOSED") throw new AppError("CONFLICT", "Only proposals can be finalized.");
       if (current.version !== input.expectedVersion) throw new AppError("CONFLICT", "Decision changed. Reload and try again.");
       if (!current.outcome?.trim() || !current.rationale?.trim()) {
@@ -426,7 +422,7 @@ export const decisionService = {
     try {
       return await prisma.$transaction(async (tx) => {
         const role = await requireMutationMember(tx, input.workspaceId, userId);
-        if (!isManager(role)) throw new AppError("FORBIDDEN", "Only workspace managers can replace decisions.");
+        if (!canManageDecisions(role)) throw new AppError("FORBIDDEN", "Only workspace managers can replace decisions.");
         // Lock both rows in a deterministic order across API processes. The
         // version predicates below remain the final optimistic concurrency gate.
         const locked = await tx.$queryRaw<Array<{ id: string }>>`
@@ -478,5 +474,51 @@ export const decisionService = {
       }
       throw error;
     }
+  },
+
+  async softDelete(userId: string, input: DeleteDecisionInput) {
+    return prisma.$transaction(async (tx) => {
+      const role = await requireMutationMember(tx, input.workspaceId, userId);
+      // Lock the row so a concurrent supersession or edit is ordered against
+      // the deletion; the version predicate below is the final gate.
+      const locked = await tx.$queryRaw<Array<{ id: string }>>`
+        SELECT "id" FROM "Decision"
+        WHERE "workspaceId" = ${input.workspaceId} AND "id" = ${input.decisionId} AND "deletedAt" IS NULL
+        FOR UPDATE
+      `;
+      if (!locked[0]) throw new AppError("NOT_FOUND", "Decision not found.");
+      const current = await tx.decision.findUniqueOrThrow({
+        where: { id: input.decisionId },
+        select: { ...decisionSelect, predecessorLink: { select: { id: true } }, replacementLink: { select: { id: true } } },
+      });
+      assertCanDeleteDecision(role, current.createdById === userId, current.status);
+      if (current.version !== input.expectedVersion) throw new AppError("CONFLICT", "Decision changed. Reload and try again.");
+      if (current.predecessorLink || current.replacementLink) {
+        throw new AppError("CONFLICT", "Decisions in a replacement history cannot be deleted.");
+      }
+      const user = await tx.user.findUnique({ where: { id: userId }, select: { name: true, username: true } });
+      if (!user) throw new AppError("UNAUTHORIZED", "Authentication required.");
+      const updatedCount = await tx.decision.updateMany({
+        where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null, version: input.expectedVersion },
+        data: { deletedAt: new Date(), deletedById: userId, version: { increment: 1 } },
+      });
+      if (updatedCount.count !== 1) throw new AppError("CONFLICT", "Decision changed. Reload and try again.");
+      await tx.decisionRevision.create({
+        data: {
+          decisionId: current.id,
+          version: current.version + 1,
+          action: "SOFT_DELETE",
+          actorUserId: userId,
+          actorLabel: actorLabel(user),
+          question: current.question,
+          outcome: current.outcome,
+          rationale: current.rationale,
+          alternatives: current.alternatives,
+          followUp: current.followUp,
+          status: current.status,
+        },
+      });
+      return { id: current.id, workspaceId: input.workspaceId };
+    });
   },
 };

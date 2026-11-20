@@ -10,6 +10,8 @@ export const WORKSPACE_ACTIONS = {
   CREATE_COMMENT: "create_comment",
   DELETE_COMMENT: "delete_comment",
   MANAGE_COMMENT: "manage_comment",
+  CREATE_DECISION: "create_decision",
+  MANAGE_DECISION: "manage_decision",
   UPDATE_WORKSPACE: "update_workspace",
   LIST_MEMBERS: "list_members",
   ADD_MEMBER: "add_member",
@@ -27,6 +29,7 @@ export const WORKSPACE_PERMISSIONS: Record<WorkspaceRole, ReadonlyArray<Workspac
     WORKSPACE_ACTIONS.READ_DISCUSSION,
     WORKSPACE_ACTIONS.CREATE_COMMENT,
     WORKSPACE_ACTIONS.DELETE_COMMENT,
+    WORKSPACE_ACTIONS.CREATE_DECISION,
   ],
   ADMIN: [
     WORKSPACE_ACTIONS.READ,
@@ -36,6 +39,8 @@ export const WORKSPACE_PERMISSIONS: Record<WorkspaceRole, ReadonlyArray<Workspac
     WORKSPACE_ACTIONS.CREATE_COMMENT,
     WORKSPACE_ACTIONS.DELETE_COMMENT,
     WORKSPACE_ACTIONS.MANAGE_COMMENT,
+    WORKSPACE_ACTIONS.CREATE_DECISION,
+    WORKSPACE_ACTIONS.MANAGE_DECISION,
     WORKSPACE_ACTIONS.UPDATE_WORKSPACE,
     WORKSPACE_ACTIONS.LIST_MEMBERS,
     WORKSPACE_ACTIONS.ADD_MEMBER,
@@ -49,6 +54,8 @@ export const WORKSPACE_PERMISSIONS: Record<WorkspaceRole, ReadonlyArray<Workspac
     WORKSPACE_ACTIONS.CREATE_COMMENT,
     WORKSPACE_ACTIONS.DELETE_COMMENT,
     WORKSPACE_ACTIONS.MANAGE_COMMENT,
+    WORKSPACE_ACTIONS.CREATE_DECISION,
+    WORKSPACE_ACTIONS.MANAGE_DECISION,
     WORKSPACE_ACTIONS.UPDATE_WORKSPACE,
     WORKSPACE_ACTIONS.LIST_MEMBERS,
     WORKSPACE_ACTIONS.ADD_MEMBER,
@@ -66,6 +73,29 @@ export function assertCanPerformWorkspaceAction(role: WorkspaceRole, action: Wor
   if (!canPerformWorkspaceAction(role, action)) {
     throw new AppError("FORBIDDEN", "Insufficient permissions for this action.");
   }
+}
+
+export function canManageDecisions(role: WorkspaceRole): boolean {
+  return canPerformWorkspaceAction(role, WORKSPACE_ACTIONS.MANAGE_DECISION);
+}
+
+// Authors may change their own proposal; managers may change any proposal.
+export function assertCanEditDecision(role: WorkspaceRole, isAuthor: boolean): void {
+  if (!isAuthor && !canManageDecisions(role)) {
+    throw new AppError("FORBIDDEN", "Only the proposal author or a workspace manager can edit it.");
+  }
+}
+
+// Authors may delete their own proposal before it is finalized; managers may
+// delete any decision. Callers check replacement links separately.
+export function assertCanDeleteDecision(
+  role: WorkspaceRole,
+  isAuthor: boolean,
+  status: "PROPOSED" | "DECIDED" | "SUPERSEDED",
+): void {
+  if (canManageDecisions(role)) return;
+  if (!isAuthor) throw new AppError("FORBIDDEN", "Only the proposal author or a workspace manager can delete it.");
+  if (status !== "PROPOSED") throw new AppError("FORBIDDEN", "Only a workspace manager can delete a finalized decision.");
 }
 
 export function assertCanAssignRoleOnAddMember(actorRole: WorkspaceRole, assignedRole: WorkspaceRole): void {

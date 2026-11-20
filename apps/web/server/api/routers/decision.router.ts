@@ -2,6 +2,7 @@ import {
   createDecisionInputSchema,
   decisionByIdInputSchema,
   decisionRevisionsInputSchema,
+  deleteDecisionInputSchema,
   editDecisionInputSchema,
   finalizeDecisionInputSchema,
   listDecisionsInputSchema,
@@ -37,6 +38,9 @@ export const decisionRouter = createTRPCRouter({
   ),
   finalize: limited("decision.finalize", 20).input(finalizeDecisionInputSchema).mutation(({ ctx, input }) =>
     execute(() => decisionService.finalize(ctx.user.id, input)),
+  ),
+  delete: limited("decision.delete", 20).input(deleteDecisionInputSchema).mutation(({ ctx, input }) =>
+    execute(() => decisionService.softDelete(ctx.user.id, input)),
   ),
   revisions: limited("decision.revisions", 80).input(decisionRevisionsInputSchema).query(({ ctx, input }) =>
     execute(() => decisionService.revisions(ctx.user.id, input)),

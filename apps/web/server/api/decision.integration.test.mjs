@@ -460,3 +460,56 @@ test("authorizer deletion preserves attribution and workspace deletion removes a
   assert.equal(await prisma.decisionRevision.count({ where: { decisionId: a.id } }), 0);
   assert.equal(await prisma.decisionSupersession.count({ where: { workspaceId: f.workspace.id } }), 0);
 });
+
+test("authors delete their own proposals and managers delete any unlinked decision", async () => {
+  const f = await fixture();
+  const ws = f.workspace.id;
+  const proposed = await caller(f.author.id).create(proposal(f, { question: "Author removes this" }));
+  await expectCode(caller(f.other.id).delete({ workspaceId: ws, decisionId: proposed.id, expectedVersion: 1 }), "FORBIDDEN");
+  await expectCode(caller(f.outsider.id).delete({ workspaceId: ws, decisionId: proposed.id, expectedVersion: 1 }), "NOT_FOUND");
+  await expectCode(caller(f.author.id).delete({ workspaceId: ws, decisionId: proposed.id, expectedVersion: 2 }), "CONFLICT");
+  assert.deepEqual(await caller(f.author.id).delete({ workspaceId: ws, decisionId: proposed.id, expectedVersion: 1 }), { id: proposed.id, workspaceId: ws });
+  await expectCode(caller(f.owner.id).getById({ workspaceId: ws, decisionId: proposed.id }), "NOT_FOUND");
+  await expectCode(caller(f.author.id).delete({ workspaceId: ws, decisionId: proposed.id, expectedVersion: 2 }), "NOT_FOUND");
+  const stored = await prisma.decision.findUniqueOrThrow({ where: { id: proposed.id }, include: { revisions: { orderBy: { version: "asc" } } } });
+  assert.ok(stored.deletedAt);
+  assert.equal(stored.deletedById, f.author.id);
+  assert.equal(stored.version, 2);
+  assert.deepEqual(stored.revisions.map((r) => [r.version, r.action, r.actorLabel, r.status]), [[1, "CREATE", "Author", "PROPOSED"], [2, "SOFT_DELETE", "Author", "PROPOSED"]]);
+
+  const decided = await finalized(f, "Manager removes this");
+  await expectCode(caller(f.author.id).delete({ workspaceId: ws, decisionId: decided.id, expectedVersion: decided.version }), "FORBIDDEN");
+  await caller(f.admin.id).delete({ workspaceId: ws, decisionId: decided.id, expectedVersion: decided.version });
+  const othersProposal = await caller(f.other.id).create(proposal(f, { question: "Owner removes this" }));
+  await caller(f.owner.id).delete({ workspaceId: ws, decisionId: othersProposal.id, expectedVersion: 1 });
+  const listed = await caller(f.owner.id).listByWorkspace({ workspaceId: ws });
+  assert.deepEqual(listed.items.map((d) => d.id), []);
+});
+
+test("decisions linked in a replacement history cannot be deleted", async () => {
+  const f = await fixture();
+  const ws = f.workspace.id;
+  const a = await finalized(f, "Original");
+  const b = await finalized(f, "Replacement");
+  await caller(f.owner.id).supersede(supersession(f, a, b));
+  const [oldAfter, newAfter] = await Promise.all([a.id, b.id].map((decisionId) => caller(f.owner.id).getById({ workspaceId: ws, decisionId })));
+  await expectCode(caller(f.owner.id).delete({ workspaceId: ws, decisionId: a.id, expectedVersion: oldAfter.version }), "CONFLICT");
+  await expectCode(caller(f.admin.id).delete({ workspaceId: ws, decisionId: b.id, expectedVersion: newAfter.version }), "CONFLICT");
+  assert.equal(await prisma.decision.count({ where: { id: { in: [a.id, b.id] }, deletedAt: { not: null } } }), 0);
+});
+
+test("concurrent deletion and supersession leave exactly one outcome", async () => {
+  const f = await fixture();
+  const ws = f.workspace.id;
+  const a = await finalized(f, "Contested original");
+  const b = await finalized(f, "Contested replacement");
+  const results = await Promise.allSettled([
+    caller(f.owner.id).delete({ workspaceId: ws, decisionId: b.id, expectedVersion: b.version }),
+    caller(f.admin.id).supersede(supersession(f, a, b)),
+  ]);
+  assert.equal(results.filter((r) => r.status === "fulfilled").length, 1);
+  assert.ok(results.filter((r) => r.status === "rejected").every((r) => r.reason.code === "CONFLICT" || r.reason.code === "NOT_FOUND"));
+  const links = await prisma.decisionSupersession.count({ where: { replacementDecisionId: b.id } });
+  const deleted = (await prisma.decision.findUniqueOrThrow({ where: { id: b.id } })).deletedAt !== null;
+  assert.equal(links + Number(deleted), 1);
+});
