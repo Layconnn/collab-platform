@@ -1,7 +1,10 @@
 import { handleCallback } from "@vercel/queue";
 
-import { deliverNotification } from "../../../../server/queue/notification.processor";
-import type { NotificationJobData } from "../../../../server/queue/notification.queue";
+import { processNotificationJob } from "../../../../server/queue/notification.processor";
+import type {
+  NotificationJobData,
+  NotificationQueueMessage,
+} from "../../../../server/queue/notification.queue";
 import { captureError, initSentry } from "../../../../server/observability/sentry";
 
 initSentry();
@@ -11,9 +14,14 @@ const MAX_DELIVERIES = 6;
 // Vercel Queues consumer for the "notification-delivery" topic, registered in
 // vercel.json. Only Vercel's queue infrastructure can invoke it. Returning
 // acknowledges the message; throwing schedules a retry with backoff.
-const handleNotificationMessage = handleCallback<NotificationJobData>(
-  async (payload) => {
-    await deliverNotification(payload);
+const handleNotificationMessage = handleCallback<NotificationQueueMessage | NotificationJobData>(
+  async (message) => {
+    // Messages published before the fan-out change carry a bare delivery payload.
+    if ("name" in message && "payload" in message) {
+      await processNotificationJob(message.name, message.payload);
+      return;
+    }
+    await processNotificationJob("deliver", message);
   },
   {
     retry: (error, metadata) => {

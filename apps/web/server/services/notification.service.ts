@@ -11,7 +11,7 @@ import {
   recordNotificationAudit,
   recordNotificationOperation,
 } from "../observability/security-events";
-import { enqueueNotificationJob } from "../queue/notification.queue";
+import { enqueueNotificationFanout, type NotificationJobData } from "../queue/notification.queue";
 import { extractMentions, normalizeUsername } from "../utils/mentions";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 
@@ -104,8 +104,42 @@ async function getWorkspaceRecipients(
   return members.map((m) => m.userId);
 }
 
-async function enqueueNotificationsForRecipients(params: {
-  requestId: string;
+type Metadata = Record<string, string | number | boolean | null>;
+
+// A notification-worthy event. The request publishes one of these; the queue
+// consumer expands it into one notification per recipient, so a write never
+// waits on the size of the workspace.
+export type NotificationEvent =
+  | {
+      kind: "discussion_created";
+      requestId: string;
+      actorUserId: string;
+      workspaceId: string;
+      discussionId: string;
+      title: string;
+      body: string;
+    }
+  | {
+      kind: "comment_created";
+      requestId: string;
+      actorUserId: string;
+      workspaceId: string;
+      discussionId: string;
+      commentId: string;
+      body: string;
+      parentCommentId: string | null;
+    }
+  | {
+      kind: "mentions_added";
+      requestId: string;
+      actorUserId: string;
+      resource: NotificationResource;
+      previousText: string;
+      updatedText: string;
+      updatedAt: string;
+    };
+
+function buildDeliveries(params: {
   actorUserId: string;
   recipients: string[];
   mentions: Set<string>;
@@ -113,14 +147,12 @@ async function enqueueNotificationsForRecipients(params: {
   genericType: NotificationType;
   genericMessage: string;
   mentionMessage: string;
-  metadata: Record<string, string | number | boolean | null>;
+  metadata: Metadata;
   dedupeSuffix?: string;
-}): Promise<void> {
-  for (const recipientUserId of params.recipients) {
+}): NotificationJobData[] {
+  return params.recipients.map((recipientUserId) => {
     const isMention = params.mentions.has(recipientUserId);
     const type: NotificationType = isMention ? "MENTION" : params.genericType;
-    const message = isMention ? params.mentionMessage : params.genericMessage;
-
     const baseDedupeKey = notificationDedupeKey({
       type,
       recipientUserId,
@@ -128,67 +160,123 @@ async function enqueueNotificationsForRecipients(params: {
       discussionId: params.resource.discussionId,
       commentId: params.resource.commentId,
     });
-    const dedupeKey = params.dedupeSuffix ? `${baseDedupeKey}:${params.dedupeSuffix}` : baseDedupeKey;
+    return {
+      dedupeKey: params.dedupeSuffix ? `${baseDedupeKey}:${params.dedupeSuffix}` : baseDedupeKey,
+      recipientUserId,
+      actorUserId: params.actorUserId,
+      workspaceId: params.resource.workspaceId,
+      discussionId: params.resource.discussionId,
+      commentId: params.resource.commentId,
+      type,
+      message: isMention ? params.mentionMessage : params.genericMessage,
+      metadata: params.metadata,
+    };
+  });
+}
 
-    try {
-      await enqueueNotificationJob({
-        dedupeKey,
-        recipientUserId,
-        actorUserId: params.actorUserId,
-        workspaceId: params.resource.workspaceId,
-        discussionId: params.resource.discussionId,
-        commentId: params.resource.commentId,
-        type,
-        message,
-        metadata: params.metadata,
-      });
+// Resolves recipients against current membership. Runs in the queue consumer
+// (and in tests); it only reads, so a retried job plans the same deliveries.
+export async function planNotificationDeliveries(event: NotificationEvent): Promise<NotificationJobData[]> {
+  if (event.kind === "mentions_added") {
+    const [previous, updated] = await Promise.all([
+      resolveMentionUserIds(event.resource.workspaceId, event.actorUserId, event.previousText),
+      resolveMentionUserIds(event.resource.workspaceId, event.actorUserId, event.updatedText),
+    ]);
+    const added = [...updated].filter((userId) => !previous.has(userId));
+    if (added.length === 0) return [];
 
-      const timestamp = new Date().toISOString();
-      await recordNotificationOperation({
-        requestId: params.requestId,
-        actorUserId: params.actorUserId,
-        recipientUserId,
-        workspaceId: params.resource.workspaceId,
-        notificationId: null,
-        action: "enqueue",
+    const message = event.resource.commentId
+      ? "You were mentioned in a comment."
+      : "You were mentioned in a discussion.";
+    return buildDeliveries({
+      actorUserId: event.actorUserId,
+      recipients: added,
+      mentions: new Set(added),
+      resource: event.resource,
+      genericType: "MENTION",
+      genericMessage: message,
+      mentionMessage: message,
+      metadata: {
+        discussionId: event.resource.discussionId,
+        commentId: event.resource.commentId,
+      },
+      dedupeSuffix: `edit:${event.updatedAt}`,
+    });
+  }
+
+  const recipients = await getWorkspaceRecipients(event.workspaceId, event.actorUserId);
+  if (recipients.length === 0) return [];
+
+  if (event.kind === "discussion_created") {
+    const mentions = await resolveMentionUserIds(event.workspaceId, event.actorUserId, `${event.title} ${event.body}`);
+    return buildDeliveries({
+      actorUserId: event.actorUserId,
+      recipients,
+      mentions,
+      resource: { workspaceId: event.workspaceId, discussionId: event.discussionId, commentId: null },
+      genericType: "DISCUSSION_CREATED",
+      genericMessage: "New discussion created in your workspace.",
+      mentionMessage: "You were mentioned in a discussion.",
+      metadata: { discussionId: event.discussionId },
+    });
+  }
+
+  const mentions = await resolveMentionUserIds(event.workspaceId, event.actorUserId, event.body);
+  return buildDeliveries({
+    actorUserId: event.actorUserId,
+    recipients,
+    mentions,
+    resource: { workspaceId: event.workspaceId, discussionId: event.discussionId, commentId: event.commentId },
+    genericType: "COMMENT_CREATED",
+    genericMessage: "New comment added in a discussion.",
+    mentionMessage: "You were mentioned in a comment.",
+    metadata: {
+      discussionId: event.discussionId,
+      commentId: event.commentId,
+      parentCommentId: event.parentCommentId,
+    },
+  });
+}
+
+// Publishing is best effort: the user's write already succeeded, so a failed
+// publish is logged instead of failing the request.
+async function publishEvent(event: NotificationEvent, resource: NotificationResource): Promise<void> {
+  const timestamp = new Date().toISOString();
+  try {
+    await enqueueNotificationFanout(event);
+    await recordNotificationOperation({
+      requestId: event.requestId,
+      actorUserId: event.actorUserId,
+      recipientUserId: null,
+      workspaceId: resource.workspaceId,
+      notificationId: null,
+      action: "enqueue",
+      timestamp,
+    });
+  } catch (error) {
+    await recordNotificationOperation({
+      requestId: event.requestId,
+      actorUserId: event.actorUserId,
+      recipientUserId: null,
+      workspaceId: resource.workspaceId,
+      notificationId: null,
+      action: "enqueue_failed",
+      timestamp,
+    });
+    console.error(
+      JSON.stringify({
+        level: "ERROR",
+        event: "notification.enqueue.failed",
+        requestId: event.requestId,
+        actorUserId: event.actorUserId,
+        kind: event.kind,
+        workspaceId: resource.workspaceId,
+        discussionId: resource.discussionId,
+        commentId: resource.commentId,
+        error: String(error),
         timestamp,
-      });
-      await recordNotificationAudit({
-        requestId: params.requestId,
-        actorUserId: params.actorUserId,
-        recipientUserId,
-        workspaceId: params.resource.workspaceId,
-        discussionId: params.resource.discussionId,
-        commentId: params.resource.commentId,
-        type,
-        action: "enqueue",
-        timestamp,
-      });
-    } catch (error) {
-      await recordNotificationOperation({
-        requestId: params.requestId,
-        actorUserId: params.actorUserId,
-        recipientUserId,
-        workspaceId: params.resource.workspaceId,
-        notificationId: null,
-        action: "enqueue_failed",
-        timestamp: new Date().toISOString(),
-      });
-      console.error(
-        JSON.stringify({
-          level: "ERROR",
-          event: "notification.enqueue.failed",
-          requestId: params.requestId,
-          actorUserId: params.actorUserId,
-          recipientUserId,
-          workspaceId: params.resource.workspaceId,
-          discussionId: params.resource.discussionId,
-          commentId: params.resource.commentId,
-          error: String(error),
-          timestamp: new Date().toISOString(),
-        }),
-      );
-    }
+      }),
+    );
   }
 }
 
@@ -202,31 +290,18 @@ export const notificationService = {
     updatedAt: Date;
   }): Promise<void> {
     if (params.previousText === params.updatedText) return;
-    const [previous, updated] = await Promise.all([
-      resolveMentionUserIds(params.resource.workspaceId, params.actorUserId, params.previousText),
-      resolveMentionUserIds(params.resource.workspaceId, params.actorUserId, params.updatedText),
-    ]);
-    const added = [...updated].filter((userId) => !previous.has(userId));
-    if (added.length === 0) return;
-
-    const message = params.resource.commentId
-      ? "You were mentioned in a comment."
-      : "You were mentioned in a discussion.";
-    await enqueueNotificationsForRecipients({
-      requestId: params.requestId,
-      actorUserId: params.actorUserId,
-      recipients: added,
-      mentions: new Set(added),
-      resource: params.resource,
-      genericType: "MENTION",
-      genericMessage: message,
-      mentionMessage: message,
-      metadata: {
-        discussionId: params.resource.discussionId,
-        commentId: params.resource.commentId,
+    await publishEvent(
+      {
+        kind: "mentions_added",
+        requestId: params.requestId,
+        actorUserId: params.actorUserId,
+        resource: params.resource,
+        previousText: params.previousText,
+        updatedText: params.updatedText,
+        updatedAt: params.updatedAt.toISOString(),
       },
-      dedupeSuffix: `edit:${params.updatedAt.toISOString()}`,
-    });
+      params.resource,
+    );
   },
 
   async enqueueDiscussionCreated(params: {
@@ -237,34 +312,10 @@ export const notificationService = {
     title: string;
     body: string;
   }): Promise<void> {
-    const recipients = await getWorkspaceRecipients(params.workspaceId, params.actorUserId);
-    if (recipients.length === 0) {
-      return;
-    }
-
-    const mentions = await resolveMentionUserIds(
-      params.workspaceId,
-      params.actorUserId,
-      `${params.title} ${params.body}`,
+    await publishEvent(
+      { kind: "discussion_created", ...params },
+      { workspaceId: params.workspaceId, discussionId: params.discussionId, commentId: null },
     );
-
-    await enqueueNotificationsForRecipients({
-      requestId: params.requestId,
-      actorUserId: params.actorUserId,
-      recipients,
-      mentions,
-      resource: {
-        workspaceId: params.workspaceId,
-        discussionId: params.discussionId,
-        commentId: null,
-      },
-      genericType: "DISCUSSION_CREATED",
-      genericMessage: "New discussion created in your workspace.",
-      mentionMessage: "You were mentioned in a discussion.",
-      metadata: {
-        discussionId: params.discussionId,
-      },
-    });
   },
 
   async enqueueCommentCreated(params: {
@@ -276,36 +327,10 @@ export const notificationService = {
     body: string;
     parentCommentId: string | null;
   }): Promise<void> {
-    const recipients = await getWorkspaceRecipients(params.workspaceId, params.actorUserId);
-    if (recipients.length === 0) {
-      return;
-    }
-
-    const mentions = await resolveMentionUserIds(
-      params.workspaceId,
-      params.actorUserId,
-      params.body,
+    await publishEvent(
+      { kind: "comment_created", ...params },
+      { workspaceId: params.workspaceId, discussionId: params.discussionId, commentId: params.commentId },
     );
-
-    await enqueueNotificationsForRecipients({
-      requestId: params.requestId,
-      actorUserId: params.actorUserId,
-      recipients,
-      mentions,
-      resource: {
-        workspaceId: params.workspaceId,
-        discussionId: params.discussionId,
-        commentId: params.commentId,
-      },
-      genericType: "COMMENT_CREATED",
-      genericMessage: "New comment added in a discussion.",
-      mentionMessage: "You were mentioned in a comment.",
-      metadata: {
-        discussionId: params.discussionId,
-        commentId: params.commentId,
-        parentCommentId: params.parentCommentId,
-      },
-    });
   },
 
   async listForUser(

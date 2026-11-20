@@ -4,7 +4,15 @@ import {
   recordNotificationOperation,
 } from "../observability/security-events";
 import { prisma } from "../db/prisma";
-import type { NotificationJobData } from "./notification.queue";
+import {
+  planNotificationDeliveries,
+  type NotificationEvent,
+} from "../services/notification.service";
+import type {
+  NotificationJobData,
+  NotificationJobName,
+  NotificationQueuePayload,
+} from "./notification.queue";
 
 // Persists one notification job. Shared by the BullMQ worker and the Vercel Queue
 // consumer; both may deliver a job more than once, so the write is an upsert on
@@ -80,4 +88,53 @@ export async function deliverNotification(payload: NotificationJobData): Promise
     action: "deliver",
     timestamp,
   });
+}
+
+// Expands one event into notifications for the current workspace members and
+// writes them in a single statement. The dedupe key is unique, so a retried
+// job skips rows it already wrote instead of failing or duplicating them.
+export async function deliverFanout(event: NotificationEvent): Promise<number> {
+  const deliveries = await planNotificationDeliveries(event);
+  if (deliveries.length === 0) return 0;
+
+  const result = await prisma.notification.createMany({
+    data: deliveries.map((delivery) => ({
+      dedupeKey: delivery.dedupeKey,
+      recipientUserId: delivery.recipientUserId,
+      actorUserId: delivery.actorUserId,
+      workspaceId: delivery.workspaceId,
+      discussionId: delivery.discussionId,
+      commentId: delivery.commentId,
+      type: delivery.type,
+      message: delivery.message,
+      metadata: delivery.metadata ?? undefined,
+    })),
+    skipDuplicates: true,
+  });
+
+  const timestamp = new Date().toISOString();
+  for (const delivery of deliveries) {
+    await recordNotificationAudit({
+      requestId: event.requestId,
+      actorUserId: delivery.actorUserId,
+      recipientUserId: delivery.recipientUserId,
+      workspaceId: delivery.workspaceId,
+      discussionId: delivery.discussionId,
+      commentId: delivery.commentId,
+      type: delivery.type,
+      action: "deliver",
+      timestamp,
+    });
+  }
+  return result.count;
+}
+
+// Entry point for both queue drivers. "deliver" jobs come from before fan-out
+// moved to the consumer and may still be in flight; they keep working.
+export async function processNotificationJob(name: NotificationJobName | string, payload: NotificationQueuePayload): Promise<void> {
+  if (name === "fanout") {
+    await deliverFanout(payload as NotificationEvent);
+    return;
+  }
+  await deliverNotification(payload as NotificationJobData);
 }

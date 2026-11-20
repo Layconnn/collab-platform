@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test, { after, beforeEach } from "node:test";
 
 import createJiti from "jiti";
@@ -16,7 +17,7 @@ const { prisma } = jiti("../db/prisma.ts");
 const { Prisma } = jiti("../../app/generated/prisma/client.ts");
 const { redis, redisCache } = jiti("../cache/redis.ts");
 const { notificationQueue } = jiti("../queue/notification.queue.ts");
-const { notificationService } = jiti("../services/notification.service.ts");
+const { notificationService, planNotificationDeliveries } = jiti("../services/notification.service.ts");
 const { extractMentions } = jiti("../utils/mentions.ts");
 const originalNotificationQueueAdd = notificationQueue.add.bind(notificationQueue);
 
@@ -67,6 +68,7 @@ const state = {
   redisKeyValues: new Map(),
   nextSeq: 300,
   notificationJobs: [],
+  fanoutJobs: [],
   userLookups: 0,
 };
 
@@ -118,6 +120,7 @@ function resetState() {
   state.redisKeyValues.clear();
   state.nextSeq = 300;
   state.notificationJobs = [];
+  state.fanoutJobs = [];
   state.userLookups = 0;
 
   state.users.set(userA, { id: userA, name: "User A", username: "user_a", email: "a@test.local" });
@@ -199,6 +202,19 @@ prisma.user.findUnique = async ({ where, select }) => {
 };
 
 notificationQueue.add = async (name, payload, options) => {
+  if (name === "fanout") {
+    // The queue consumer expands a fan-out event; plan it here so the tests
+    // observe the same per-recipient deliveries the consumer would write.
+    state.fanoutJobs.push({ payload, options });
+    for (const delivery of await planNotificationDeliveries(payload)) {
+      state.notificationJobs.push({
+        name: "deliver",
+        payload: delivery,
+        options: { jobId: createHash("sha256").update(delivery.dedupeKey).digest("hex") },
+      });
+    }
+    return { id: options.jobId };
+  }
   state.notificationJobs.push({ name, payload, options });
   return { id: options.jobId };
 };
@@ -743,6 +759,28 @@ test("edits notify only newly mentioned workspace members", async () => {
   const replayed = state.notificationJobs.slice(-2);
   assert.equal(replayed[0].options.jobId, replayed[1].options.jobId);
   assert.equal(replayed[0].payload.dedupeKey, replayed[1].payload.dedupeKey);
+});
+
+test("a write publishes one fan-out job however many members the workspace has", async () => {
+  const extra = [makeCuid(911), makeCuid(912), makeCuid(913)];
+  extra.forEach((id, i) => state.users.set(id, { id, name: null, username: `member_${i}`, email: `m${i}@test.local` }));
+  const owner = createCaller(userA);
+  const workspace = await owner.workspace.create({ name: "Fan-out", slug: "fan-out" });
+  await owner.workspace.addMember({ workspaceId: workspace.id, userId: userB, role: "MEMBER" });
+  for (const id of extra) {
+    await owner.workspace.addMember({ workspaceId: workspace.id, userId: id, role: "MEMBER" });
+  }
+
+  const fanoutBefore = state.fanoutJobs.length;
+  const deliveriesBefore = state.notificationJobs.length;
+  await createCaller(userB).discussion.create({ workspaceId: workspace.id, title: "Fan-out check", body: "Hello team" });
+
+  const fanouts = state.fanoutJobs.slice(fanoutBefore);
+  assert.equal(fanouts.length, 1);
+  assert.equal(fanouts[0].payload.kind, "discussion_created");
+  assert.match(fanouts[0].options.jobId, /^[0-9a-f]{64}$/);
+  const recipients = state.notificationJobs.slice(deliveriesBefore).map((job) => job.payload.recipientUserId).sort();
+  assert.deepEqual(recipients, [userA, ...extra].sort());
 });
 
 test("workspace + discussion + comment integration flow", async () => {
