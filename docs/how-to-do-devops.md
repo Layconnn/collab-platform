@@ -32,6 +32,17 @@ Linking writes `apps/web/.vercel/` and `apps/web/.env.local` (an expiring OIDC t
 | `security.alert.threshold_exceeded` | Repeated auth failures, permission denials or rate-limit hits for one user or route. |
 | `security.metrics.failure` | Redis was unreachable for metrics; requests still succeed. |
 
+## Production database migrations
+
+Migrations reach production through `.github/workflows/migrate-production.yml`, never from a laptop.
+
+- It runs when a push to `main` changes `apps/web/prisma/migrations/**`, or by hand from the Actions tab ("Run workflow").
+- The job uses the `production-migrations` GitHub environment. That environment holds the `PRODUCTION_DATABASE_URL` secret (Neon direct connection, not pooled) and requires the repository owner to approve each run.
+- It prints `prisma migrate status`, applies pending migrations with `prisma migrate deploy`, then prints the status again.
+- Vercel deploys `main` independently and may go live before the migration is approved. Write migrations that the currently deployed code tolerates (add first, remove in a later release), so either order is safe.
+- Check a run with `gh run list --workflow migrate-production.yml` and `gh run view <id> --log`.
+- Do not apply migrations to production from a local shell, and do not move the secret into Vercel's build: Preview deployments share the production database until Preview has its own Neon branch.
+
 ## Changes that need approval
 
 Redeploying, promoting, rolling back, and adding or removing environment variables change production. Propose them; do not run them without the author's explicit go-ahead.
