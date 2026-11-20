@@ -72,6 +72,7 @@ Around 270 automated tests, all run on every pull request:
 | `test:integration` | End-to-end API flows |
 | `test:decision-db`, `test:decision-api` | Decision records against a real PostgreSQL database, including multi-process races |
 | `test:frontend` | Around 185 component tests (Vitest) |
+| `test:e2e` | Playwright smoke tests in Chromium against a production build: registration through a decision proposal to sign-out |
 
 CI also checks lint and types, verifies that migrations match the Prisma schema exactly, builds the production app, audits dependencies and scans for committed secrets. Production database migrations run from GitHub Actions behind a manual approval.
 
