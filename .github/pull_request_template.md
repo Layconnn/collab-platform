@@ -5,6 +5,8 @@ Title: Product: Subdomain: task in that subdomain
 No conventional-commit prefixes. See docs/how-to-work-with-git-github.md.
 -->
 
+<!-- First line: Closes #N (the issue this pull request completes). -->
+
 <!-- Optional: > Draft: what must happen before this is ready. Stacked on #N; merge #N first. -->
 <!-- Optional: Addresses: FR-1, NFR-2 -->
 

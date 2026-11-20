@@ -9,10 +9,19 @@
 - Never commit secrets, `.env*` files, database dumps or local snapshots. `.tmp/` is git-ignored for this reason; local snapshots belong there or outside the repository.
 - One concern per branch. If a change depends on an unmerged branch, branch from that branch and say so in the pull request ("Stacked on #N; merge #N first").
 
+### Issues
+
+Every pull request starts from a GitHub issue, which records why the work exists and appears on the [Commons project board](https://github.com/users/Layconnn/projects/1).
+
+- Open it with the `/issue` command or the templates in `.github/ISSUE_TEMPLATE/` (feature, bug, chore). The title uses the same product language as the pull request.
+- The branch starts with the issue number, and the pull request description starts with `Closes #N`.
+- Pull requests target `dev`, and GitHub only links closing keywords in pull requests that target the default branch. So the squash commit message must also end with `Closes #N`: when that commit reaches `main` at release, GitHub closes the issue and the board moves it to Done.
+- A project planned with `/prd` gets one issue per pull request in its delivery plan.
+
 ### Branch Naming
 
-- Start the branch name with the GitHub issue number when one exists: `42-session-refresh`, `57-decision-reviews`.
-- Without an issue, start with the kind of change: `feat/`, `fix/`, `chore/`, `docs/`, `ci/`, `refactor/` (for example `fix/next-security-upgrade`).
+- Start the branch name with the issue number: `42-session-refresh`, `57-decision-reviews`.
+- Only for urgent work without an issue (an incident fix, a Dependabot follow-up), start with the kind of change instead: `feat/`, `fix/`, `chore/`, `docs/`, `ci/`, `refactor/`.
 - Use hyphens between words; keep names short and descriptive.
 
 ### Commits
