@@ -15,7 +15,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    include: ["components/**/*.test.tsx"],
+    include: ["components/**/*.test.tsx", "lib/**/*.test.ts"],
     restoreMocks: true,
   },
 });
