@@ -19,9 +19,9 @@ export function WorkspaceNavigation({
   const pathname = usePathname();
   const items: NavItem[] = [
     {
-      label: "Workspaces",
+      label: "Home",
       href: "/workspace",
-      icon: "workspaces",
+      icon: "home",
       active: pathname === "/workspace",
     },
     {
