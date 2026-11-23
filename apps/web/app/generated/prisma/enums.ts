@@ -45,3 +45,37 @@ export const DecisionRevisionAction = {
 } as const
 
 export type DecisionRevisionAction = (typeof DecisionRevisionAction)[keyof typeof DecisionRevisionAction]
+
+
+export const ActivityKind = {
+  WORKSPACE_CREATED: 'WORKSPACE_CREATED',
+  WORKSPACE_UPDATED: 'WORKSPACE_UPDATED',
+  MEMBER_ADDED: 'MEMBER_ADDED',
+  MEMBER_ROLE_CHANGED: 'MEMBER_ROLE_CHANGED',
+  MEMBER_REMOVED: 'MEMBER_REMOVED',
+  OWNERSHIP_TRANSFERRED: 'OWNERSHIP_TRANSFERRED',
+  DISCUSSION_CREATED: 'DISCUSSION_CREATED',
+  DISCUSSION_UPDATED: 'DISCUSSION_UPDATED',
+  DISCUSSION_DELETED: 'DISCUSSION_DELETED',
+  COMMENT_CREATED: 'COMMENT_CREATED',
+  COMMENT_UPDATED: 'COMMENT_UPDATED',
+  COMMENT_DELETED: 'COMMENT_DELETED',
+  DECISION_PROPOSED: 'DECISION_PROPOSED',
+  DECISION_EDITED: 'DECISION_EDITED',
+  DECISION_FINALIZED: 'DECISION_FINALIZED',
+  DECISION_SUPERSEDED: 'DECISION_SUPERSEDED',
+  DECISION_DELETED: 'DECISION_DELETED'
+} as const
+
+export type ActivityKind = (typeof ActivityKind)[keyof typeof ActivityKind]
+
+
+export const ActivitySubjectType = {
+  WORKSPACE: 'WORKSPACE',
+  MEMBER: 'MEMBER',
+  DISCUSSION: 'DISCUSSION',
+  COMMENT: 'COMMENT',
+  DECISION: 'DECISION'
+} as const
+
+export type ActivitySubjectType = (typeof ActivitySubjectType)[keyof typeof ActivitySubjectType]

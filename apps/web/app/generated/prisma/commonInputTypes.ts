@@ -281,6 +281,40 @@ export type EnumDecisionRevisionActionWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumDecisionRevisionActionFilter<$PrismaModel>
 }
 
+export type EnumActivityKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivityKind | Prisma.EnumActivityKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivityKindFilter<$PrismaModel> | $Enums.ActivityKind
+}
+
+export type EnumActivitySubjectTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivitySubjectType | Prisma.EnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivitySubjectTypeFilter<$PrismaModel> | $Enums.ActivitySubjectType
+}
+
+export type EnumActivityKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivityKind | Prisma.EnumActivityKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivityKindWithAggregatesFilter<$PrismaModel> | $Enums.ActivityKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumActivityKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumActivityKindFilter<$PrismaModel>
+}
+
+export type EnumActivitySubjectTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivitySubjectType | Prisma.EnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivitySubjectTypeWithAggregatesFilter<$PrismaModel> | $Enums.ActivitySubjectType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumActivitySubjectTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumActivitySubjectTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -532,6 +566,40 @@ export type NestedEnumDecisionRevisionActionWithAggregatesFilter<$PrismaModel = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumDecisionRevisionActionFilter<$PrismaModel>
   _max?: Prisma.NestedEnumDecisionRevisionActionFilter<$PrismaModel>
+}
+
+export type NestedEnumActivityKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivityKind | Prisma.EnumActivityKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivityKindFilter<$PrismaModel> | $Enums.ActivityKind
+}
+
+export type NestedEnumActivitySubjectTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivitySubjectType | Prisma.EnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivitySubjectTypeFilter<$PrismaModel> | $Enums.ActivitySubjectType
+}
+
+export type NestedEnumActivityKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivityKind | Prisma.EnumActivityKindFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivityKindWithAggregatesFilter<$PrismaModel> | $Enums.ActivityKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumActivityKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumActivityKindFilter<$PrismaModel>
+}
+
+export type NestedEnumActivitySubjectTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ActivitySubjectType | Prisma.EnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ActivitySubjectType[] | Prisma.ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumActivitySubjectTypeWithAggregatesFilter<$PrismaModel> | $Enums.ActivitySubjectType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumActivitySubjectTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumActivitySubjectTypeFilter<$PrismaModel>
 }
 
 

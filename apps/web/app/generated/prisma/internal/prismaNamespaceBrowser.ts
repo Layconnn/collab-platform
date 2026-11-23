@@ -59,7 +59,8 @@ export const ModelName = {
   WorkspaceMember: 'WorkspaceMember',
   Decision: 'Decision',
   DecisionRevision: 'DecisionRevision',
-  DecisionSupersession: 'DecisionSupersession'
+  DecisionSupersession: 'DecisionSupersession',
+  ActivityEvent: 'ActivityEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -222,6 +223,21 @@ export const DecisionSupersessionScalarFieldEnum = {
 } as const
 
 export type DecisionSupersessionScalarFieldEnum = (typeof DecisionSupersessionScalarFieldEnum)[keyof typeof DecisionSupersessionScalarFieldEnum]
+
+
+export const ActivityEventScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  actorUserId: 'actorUserId',
+  actorLabel: 'actorLabel',
+  kind: 'kind',
+  subjectType: 'subjectType',
+  subjectId: 'subjectId',
+  summary: 'summary',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
 
 
 export const SortOrder = {

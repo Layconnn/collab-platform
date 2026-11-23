@@ -57,6 +57,7 @@ model User {
   supersessionsAuthorized DecisionSupersession[] @relation("DecisionSupersessionAuthorizer")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
+  activityEvents        ActivityEvent[]
 }
 
 model Workspace {
@@ -74,6 +75,7 @@ model Workspace {
   comments    Comment[]
   decisions   Decision[]
   notifications Notification[]
+  activityEvents ActivityEvent[]
 
   @@index([ownerId, createdAt])
   // Recommended (optional): @@index([createdAt]) for global recent-workspaces feeds.
@@ -241,4 +243,54 @@ model DecisionSupersession {
 
   @@unique([workspaceId, previousDecisionId])
   @@unique([workspaceId, replacementDecisionId])
+}
+
+enum ActivityKind {
+  WORKSPACE_CREATED
+  WORKSPACE_UPDATED
+  MEMBER_ADDED
+  MEMBER_ROLE_CHANGED
+  MEMBER_REMOVED
+  OWNERSHIP_TRANSFERRED
+  DISCUSSION_CREATED
+  DISCUSSION_UPDATED
+  DISCUSSION_DELETED
+  COMMENT_CREATED
+  COMMENT_UPDATED
+  COMMENT_DELETED
+  DECISION_PROPOSED
+  DECISION_EDITED
+  DECISION_FINALIZED
+  DECISION_SUPERSEDED
+  DECISION_DELETED
+}
+
+enum ActivitySubjectType {
+  WORKSPACE
+  MEMBER
+  DISCUSSION
+  COMMENT
+  DECISION
+}
+
+// Append-only record of what happened in a workspace, written in the same
+// transaction as the change it describes. Feeds, digests and search indexing
+// read it; nothing updates or deletes a row except workspace deletion.
+model ActivityEvent {
+  id          String              @id @default(cuid())
+  workspaceId String
+  actorUserId String?
+  actorLabel  String
+  kind        ActivityKind
+  subjectType ActivitySubjectType
+  subjectId   String
+  // A small snapshot such as a title or roles; never full bodies.
+  summary     Json?
+  createdAt   DateTime            @default(now())
+  workspace   Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actor       User?               @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([subjectType, subjectId])
+  @@index([actorUserId])
 }

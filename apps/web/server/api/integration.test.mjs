@@ -195,7 +195,20 @@ redisCache.delByPattern = async (pattern) => {
 
 prisma.$transaction = async (cb) => cb(prisma);
 
+// Changes and their activity events run in one transaction; the fake keeps the events.
+state.activityEvents = [];
+const originalActivityEventCreate = prisma.activityEvent.create;
+prisma.activityEvent.create = async ({ data }) => {
+  state.activityEvents.push(data);
+  return data;
+};
+
 prisma.user.findUnique = async ({ where, select }) => {
+  // Activity events read display names by id; only username lookups are counted.
+  if (where.id) {
+    const user = state.users.get(where.id);
+    return user ? projectSelect(user, select) : null;
+  }
   state.userLookups += 1;
   const user = [...state.users.values()].find((item) => item.username === where.username);
   return user ? projectSelect(user, select) : null;
@@ -537,6 +550,7 @@ prisma.comment.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.activityEvent.create = originalActivityEventCreate;
   redis.incr = originalRedisIncr;
   redis.expire = originalRedisExpire;
   redis.get = originalRedisGet;
@@ -996,4 +1010,39 @@ test("workspace + discussion + comment integration flow", async () => {
   } finally {
     console.info = originalInfo;
   }
+});
+
+test("workspace and membership changes each record one activity event", async () => {
+  const owner = createCaller(userA);
+  const workspace = await owner.workspace.create({ name: "Activity Space", slug: "activity-space" });
+  state.activityEvents.length = 0;
+  await owner.workspace.update({ workspaceId: workspace.id, name: "Activity Space Renamed", slug: "activity-space" });
+  await owner.workspace.addMember({ workspaceId: workspace.id, userId: userB, role: "MEMBER" });
+  await owner.workspace.updateMemberRole({ workspaceId: workspace.id, userId: userB, role: "ADMIN" });
+  await owner.workspace.transferOwnership({ workspaceId: workspace.id, newOwnerUserId: userB });
+  await createCaller(userB).workspace.removeMember({ workspaceId: workspace.id, userId: userA });
+
+  assert.deepEqual(
+    state.activityEvents.map((event) => [event.kind, event.subjectType, event.subjectId, event.actorUserId]),
+    [
+      ["WORKSPACE_UPDATED", "WORKSPACE", workspace.id, userA],
+      ["MEMBER_ADDED", "MEMBER", userB, userA],
+      ["MEMBER_ROLE_CHANGED", "MEMBER", userB, userA],
+      ["OWNERSHIP_TRANSFERRED", "MEMBER", userB, userA],
+      ["MEMBER_REMOVED", "MEMBER", userA, userB],
+    ],
+  );
+  assert.ok(state.activityEvents.every((event) => event.workspaceId === workspace.id));
+  assert.deepEqual(state.activityEvents[1].summary, { member: "User B", role: "MEMBER" });
+  assert.deepEqual(state.activityEvents[2].summary, { member: "User B", previousRole: "MEMBER", role: "ADMIN" });
+  assert.deepEqual(state.activityEvents[4].summary, { member: "User A", previousRole: "ADMIN" });
+});
+
+test("creating a workspace records one activity event", async () => {
+  state.activityEvents.length = 0;
+  const workspace = await createCaller(userA).workspace.create({ name: "Event Origin", slug: "event-origin" });
+  assert.deepEqual(
+    state.activityEvents.map((event) => [event.kind, event.subjectId, event.summary?.name, event.actorLabel]),
+    [["WORKSPACE_CREATED", workspace.id, "Event Origin", "User A"]],
+  );
 });

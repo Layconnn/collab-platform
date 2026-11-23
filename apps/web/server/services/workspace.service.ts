@@ -24,6 +24,7 @@ import {
   recordPermissionEscalationAttempt,
   recordWorkspacePermissionAudit,
 } from "../observability/security-events";
+import { memberLabel, recordActivity } from "./activity.service";
 import { getMembershipRole, requireWorkspaceAction } from "./workspace.access";
 import {
   WORKSPACE_ACTIONS,
@@ -145,6 +146,14 @@ export const workspaceService = {
         });
 
         await enforceOwnerInvariant(createdWorkspace.id, tx as unknown as typeof prisma);
+        await recordActivity(tx, {
+          workspaceId: createdWorkspace.id,
+          actorUserId: userId,
+          kind: "WORKSPACE_CREATED",
+          subjectType: "WORKSPACE",
+          subjectId: createdWorkspace.id,
+          summary: { name: createdWorkspace.name },
+        });
         return createdWorkspace;
       });
 
@@ -246,20 +255,31 @@ export const workspaceService = {
     await requireRoleForAction(input.workspaceId, userId, WORKSPACE_ACTIONS.UPDATE_WORKSPACE, context.requestId);
 
     try {
-      const updated = await prisma.workspace.update({
-        where: { id: input.workspaceId },
-        data: {
-          name: input.name,
-          slug: input.slug,
-        },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          ownerId: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+      const updated = await prisma.$transaction(async (tx) => {
+        const changed = await tx.workspace.update({
+          where: { id: input.workspaceId },
+          data: {
+            name: input.name,
+            slug: input.slug,
+          },
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            ownerId: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+        await recordActivity(tx, {
+          workspaceId: changed.id,
+          actorUserId: userId,
+          kind: "WORKSPACE_UPDATED",
+          subjectType: "WORKSPACE",
+          subjectId: changed.id,
+          summary: { name: changed.name, slug: changed.slug },
+        });
+        return changed;
       });
 
       await invalidateWorkspaceCache(input.workspaceId);
@@ -427,6 +447,14 @@ export const workspaceService = {
           },
         });
         await enforceOwnerInvariant(input.workspaceId, tx as unknown as typeof prisma);
+        await recordActivity(tx, {
+          workspaceId: input.workspaceId,
+          actorUserId,
+          kind: "MEMBER_ADDED",
+          subjectType: "MEMBER",
+          subjectId: input.userId,
+          summary: { member: await memberLabel(tx, input.userId), role: input.role },
+        });
         return created;
       });
 
@@ -500,6 +528,14 @@ export const workspaceService = {
         },
       });
       await enforceOwnerInvariant(input.workspaceId, tx as unknown as typeof prisma);
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId,
+        kind: "MEMBER_ROLE_CHANGED",
+        subjectType: "MEMBER",
+        subjectId: input.userId,
+        summary: { member: await memberLabel(tx, input.userId), previousRole: targetRole, role: input.role },
+      });
       return changed;
     });
 
@@ -536,6 +572,7 @@ export const workspaceService = {
     assertCanRemoveMember(actor.role, targetRole);
 
     await prisma.$transaction(async (tx) => {
+      const removedLabel = await memberLabel(tx, input.userId);
       await tx.workspaceMember.delete({
         where: {
           workspaceId_userId: {
@@ -543,6 +580,14 @@ export const workspaceService = {
             userId: input.userId,
           },
         },
+      });
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId,
+        kind: "MEMBER_REMOVED",
+        subjectType: "MEMBER",
+        subjectId: input.userId,
+        summary: { member: removedLabel, previousRole: targetRole },
       });
       await enforceOwnerInvariant(input.workspaceId, tx as unknown as typeof prisma);
     });
@@ -615,6 +660,14 @@ export const workspaceService = {
         data: { ownerId: input.newOwnerUserId },
       });
 
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId,
+        kind: "OWNERSHIP_TRANSFERRED",
+        subjectType: "MEMBER",
+        subjectId: input.newOwnerUserId,
+        summary: { member: await memberLabel(tx, input.newOwnerUserId), previousRole: targetRole },
+      });
       await enforceOwnerInvariant(input.workspaceId, tx as unknown as typeof prisma);
     });
 

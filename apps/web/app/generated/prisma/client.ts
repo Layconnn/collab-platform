@@ -86,3 +86,8 @@ export type DecisionRevision = Prisma.DecisionRevisionModel
  * 
  */
 export type DecisionSupersession = Prisma.DecisionSupersessionModel
+/**
+ * Model ActivityEvent
+ * 
+ */
+export type ActivityEvent = Prisma.ActivityEventModel
