@@ -34,7 +34,9 @@ test("a new user registers, records a decision from a discussion and signs out",
     await page.getByLabel("Password", { exact: true }).fill(`smoke-password-${id}`);
     await page.getByRole("button", { name: "Create account" }).click();
     await expect(page).toHaveURL(/\/workspace$/);
-    await expect(page.getByRole("heading", { level: 1, name: "Your workspaces" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^Good (morning|afternoon|evening)/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Needs you · 0" })).toBeVisible();
+    await expect(page.getByText("You're all caught up")).toBeVisible();
   });
 
   await test.step("create a workspace", async () => {
