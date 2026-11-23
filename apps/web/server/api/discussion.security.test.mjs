@@ -170,6 +170,18 @@ redisCache.delByPattern = async (pattern) => {
   }
 };
 
+// Changes and their activity events run in one transaction; the fake keeps the events.
+state.activityEvents = [];
+const originalPrismaTransactionForActivity = prisma.$transaction;
+const originalActivityEventCreate = prisma.activityEvent.create;
+const originalUserFindUniqueForActivity = prisma.user.findUnique;
+prisma.$transaction = async (callback) => callback(prisma);
+prisma.activityEvent.create = async ({ data }) => {
+  state.activityEvents.push(data);
+  return data;
+};
+prisma.user.findUnique = async ({ where }) => ({ name: null, username: `user_${where.id}` });
+
 prisma.workspaceMember.findUnique = async ({ where }) => {
   const role = state.memberships.get(
     membershipKey(where.workspaceId_userId.workspaceId, where.workspaceId_userId.userId),
@@ -272,6 +284,9 @@ prisma.discussion.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.$transaction = originalPrismaTransactionForActivity;
+  prisma.activityEvent.create = originalActivityEventCreate;
+  prisma.user.findUnique = originalUserFindUniqueForActivity;
   redis.incr = originalRedisIncr;
   redis.expire = originalRedisExpire;
   redis.get = originalRedisGet;
@@ -651,4 +666,30 @@ test("12. Cursor from other workspace cannot leak results or behavior", async ()
     assert.equal(typeof item.author.username, "string");
     assert.deepEqual(Object.keys(item.author).sort(), ["id", "name", "username"]);
   }
+});
+
+test("15. Each discussion change records exactly one activity event", async () => {
+  state.activityEvents.length = 0;
+  const caller = createCaller(memberUserId);
+  const created = await caller.create({ workspaceId, title: "Pick a queue", body: "Vercel Queues or BullMQ?" });
+  await caller.update({ discussionId: created.id, title: "Pick a notification queue", body: "Vercel Queues or BullMQ?" });
+  await createCaller(adminUserId).remove({ discussionId: created.id });
+
+  assert.deepEqual(
+    state.activityEvents.map((event) => [event.kind, event.subjectType, event.subjectId, event.workspaceId, event.summary?.title]),
+    [
+      ["DISCUSSION_CREATED", "DISCUSSION", created.id, workspaceId, "Pick a queue"],
+      ["DISCUSSION_UPDATED", "DISCUSSION", created.id, workspaceId, "Pick a notification queue"],
+      ["DISCUSSION_DELETED", "DISCUSSION", created.id, workspaceId, "Pick a notification queue"],
+    ],
+  );
+  assert.deepEqual(state.activityEvents.map((event) => event.actorUserId), [memberUserId, memberUserId, adminUserId]);
+  assert.ok(state.activityEvents.every((event) => typeof event.actorLabel === "string" && event.actorLabel.length > 0));
+  assert.ok(state.activityEvents.every((event) => !("body" in (event.summary ?? {}))), "summaries never carry bodies");
+});
+
+test("16. A rejected discussion change records no activity event", async () => {
+  state.activityEvents.length = 0;
+  await assert.rejects(() => createCaller(nonMemberUserId).create({ workspaceId, title: "Not allowed", body: "Body" }));
+  assert.equal(state.activityEvents.length, 0);
 });

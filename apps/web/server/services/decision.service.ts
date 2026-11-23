@@ -16,6 +16,7 @@ import { Prisma, type WorkspaceRole } from "../../app/generated/prisma/client";
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import { toPaginatedResult } from "../../src/common/utils/pagination";
+import { recordActivity } from "./activity.service";
 import { assertCanDeleteDecision, assertCanEditDecision, canManageDecisions } from "./workspace.permissions";
 
 const decisionSelect = {
@@ -179,6 +180,15 @@ export const decisionService = {
             followUp: created.followUp,
             status: created.status,
           },
+        });
+        await recordActivity(tx, {
+          workspaceId: input.workspaceId,
+          actorUserId: userId,
+          actorLabel: actorLabel(user),
+          kind: "DECISION_PROPOSED",
+          subjectType: "DECISION",
+          subjectId: created.id,
+          summary: { question: created.question, status: created.status },
         });
         return created;
       });
@@ -371,6 +381,15 @@ export const decisionService = {
           status: updated.status,
         },
       });
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId: userId,
+        actorLabel: actorLabel(user),
+        kind: "DECISION_EDITED",
+        subjectType: "DECISION",
+        subjectId: updated.id,
+        summary: { question: updated.question, status: updated.status },
+      });
       return updated;
     });
   },
@@ -412,6 +431,15 @@ export const decisionService = {
           followUp: updated.followUp,
           status: updated.status,
         },
+      });
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId: userId,
+        actorLabel: actorLabel(user),
+        kind: "DECISION_FINALIZED",
+        subjectType: "DECISION",
+        subjectId: updated.id,
+        summary: { question: updated.question, status: updated.status },
       });
       return updated;
     });
@@ -466,6 +494,15 @@ export const decisionService = {
           { decisionId: old.id, version: old.version + 1, action: "SUPERSEDE", actorUserId: userId, actorLabel: label, reason: input.reason, question: old.question, outcome: old.outcome, rationale: old.rationale, alternatives: old.alternatives, followUp: old.followUp, status: "SUPERSEDED", createdAt: now },
           { decisionId: replacement.id, version: replacement.version + 1, action: "SUPERSEDE", actorUserId: userId, actorLabel: label, reason: input.reason, question: replacement.question, outcome: replacement.outcome, rationale: replacement.rationale, alternatives: replacement.alternatives, followUp: replacement.followUp, status: "DECIDED", createdAt: now },
         ] });
+        await recordActivity(tx, {
+          workspaceId: input.workspaceId,
+          actorUserId: userId,
+          actorLabel: label,
+          kind: "DECISION_SUPERSEDED",
+          subjectType: "DECISION",
+          subjectId: old.id,
+          summary: { question: old.question, replacementDecisionId: replacement.id, replacementQuestion: replacement.question },
+        });
         return { oldDecisionId: old.id, replacementDecisionId: replacement.id, supersessionId: link.id };
       });
     } catch (error) {
@@ -517,6 +554,15 @@ export const decisionService = {
           followUp: current.followUp,
           status: current.status,
         },
+      });
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId: userId,
+        actorLabel: actorLabel(user),
+        kind: "DECISION_DELETED",
+        subjectType: "DECISION",
+        subjectId: current.id,
+        summary: { question: current.question, status: current.status },
       });
       return { id: current.id, workspaceId: input.workspaceId };
     });
