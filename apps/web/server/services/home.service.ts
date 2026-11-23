@@ -131,6 +131,10 @@ export const homeService = {
     return { workspaces: await workspacePulse(userId) };
   },
 
+  async recentDecisions(userId: string): Promise<{ decisions: RecentDecision[] }> {
+    return { decisions: await recentDecisions(userId) };
+  },
+
   async dismiss(userId: string, input: DismissNeedsInput): Promise<{ dismissed: number }> {
     const result = await prisma.notification.updateMany({
       where: { id: { in: input.notificationIds }, recipientUserId: userId, readAt: null, type: { in: ["MENTION", "COMMENT_CREATED"] } },
@@ -242,4 +246,68 @@ export async function workspacePulse(userId: string, now = new Date()): Promise<
     }))
     // Busiest first: the most recent activity, then name; never-active last.
     .sort((a, b) => (b.lastActivityAt?.getTime() ?? 0) - (a.lastActivityAt?.getTime() ?? 0) || a.name.localeCompare(b.name));
+}
+
+// ---------------------------------------------------------------------------
+// Decided this week (FR-10): decisions finalized or superseded in the last
+// seven days across the user's workspaces, newest first.
+// ---------------------------------------------------------------------------
+
+export const RECENT_DECISIONS_LIMIT = 10;
+
+export type RecentDecision = {
+  decisionId: string;
+  workspace: { id: string; name: string };
+  question: string;
+  action: "FINALIZED" | "SUPERSEDED";
+  // Who finalized it or replaced it.
+  actor: string;
+  at: Date;
+  // For a superseded decision: what replaced it, when it still exists.
+  replacement: { id: string; question: string } | null;
+};
+
+export async function recentDecisions(userId: string, now = new Date()): Promise<RecentDecision[]> {
+  const since = new Date(now.getTime() - PULSE_DAYS * DAY_MS);
+  const events = await prisma.activityEvent.findMany({
+    where: {
+      kind: { in: ["DECISION_FINALIZED", "DECISION_SUPERSEDED"] },
+      createdAt: { gt: since, lte: now },
+      workspace: { members: { some: { userId } } },
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 50,
+    select: { kind: true, subjectId: true, actorLabel: true, createdAt: true, summary: true, workspace: { select: { id: true, name: true } } },
+  });
+
+  // One entry per decision: its latest event in the window.
+  const latest = new Map<string, (typeof events)[number]>();
+  for (const event of events) if (!latest.has(event.subjectId)) latest.set(event.subjectId, event);
+  const replacementIds = [...latest.values()]
+    .map((event) => (event.summary as { replacementDecisionId?: unknown } | null)?.replacementDecisionId)
+    .filter((id): id is string => typeof id === "string");
+  const decisions = await prisma.decision.findMany({
+    where: { id: { in: [...latest.keys(), ...replacementIds] }, deletedAt: null },
+    select: { id: true, question: true },
+  });
+  const live = new Map(decisions.map((decision) => [decision.id, decision]));
+
+  const result: RecentDecision[] = [];
+  for (const event of latest.values()) {
+    const decision = live.get(event.subjectId);
+    if (!decision) continue; // deleted since
+    const replacementId = (event.summary as { replacementDecisionId?: unknown } | null)?.replacementDecisionId;
+    const replacement = typeof replacementId === "string" ? live.get(replacementId) ?? null : null;
+    result.push({
+      decisionId: decision.id,
+      workspace: event.workspace,
+      question: decision.question,
+      action: event.kind === "DECISION_SUPERSEDED" ? "SUPERSEDED" : "FINALIZED",
+      actor: event.actorLabel,
+      at: event.createdAt,
+      replacement: event.kind === "DECISION_SUPERSEDED" && replacement ? { id: replacement.id, question: replacement.question } : null,
+    });
+    if (result.length === RECENT_DECISIONS_LIMIT) break;
+  }
+  return result;
 }

@@ -232,3 +232,56 @@ test("pulse keeps an old last activity even when the week was quiet", async () =
   assert.ok(pulse.lastActivityAt, "last activity is reported");
   assert.ok(Date.now() - new Date(pulse.lastActivityAt).getTime() > 19 * DAY);
 });
+
+// ---------------------------------------------------------------------------
+// Decided this week
+// ---------------------------------------------------------------------------
+
+const decisionEvent = (ws, actor, kind, decision, msAgo, summary = {}) => prisma.activityEvent.create({ data: {
+  workspaceId: ws.id, actorUserId: actor.id, actorLabel: actor.name, kind, subjectType: "DECISION",
+  subjectId: decision.id, summary: { question: decision.question, ...summary }, createdAt: new Date(Date.now() - msAgo),
+} });
+
+test("decided this week lists finalized and replaced decisions, newest first, once each", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(sam, [[maya, "MEMBER"]]);
+  const a = await proposal(ws, sam, "Use BullMQ", new Date(), { status: "SUPERSEDED" });
+  const b = await proposal(ws, sam, "Use Vercel Queues", new Date(), { status: "DECIDED" });
+  const c = await proposal(ws, sam, "Adopt Playwright", new Date(), { status: "DECIDED" });
+  const gone = await proposal(ws, sam, "Deleted later", new Date(), { status: "DECIDED", deletedAt: new Date() });
+  const old = await proposal(ws, sam, "Last month", new Date(), { status: "DECIDED" });
+  await decisionEvent(ws, sam, "DECISION_FINALIZED", a, 3 * DAY);
+  await decisionEvent(ws, maya, "DECISION_SUPERSEDED", a, 1 * DAY, { replacementDecisionId: b.id, replacementQuestion: b.question });
+  await decisionEvent(ws, sam, "DECISION_FINALIZED", b, 2 * DAY);
+  await decisionEvent(ws, sam, "DECISION_FINALIZED", c, 1 * HOUR);
+  await decisionEvent(ws, sam, "DECISION_FINALIZED", gone, 2 * HOUR);
+  await decisionEvent(ws, sam, "DECISION_FINALIZED", old, 9 * DAY);
+  await decisionEvent(ws, sam, "DECISION_PROPOSED", c, 30); // not a decision being made
+
+  const { decisions } = await caller(maya.id).recentDecisions();
+  assert.deepEqual(decisions.map((d) => [d.question, d.action, d.actor]), [
+    ["Adopt Playwright", "FINALIZED", "Sam"],
+    ["Use BullMQ", "SUPERSEDED", "Maya"],
+    ["Use Vercel Queues", "FINALIZED", "Sam"],
+  ]);
+  assert.deepEqual(decisions[1].replacement, { id: b.id, question: "Use Vercel Queues" });
+  assert.equal(decisions[0].replacement, null);
+  assert.deepEqual(decisions[0].workspace, { id: ws.id, name: ws.name });
+});
+
+test("decided this week never shows other workspaces and stops at ten", async () => {
+  const [maya, outsider] = await Promise.all([user("Maya"), user("Outsider")]);
+  const ws = await workspace(maya, []);
+  const other = await workspace(outsider, []);
+  for (let i = 0; i < 12; i++) {
+    const d = await proposal(ws, maya, `Decision ${i}`, new Date(), { status: "DECIDED" });
+    await decisionEvent(ws, maya, "DECISION_FINALIZED", d, (i + 1) * HOUR);
+  }
+  const theirs = await proposal(other, outsider, "Theirs", new Date(), { status: "DECIDED" });
+  await decisionEvent(other, outsider, "DECISION_FINALIZED", theirs, 10);
+  const { decisions } = await caller(maya.id).recentDecisions();
+  assert.equal(decisions.length, 10);
+  assert.equal(decisions[0].question, "Decision 0");
+  assert.equal(decisions.some((d) => d.question === "Theirs"), false);
+  assert.deepEqual((await caller(outsider.id).recentDecisions()).decisions.map((d) => d.question), ["Theirs"]);
+});
