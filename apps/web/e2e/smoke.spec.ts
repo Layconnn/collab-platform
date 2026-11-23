@@ -79,6 +79,34 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect(page.getByRole("heading", { level: 3, name: question })).toBeVisible();
   });
 
+  await test.step("jump with the command palette", async () => {
+    await page.keyboard.press("Control+K");
+    const palette = page.getByRole("dialog", { name: "Command palette" });
+    await expect(palette).toBeVisible();
+    await palette.getByRole("combobox").fill("open discussions");
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/discussions$/);
+    await expect(palette).toBeHidden();
+  });
+
+  await test.step("find it from the palette's live results", async () => {
+    await page.keyboard.press("Control+K");
+    const palette = page.getByRole("dialog", { name: "Command palette" });
+    await palette.getByRole("combobox").fill(`PostgreSQL ${id}`);
+    const result = palette.getByRole("option", { name: new RegExp(`^${question.replace(/[?]/g, "\\?")}`) });
+    await expect(result).toBeVisible();
+    await result.click();
+    await expect(page).toHaveURL(/\/decisions\/[a-z0-9]+$/);
+    await expect(page.getByRole("heading", { level: 1, name: question })).toBeVisible();
+  });
+
+  await test.step("find it with search", async () => {
+    await page.goto(`/search?q=${id}`);
+    const results = page.getByRole("region", { name: "Search results" });
+    await expect(results.getByRole("link", { name: question })).toBeVisible();
+    await expect(results.getByRole("link", { name: discussionTitle })).toBeVisible();
+  });
+
   await test.step("sign out", async () => {
     await page.getByLabel(/^Account menu for /).click();
     await page.getByRole("button", { name: "Sign out" }).click();

@@ -190,6 +190,18 @@ redisCache.delByPattern = async (pattern) => {
   }
 };
 
+// Changes and their activity events run in one transaction; the fake keeps the events.
+state.activityEvents = [];
+const originalPrismaTransactionForActivity = prisma.$transaction;
+const originalActivityEventCreate = prisma.activityEvent.create;
+const originalUserFindUniqueForActivity = prisma.user.findUnique;
+prisma.$transaction = async (callback) => callback(prisma);
+prisma.activityEvent.create = async ({ data }) => {
+  state.activityEvents.push(data);
+  return data;
+};
+prisma.user.findUnique = async ({ where }) => ({ name: null, username: `user_${where.id}` });
+
 prisma.workspaceMember.findUnique = async ({ where }) => {
   const role = state.memberships.get(
     membershipKey(where.workspaceId_userId.workspaceId, where.workspaceId_userId.userId),
@@ -314,6 +326,9 @@ prisma.comment.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.$transaction = originalPrismaTransactionForActivity;
+  prisma.activityEvent.create = originalActivityEventCreate;
+  prisma.user.findUnique = originalUserFindUniqueForActivity;
   redis.incr = originalRedisIncr;
   redis.expire = originalRedisExpire;
   redis.get = originalRedisGet;
@@ -808,4 +823,27 @@ test("18. Adaptive strict rate limiting applies after repeated permission denial
     async () => caller.remove({ commentId: makeCuid(980) }),
     (error) => error?.code === "TOO_MANY_REQUESTS",
   );
+});
+
+test("Each comment change records exactly one activity event", async () => {
+  state.activityEvents.length = 0;
+  const created = await createCaller(memberUserId).create({ discussionId, body: "I prefer Vercel Queues" });
+  await createCaller(memberUserId).update({ commentId: created.id, body: "I prefer Vercel Queues for now" });
+  await createCaller(adminUserId).remove({ commentId: created.id });
+
+  assert.deepEqual(
+    state.activityEvents.map((event) => [event.kind, event.subjectType, event.subjectId, event.workspaceId, event.summary?.discussionId, event.actorUserId]),
+    [
+      ["COMMENT_CREATED", "COMMENT", created.id, workspaceId, discussionId, memberUserId],
+      ["COMMENT_UPDATED", "COMMENT", created.id, workspaceId, discussionId, memberUserId],
+      ["COMMENT_DELETED", "COMMENT", created.id, workspaceId, discussionId, adminUserId],
+    ],
+  );
+  assert.ok(state.activityEvents.every((event) => !("body" in (event.summary ?? {}))), "summaries never carry bodies");
+});
+
+test("A rejected comment change records no activity event", async () => {
+  state.activityEvents.length = 0;
+  await assert.rejects(() => createCaller(nonMemberUserId).create({ discussionId, body: "Not allowed" }));
+  assert.equal(state.activityEvents.length, 0);
 });

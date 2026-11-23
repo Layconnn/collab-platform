@@ -515,3 +515,40 @@ test("concurrent deletion and supersession leave exactly one outcome", async () 
   const deleted = (await prisma.decision.findUniqueOrThrow({ where: { id: b.id } })).deletedAt !== null;
   assert.equal(links + Number(deleted), 1);
 });
+
+test("decision changes record one activity event each, in the same transaction", async () => {
+  const f = await fixture();
+  const ws = f.workspace.id;
+  const events = () => prisma.activityEvent.findMany({ where: { workspaceId: ws }, orderBy: [{ createdAt: "asc" }, { id: "asc" }] });
+  const proposal1 = await caller(f.author.id).create(proposal(f, { question: "Which queue?" }));
+  await caller(f.author.id).edit({ workspaceId: ws, decisionId: proposal1.id, expectedVersion: 1, rationale: "Fits the free plan" });
+  const a = await caller(f.owner.id).finalize({ workspaceId: ws, decisionId: proposal1.id, expectedVersion: 2 });
+  const b = await finalized(f, "Which queue, revisited?");
+  await caller(f.admin.id).supersede(supersession(f, a, b));
+  const doomed = await caller(f.author.id).create(proposal(f, { question: "Delete me" }));
+  await caller(f.author.id).delete({ workspaceId: ws, decisionId: doomed.id, expectedVersion: 1 });
+
+  const recorded = await events();
+  assert.deepEqual(
+    recorded.filter((e) => e.subjectId === a.id).map((e) => [e.kind, e.actorUserId, e.actorLabel]),
+    [["DECISION_PROPOSED", f.author.id, "Author"], ["DECISION_EDITED", f.author.id, "Author"], ["DECISION_FINALIZED", f.owner.id, "Owner"], ["DECISION_SUPERSEDED", f.admin.id, "Admin"]],
+  );
+  assert.equal(recorded.find((e) => e.kind === "DECISION_SUPERSEDED").summary.replacementDecisionId, b.id);
+  assert.deepEqual(recorded.filter((e) => e.subjectId === doomed.id).map((e) => e.kind), ["DECISION_PROPOSED", "DECISION_DELETED"]);
+  assert.ok(recorded.every((e) => e.subjectType === "DECISION" && e.workspaceId === ws));
+
+  // A rejected change rolls back with its event: nothing new is recorded.
+  const before = recorded.length;
+  await expectCode(caller(f.author.id).edit({ workspaceId: ws, decisionId: proposal1.id, expectedVersion: 1, rationale: "Stale" }), "CONFLICT");
+  await expectCode(caller(f.other.id).delete({ workspaceId: ws, decisionId: b.id, expectedVersion: b.version + 1 }), "FORBIDDEN");
+  assert.equal((await events()).length, before);
+});
+
+test("activity events keep the actor's name after the actor is deleted", async () => {
+  const f = await fixture();
+  const created = await caller(f.author.id).create(proposal(f, { question: "Kept attribution" }));
+  await prisma.user.delete({ where: { id: f.author.id } });
+  const event = await prisma.activityEvent.findFirstOrThrow({ where: { subjectId: created.id, kind: "DECISION_PROPOSED" } });
+  assert.equal(event.actorUserId, null);
+  assert.equal(event.actorLabel, "Author");
+});

@@ -21,6 +21,8 @@ Dated documents named `YYYY-MM-DD-<investigation|issue|incident>-<topic>.md`:
 
 Multi-pull-request work lives in `projects/YYYY-MM-DD-<name>/` with a `PRD.md` (requirements with stable IDs such as `FR-1`, `NFR-1`) and an optional `planning/` folder.
 
+- [2026-11-23 Event log, universal search and Cmd-K](./projects/2026-11-23-search-and-activity/PRD.md) — Horizon 1, delivered: event log #78, recent activity #79, search index #80, search page #81, Cmd-K palette #82, live palette results (this project's last pull request).
+
 ## Operations
 
 - [Development setup, CI and notification delivery](../../../docs/DEVELOPMENT.md)

@@ -15,6 +15,7 @@ import {
   recordCommentOperation,
   recordCommentPermissionDenied,
 } from "../observability/security-events";
+import { activityActorLabel, recordActivity } from "./activity.service";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 import { requireWorkspaceAction as requireMemberAction } from "./workspace.access";
@@ -249,31 +250,43 @@ export const commentService = {
         ? await validateParentComment(input.discussionId, input.parentCommentId)
         : 0;
 
-      const comment = await prisma.comment.create({
-        data: {
-          discussionId: input.discussionId,
-          workspaceId: discussion.workspaceId,
-          authorId: userId,
-          parentCommentId: input.parentCommentId,
-          depth,
-          body: input.body,
-        },
-        select: {
-          id: true,
-          discussionId: true,
-          parentCommentId: true,
-          depth: true,
-          body: true,
-          author: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-            },
+      const comment = await prisma.$transaction(async (tx) => {
+        const created = await tx.comment.create({
+          data: {
+            discussionId: input.discussionId,
+            workspaceId: discussion.workspaceId,
+            authorId: userId,
+            parentCommentId: input.parentCommentId,
+            depth,
+            body: input.body,
           },
-          createdAt: true,
-          updatedAt: true,
-        },
+          select: {
+            id: true,
+            discussionId: true,
+            parentCommentId: true,
+            depth: true,
+            body: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+              },
+            },
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+        await recordActivity(tx, {
+          workspaceId: discussion.workspaceId,
+          actorUserId: userId,
+          actorLabel: activityActorLabel(created.author),
+          kind: "COMMENT_CREATED",
+          subjectType: "COMMENT",
+          subjectId: created.id,
+          summary: { discussionId: created.discussionId },
+        });
+        return created;
       });
 
       await invalidateCommentCaches(input.discussionId, comment.id);
@@ -539,8 +552,18 @@ export const commentService = {
       );
     }
 
-    await prisma.comment.delete({
-      where: { id: input.commentId },
+    await prisma.$transaction(async (tx) => {
+      await tx.comment.delete({
+        where: { id: input.commentId },
+      });
+      await recordActivity(tx, {
+        workspaceId: comment.workspaceId,
+        actorUserId: userId,
+        kind: "COMMENT_DELETED",
+        subjectType: "COMMENT",
+        subjectId: comment.id,
+        summary: { discussionId: comment.discussionId },
+      });
     });
 
     await invalidateCommentCaches(comment.discussionId, comment.id);
@@ -620,27 +643,39 @@ export const commentService = {
       );
     }
 
-    const updated = await prisma.comment.update({
-      where: { id: input.commentId },
-      data: {
-        body: input.body,
-      },
-      select: {
-        id: true,
-        discussionId: true,
-        parentCommentId: true,
-        depth: true,
-        body: true,
-        author: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-          },
+    const updated = await prisma.$transaction(async (tx) => {
+      const changed = await tx.comment.update({
+        where: { id: input.commentId },
+        data: {
+          body: input.body,
         },
-        createdAt: true,
-        updatedAt: true,
-      },
+        select: {
+          id: true,
+          discussionId: true,
+          parentCommentId: true,
+          depth: true,
+          body: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+            },
+          },
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+      await recordActivity(tx, {
+        workspaceId: comment.workspaceId,
+        actorUserId: userId,
+        actorLabel: activityActorLabel(changed.author),
+        kind: "COMMENT_UPDATED",
+        subjectType: "COMMENT",
+        subjectId: changed.id,
+        summary: { discussionId: changed.discussionId },
+      });
+      return changed;
     });
 
     await invalidateCommentCaches(comment.discussionId, comment.id);

@@ -16,6 +16,7 @@ import {
   recordDiscussionOperation,
   recordDiscussionPermissionDenied,
 } from "../observability/security-events";
+import { activityActorLabel, recordActivity } from "./activity.service";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 import { requireWorkspaceAction as requireMemberAction } from "./workspace.access";
@@ -124,28 +125,40 @@ export const discussionService = {
     );
 
     try {
-      const discussion = await prisma.discussion.create({
-        data: {
-          workspaceId: input.workspaceId,
-          authorId: userId,
-          title: input.title,
-          body: input.body,
-        },
-        select: {
-          id: true,
-          workspaceId: true,
-          title: true,
-          body: true,
-          author: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-            },
+      const discussion = await prisma.$transaction(async (tx) => {
+        const created = await tx.discussion.create({
+          data: {
+            workspaceId: input.workspaceId,
+            authorId: userId,
+            title: input.title,
+            body: input.body,
           },
-          createdAt: true,
-          updatedAt: true,
-        },
+          select: {
+            id: true,
+            workspaceId: true,
+            title: true,
+            body: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+              },
+            },
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+        await recordActivity(tx, {
+          workspaceId: created.workspaceId,
+          actorUserId: userId,
+          actorLabel: activityActorLabel(created.author),
+          kind: "DISCUSSION_CREATED",
+          subjectType: "DISCUSSION",
+          subjectId: created.id,
+          summary: { title: created.title },
+        });
+        return created;
       });
 
       await invalidateDiscussionCaches(input.workspaceId, discussion.id);
@@ -416,27 +429,38 @@ export const discussionService = {
     }
 
     try {
-      const updated = await prisma.discussion.update({
-        where: { id: input.discussionId },
-        data: {
-          title: input.title,
-          body: input.body,
-        },
-        select: {
-          id: true,
-          workspaceId: true,
-          title: true,
-          body: true,
-          author: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-            },
+      const updated = await prisma.$transaction(async (tx) => {
+        const changed = await tx.discussion.update({
+          where: { id: input.discussionId },
+          data: {
+            title: input.title,
+            body: input.body,
           },
-          createdAt: true,
-          updatedAt: true,
-        },
+          select: {
+            id: true,
+            workspaceId: true,
+            title: true,
+            body: true,
+            author: {
+              select: {
+                id: true,
+                name: true,
+                username: true,
+              },
+            },
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+        await recordActivity(tx, {
+          workspaceId: changed.workspaceId,
+          actorUserId: userId,
+          kind: "DISCUSSION_UPDATED",
+          subjectType: "DISCUSSION",
+          subjectId: changed.id,
+          summary: { title: changed.title },
+        });
+        return changed;
       });
 
       await invalidateDiscussionCaches(updated.workspaceId, updated.id);
@@ -495,6 +519,7 @@ export const discussionService = {
         id: true,
         workspaceId: true,
         authorId: true,
+        title: true,
       },
     });
 
@@ -529,8 +554,18 @@ export const discussionService = {
       );
     }
 
-    await prisma.discussion.delete({
-      where: { id: input.discussionId },
+    await prisma.$transaction(async (tx) => {
+      await tx.discussion.delete({
+        where: { id: input.discussionId },
+      });
+      await recordActivity(tx, {
+        workspaceId: discussion.workspaceId,
+        actorUserId: userId,
+        kind: "DISCUSSION_DELETED",
+        subjectType: "DISCUSSION",
+        subjectId: discussion.id,
+        summary: { title: discussion.title },
+      });
     });
 
     await invalidateDiscussionCaches(discussion.workspaceId, discussion.id);
