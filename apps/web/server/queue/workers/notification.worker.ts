@@ -4,6 +4,7 @@ import {
   NOTIFICATION_QUEUE_NAME,
   type NotificationQueuePayload,
 } from "../notification.queue";
+import { notificationBacklog } from "../notification.backlog";
 import { processNotificationJob } from "../notification.processor";
 
 export const notificationWorker = createWorker<NotificationQueuePayload>(
@@ -12,6 +13,7 @@ export const notificationWorker = createWorker<NotificationQueuePayload>(
 );
 
 notificationWorker.on("completed", (job) => {
+  if (job.id) void notificationBacklog.markSettled(job.id);
   console.info(
     JSON.stringify({
       level: "INFO",
@@ -23,6 +25,8 @@ notificationWorker.on("completed", (job) => {
 });
 
 notificationWorker.on("failed", (job, error) => {
+  // Stop tracking once BullMQ has used every attempt; earlier failures retry.
+  if (job?.id && job.attemptsMade >= (job.opts.attempts ?? 1)) void notificationBacklog.markSettled(job.id);
   captureError(error, { jobId: job?.id, queue: NOTIFICATION_QUEUE_NAME });
   console.error(
     JSON.stringify({
