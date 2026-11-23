@@ -4,12 +4,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
 
 import { useTheme } from "@/components/theme/ThemeProvider";
+import { resultHref } from "@/components/search/SearchPage";
 import { useAuth } from "@/hooks/useAuth";
+import { useSearch } from "@/hooks/useSearch";
 import { useWorkspaceDetail, useWorkspaceSwitcherList } from "@/hooks/useWorkspace";
 import { useUiStore } from "@/stores/ui.store";
 import {
   buildCommands, isMacPlatform, matchCommands, readRecent, recentItems, rememberRecent,
-  type CommandItem,
+  searchResultItems, seeAllResultsItem, type CommandItem, type SearchHit,
 } from "./commandItems";
 
 const storage = () => (typeof window === "undefined" ? undefined : window.localStorage);
@@ -67,10 +69,26 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
       : undefined,
     workspaces: (workspaces.data?.pages.flatMap((page) => page.items) ?? []).map((item) => ({ id: item.workspaceId, name: item.name })),
   }), [workspaceId, workspace.data, workspace.error, workspaces.data]);
-  const items = useMemo(
-    () => (query.trim() ? matchCommands(commands, query) : [...recentItems(recent), ...commands]),
-    [commands, query, recent],
-  );
+  // Live results follow the typing after a 150 ms pause, so a fast typist
+  // sends at most one search request per pause (FR-18).
+  const [searchText, setSearchText] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchText(query.trim()), 150);
+    return () => clearTimeout(timer);
+  }, [query]);
+  const search = useSearch({ query: searchText }, 8);
+  const searchable = searchText.replace(/\s+/g, "").length >= 2;
+  const pageItems = search.data?.pages[0]?.items;
+  const current = searchable && searchText === query.trim();
+  const hits = useMemo<SearchHit[]>(() => (current ? pageItems ?? [] : []), [current, pageItems]);
+  // Typed but not yet sent, or sent and loading: both count as searching.
+  const typedSearchable = query.trim().replace(/\s+/g, "").length >= 2;
+  const searching = typedSearchable && (search.isFetching || searchText !== query.trim());
+  const items = useMemo(() => {
+    if (!query.trim()) return [...recentItems(recent), ...commands];
+    const results = searchResultItems(hits, (hit) => resultHref({ ...hit, snippet: "", status: null, author: "", updatedAt: new Date() }));
+    return [...matchCommands(commands, query), ...results, ...(query.trim().replace(/\s+/g, "").length >= 2 ? [seeAllResultsItem(query)] : [])];
+  }, [commands, query, recent, hits]);
 
   useEffect(() => {
     returnFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -147,7 +165,10 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         })}
         {!items.length ? <li role="presentation" className="px-3 py-6 text-center text-sm text-text-muted">No matching commands.</li> : null}
       </ul>
-      <p className="border-t border-border-subtle px-4 py-2 text-xs text-text-muted">↑ ↓ to move · Enter to open · Esc to close</p>
+      <div className="flex items-center justify-between gap-3 border-t border-border-subtle px-4 py-2 text-xs text-text-muted">
+        <span>↑ ↓ to move · Enter to open · Esc to close</span>
+        <span role="status" aria-live="polite">{searching ? "Searching…" : search.error && searchable ? "Search unavailable" : ""}</span>
+      </div>
     </div>
   </div>;
 }

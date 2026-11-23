@@ -1,6 +1,6 @@
 // Pure helpers for the command palette: building, matching and remembering items.
 
-export type CommandGroup = "Recent" | "Actions" | "Workspaces";
+export type CommandGroup = "Recent" | "Actions" | "Workspaces" | "Decisions" | "Discussions" | "Replies" | "Search";
 
 export type CommandItem = {
   id: string;
@@ -105,3 +105,34 @@ export function recentItems(entries: RecentEntry[]): CommandItem[] {
 export function isMacPlatform(): boolean {
   return typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 }
+
+// Live search results as palette items, grouped by type (FR-18).
+export type SearchHit = {
+  type: "DECISION" | "DISCUSSION" | "COMMENT";
+  id: string;
+  title: string;
+  workspace: { id: string; name: string };
+  discussionId: string | null;
+};
+
+const RESULT_GROUP = { DECISION: "Decisions", DISCUSSION: "Discussions", COMMENT: "Replies" } as const;
+const GROUP_ORDER = ["DECISION", "DISCUSSION", "COMMENT"] as const;
+
+export function searchResultItems(hits: SearchHit[], hrefOf: (hit: SearchHit) => string): CommandItem[] {
+  return GROUP_ORDER.flatMap((type) =>
+    hits.filter((hit) => hit.type === type).map((hit) => ({
+      id: `result-${hit.type}-${hit.id}`,
+      group: RESULT_GROUP[hit.type],
+      label: hit.type === "COMMENT" ? `Reply in ${hit.title}` : hit.title,
+      hint: hit.workspace.name,
+      href: hrefOf(hit),
+    })),
+  );
+}
+
+// The last item while typing: the same query on the full search page (FR-21).
+export function seeAllResultsItem(query: string): CommandItem {
+  const trimmed = query.trim();
+  return { id: "see-all-results", group: "Search", label: `See all results for “${trimmed}”`, href: `/search?q=${encodeURIComponent(trimmed)}` };
+}
+

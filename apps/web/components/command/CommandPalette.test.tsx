@@ -5,11 +5,21 @@ const mocks = vi.hoisted(() => ({
   pathname: "/workspace/c000000000000000000000001/decisions",
   role: "MEMBER" as "OWNER" | "ADMIN" | "MEMBER",
   push: vi.fn(), replace: vi.fn(), setMode: vi.fn(), logout: vi.fn(),
+  searchQueries: [] as string[],
+  searchFetching: false,
+  hits: [] as unknown[],
 }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: mocks.push, replace: mocks.replace }), usePathname: () => mocks.pathname }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: "u1" }, logout: { mutateAsync: mocks.logout } }) }));
 vi.mock("@/components/theme/ThemeProvider", () => ({ useTheme: () => ({ mode: "system", setMode: mocks.setMode }) }));
+vi.mock("@/hooks/useSearch", () => ({
+  useSearch: (filters: { query: string }) => {
+    mocks.searchQueries.push(filters.query);
+    const enabled = filters.query.replace(/\s+/g, "").length >= 2;
+    return { data: enabled ? { pages: [{ items: mocks.hits, nextCursor: null }] } : undefined, isFetching: enabled && mocks.searchFetching, error: null };
+  },
+}));
 vi.mock("@/hooks/useWorkspace", () => ({
   useWorkspaceDetail: () => ({ data: { name: "Platform", viewerRole: mocks.role }, error: null }),
   useWorkspaceSwitcherList: () => ({ data: { pages: [{ items: [
@@ -33,6 +43,7 @@ const options = () => screen.getAllByRole("option").map((option) => option.textC
 describe("CommandPalette", () => {
   beforeEach(() => {
     mocks.pathname = "/workspace/c000000000000000000000001/decisions"; mocks.role = "MEMBER";
+    mocks.searchQueries = []; mocks.searchFetching = false; mocks.hits = [];
     mocks.push.mockReset(); mocks.replace.mockReset(); mocks.setMode.mockReset(); mocks.logout.mockReset().mockResolvedValue({ success: true });
     useUiStore.setState({ isCommandPaletteOpen: false, isShortcutsOpen: false });
     window.localStorage.clear();
@@ -115,9 +126,12 @@ describe("CommandPalette", () => {
   it("says when nothing matches", () => {
     render(<Host />);
     press("k", { ctrlKey: true });
-    fireEvent.change(combobox(), { target: { value: "zzzz" } });
+    fireEvent.change(combobox(), { target: { value: "z" } });
     expect(screen.getByText("No matching commands.")).toBeTruthy();
     expect(combobox().getAttribute("aria-activedescendant")).toBeNull();
+    // Longer queries always offer the full search page.
+    fireEvent.change(combobox(), { target: { value: "zzzz" } });
+    expect(options()).toEqual(["See all results for “zzzz”"]);
   });
 
   it("opens the shortcuts sheet on ? but not while typing", () => {
@@ -160,5 +174,83 @@ describe("command items", () => {
     store.set(RECENT_KEY, JSON.stringify([{ label: "Evil", href: "https://example.com" }]));
     expect(readRecent(storage)).toEqual([]);
     expect(() => rememberRecent({ getItem: () => { throw new Error("blocked"); }, setItem: () => {} }, { label: "x", href: "/x" })).not.toThrow();
+  });
+});
+
+describe("CommandPalette live search", () => {
+  const ws = { id: "c000000000000000000000001", name: "Platform" };
+  beforeEach(() => {
+    mocks.pathname = "/workspace"; mocks.searchQueries = []; mocks.searchFetching = false;
+    mocks.push.mockReset();
+    mocks.hits = [
+      { type: "COMMENT", id: "c3", title: "Pick a queue", workspace: ws, discussionId: "c2" },
+      { type: "DECISION", id: "c1", title: "Use Vercel Queues", workspace: ws, discussionId: null },
+      { type: "DISCUSSION", id: "c2", title: "Pick a queue", workspace: ws, discussionId: "c2" },
+    ];
+    useUiStore.setState({ isCommandPaletteOpen: false, isShortcutsOpen: false });
+    window.localStorage.clear();
+  });
+  afterEach(() => { cleanup(); vi.useRealTimers(); });
+
+  it("searches 150 ms after typing stops and groups results by type", () => {
+    vi.useFakeTimers();
+    render(<Host />);
+    press("k", { ctrlKey: true });
+    fireEvent.change(combobox(), { target: { value: "que" } });
+    fireEvent.change(combobox(), { target: { value: "queue" } });
+    expect(mocks.searchQueries.at(-1)).toBe("");
+    act(() => { vi.advanceTimersByTime(149); });
+    expect(mocks.searchQueries.at(-1)).toBe("");
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(mocks.searchQueries.at(-1)).toBe("queue");
+    expect(mocks.searchQueries).not.toContain("que");
+    expect(options()).toEqual([
+      "Use Vercel QueuesPlatform",
+      "Pick a queuePlatform",
+      "Reply in Pick a queuePlatform",
+      "See all results for “queue”",
+    ]);
+    expect(screen.getByText("Decisions")).toBeTruthy();
+    expect(screen.getByText("Replies")).toBeTruthy();
+  });
+
+  it("keeps matching actions above search results", () => {
+    vi.useFakeTimers();
+    render(<Host />);
+    press("k", { ctrlKey: true });
+    fireEvent.change(combobox(), { target: { value: "new workspace" } });
+    act(() => { vi.advanceTimersByTime(150); });
+    expect(options()[0]).toBe("New workspace");
+    expect(options().at(-1)).toBe("See all results for “new workspace”");
+  });
+
+  it("opens a result and offers the full search page", () => {
+    vi.useFakeTimers();
+    const view = render(<Host />);
+    press("k", { ctrlKey: true });
+    fireEvent.change(combobox(), { target: { value: "queue" } });
+    act(() => { vi.advanceTimersByTime(150); });
+    fireEvent.keyDown(combobox(), { key: "Enter" });
+    expect(mocks.push).toHaveBeenLastCalledWith(`/workspace/${ws.id}/decisions/c1`);
+    view.unmount();
+    render(<Host />);
+    press("k", { ctrlKey: true });
+    fireEvent.change(combobox(), { target: { value: "vercel queues" } });
+    act(() => { vi.advanceTimersByTime(150); });
+    fireEvent.keyDown(combobox(), { key: "End" });
+    fireEvent.keyDown(combobox(), { key: "Enter" });
+    expect(mocks.push).toHaveBeenLastCalledWith("/search?q=vercel%20queues");
+  });
+
+  it("announces while searching and hides stale results", () => {
+    vi.useFakeTimers();
+    mocks.searchFetching = true;
+    render(<Host />);
+    press("k", { ctrlKey: true });
+    fireEvent.change(combobox(), { target: { value: "queue" } });
+    expect(screen.getByRole("status").textContent).toBe("Searching…");
+    expect(options().some((label) => label?.includes("Vercel"))).toBe(false);
+    act(() => { vi.advanceTimersByTime(150); });
+    expect(screen.getByRole("status").textContent).toBe("Searching…");
   });
 });
