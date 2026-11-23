@@ -22,6 +22,7 @@ function currentWorkspaceId(pathname: string) {
 
 function pageContext(pathname: string) {
   if (pathname === "/workspace") return "Workspaces";
+  if (pathname.startsWith("/search")) return "Search";
   if (pathname.includes("/members")) return "Members";
   if (pathname.includes("/discussions")) return "Discussions";
   return "Overview";
