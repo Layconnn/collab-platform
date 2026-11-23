@@ -10,6 +10,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Search,
   Users,
   X,
   type LucideIcon,
@@ -28,7 +29,8 @@ export type AppIconName =
   | "panel"
   | "panel-open"
   | "chevron"
-  | "logout";
+  | "logout"
+  | "search";
 
 const icons: Record<AppIconName, LucideIcon> = {
   home: House,
@@ -44,6 +46,7 @@ const icons: Record<AppIconName, LucideIcon> = {
   "panel-open": PanelLeftOpen,
   chevron: ChevronDown,
   logout: LogOut,
+  search: Search,
 };
 
 export function AppIcon({ name, className = "size-4" }: { name: AppIconName; className?: string }) {

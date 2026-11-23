@@ -79,6 +79,13 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect(page.getByRole("heading", { level: 3, name: question })).toBeVisible();
   });
 
+  await test.step("find it with search", async () => {
+    await page.goto(`/search?q=${id}`);
+    const results = page.getByRole("region", { name: "Search results" });
+    await expect(results.getByRole("link", { name: question })).toBeVisible();
+    await expect(results.getByRole("link", { name: discussionTitle })).toBeVisible();
+  });
+
   await test.step("sign out", async () => {
     await page.getByLabel(/^Account menu for /).click();
     await page.getByRole("button", { name: "Sign out" }).click();
