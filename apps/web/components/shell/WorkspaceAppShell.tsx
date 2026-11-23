@@ -8,6 +8,8 @@ import { useEffect, useRef } from "react";
 import { AccountMenu } from "@/components/shell/AccountMenu";
 import { AppIcon } from "@/components/common/AppIcon";
 import { WorkspaceSwitcher } from "@/components/shell/WorkspaceSwitcher";
+import { CommandPalette, ShortcutsSheet, useCommandShortcuts } from "@/components/command/CommandPalette";
+import { isMacPlatform } from "@/components/command/commandItems";
 import { NotificationDropdown } from "@/components/notification/NotificationDropdown";
 import { WorkspaceNavigation } from "@/components/workspace/WorkspaceNavigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -129,6 +131,8 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
   const mobileNavOpen = useUiStore((state) => state.isMobileNavOpen);
   const setMobileNavOpen = useUiStore((state) => state.setMobileNavOpen);
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
+  const setCommandPaletteOpen = useUiStore((state) => state.setCommandPaletteOpen);
+  useCommandShortcuts();
   const mobileCloseRef = useRef<HTMLButtonElement>(null);
   const mobilePanelRef = useRef<HTMLElement>(null);
   const previousPathname = useRef(pathname);
@@ -252,6 +256,17 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
             {visibleWorkspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span><span aria-current="page" className="text-text-secondary">{context}</span></> : null}
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCommandPaletteOpen(true)}
+              aria-keyshortcuts="Control+K Meta+K"
+              className="flex min-h-9 items-center gap-2 rounded-sm border border-border-subtle px-2.5 text-xs text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"
+            >
+              <AppIcon name="search" />
+              <span className="hidden sm:inline">Search or jump to…</span>
+              <span className="sr-only sm:hidden">Open command palette</span>
+              <kbd suppressHydrationWarning className="hidden rounded-[3px] border border-border-subtle px-1 font-mono text-[11px] sm:inline">{isMacPlatform() ? "⌘K" : "Ctrl K"}</kbd>
+            </button>
             <NotificationDropdown compact />
           </div>
         </header>
@@ -259,6 +274,8 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
         <main id="main-content" className="mx-auto w-full min-w-0 max-w-none wrap-anywhere px-4 py-6 sm:px-6 lg:px-8">
           {children}
         </main>
+        <CommandPalette />
+        <ShortcutsSheet />
       </div>
 
       {mobileNavOpen ? (
