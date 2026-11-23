@@ -1,0 +1,33 @@
+name: Notification delivery health
+
+# Fails when production notifications wait too long in the queue (or the check
+# cannot reach Redis). GitHub emails the repository owner about failed
+# scheduled runs, which is the alert. Schedules run from the default branch.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check notification backlog
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read /api/health/notifications
+        env:
+          HEALTH_URL: https://collab-platform-web.vercel.app/api/health/notifications
+        run: |
+          # Retry transient network errors; a 503 is an answer, not a network error.
+          code=$(curl -sS -o body.json -w '%{http_code}' --retry 3 --retry-delay 10 --max-time 30 "$HEALTH_URL" || echo "000")
+          echo "HTTP $code"
+          cat body.json 2>/dev/null || true
+          echo
+          if [ "$code" != "200" ]; then
+            echo "::error::Notification delivery is delayed or unchecked (HTTP $code). See docs/how-to-do-devops.md."
+            exit 1
+          fi

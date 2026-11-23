@@ -52,6 +52,13 @@ test("a new user registers, records a decision from a discussion and signs out",
     await composer.getByLabel("Context").fill("We need transactions and constraints for decision records.");
     await composer.getByRole("button", { name: "Publish discussion" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Discussion published." })).toBeVisible();
+    // Publishing queued a notification job; no worker runs here, so it is still
+    // pending, and the health check counts it without reporting a delay.
+    const health = await page.request.get("/api/health/notifications");
+    expect(health.status()).toBe(200);
+    const backlog = await health.json();
+    expect(backlog.status).toBe("ok");
+    expect(backlog.pending).toBeGreaterThanOrEqual(1);
     await page.getByRole("link", { name: `Open ${discussionTitle}` }).click();
     await expect(page.getByRole("heading", { level: 1, name: discussionTitle })).toBeVisible();
   });

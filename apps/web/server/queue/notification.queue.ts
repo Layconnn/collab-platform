@@ -4,6 +4,7 @@ import type { NotificationType } from "../../app/generated/prisma/client";
 import type { NotificationEvent } from "../services/notification.service";
 
 import { env } from "../env";
+import { notificationBacklog } from "./notification.backlog";
 
 export const NOTIFICATION_QUEUE_NAME = "notification-delivery";
 
@@ -35,8 +36,9 @@ export function resolveNotificationQueueDriver(): NotificationQueueDriver {
 export type NotificationJobName = "deliver" | "fanout";
 export type NotificationQueuePayload = NotificationJobData | NotificationEvent;
 
-// What a Vercel Queue message carries; BullMQ keeps the name on the job itself.
-export type NotificationQueueMessage = { name: NotificationJobName; payload: NotificationQueuePayload };
+// What a Vercel Queue message carries; BullMQ keeps the name and id on the job.
+// jobId is absent on messages published before backlog tracking existed.
+export type NotificationQueueMessage = { name: NotificationJobName; payload: NotificationQueuePayload; jobId?: string };
 
 let bullQueue: Queue<NotificationQueuePayload> | null = null;
 
@@ -54,13 +56,15 @@ export const notificationQueue = {
     if (resolveNotificationQueueDriver() === "vercel") {
       const { send } = await import("@vercel/queue");
       // The same job id makes a repeated enqueue deliver only once.
-      const message: NotificationQueueMessage = { name, payload };
+      const message: NotificationQueueMessage = { name, payload, jobId: options.jobId };
       await send(NOTIFICATION_QUEUE_NAME, message, { idempotencyKey: options.jobId });
+      await notificationBacklog.markPublished(options.jobId);
       return;
     }
 
     const queue = await getBullQueue();
     await queue.add(name, payload, options);
+    await notificationBacklog.markPublished(options.jobId);
   },
 
   async close(): Promise<void> {
