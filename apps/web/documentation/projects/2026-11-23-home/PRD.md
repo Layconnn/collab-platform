@@ -1,6 +1,6 @@
 # PRD: The new Home
 
-Status: draft for approval · Horizon 1 · Issue #85
+Status: approved 2026-11-23 · Horizon 1 · Issue #85
 
 ## Problem
 
@@ -122,10 +122,10 @@ Every query joins `WorkspaceMember` on the user in the same statement. Possible 
 
 ## Risks and open questions
 
-- **Events start at the release of #78.** Pulse and "Decided this week" are empty for older activity. Accept: data accumulates from 2026-11-23. (Open question: backfill decisions from `DecisionRevision`, which does hold history?)
+- **Events start at the release of #78.** Pulse and "Decided this week" are empty for older activity. Decided: no backfill; data accumulates from 2026-11-23.
 - **Notification types are coarse.** "Replies in discussions you started" relies on COMMENT_CREATED notifications going to the discussion author, as the fan-out does today.
-- **Urgency order is a first guess.** Revisit after the test team uses it.
-- **Renaming "Workspaces" to "Home"** changes a label people know. The breadcrumb and the palette keep "All workspaces".
+- **Urgency order is a first guess.** Decided: keep FR-2's order; revisit after the test team uses it.
+- **Renaming "Workspaces" to "Home"** changes a label people know. Decided: rename; the breadcrumb and the palette keep "All workspaces".
 
 ## Delivery plan
 
