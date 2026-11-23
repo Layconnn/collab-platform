@@ -15,6 +15,7 @@ import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { DiscussionRow } from "@/components/discussion/DiscussionRow";
 import { useDiscussionList } from "@/hooks/useDiscussion";
+import { RecentActivity } from "@/components/activity/RecentActivity";
 import { useWorkspaceDetail } from "@/hooks/useWorkspace";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 import { resolveUserIdentity } from "@/lib/user-identity";
@@ -226,6 +227,7 @@ export function WorkspaceHome({ workspaceId }: { workspaceId: string }) {
       </header>
 
       <div className="grid min-w-0 items-start gap-9 xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-12">
+        <div className="min-w-0 space-y-12">
         <section
           aria-labelledby="recent-discussions-heading"
           className="min-w-0"
@@ -348,6 +350,8 @@ export function WorkspaceHome({ workspaceId }: { workspaceId: string }) {
             </Link>
           ) : null}
         </section>
+          <RecentActivity workspaceId={workspaceId} />
+        </div>
 
         <aside className="min-w-0 space-y-8" aria-label="Workspace context">
           {canViewMembers ? (
