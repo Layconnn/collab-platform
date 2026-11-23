@@ -5,6 +5,7 @@ import type {
   NotificationJobData,
   NotificationQueueMessage,
 } from "../../../../server/queue/notification.queue";
+import { notificationBacklog } from "../../../../server/queue/notification.backlog";
 import { captureError, initSentry } from "../../../../server/observability/sentry";
 
 initSentry();
@@ -15,13 +16,31 @@ const MAX_DELIVERIES = 6;
 // vercel.json. Only Vercel's queue infrastructure can invoke it. Returning
 // acknowledges the message; throwing schedules a retry with backoff.
 const handleNotificationMessage = handleCallback<NotificationQueueMessage | NotificationJobData>(
-  async (message) => {
-    // Messages published before the fan-out change carry a bare delivery payload.
-    if ("name" in message && "payload" in message) {
-      await processNotificationJob(message.name, message.payload);
-      return;
+  async (message, metadata) => {
+    const jobId = "jobId" in message ? message.jobId : undefined;
+    try {
+      // Messages published before the fan-out change carry a bare delivery payload.
+      if ("name" in message && "payload" in message) {
+        await processNotificationJob(message.name, message.payload);
+      } else {
+        await processNotificationJob("deliver", message);
+      }
+    } catch (error) {
+      // The retry handler below acknowledges the final attempt; stop tracking it then.
+      if (jobId && metadata.deliveryCount >= MAX_DELIVERIES) await notificationBacklog.markSettled(jobId);
+      throw error;
     }
-    await processNotificationJob("deliver", message);
+    if (jobId) await notificationBacklog.markSettled(jobId);
+    console.info(
+      JSON.stringify({
+        level: "INFO",
+        event: "notification.queue.delivered",
+        messageId: metadata.messageId,
+        deliveryCount: metadata.deliveryCount,
+        waitedMs: Date.now() - new Date(metadata.createdAt).getTime(),
+        timestamp: new Date().toISOString(),
+      }),
+    );
   },
   {
     retry: (error, metadata) => {

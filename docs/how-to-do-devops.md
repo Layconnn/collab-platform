@@ -32,6 +32,15 @@ Linking writes `apps/web/.vercel/` and `apps/web/.env.local` (an expiring OIDC t
 | `security.alert.threshold_exceeded` | Repeated auth failures, permission denials or rate-limit hits for one user or route. |
 | `security.metrics.failure` | Redis was unreachable for metrics; requests still succeed. |
 
+## Notification delivery alert
+
+Vercel Queues has no queue-depth API, so Commons tracks its own backlog (`server/queue/notification.backlog.ts`): every published notification job is added to the Redis sorted set `notifications:pending` with its publish time, and removed when it is delivered or given up on after the last attempt.
+
+- `GET /api/health/notifications` returns `{ status, pending, oldestPendingSeconds }`: 200 with `ok`, or 503 when the oldest job has waited more than 5 minutes (`delayed`) or Redis cannot be read (`unknown`). It carries no user data.
+- `.github/workflows/notification-health.yml` calls it every 15 minutes. A failed run is the alert: GitHub emails the owner about failed scheduled runs. Run it by hand from the Actions tab to check on demand.
+- Each delivery logs `notification.queue.delivered` with `waitedMs`, the time between publish and delivery.
+- When it fires: check the consumer's function logs on Vercel for `notification.queue.delivery_failed`, then the Vercel Queues dashboard for the `notification-delivery` topic. Entries older than 24 hours are dropped from the set, so a lost message stops alerting after a day.
+
 ## Production database migrations
 
 Migrations reach production through `.github/workflows/migrate-production.yml`, never from a laptop.
