@@ -16,6 +16,10 @@ vi.mock("@/hooks/useWorkspace", () => ({
 vi.mock("@/hooks/useDiscussion", () => ({
   useDiscussionList: () => mocks.discussions,
 }));
+// The activity panel has its own tests; here it only needs an empty feed.
+vi.mock("@/hooks/useActivity", () => ({
+  useWorkspaceActivity: () => ({ data: { pages: [{ items: [], nextCursor: null }] }, error: null, isLoading: false, isFetching: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() }),
+}));
 vi.mock("@/hooks/useWorkspaceMembers", () => ({
   useWorkspaceMembers: (_workspaceId: string, enabled: boolean) => {
     mocks.memberEnabled(enabled);

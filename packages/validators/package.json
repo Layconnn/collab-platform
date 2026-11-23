@@ -9,7 +9,8 @@
     "./decision": "./src/decision.ts",
     "./comment": "./src/comment.ts",
     "./notification": "./src/notification.ts",
-    "./auth": "./src/auth.ts"
+    "./auth": "./src/auth.ts",
+    "./activity": "./src/activity.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

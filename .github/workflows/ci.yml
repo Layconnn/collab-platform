@@ -121,6 +121,8 @@ jobs:
         run: pnpm -C apps/web run test:decision-db
       - name: Decision API (real database, includes a multi-process race)
         run: pnpm -C apps/web run test:decision-api
+      - name: Activity API (real database)
+        run: pnpm -C apps/web run test:activity-api
 
   frontend-tests:
     name: Frontend tests
