@@ -1,6 +1,6 @@
 # PRD: Event log, universal search and Cmd-K
 
-Status: draft for approval · Horizon 1 · Issue #70
+Status: approved 2026-11-23 · Horizon 1 · Issue #70
 
 ## Problem
 
@@ -136,10 +136,10 @@ Indexes: `(workspaceId, createdAt desc, id)` for the feed, `(subjectType, subjec
 ## Risks and open questions
 
 - **Migration size:** generated columns rewrite the three tables once. At today's data size this takes seconds; the production migration runs through the approval-gated workflow.
-- **`simple` versus `english` configuration:** `simple` will not match "decide" to "decided". Accept for v1 and add a stemmed column later if users miss matches (open question).
-- **Hard-deleted discussions and comments:** their events keep the title snapshot but lose the link (FR-6). Should deleting a discussion also hide its title from the activity feed for privacy? Proposed: keep the title, since all members could already read it (open question).
+- **`simple` versus `english` configuration:** `simple` will not match "decide" to "decided". Decided: `simple` for v1; add a stemmed column later if users miss matches.
+- **Hard-deleted discussions and comments:** their events keep the title snapshot but lose the link (FR-6). Should deleting a discussion also hide its title from the activity feed for privacy? Decided: keep the title, since all members could already read it.
 - **Recent items per browser:** kept in local storage, so they do not follow the user across devices. A server-side "recently viewed" comes with the Home project.
-- **Ranking quality:** weights are a first guess; the search page logs anonymous result-position clicks (no query text) so ranking can be tuned (open question whether to add this in v1).
+- **Ranking quality:** weights are a first guess; anonymous result-position clicks (no query text) could tune ranking. Decided: not in v1; revisit after the test team uses search.
 
 ## Delivery plan
 
