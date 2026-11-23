@@ -18,6 +18,7 @@ export const homeRouter = createTRPCRouter({
     execute(() => homeService.needsYou(ctx.user.id, input)),
   ),
   pulse: limited("home.pulse", 120).query(({ ctx }) => execute(() => homeService.pulse(ctx.user.id))),
+  recentDecisions: limited("home.recentDecisions", 120).query(({ ctx }) => execute(() => homeService.recentDecisions(ctx.user.id))),
   dismiss: limited("home.dismiss", 120).input(dismissNeedsInputSchema).mutation(({ ctx, input }) =>
     execute(() => homeService.dismiss(ctx.user.id, input)),
   ),
