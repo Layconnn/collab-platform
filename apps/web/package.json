@@ -20,6 +20,7 @@
     "test:decision-db": "node --test server/db/decision.schema.integration.test.mjs",
     "test:decision-api": "node --test server/api/decision.integration.test.mjs",
     "test:activity-api": "node --test server/api/activity.integration.test.mjs",
+    "test:search-api": "node --test server/services/search.query.test.mjs server/api/search.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },

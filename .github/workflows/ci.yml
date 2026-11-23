@@ -123,6 +123,8 @@ jobs:
         run: pnpm -C apps/web run test:decision-api
       - name: Activity API (real database)
         run: pnpm -C apps/web run test:activity-api
+      - name: Search query parsing and search API (real database)
+        run: pnpm -C apps/web run test:search-api
 
   frontend-tests:
     name: Frontend tests
