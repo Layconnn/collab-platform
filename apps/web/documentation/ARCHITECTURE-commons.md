@@ -28,6 +28,7 @@ flowchart TB
     SVC["Services<br/>workspace · discussion · comment · decision · notification"]
     PERM["Permission matrix<br/>workspace.permissions.ts"]
     CONS["/api/queues/notifications<br/>queue consumer"]
+    HEALTH["/api/health/notifications<br/>backlog: pending, oldest age"]
   end
 
   RD[("Redis · Upstash<br/>sessions · rate limits · cache · security metrics")]
@@ -36,6 +37,7 @@ flowchart TB
   SEN["Sentry (optional)"]
   CI["GitHub Actions CI<br/>lint · types · schema drift · tests · build · audit"]
   MIG["GitHub Actions: migrate production<br/>approval required"]
+  NH["GitHub Actions: notification health<br/>every 15 min, fails if delayed"]
 
   UI -->|"HTTPS, cookies"| TRPC --> MW --> SVC
   SVC --> PERM
@@ -48,6 +50,10 @@ flowchart TB
   CONS -.->|"failed deliveries"| SEN
   CI -.->|"checks every pull request"| Vercel
   MIG -.->|"prisma migrate deploy"| PG
+  SVC -.->|"mark job pending"| RD
+  CONS -.->|"mark job settled"| RD
+  HEALTH --> RD
+  NH -.->|"GET every 15 min"| HEALTH
 ```
 
 Locally, BullMQ on Redis replaces Vercel Queues and the notification worker runs inside the dev server (`RUN_WORKER_IN_API=1`); see [Notification delivery](../../../docs/DEVELOPMENT.md#notification-delivery).
