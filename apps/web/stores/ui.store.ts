@@ -7,6 +7,10 @@ type UiState = {
   isMobileNavOpen: boolean;
   toggleMobileNav: () => void;
   setMobileNavOpen: (value: boolean) => void;
+  isCommandPaletteOpen: boolean;
+  setCommandPaletteOpen: (value: boolean) => void;
+  isShortcutsOpen: boolean;
+  setShortcutsOpen: (value: boolean) => void;
 };
 
 export const useUiStore = create<UiState>((set) => ({
@@ -16,4 +20,8 @@ export const useUiStore = create<UiState>((set) => ({
   isMobileNavOpen: false,
   toggleMobileNav: () => set((state) => ({ isMobileNavOpen: !state.isMobileNavOpen })),
   setMobileNavOpen: (value) => set({ isMobileNavOpen: value }),
+  isCommandPaletteOpen: false,
+  setCommandPaletteOpen: (value) => set({ isCommandPaletteOpen: value }),
+  isShortcutsOpen: false,
+  setShortcutsOpen: (value) => set({ isShortcutsOpen: value }),
 }));

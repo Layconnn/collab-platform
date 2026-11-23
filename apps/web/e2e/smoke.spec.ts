@@ -79,6 +79,16 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect(page.getByRole("heading", { level: 3, name: question })).toBeVisible();
   });
 
+  await test.step("jump with the command palette", async () => {
+    await page.keyboard.press("Control+K");
+    const palette = page.getByRole("dialog", { name: "Command palette" });
+    await expect(palette).toBeVisible();
+    await palette.getByRole("combobox").fill("open discussions");
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/\/discussions$/);
+    await expect(palette).toBeHidden();
+  });
+
   await test.step("find it with search", async () => {
     await page.goto(`/search?q=${id}`);
     const results = page.getByRole("region", { name: "Search results" });
