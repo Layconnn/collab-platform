@@ -168,3 +168,67 @@ test("ranking puts urgent proposals between mentions and replies", () => {
   ], now).map((i) => i.id);
   assert.deepEqual(order, ["mention", "oldest", "older", "reply-new", "reply-old", "fresh", "own"]);
 });
+
+// ---------------------------------------------------------------------------
+// Workspace pulse
+// ---------------------------------------------------------------------------
+
+const HOUR = 60 * 60 * 1000;
+const event = (ws, actor, kind, msAgo) => prisma.activityEvent.create({ data: {
+  workspaceId: ws.id, actorUserId: actor?.id ?? null, actorLabel: actor?.name ?? "Gone", kind,
+  subjectType: kind.startsWith("DECISION") ? "DECISION" : kind.startsWith("COMMENT") ? "COMMENT" : "DISCUSSION",
+  subjectId: `c${suffix().slice(0, 24)}`, createdAt: new Date(Date.now() - msAgo),
+} });
+
+test("pulse counts the last seven days per workspace, by kind and by day", async () => {
+  const [maya, sam, lee] = await Promise.all([user("Maya"), user("Sam"), user("Lee")]);
+  const ws = await workspace(maya, [[sam, "MEMBER"], [lee, "ADMIN"]]);
+  await event(ws, sam, "DISCUSSION_CREATED", 1 * HOUR);
+  await event(ws, lee, "COMMENT_CREATED", 2 * HOUR);
+  await event(ws, sam, "COMMENT_CREATED", 30 * HOUR);
+  await event(ws, maya, "DECISION_FINALIZED", 30 * HOUR + 5);
+  await event(ws, maya, "DECISION_PROPOSED", 6 * DAY + 12 * HOUR);
+  await event(ws, sam, "DISCUSSION_CREATED", 8 * DAY); // outside the window
+  await proposal(ws, sam, "Open one");
+  await proposal(ws, sam, "Open two");
+  await proposal(ws, sam, "Decided", new Date(), { status: "DECIDED" });
+  await proposal(ws, sam, "Deleted", new Date(), { deletedAt: new Date() });
+
+  const { workspaces } = await caller(maya.id).pulse();
+  const pulse = workspaces.find((w) => w.id === ws.id);
+  assert.equal(pulse.role, "OWNER");
+  assert.deepEqual(
+    [pulse.discussionsStarted, pulse.replies, pulse.decisionsFinalized, pulse.activePeople, pulse.openProposals],
+    [1, 2, 1, 3, 2],
+  );
+  assert.deepEqual(pulse.daily, [1, 0, 0, 0, 0, 2, 2]);
+  assert.ok(Date.now() - new Date(pulse.lastActivityAt).getTime() < 1 * HOUR + 60_000);
+});
+
+test("pulse orders workspaces by recent activity and shows quiet ones last with zeros", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const busy = await workspace(sam, [[maya, "MEMBER"]]);
+  const older = await workspace(sam, [[maya, "ADMIN"]]);
+  const quiet = await workspace(sam, [[maya, "MEMBER"]]);
+  const elsewhere = await workspace(sam, []);
+  await event(older, sam, "COMMENT_CREATED", 3 * DAY);
+  await event(busy, sam, "COMMENT_CREATED", 1 * HOUR);
+  await event(elsewhere, sam, "COMMENT_CREATED", 10);
+  const { workspaces } = await caller(maya.id).pulse();
+  assert.deepEqual(workspaces.map((w) => w.id), [busy.id, older.id, quiet.id]);
+  const silent = workspaces[2];
+  assert.equal(silent.lastActivityAt, null);
+  assert.deepEqual(silent.daily, [0, 0, 0, 0, 0, 0, 0]);
+  assert.equal(silent.activePeople, 0);
+  assert.equal(workspaces[1].role, "ADMIN");
+});
+
+test("pulse keeps an old last activity even when the week was quiet", async () => {
+  const [maya] = await Promise.all([user("Maya")]);
+  const ws = await workspace(maya, []);
+  await event(ws, maya, "COMMENT_CREATED", 20 * DAY);
+  const [pulse] = (await caller(maya.id).pulse()).workspaces;
+  assert.equal(pulse.replies, 0);
+  assert.ok(pulse.lastActivityAt, "last activity is reported");
+  assert.ok(Date.now() - new Date(pulse.lastActivityAt).getTime() > 19 * DAY);
+});
