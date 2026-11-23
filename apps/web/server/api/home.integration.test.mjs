@@ -1,0 +1,170 @@
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+import test, { after } from "node:test";
+
+import createJiti from "jiti";
+
+// "Needs you" against a real database: providers, ordering, permissions,
+// membership changes and dismissal scope.
+const databaseUrl = process.env.DECISION_TEST_DATABASE_URL;
+if (!databaseUrl || !new URL(databaseUrl).pathname.endsWith("_decision_test")) {
+  throw new Error("Set DECISION_TEST_DATABASE_URL to an isolated database ending in _decision_test.");
+}
+process.env.NODE_ENV = "test";
+process.env.DATABASE_URL = databaseUrl;
+process.env.REDIS_URL ??= "redis://localhost:6379";
+process.env.JWT_SECRET ??= "test-jwt-secret-123456789";
+
+const jiti = createJiti(import.meta.url, { nativeModules: ["@prisma/client"] });
+const { homeRouter } = jiti("./routers/home.router.ts");
+const { rankNeeds } = jiti("../services/home.service.ts");
+const { prisma } = jiti("../db/prisma.ts");
+const { redis } = jiti("../cache/redis.ts");
+redis.incr = async () => 1;
+redis.expire = async () => 1;
+
+const suffix = () => randomUUID().replaceAll("-", "");
+const createdUserIds = [];
+const DAY = 24 * 60 * 60 * 1000;
+
+function caller(userId) {
+  return homeRouter.createCaller({
+    user: { id: userId }, requestId: `home-test-${suffix()}`, headers: new Headers(),
+    requestMethod: "POST", ip: null, responseHeaders: new Headers(),
+  });
+}
+
+async function user(name) {
+  const unique = suffix();
+  const created = await prisma.user.create({ data: { email: `${unique}@example.test`, username: `home_${unique}`, name } });
+  createdUserIds.push(created.id);
+  return created;
+}
+
+async function workspace(owner, members) {
+  const ws = await prisma.workspace.create({ data: { name: `WS ${suffix().slice(0, 6)}`, slug: `home-${suffix()}`, ownerId: owner.id } });
+  await prisma.workspaceMember.createMany({ data: [
+    { workspaceId: ws.id, userId: owner.id, role: "OWNER" },
+    ...members.map(([member, role]) => ({ workspaceId: ws.id, userId: member.id, role })),
+  ] });
+  return ws;
+}
+
+const discussion = (ws, author, title) => prisma.discussion.create({ data: { workspaceId: ws.id, authorId: author.id, title, body: "Body" } });
+const notify = (recipient, actor, ws, d, type, createdAt = new Date()) => prisma.notification.create({ data: {
+  recipientUserId: recipient.id, actorUserId: actor.id, workspaceId: ws.id, discussionId: d.id, type,
+  message: type, dedupeKey: suffix(), createdAt,
+} });
+const proposal = (ws, author, question, createdAt = new Date(), extra = {}) => prisma.decision.create({ data: {
+  workspaceId: ws.id, createdById: author.id, createdByLabel: author.name, question, sourceDiscussionTitle: "Source",
+  idempotencyKey: suffix(), createdAt, ...extra,
+} });
+
+after(async () => {
+  await prisma.workspace.deleteMany({ where: { ownerId: { in: createdUserIds } } });
+  for (const id of createdUserIds.reverse()) await prisma.user.deleteMany({ where: { id } });
+  await prisma.$disconnect();
+  redis.disconnect();
+});
+
+test("lists mentions, replies to own discussions, waiting proposals and own proposals in urgency order", async () => {
+  const [maya, sam, lee] = await Promise.all([user("Maya"), user("Sam"), user("Lee")]);
+  const ws = await workspace(lee, [[maya, "ADMIN"], [sam, "MEMBER"]]);
+  const mine = await discussion(ws, maya, "Which queue?");
+  const theirs = await discussion(ws, sam, "Pricing");
+  await notify(maya, sam, ws, theirs, "MENTION");
+  await notify(maya, sam, ws, mine, "COMMENT_CREATED", new Date(Date.now() - 1000));
+  await notify(maya, sam, ws, theirs, "COMMENT_CREATED"); // a reply in someone else's discussion
+  await notify(maya, sam, ws, theirs, "DISCUSSION_CREATED"); // not something Home shows
+  const old = await proposal(ws, sam, "Old proposal", new Date(Date.now() - 3 * DAY));
+  const fresh = await proposal(ws, sam, "Fresh proposal");
+  const own = await proposal(ws, maya, "My proposal");
+  await proposal(ws, sam, "Already decided", new Date(), { status: "DECIDED" });
+  await proposal(ws, sam, "Deleted proposal", new Date(), { deletedAt: new Date() });
+
+  const { items, total } = await caller(maya.id).needsYou({});
+  assert.deepEqual(items.map((i) => [i.kind, i.title]), [
+    ["MENTION", "Pricing"],
+    ["PROPOSAL_WAITING", "Old proposal"],
+    ["REPLY", "Which queue?"],
+    ["PROPOSAL_WAITING", "Fresh proposal"],
+    ["OWN_PROPOSAL", "My proposal"],
+  ]);
+  assert.equal(total, 5);
+  assert.equal(items[0].actor, "Sam");
+  assert.deepEqual(items[0].workspace, { id: ws.id, name: ws.name });
+  assert.equal(items[1].decisionId, old.id);
+  assert.equal(items[3].decisionId, fresh.id);
+  assert.equal(items[4].decisionId, own.id);
+  assert.ok(items[0].notificationId && items[2].notificationId);
+  assert.equal(items[1].notificationId, null);
+});
+
+test("only owners and admins see proposals waiting for a decision", async () => {
+  const [owner, member, author] = await Promise.all([user("Owner"), user("Member"), user("Author")]);
+  const ws = await workspace(owner, [[member, "MEMBER"], [author, "MEMBER"]]);
+  await proposal(ws, author, "Needs a decision");
+  assert.deepEqual((await caller(owner.id).needsYou({})).items.map((i) => i.kind), ["PROPOSAL_WAITING"]);
+  assert.deepEqual((await caller(member.id).needsYou({})).items, []);
+  assert.deepEqual((await caller(author.id).needsYou({})).items.map((i) => i.kind), ["OWN_PROPOSAL"]);
+});
+
+test("items disappear when the user leaves a workspace and never come from other workspaces", async () => {
+  const [maya, sam, outsider] = await Promise.all([user("Maya"), user("Sam"), user("Outsider")]);
+  const ws = await workspace(sam, [[maya, "ADMIN"]]);
+  const other = await workspace(outsider, []);
+  const d = await discussion(ws, sam, "Shared");
+  await notify(maya, sam, ws, d, "MENTION");
+  await proposal(ws, sam, "Pending");
+  await proposal(other, outsider, "Not yours");
+  assert.equal((await caller(maya.id).needsYou({})).total, 2);
+  assert.equal((await caller(outsider.id).needsYou({})).items.some((i) => i.workspace.id === ws.id), false);
+  await prisma.workspaceMember.delete({ where: { workspaceId_userId: { workspaceId: ws.id, userId: maya.id } } });
+  assert.deepEqual(await caller(maya.id).needsYou({}), { items: [], total: 0 });
+});
+
+test("dismissing marks only the user's own mention and reply notifications done", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(sam, [[maya, "MEMBER"]]);
+  const mine = await discussion(ws, maya, "Mine");
+  const theirs = await discussion(ws, sam, "Theirs");
+  const mention = await notify(maya, sam, ws, theirs, "MENTION");
+  const reply = await notify(maya, sam, ws, mine, "COMMENT_CREATED");
+  const created = await notify(maya, sam, ws, theirs, "DISCUSSION_CREATED");
+  const otherReply = await notify(maya, sam, ws, theirs, "COMMENT_CREATED");
+  const samsMention = await notify(sam, maya, ws, theirs, "MENTION");
+
+  assert.deepEqual(await caller(maya.id).dismiss({ notificationIds: [mention.id, created.id, samsMention.id] }), { dismissed: 1 });
+  assert.deepEqual((await caller(maya.id).needsYou({})).items.map((i) => i.kind), ["REPLY"]);
+  assert.deepEqual(await caller(maya.id).dismissAll(), { dismissed: 1 });
+  assert.deepEqual((await caller(maya.id).needsYou({})).items, []);
+
+  const readAt = async (n) => (await prisma.notification.findUniqueOrThrow({ where: { id: n.id } })).readAt;
+  assert.ok(await readAt(reply));
+  assert.equal(await readAt(created), null, "other notification kinds are untouched");
+  assert.equal(await readAt(otherReply), null, "replies in other people's discussions are untouched");
+  assert.equal(await readAt(samsMention), null, "other users' notifications are untouched");
+});
+
+test("Home shows 20 items with the total, and all on request", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(sam, [[maya, "MEMBER"]]);
+  const d = await discussion(ws, sam, "Busy");
+  for (let i = 0; i < 23; i++) await notify(maya, sam, ws, d, "MENTION", new Date(Date.now() - i * 1000));
+  const page = await caller(maya.id).needsYou({});
+  assert.equal(page.items.length, 20);
+  assert.equal(page.total, 23);
+  assert.equal((await caller(maya.id).needsYou({ all: true })).items.length, 23);
+});
+
+test("ranking puts urgent proposals between mentions and replies", () => {
+  const now = new Date("2026-11-23T12:00:00Z");
+  const at = (msAgo) => new Date(now.getTime() - msAgo);
+  const item = (kind, msAgo, id) => ({ id, kind, at: at(msAgo) });
+  const order = rankNeeds([
+    item("OWN_PROPOSAL", 5 * DAY, "own"), item("REPLY", 10, "reply-new"), item("REPLY", 1000, "reply-old"),
+    item("PROPOSAL_WAITING", DAY, "fresh"), item("PROPOSAL_WAITING", 4 * DAY, "oldest"), item("PROPOSAL_WAITING", 3 * DAY, "older"),
+    item("MENTION", 50, "mention"),
+  ], now).map((i) => i.id);
+  assert.deepEqual(order, ["mention", "oldest", "older", "reply-new", "reply-old", "fresh", "own"]);
+});

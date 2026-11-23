@@ -11,7 +11,8 @@
     "./notification": "./src/notification.ts",
     "./auth": "./src/auth.ts",
     "./activity": "./src/activity.ts",
-    "./search": "./src/search.ts"
+    "./search": "./src/search.ts",
+    "./home": "./src/home.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
