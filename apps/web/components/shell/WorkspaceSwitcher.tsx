@@ -5,6 +5,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "@/server/api/root";
 import { AppIcon } from "@/components/common/AppIcon";
+import { useUiStore } from "@/stores/ui.store";
 import { workspaceInitials } from "@/lib/workspace-identity";
 import { useDismissibleDetails } from "@/components/shell/useDismissibleDetails";
 
@@ -46,6 +47,7 @@ export function WorkspaceSwitcher({
   const { detailsRef, summaryRef } = useDismissibleDetails();
   const selected = workspaces.find((workspace) => workspace.workspaceId === currentId);
   const label = currentWorkspace?.name ?? selected?.name ?? (currentId ? "Loading workspace..." : "Your workspaces");
+  const setCreateWorkspaceOpen = useUiStore((state) => state.setCreateWorkspaceOpen);
   const closeMenu = () => {
     if (detailsRef.current) detailsRef.current.open = false;
     onNavigate?.();
@@ -111,10 +113,10 @@ export function WorkspaceSwitcher({
           ) : null}
         </div>
         <div className="border-t border-border-subtle p-1">
-          <Link href="/workspace#new-workspace" onClick={closeMenu} className="flex min-h-10 items-center gap-2 rounded px-2 text-sm font-medium text-text-secondary hover:bg-surface-subtle hover:text-text-primary">
+          <button type="button" onClick={() => { closeMenu(); setCreateWorkspaceOpen(true); }} className="flex min-h-10 w-full items-center gap-2 rounded px-2 text-left text-sm font-medium text-text-secondary hover:bg-surface-subtle hover:text-text-primary">
             <AppIcon name="plus" />
             Create a workspace
-          </Link>
+          </button>
           <Link href="/workspace" onClick={closeMenu} className="flex min-h-10 items-center gap-2 rounded px-2 text-sm font-medium text-text-secondary hover:bg-surface-subtle hover:text-text-primary">
             <AppIcon name="workspaces" />
             All workspaces

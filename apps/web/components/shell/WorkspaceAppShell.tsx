@@ -9,6 +9,7 @@ import { AccountMenu } from "@/components/shell/AccountMenu";
 import { AppIcon } from "@/components/common/AppIcon";
 import { WorkspaceSwitcher } from "@/components/shell/WorkspaceSwitcher";
 import { CommandPalette, ShortcutsSheet, useCommandShortcuts } from "@/components/command/CommandPalette";
+import { CreateWorkspaceDialog } from "@/components/workspace/CreateWorkspaceDialog";
 import { isMacPlatform } from "@/components/command/commandItems";
 import { NotificationDropdown } from "@/components/notification/NotificationDropdown";
 import { WorkspaceNavigation } from "@/components/workspace/WorkspaceNavigation";
@@ -276,6 +277,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
         </main>
         <CommandPalette />
         <ShortcutsSheet />
+        <CreateWorkspaceDialog />
       </div>
 
       {mobileNavOpen ? (

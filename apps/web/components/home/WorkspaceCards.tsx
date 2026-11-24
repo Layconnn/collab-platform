@@ -6,6 +6,7 @@ import { Building2 } from "lucide-react";
 import { timeAgo } from "@/components/activity/RecentActivity";
 import { ErrorState } from "@/components/common/StateNotice";
 import { useWorkspacePulse } from "@/hooks/useHome";
+import { useUiStore } from "@/stores/ui.store";
 import { workspaceInitials } from "@/lib/workspace-identity";
 
 export type PulseCard = {
@@ -93,6 +94,7 @@ function Card({ card, max }: { card: PulseCard; max: number }) {
 
 export function WorkspaceCards() {
   const pulse = useWorkspacePulse();
+  const openCreate = useUiStore((state) => state.setCreateWorkspaceOpen);
   const cards: PulseCard[] = pulse.data?.workspaces ?? [];
 
   if (pulse.isLoading) {
@@ -108,7 +110,7 @@ export function WorkspaceCards() {
       <span aria-hidden="true" className="grid size-11 place-items-center rounded-sm bg-surface-active text-brand-link"><Building2 size={21} /></span>
       <h3 className="mt-5 text-lg font-semibold text-text-primary">Your first workspace starts here.</h3>
       <p className="mt-2 max-w-[48ch] text-sm leading-6 text-text-secondary">Give your project a shared place for discussions, decisions and the people who make them.</p>
-      <a href="#new-workspace" className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-brand-link hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Create a workspace</a>
+      <button type="button" onClick={() => openCreate(true)} className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-brand-link hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Create a workspace</button>
     </div>;
   }
 

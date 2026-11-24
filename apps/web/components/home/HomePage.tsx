@@ -1,16 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Check, Copy, Plus } from "lucide-react";
 import { useState } from "react";
 
 import { timeAgo } from "@/components/activity/RecentActivity";
 import { readRecent, type RecentEntry } from "@/components/command/commandItems";
 import { ErrorState } from "@/components/common/StateNotice";
 import { WorkspaceCards } from "@/components/home/WorkspaceCards";
-import { CreateWorkspaceForm } from "@/components/workspace/CreateWorkspaceForm";
 import { useAuth } from "@/hooks/useAuth";
-import { useDismissNeeds, useNeedsYou, useRecentDecisions } from "@/hooks/useHome";
+import { useDismissNeeds, useNeedsYou, useRecentDecisions, useWorkspacePulse } from "@/hooks/useHome";
+import { useUiStore } from "@/stores/ui.store";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const URGENT_MS = 2 * DAY_MS;
@@ -173,10 +173,57 @@ function JumpBackIn() {
   </section>;
 }
 
+const primaryButton = "inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring sm:w-auto";
+
+// First run (FR-14): a member with no workspace creates one or shares their
+// username so a teammate can add them. Home switches to the full layout as
+// soon as the pulse lists a workspace.
+function FirstRun({ username }: { username: string }) {
+  const openCreate = useUiStore((state) => state.setCreateWorkspaceOpen);
+  const [copy, setCopy] = useState<"idle" | "copied" | "failed">("idle");
+  const copyUsername = async () => {
+    try { await navigator.clipboard.writeText(username); setCopy("copied"); } catch { setCopy("failed"); }
+  };
+  const step = "grid min-w-0 gap-4 border-t border-border-subtle py-6 sm:grid-cols-[2.5rem_minmax(0,1fr)]";
+  const number = "grid size-9 place-items-center rounded-full bg-brand-100 text-sm font-semibold text-brand-800";
+  return <section aria-labelledby="first-run-heading" className="max-w-3xl">
+    <p className={eyebrow}>Getting started</p>
+    <h2 id="first-run-heading" className="mt-1 text-xl font-semibold text-text-primary sm:text-2xl">Start with a workspace</h2>
+    <p className="mt-2 max-w-[60ch] text-sm leading-6 text-text-secondary">A workspace holds your team&apos;s discussions and the decisions they lead to. Once you&apos;re in one, this page shows what needs you, what was decided and how each workspace is doing.</p>
+    <ol className="mt-6 border-b border-border-subtle">
+      <li className={step}>
+        <span aria-hidden="true" className={number}>1</span>
+        <div className="min-w-0">
+          <h3 className="text-base font-semibold text-text-primary">Create one for your team</h3>
+          <p className="mt-1 text-sm leading-6 text-text-secondary">Name it after the team or project. You can add people by their username straight after.</p>
+          <button type="button" onClick={() => openCreate(true)} className={`mt-4 ${primaryButton}`}><Plus size={16} aria-hidden="true" /> Create a workspace</button>
+        </div>
+      </li>
+      <li className={step}>
+        <span aria-hidden="true" className={number}>2</span>
+        <div className="min-w-0">
+          <h3 className="text-base font-semibold text-text-primary">Or join your team&apos;s workspace</h3>
+          <p className="mt-1 text-sm leading-6 text-text-secondary">Ask a teammate who already uses Commons to add you from their workspace&apos;s Members page. They&apos;ll need your username:</p>
+          <div className="mt-4 flex min-w-0 flex-wrap items-center gap-2">
+            <code className="min-w-0 wrap-anywhere rounded-sm border border-border-subtle bg-surface-subtle px-3 py-2 font-mono text-sm text-text-primary">{username}</code>
+            <button type="button" onClick={() => void copyUsername()} className="inline-flex min-h-10 items-center gap-2 rounded-sm border border-border px-3 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
+              {copy === "copied" ? <Check size={15} aria-hidden="true" /> : <Copy size={15} aria-hidden="true" />} Copy username
+            </button>
+            <span role="status" className="text-xs text-text-muted">{copy === "copied" ? "Copied" : copy === "failed" ? "Could not copy. Select the username instead." : ""}</span>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </section>;
+}
+
 export function HomePage() {
   const { user } = useAuth();
   const [now] = useState(() => new Date());
   const firstName = (user?.name?.trim() || user?.username || "").split(/\s+/)[0];
+  const openCreate = useUiStore((state) => state.setCreateWorkspaceOpen);
+  const pulse = useWorkspacePulse();
+  const firstRun = Boolean(pulse.data && !pulse.data.workspaces.length);
 
   return <div className="mx-auto w-full max-w-[1200px] min-w-0 space-y-10 pb-12">
     <header className="flex flex-col gap-4 border-b border-border-subtle pb-7 sm:flex-row sm:items-end sm:justify-between">
@@ -184,10 +231,10 @@ export function HomePage() {
         <p className="text-sm text-text-muted" suppressHydrationWarning>{new Intl.DateTimeFormat("en", { weekday: "long", month: "long", day: "numeric" }).format(now)}</p>
         <h1 className="mt-1 wrap-anywhere text-[1.8rem] font-semibold leading-tight text-text-primary sm:text-[2.1rem]" suppressHydrationWarning>{greeting(now.getHours())}{firstName ? `, ${firstName}` : ""}</h1>
       </div>
-      <a href="#new-workspace" className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring sm:w-auto"><Plus size={16} aria-hidden="true" /> New workspace</a>
+      {firstRun ? null : <button type="button" onClick={() => openCreate(true)} className={primaryButton}><Plus size={16} aria-hidden="true" /> New workspace</button>}
     </header>
 
-    <div className="grid min-w-0 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
+    {firstRun ? <FirstRun username={user?.username ?? ""} /> : <div className="grid min-w-0 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
       <div className="min-w-0 space-y-10">
         <NeedsYou />
         <section aria-labelledby="workspace-directory-heading" className="min-w-0">
@@ -199,18 +246,8 @@ export function HomePage() {
         <DecidedThisWeek />
         <JumpBackIn />
       </aside>
-    </div>
+    </div>}
 
-    <section id="new-workspace" aria-labelledby="new-workspace-heading" className="scroll-mt-20 border-t border-border-subtle pt-8 sm:pt-10">
-      <div className="grid min-w-0 items-start gap-7 xl:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] xl:gap-12">
-        <div className="max-w-[42ch]">
-          <p className={eyebrow}>Begin together</p>
-          <h2 id="new-workspace-heading" className="mt-2 text-xl font-semibold leading-snug text-text-primary sm:text-2xl">Create a workspace</h2>
-          <p className="mt-3 text-sm leading-6 text-text-secondary">A workspace keeps your people and discussions in one place. Give it a name and a short address; you can add existing account holders after creating it.</p>
-        </div>
-        <CreateWorkspaceForm />
-      </div>
-    </section>
   </div>;
 }
 

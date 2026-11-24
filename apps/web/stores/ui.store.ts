@@ -11,6 +11,8 @@ type UiState = {
   setCommandPaletteOpen: (value: boolean) => void;
   isShortcutsOpen: boolean;
   setShortcutsOpen: (value: boolean) => void;
+  isCreateWorkspaceOpen: boolean;
+  setCreateWorkspaceOpen: (value: boolean) => void;
 };
 
 export const useUiStore = create<UiState>((set) => ({
@@ -24,4 +26,6 @@ export const useUiStore = create<UiState>((set) => ({
   setCommandPaletteOpen: (value) => set({ isCommandPaletteOpen: value }),
   isShortcutsOpen: false,
   setShortcutsOpen: (value) => set({ isShortcutsOpen: value }),
+  isCreateWorkspaceOpen: false,
+  setCreateWorkspaceOpen: (value) => set({ isCreateWorkspaceOpen: value }),
 }));

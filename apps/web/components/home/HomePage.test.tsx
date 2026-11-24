@@ -11,18 +11,20 @@ const mocks = vi.hoisted(() => ({
   decisions: [] as unknown[],
   decisionsError: null as null | { data: { code: string } },
   dismiss: vi.fn(), dismissAll: vi.fn(), refetch: vi.fn(),
+  workspaces: [{ id: "c000000000000000000000001" }] as unknown[],
 }));
 
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: "u1", name: "Maya Okafor", username: "maya" } }) }));
 vi.mock("@/hooks/useHome", () => ({
   useNeedsYou: (all: boolean) => { mocks.needsAll.push(all); return { data: mocks.needsError ? undefined : mocks.needs, error: mocks.needsError, isLoading: false, isFetching: false, refetch: mocks.refetch }; },
   useRecentDecisions: () => ({ data: mocks.decisionsError ? undefined : { decisions: mocks.decisions }, error: mocks.decisionsError, isLoading: false, isFetching: false, refetch: mocks.refetch }),
+  useWorkspacePulse: () => ({ data: { workspaces: mocks.workspaces }, error: null, isLoading: false }),
   useDismissNeeds: () => ({ dismiss: { mutate: mocks.dismiss, isPending: false }, dismissAll: { mutate: mocks.dismissAll, isPending: false } }),
 }));
 vi.mock("@/components/home/WorkspaceCards", () => ({ WorkspaceCards: () => <p>Workspace list</p> }));
-vi.mock("@/components/workspace/CreateWorkspaceForm", () => ({ CreateWorkspaceForm: () => <p>Create form</p> }));
 
 import { HomePage, greeting, needReason } from "./HomePage";
+import { useUiStore } from "@/stores/ui.store";
 
 const need = (overrides: Record<string, unknown>) => ({
   id: `n${Math.random()}`, kind: "MENTION", workspace: ws, title: "Pricing for small teams", actor: "Sam",
@@ -33,7 +35,8 @@ const need = (overrides: Record<string, unknown>) => ({
 describe("HomePage", () => {
   beforeEach(() => {
     mocks.needs = { items: [], total: 0 }; mocks.needsError = null; mocks.needsAll = [];
-    mocks.decisions = []; mocks.decisionsError = null;
+    mocks.decisions = []; mocks.decisionsError = null; mocks.workspaces = [{ id: "c000000000000000000000001" }];
+    useUiStore.setState({ isCreateWorkspaceOpen: false });
     mocks.dismiss.mockReset(); mocks.dismissAll.mockReset(); mocks.refetch.mockReset();
     window.localStorage.clear();
   });
@@ -107,6 +110,36 @@ describe("HomePage", () => {
     expect(screen.getByText("Could not load what needs you")).toBeTruthy();
     expect(screen.getByText(/No decisions this week/)).toBeTruthy();
     expect(screen.getByText("Workspace list")).toBeTruthy();
+  });
+
+  it("opens the create dialog from the header", () => {
+    render(<HomePage />);
+    fireEvent.click(screen.getByRole("button", { name: "New workspace" }));
+    expect(useUiStore.getState().isCreateWorkspaceOpen).toBe(true);
+  });
+
+  it("guides a member with no workspace to create one or share their username", async () => {
+    mocks.workspaces = [];
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    render(<HomePage />);
+    expect(screen.getByRole("heading", { name: "Start with a workspace" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: /Needs you/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "New workspace" })).toBeNull();
+    expect(screen.getByText("maya").tagName).toBe("CODE");
+    fireEvent.click(screen.getByRole("button", { name: "Copy username" }));
+    expect(writeText).toHaveBeenCalledWith("maya");
+    expect(await screen.findByText("Copied")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Create a workspace" }));
+    expect(useUiStore.getState().isCreateWorkspaceOpen).toBe(true);
+  });
+
+  it("says when the username could not be copied", async () => {
+    mocks.workspaces = [];
+    Object.defineProperty(navigator, "clipboard", { value: { writeText: vi.fn().mockRejectedValue(new Error("denied")) }, configurable: true });
+    render(<HomePage />);
+    fireEvent.click(screen.getByRole("button", { name: "Copy username" }));
+    expect(await screen.findByText("Could not copy. Select the username instead.")).toBeTruthy();
   });
 
   it("offers places opened recently from the palette", () => {

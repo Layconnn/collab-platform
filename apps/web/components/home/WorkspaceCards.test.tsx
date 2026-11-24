@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
 const mocks = vi.hoisted(() => ({
   workspaces: [] as unknown[],
@@ -16,6 +16,7 @@ vi.mock("@/hooks/useHome", () => ({
 }));
 
 import { WorkspaceCards, dailySummary } from "./WorkspaceCards";
+import { useUiStore } from "@/stores/ui.store";
 
 const card = (overrides: Record<string, unknown>) => ({
   id: "c000000000000000000000001", name: "Platform", role: "OWNER", lastActivityAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
@@ -62,7 +63,9 @@ describe("WorkspaceCards", () => {
   it("invites a first workspace when there are none", () => {
     render(<WorkspaceCards />);
     expect(screen.getByText("Your first workspace starts here.")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Create a workspace" }).getAttribute("href")).toBe("#new-workspace");
+    useUiStore.setState({ isCreateWorkspaceOpen: false });
+    fireEvent.click(screen.getByRole("button", { name: "Create a workspace" }));
+    expect(useUiStore.getState().isCreateWorkspaceOpen).toBe(true);
   });
 
   it("offers a retry when the pulse cannot load", () => {

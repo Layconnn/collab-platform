@@ -34,35 +34,6 @@ describe("CreateWorkspaceForm", () => {
     vi.unstubAllGlobals();
   });
 
-  it("focuses the creation form when reached through the workspace anchor", async () => {
-    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-      callback(0);
-      return 1;
-    });
-    vi.stubGlobal("cancelAnimationFrame", vi.fn());
-    window.history.replaceState(null, "", "#new-workspace");
-    render(<CreateWorkspaceForm />);
-    await waitFor(() =>
-      expect(document.activeElement).toBe(
-        screen.getByRole("textbox", { name: "Workspace name" }),
-      ),
-    );
-  });
-
-  it("restores focus when the workspace anchor is selected again", async () => {
-    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-      callback(0);
-      return 1;
-    });
-    vi.stubGlobal("cancelAnimationFrame", vi.fn());
-    window.history.replaceState(null, "", "#new-workspace");
-    render(<><a href="#new-workspace">New workspace</a><CreateWorkspaceForm /></>);
-    const link = screen.getByRole("link", { name: "New workspace" });
-    link.focus();
-    fireEvent.click(link);
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Workspace name" })));
-  });
-
   it("suggests an address and preserves a manually edited address", async () => {
     render(<CreateWorkspaceForm />);
     const name = screen.getByRole("textbox", {
