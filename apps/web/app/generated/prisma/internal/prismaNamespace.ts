@@ -405,6 +405,7 @@ export const ModelName = {
   WorkspaceMember: 'WorkspaceMember',
   Decision: 'Decision',
   DecisionRevision: 'DecisionRevision',
+  DecisionReview: 'DecisionReview',
   DecisionSupersession: 'DecisionSupersession',
   ActivityEvent: 'ActivityEvent'
 } as const
@@ -422,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionSupersession" | "activityEvent"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "decisionSupersession" | "activityEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1018,6 +1019,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DecisionReview: {
+      payload: Prisma.$DecisionReviewPayload<ExtArgs>
+      fields: Prisma.DecisionReviewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DecisionReviewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DecisionReviewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>
+        }
+        findFirst: {
+          args: Prisma.DecisionReviewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DecisionReviewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>
+        }
+        findMany: {
+          args: Prisma.DecisionReviewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>[]
+        }
+        create: {
+          args: Prisma.DecisionReviewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>
+        }
+        createMany: {
+          args: Prisma.DecisionReviewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DecisionReviewCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>[]
+        }
+        delete: {
+          args: Prisma.DecisionReviewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>
+        }
+        update: {
+          args: Prisma.DecisionReviewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>
+        }
+        deleteMany: {
+          args: Prisma.DecisionReviewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DecisionReviewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DecisionReviewUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>[]
+        }
+        upsert: {
+          args: Prisma.DecisionReviewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DecisionReviewPayload>
+        }
+        aggregate: {
+          args: Prisma.DecisionReviewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDecisionReview>
+        }
+        groupBy: {
+          args: Prisma.DecisionReviewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DecisionReviewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DecisionReviewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DecisionReviewCountAggregateOutputType> | number
+        }
+      }
+    }
     DecisionSupersession: {
       payload: Prisma.$DecisionSupersessionPayload<ExtArgs>
       fields: Prisma.DecisionSupersessionFieldRefs
@@ -1304,6 +1379,8 @@ export const DecisionScalarFieldEnum = {
   alternatives: 'alternatives',
   followUp: 'followUp',
   status: 'status',
+  reviewRule: 'reviewRule',
+  requiredApprovals: 'requiredApprovals',
   version: 'version',
   idempotencyKey: 'idempotencyKey',
   creationPayloadHash: 'creationPayloadHash',
@@ -1325,6 +1402,7 @@ export const DecisionRevisionScalarFieldEnum = {
   actorUserId: 'actorUserId',
   actorLabel: 'actorLabel',
   reason: 'reason',
+  overrideReason: 'overrideReason',
   question: 'question',
   outcome: 'outcome',
   rationale: 'rationale',
@@ -1335,6 +1413,25 @@ export const DecisionRevisionScalarFieldEnum = {
 } as const
 
 export type DecisionRevisionScalarFieldEnum = (typeof DecisionRevisionScalarFieldEnum)[keyof typeof DecisionRevisionScalarFieldEnum]
+
+
+export const DecisionReviewScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  decisionId: 'decisionId',
+  reviewerId: 'reviewerId',
+  reviewerLabel: 'reviewerLabel',
+  requestedById: 'requestedById',
+  requestedByLabel: 'requestedByLabel',
+  state: 'state',
+  note: 'note',
+  respondedVersion: 'respondedVersion',
+  respondedAt: 'respondedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DecisionReviewScalarFieldEnum = (typeof DecisionReviewScalarFieldEnum)[keyof typeof DecisionReviewScalarFieldEnum]
 
 
 export const DecisionSupersessionScalarFieldEnum = {
@@ -1512,6 +1609,20 @@ export type ListEnumDecisionStatusFieldRefInput<$PrismaModel> = FieldRefInputTyp
 
 
 /**
+ * Reference to a field of type 'DecisionReviewRule'
+ */
+export type EnumDecisionReviewRuleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionReviewRule'>
+    
+
+
+/**
+ * Reference to a field of type 'DecisionReviewRule[]'
+ */
+export type ListEnumDecisionReviewRuleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionReviewRule[]'>
+    
+
+
+/**
  * Reference to a field of type 'DecisionRevisionAction'
  */
 export type EnumDecisionRevisionActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionRevisionAction'>
@@ -1522,6 +1633,20 @@ export type EnumDecisionRevisionActionFieldRefInput<$PrismaModel> = FieldRefInpu
  * Reference to a field of type 'DecisionRevisionAction[]'
  */
 export type ListEnumDecisionRevisionActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionRevisionAction[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DecisionReviewState'
+ */
+export type EnumDecisionReviewStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionReviewState'>
+    
+
+
+/**
+ * Reference to a field of type 'DecisionReviewState[]'
+ */
+export type ListEnumDecisionReviewStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionReviewState[]'>
     
 
 
@@ -1725,6 +1850,7 @@ export type GlobalOmitConfig = {
   workspaceMember?: Prisma.WorkspaceMemberOmit
   decision?: Prisma.DecisionOmit
   decisionRevision?: Prisma.DecisionRevisionOmit
+  decisionReview?: Prisma.DecisionReviewOmit
   decisionSupersession?: Prisma.DecisionSupersessionOmit
   activityEvent?: Prisma.ActivityEventOmit
 }

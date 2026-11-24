@@ -42,6 +42,7 @@ export type DecisionRevisionMinAggregateOutputType = {
   actorUserId: string | null
   actorLabel: string | null
   reason: string | null
+  overrideReason: string | null
   question: string | null
   outcome: string | null
   rationale: string | null
@@ -59,6 +60,7 @@ export type DecisionRevisionMaxAggregateOutputType = {
   actorUserId: string | null
   actorLabel: string | null
   reason: string | null
+  overrideReason: string | null
   question: string | null
   outcome: string | null
   rationale: string | null
@@ -76,6 +78,7 @@ export type DecisionRevisionCountAggregateOutputType = {
   actorUserId: number
   actorLabel: number
   reason: number
+  overrideReason: number
   question: number
   outcome: number
   rationale: number
@@ -103,6 +106,7 @@ export type DecisionRevisionMinAggregateInputType = {
   actorUserId?: true
   actorLabel?: true
   reason?: true
+  overrideReason?: true
   question?: true
   outcome?: true
   rationale?: true
@@ -120,6 +124,7 @@ export type DecisionRevisionMaxAggregateInputType = {
   actorUserId?: true
   actorLabel?: true
   reason?: true
+  overrideReason?: true
   question?: true
   outcome?: true
   rationale?: true
@@ -137,6 +142,7 @@ export type DecisionRevisionCountAggregateInputType = {
   actorUserId?: true
   actorLabel?: true
   reason?: true
+  overrideReason?: true
   question?: true
   outcome?: true
   rationale?: true
@@ -241,6 +247,7 @@ export type DecisionRevisionGroupByOutputType = {
   actorUserId: string | null
   actorLabel: string
   reason: string | null
+  overrideReason: string | null
   question: string
   outcome: string | null
   rationale: string | null
@@ -281,6 +288,7 @@ export type DecisionRevisionWhereInput = {
   actorUserId?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   actorLabel?: Prisma.StringFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
+  overrideReason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   question?: Prisma.StringFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
@@ -300,6 +308,7 @@ export type DecisionRevisionOrderByWithRelationInput = {
   actorUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  overrideReason?: Prisma.SortOrderInput | Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrderInput | Prisma.SortOrder
   rationale?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -323,6 +332,7 @@ export type DecisionRevisionWhereUniqueInput = Prisma.AtLeast<{
   actorUserId?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   actorLabel?: Prisma.StringFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
+  overrideReason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   question?: Prisma.StringFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
@@ -342,6 +352,7 @@ export type DecisionRevisionOrderByWithAggregationInput = {
   actorUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  overrideReason?: Prisma.SortOrderInput | Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrderInput | Prisma.SortOrder
   rationale?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -367,6 +378,7 @@ export type DecisionRevisionScalarWhereWithAggregatesInput = {
   actorUserId?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
   actorLabel?: Prisma.StringWithAggregatesFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
+  overrideReason?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
   question?: Prisma.StringWithAggregatesFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
@@ -382,6 +394,7 @@ export type DecisionRevisionCreateInput = {
   action: $Enums.DecisionRevisionAction
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -401,6 +414,7 @@ export type DecisionRevisionUncheckedCreateInput = {
   actorUserId?: string | null
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -416,6 +430,7 @@ export type DecisionRevisionUpdateInput = {
   action?: Prisma.EnumDecisionRevisionActionFieldUpdateOperationsInput | $Enums.DecisionRevisionAction
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -435,6 +450,7 @@ export type DecisionRevisionUncheckedUpdateInput = {
   actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -452,6 +468,7 @@ export type DecisionRevisionCreateManyInput = {
   actorUserId?: string | null
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -467,6 +484,7 @@ export type DecisionRevisionUpdateManyMutationInput = {
   action?: Prisma.EnumDecisionRevisionActionFieldUpdateOperationsInput | $Enums.DecisionRevisionAction
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -484,6 +502,7 @@ export type DecisionRevisionUncheckedUpdateManyInput = {
   actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -516,6 +535,7 @@ export type DecisionRevisionCountOrderByAggregateInput = {
   actorUserId?: Prisma.SortOrder
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  overrideReason?: Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrder
   rationale?: Prisma.SortOrder
@@ -537,6 +557,7 @@ export type DecisionRevisionMaxOrderByAggregateInput = {
   actorUserId?: Prisma.SortOrder
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  overrideReason?: Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrder
   rationale?: Prisma.SortOrder
@@ -554,6 +575,7 @@ export type DecisionRevisionMinOrderByAggregateInput = {
   actorUserId?: Prisma.SortOrder
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  overrideReason?: Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrder
   rationale?: Prisma.SortOrder
@@ -661,6 +683,7 @@ export type DecisionRevisionCreateWithoutActorInput = {
   action: $Enums.DecisionRevisionAction
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -678,6 +701,7 @@ export type DecisionRevisionUncheckedCreateWithoutActorInput = {
   action: $Enums.DecisionRevisionAction
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -724,6 +748,7 @@ export type DecisionRevisionScalarWhereInput = {
   actorUserId?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   actorLabel?: Prisma.StringFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
+  overrideReason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   question?: Prisma.StringFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
@@ -739,6 +764,7 @@ export type DecisionRevisionCreateWithoutDecisionInput = {
   action: $Enums.DecisionRevisionAction
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -756,6 +782,7 @@ export type DecisionRevisionUncheckedCreateWithoutDecisionInput = {
   actorUserId?: string | null
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -798,6 +825,7 @@ export type DecisionRevisionCreateManyActorInput = {
   action: $Enums.DecisionRevisionAction
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -813,6 +841,7 @@ export type DecisionRevisionUpdateWithoutActorInput = {
   action?: Prisma.EnumDecisionRevisionActionFieldUpdateOperationsInput | $Enums.DecisionRevisionAction
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -830,6 +859,7 @@ export type DecisionRevisionUncheckedUpdateWithoutActorInput = {
   action?: Prisma.EnumDecisionRevisionActionFieldUpdateOperationsInput | $Enums.DecisionRevisionAction
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -846,6 +876,7 @@ export type DecisionRevisionUncheckedUpdateManyWithoutActorInput = {
   action?: Prisma.EnumDecisionRevisionActionFieldUpdateOperationsInput | $Enums.DecisionRevisionAction
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -862,6 +893,7 @@ export type DecisionRevisionCreateManyDecisionInput = {
   actorUserId?: string | null
   actorLabel: string
   reason?: string | null
+  overrideReason?: string | null
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -877,6 +909,7 @@ export type DecisionRevisionUpdateWithoutDecisionInput = {
   action?: Prisma.EnumDecisionRevisionActionFieldUpdateOperationsInput | $Enums.DecisionRevisionAction
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -894,6 +927,7 @@ export type DecisionRevisionUncheckedUpdateWithoutDecisionInput = {
   actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -910,6 +944,7 @@ export type DecisionRevisionUncheckedUpdateManyWithoutDecisionInput = {
   actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -929,6 +964,7 @@ export type DecisionRevisionSelect<ExtArgs extends runtime.Types.Extensions.Inte
   actorUserId?: boolean
   actorLabel?: boolean
   reason?: boolean
+  overrideReason?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -948,6 +984,7 @@ export type DecisionRevisionSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   actorUserId?: boolean
   actorLabel?: boolean
   reason?: boolean
+  overrideReason?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -967,6 +1004,7 @@ export type DecisionRevisionSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   actorUserId?: boolean
   actorLabel?: boolean
   reason?: boolean
+  overrideReason?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -986,6 +1024,7 @@ export type DecisionRevisionSelectScalar = {
   actorUserId?: boolean
   actorLabel?: boolean
   reason?: boolean
+  overrideReason?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -995,7 +1034,7 @@ export type DecisionRevisionSelectScalar = {
   createdAt?: boolean
 }
 
-export type DecisionRevisionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "decisionId" | "version" | "action" | "actorUserId" | "actorLabel" | "reason" | "question" | "outcome" | "rationale" | "alternatives" | "followUp" | "status" | "createdAt", ExtArgs["result"]["decisionRevision"]>
+export type DecisionRevisionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "decisionId" | "version" | "action" | "actorUserId" | "actorLabel" | "reason" | "overrideReason" | "question" | "outcome" | "rationale" | "alternatives" | "followUp" | "status" | "createdAt", ExtArgs["result"]["decisionRevision"]>
 export type DecisionRevisionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   decision?: boolean | Prisma.DecisionDefaultArgs<ExtArgs>
   actor?: boolean | Prisma.DecisionRevision$actorArgs<ExtArgs>
@@ -1023,6 +1062,7 @@ export type $DecisionRevisionPayload<ExtArgs extends runtime.Types.Extensions.In
     actorUserId: string | null
     actorLabel: string
     reason: string | null
+    overrideReason: string | null
     question: string
     outcome: string | null
     rationale: string | null
@@ -1462,6 +1502,7 @@ export interface DecisionRevisionFieldRefs {
   readonly actorUserId: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly actorLabel: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly reason: Prisma.FieldRef<"DecisionRevision", 'String'>
+  readonly overrideReason: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly question: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly outcome: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly rationale: Prisma.FieldRef<"DecisionRevision", 'String'>

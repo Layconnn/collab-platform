@@ -23,12 +23,26 @@ enum NotificationType {
   DISCUSSION_CREATED
   COMMENT_CREATED
   MENTION
+  REVIEW_REQUESTED
+  REVIEW_RESPONDED
 }
 
 enum DecisionStatus {
   PROPOSED
   DECIDED
   SUPERSEDED
+}
+
+enum DecisionReviewRule {
+  ALL
+  AT_LEAST
+}
+
+enum DecisionReviewState {
+  PENDING
+  APPROVED
+  OBJECTED
+  WITHDRAWN
 }
 
 enum DecisionRevisionAction {
@@ -55,6 +69,8 @@ model User {
   decisionsDeleted Decision[] @relation("DecisionDeleter")
   decisionRevisions DecisionRevision[] @relation("DecisionRevisionActor")
   supersessionsAuthorized DecisionSupersession[] @relation("DecisionSupersessionAuthorizer")
+  decisionReviews DecisionReview[] @relation("DecisionReviewer")
+  decisionReviewsRequested DecisionReview[] @relation("DecisionReviewRequester")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
   activityEvents        ActivityEvent[]
@@ -74,6 +90,7 @@ model Workspace {
   discussions Discussion[]
   comments    Comment[]
   decisions   Decision[]
+  decisionReviews DecisionReview[]
   notifications Notification[]
   activityEvents ActivityEvent[]
 
@@ -193,6 +210,10 @@ model Decision {
   alternatives             String?
   followUp                 String?
   status                   DecisionStatus @default(PROPOSED)
+  // Review rule (decision reviews PRD, FR-2): everyone asked must approve, or
+  // at least requiredApprovals of them. Only meaningful once reviewers exist.
+  reviewRule               DecisionReviewRule @default(ALL)
+  requiredApprovals        Int?
   version                  Int            @default(1)
   idempotencyKey           String         @unique
   creationPayloadHash      String?
@@ -206,6 +227,7 @@ model Decision {
   createdBy                User?          @relation("DecisionCreator", fields: [createdById], references: [id], onDelete: SetNull)
   deletedBy                User?          @relation("DecisionDeleter", fields: [deletedById], references: [id], onDelete: SetNull)
   revisions                DecisionRevision[]
+  reviews                  DecisionReview[]
   replacementLink          DecisionSupersession? @relation("PreviousDecision")
   predecessorLink          DecisionSupersession? @relation("ReplacementDecision")
 
@@ -226,6 +248,8 @@ model DecisionRevision {
   actorUserId   String?
   actorLabel    String
   reason        String?
+  // Set when a manager finalized without the review rule being met (FR-9).
+  overrideReason String?
   question      String
   outcome       String?
   rationale     String?
@@ -237,6 +261,35 @@ model DecisionRevision {
   actor         User?                  @relation("DecisionRevisionActor", fields: [actorUserId], references: [id], onDelete: SetNull)
 
   @@unique([decisionId, version])
+}
+
+// One reviewer asked to review one proposal (decision reviews PRD). The row
+// keeps its latest state; every change is also written to the event log.
+// Hand-written CHECK constraints in the migration: an objection needs a note,
+// and requiredApprovals is at least 1.
+model DecisionReview {
+  id               String              @id @default(cuid())
+  workspaceId      String
+  decisionId       String
+  reviewerId       String?
+  reviewerLabel    String
+  requestedById    String?
+  requestedByLabel String
+  state            DecisionReviewState @default(PENDING)
+  note             String?
+  // The decision version the latest response applies to.
+  respondedVersion Int?
+  respondedAt      DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  workspace        Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  decision         Decision            @relation(fields: [workspaceId, decisionId], references: [workspaceId, id], onDelete: Cascade)
+  reviewer         User?               @relation("DecisionReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  requestedBy      User?               @relation("DecisionReviewRequester", fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@unique([decisionId, reviewerId])
+  @@index([workspaceId, decisionId])
+  @@index([reviewerId, state])
 }
 
 model DecisionSupersession {
@@ -274,6 +327,11 @@ enum ActivityKind {
   DECISION_FINALIZED
   DECISION_SUPERSEDED
   DECISION_DELETED
+  DECISION_REVIEW_REQUESTED
+  DECISION_REVIEW_RESPONDED
+  DECISION_REVIEW_WITHDRAWN
+  DECISION_REVIEWS_RESET
+  DECISION_REVIEW_RULE_CHANGED
 }
 
 enum ActivitySubjectType {
