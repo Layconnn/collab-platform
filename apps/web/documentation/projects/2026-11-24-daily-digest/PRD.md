@@ -1,6 +1,6 @@
 # PRD: The daily digest email
 
-Status: draft 2026-11-24 · Horizon 1 · Issue #134
+Status: approved 2026-11-24 (defaults confirmed by the author) · Horizon 1 · Issue #134
 
 ## Problem
 
@@ -120,18 +120,18 @@ Evidence:
 
 ## Risks and open questions
 
-Each question has a proposed default; the author confirms or changes it before work starts.
+Each question had a proposed default; the author confirmed all of them on 2026-11-24.
 
-- **The sending domain (needs a decision).** Resend, like every reputable provider, only delivers to arbitrary addresses from a domain you control. Default: build and run everything now at $0 with the allow list (the owner's address), and switch on for everyone when a domain is bought and verified; no code change is needed then, only settings. The alternative is Brevo's free plan with a single verified sender address, which avoids the domain cost but lands in spam far more often.
-- **Send time.** Default: 06:00 UTC for everyone (07:00 in Lagos and Central Europe). Per-member time zones come with the notification preferences project.
-- **On by default.** Default: yes, with one-click unsubscribe in every email and no email on empty days. Off by default would mean almost nobody gets it.
-- **Provider SDK.** Default: call Resend's HTTP API with `fetch`, behind a small adapter, so the provider can change and tests do not need a network.
+- **The sending domain.** Resend, like every reputable provider, only delivers to arbitrary addresses from a domain you control. Decided: build and run everything now at $0 with the allow list (the owner's address), and switch on for everyone when a domain is bought and verified; no code change is needed then, only settings. The alternative is Brevo's free plan with a single verified sender address, which avoids the domain cost but lands in spam far more often.
+- **Send time.** Decided: 06:00 UTC for everyone (07:00 in Lagos and Central Europe). Per-member time zones come with the notification preferences project.
+- **On by default.** Decided: yes, with one-click unsubscribe in every email and no email on empty days. Off by default would mean almost nobody gets it.
+- **Provider SDK.** Decided: call Resend's HTTP API with `fetch`, behind a small adapter, so the provider can change and tests do not need a network.
 
 ## Delivery plan
 
 | # | Pull request | Requirements |
 | --- | --- | --- |
-| 1 | `Commons: Notifications: PRD for the daily digest email` — this document | — |
-| 2 | `Commons: Notifications: build each member's daily digest` — the digest builder from Home providers, decisions and the event log; HTML and text templates; "Preview today's digest" | FR-1 to FR-4, NFR-1, NFR-4 |
-| 3 | `Commons: Notifications: send the daily digest once a day` — email adapter, scheduled run, delivery records, retries, the allow list | FR-5 to FR-8, NFR-3, NFR-5 |
-| 4 | `Commons: Notifications: let members stop digests from the email or settings` — preferences, per-workspace opt-outs, signed links, one-click headers, Settings → Email | FR-9 to FR-12, NFR-2 |
+| 1 (#134) | `Commons: Notifications: PRD for the daily digest email` — this document | — |
+| 2 (#136) | `Commons: Notifications: build each member's daily digest` — the digest builder from Home providers, decisions and the event log; HTML and text templates; "Preview today's digest" | FR-1 to FR-4, NFR-1, NFR-4 |
+| 3 (#137) | `Commons: Notifications: send the daily digest once a day` — email adapter, scheduled run, delivery records, retries, the allow list | FR-5 to FR-8, NFR-3, NFR-5 |
+| 4 (#138) | `Commons: Notifications: let members stop digests from the email or settings` — preferences, per-workspace opt-outs, signed links, one-click headers, Settings → Email | FR-9 to FR-12, NFR-2 |
