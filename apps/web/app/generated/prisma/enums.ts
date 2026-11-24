@@ -38,6 +38,18 @@ export const DecisionStatus = {
 export type DecisionStatus = (typeof DecisionStatus)[keyof typeof DecisionStatus]
 
 
+export const DigestDeliveryStatus = {
+  SENDING: 'SENDING',
+  SENT: 'SENT',
+  SKIPPED_EMPTY: 'SKIPPED_EMPTY',
+  SKIPPED_OFF: 'SKIPPED_OFF',
+  HELD: 'HELD',
+  FAILED: 'FAILED'
+} as const
+
+export type DigestDeliveryStatus = (typeof DigestDeliveryStatus)[keyof typeof DigestDeliveryStatus]
+
+
 export const FollowState = {
   FOLLOWING: 'FOLLOWING',
   MUTED: 'MUTED'

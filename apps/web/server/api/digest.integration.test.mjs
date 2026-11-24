@@ -112,3 +112,144 @@ test("the email escapes what members wrote and links every item", async () => {
   assert.ok(text.includes("NEEDS YOU (1)") && text.includes("<script>alert(1)</script> Use queues?"), "the text part is plain");
   assert.equal(subject, "Commons: 1 thing needs you");
 });
+
+// ---------------------------------------------------------------------------
+// Sending: the daily run and the email adapter (PR 3)
+// ---------------------------------------------------------------------------
+
+const { runDigest, MAX_ATTEMPTS } = jiti("../services/digest/digest.runner.ts");
+const { createResendSender, EmailError } = jiti("../services/email/email.ts");
+
+function fakeSender(plan = () => "ok") {
+  const sent = [];
+  const sender = async (email) => {
+    const outcome = plan(email, sent.length);
+    if (outcome instanceof Error) throw outcome;
+    sent.push(email);
+    return { id: `msg_${sent.length}` };
+  };
+  return { sender, sent };
+}
+const run = (options) => runDigest({ delivery: "all", allowlist: [], deadline: Date.now() + 60_000, ...options });
+const deliveries = (userIds, date) => prisma.digestDelivery.findMany({ where: { userId: { in: userIds }, digestDate: new Date(`${date}T00:00:00.000Z`) } });
+
+async function teamWithNews() {
+  const [busy, quiet, sam] = await Promise.all([user("Busy"), user("Quiet"), user("Sam")]);
+  const ws = await workspace(sam, [[busy, "MEMBER"]], "Platform");
+  await workspace(quiet, [], "Quiet one");
+  await event(ws, sam, "DISCUSSION_CREATED", HOUR);
+  return { busy, quiet, sam, ws };
+}
+
+test("each member gets at most one digest a day, and nothing on a quiet day", async () => {
+  const { busy, quiet } = await teamWithNews();
+  const ids = [busy.id, quiet.id];
+  const first = fakeSender();
+  const a = await run({ sender: first.sender, onlyUserIds: ids });
+  assert.deepEqual([a.sent, a.skippedEmpty, a.done], [1, 1, false]);
+  assert.equal(first.sent[0].to, busy.email);
+  assert.match(first.sent[0].subject, /^Commons: /);
+  assert.ok(first.sent[0].html.includes("Platform") && first.sent[0].text.includes("IN YOUR WORKSPACES"));
+
+  const again = fakeSender();
+  const b = await run({ sender: again.sender, onlyUserIds: ids });
+  assert.deepEqual([b.sent, b.done], [0, true], "a second run the same day sends nothing and reports done");
+  assert.equal(again.sent.length, 0);
+  const rows = await deliveries(ids, a.date);
+  assert.deepEqual(rows.map((row) => row.status).sort(), ["SENT", "SKIPPED_EMPTY"]);
+});
+
+test("overlapping runs never send twice", async () => {
+  const { busy } = await teamWithNews();
+  const shared = fakeSender();
+  const results = await Promise.all([1, 2, 3].map(() => run({ sender: shared.sender, onlyUserIds: [busy.id] })));
+  assert.equal(shared.sent.length, 1);
+  assert.equal(results.reduce((sum, r) => sum + r.sent, 0), 1);
+});
+
+test("the allow list holds everyone else's digest, and so does a missing sender", async () => {
+  const { busy, ws } = await teamWithNews();
+  const lee = await user("Lee");
+  await prisma.workspaceMember.create({ data: { workspaceId: ws.id, userId: lee.id, role: "MEMBER" } });
+  const { sender, sent } = fakeSender();
+  const result = await runDigest({ sender, delivery: "allowlist", allowlist: [` ${busy.email.toUpperCase()} `], deadline: Date.now() + 60_000, onlyUserIds: [busy.id, lee.id] });
+  assert.deepEqual([result.sent, result.held], [1, 1]);
+  assert.deepEqual(sent.map((email) => email.to), [busy.email]);
+
+  const tomorrow = new Date(Date.now() + 24 * HOUR);
+  const unconfigured = await runDigest({ sender: null, delivery: "all", allowlist: [], deadline: Date.now() + 60_000, now: tomorrow, onlyUserIds: [lee.id] });
+  const [row] = await deliveries([lee.id], unconfigured.date);
+  assert.ok(row, "a row is recorded for tomorrow");
+  assert.ok(["HELD", "SKIPPED_EMPTY"].includes(row.status));
+});
+
+test("without a sender, a digest with news is held and says why", async () => {
+  const { busy } = await teamWithNews();
+  const result = await runDigest({ sender: null, delivery: "all", allowlist: [], deadline: Date.now() + 60_000, onlyUserIds: [busy.id] });
+  assert.equal(result.held, 1);
+  const [row] = await deliveries([busy.id], result.date);
+  assert.deepEqual([row.status, row.error], ["HELD", "Email is not configured."]);
+});
+
+test("temporary failures are retried up to three times; rejected addresses are not", async () => {
+  const { busy, ws } = await teamWithNews();
+  const lee = await user("Lee");
+  await prisma.workspaceMember.create({ data: { workspaceId: ws.id, userId: lee.id, role: "MEMBER" } });
+  const ids = [busy.id, lee.id];
+  const flaky = fakeSender((email) => (email.to === busy.email ? new EmailError("Resend 429: slow down", 429, true) : new EmailError("Resend 422: invalid to", 422, false)));
+  let result = await run({ sender: flaky.sender, onlyUserIds: ids });
+  assert.equal(result.failed, 2);
+  let rows = await deliveries(ids, result.date);
+  const byUser = Object.fromEntries(rows.map((row) => [row.userId, row]));
+  assert.deepEqual([byUser[busy.id].attempts, byUser[lee.id].attempts], [1, MAX_ATTEMPTS], "a rejected address is not retried");
+  assert.match(byUser[busy.id].error, /429/);
+
+  const healthy = fakeSender();
+  result = await run({ sender: healthy.sender, onlyUserIds: ids });
+  assert.deepEqual(healthy.sent.map((email) => email.to), [busy.email]);
+  rows = await deliveries(ids, result.date);
+  const after = Object.fromEntries(rows.map((row) => [row.userId, row]));
+  assert.deepEqual([after[busy.id].status, after[busy.id].attempts, after[lee.id].status], ["SENT", 2, "FAILED"]);
+});
+
+test("a run stops at its deadline and the next call carries on", async () => {
+  const { busy } = await teamWithNews();
+  const { sender, sent } = fakeSender();
+  const stopped = await run({ sender, deadline: Date.now() - 1, onlyUserIds: [busy.id] });
+  assert.deepEqual([stopped.sent, stopped.done], [0, false]);
+  const next = await run({ sender, onlyUserIds: [busy.id] });
+  assert.equal(next.sent, 1);
+  assert.equal(sent.length, 1);
+});
+
+test("the Resend adapter sends the expected request and classifies errors", async () => {
+  const calls = [];
+  const ok = createResendSender({ apiKey: "re_test", from: "Commons <digest@commons.test>", fetchImpl: async (url, init) => { calls.push([url, init]); return new Response(JSON.stringify({ id: "abc" }), { status: 200 }); } });
+  assert.deepEqual(await ok({ to: "maya@example.test", subject: "S", html: "<p>H</p>", text: "T", headers: { "List-Unsubscribe": "<https://x>" } }), { id: "abc" });
+  const [url, init] = calls[0];
+  assert.equal(url, "https://api.resend.com/emails");
+  assert.equal(init.headers.authorization, "Bearer re_test");
+  assert.deepEqual(JSON.parse(init.body), { from: "Commons <digest@commons.test>", to: ["maya@example.test"], subject: "S", html: "<p>H</p>", text: "T", headers: { "List-Unsubscribe": "<https://x>" } });
+
+  const limited = createResendSender({ apiKey: "k", fetchImpl: async () => new Response(JSON.stringify({ message: "Too many requests" }), { status: 429 }) });
+  await assert.rejects(limited({ to: "a@b.c", subject: "s", html: "h", text: "t" }), (error) => error instanceof EmailError && error.retryable && /429/.test(error.message));
+  const rejected = createResendSender({ apiKey: "k", fetchImpl: async () => new Response(JSON.stringify({ message: "Invalid to field" }), { status: 422 }) });
+  await assert.rejects(rejected({ to: "bad", subject: "s", html: "h", text: "t" }), (error) => error instanceof EmailError && !error.retryable);
+});
+
+test("the run endpoint refuses callers without the shared secret", async () => {
+  const { env } = jiti("../env.ts");
+  const { POST } = jiti("../../app/api/digest/run/route.ts");
+  const call = (authorization) => POST(new Request("https://commons.test/api/digest/run", { method: "POST", headers: authorization ? { authorization } : {} }));
+  const saved = env.DIGEST_RUN_SECRET;
+  try {
+    env.DIGEST_RUN_SECRET = undefined;
+    assert.equal((await call("Bearer anything")).status, 503, "not configured yet");
+    env.DIGEST_RUN_SECRET = "s".repeat(40);
+    assert.equal((await call()).status, 401);
+    assert.equal((await call("Bearer wrong")).status, 401);
+    assert.equal((await call(`Bearer ${"t".repeat(40)}`)).status, 401, "same length, wrong secret");
+  } finally {
+    env.DIGEST_RUN_SECRET = saved;
+  }
+});
