@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { Markdown } from "@/components/common/Markdown";
+
 export function DecisionStatus({ status }: { status: "PROPOSED" | "DECIDED" | "SUPERSEDED" }) {
   const label = status === "DECIDED" ? "Finalized" : status === "PROPOSED" ? "Proposal" : "Superseded";
   return <span className={`inline-flex min-h-7 items-center rounded-sm border px-2.5 text-xs font-semibold ${status === "DECIDED" ? "border-success text-success" : status === "PROPOSED" ? "border-info text-info" : "border-border text-text-muted"}`}>{label}</span>;
@@ -13,7 +15,7 @@ export function DecisionDate({ value }: { value: Date | string }) {
 export function DecisionSection({ title, children }: { title: string; children: ReactNode }) {
   return <section className="border-t border-border-subtle py-5 sm:py-6">
     <h2 className="text-xs font-semibold uppercase text-brand-link">{title}</h2>
-    <div className="mt-2 whitespace-pre-wrap wrap-anywhere text-[0.96rem] leading-7 text-text-primary sm:text-base">{children}</div>
+    <div className="mt-2 wrap-anywhere text-[0.96rem] leading-7 text-text-primary sm:text-base">{typeof children === "string" ? <Markdown text={children} /> : children}</div>
   </section>;
 }
 

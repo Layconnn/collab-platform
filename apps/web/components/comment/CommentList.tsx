@@ -10,8 +10,9 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { updateCommentInputSchema, type UpdateCommentInput } from "@repo/validators/comment";
 import { commentActionError } from "@/components/comment/commentErrors";
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
-import { MentionText } from "@/components/common/MentionText";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
+import { MarkdownField } from "@/components/common/MarkdownField";
+import { Markdown } from "@/components/common/Markdown";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { ErrorState } from "@/components/common/StateNotice";
 import { useCommentActions, useCommentList } from "@/hooks/useComment";
@@ -141,6 +142,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
             {editing && canManage ? (
               <form onSubmit={onSubmit} className="mt-3 space-y-2.5" noValidate>
                 <label htmlFor={`edit-comment-${comment.id}`} className="block text-sm font-semibold text-text-primary">Edit comment</label>
+                <MarkdownField>
                 <MentionTextarea
                   workspaceId={workspaceId}
                   registration={form.register("body")}
@@ -154,6 +156,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                   aria-describedby={form.formState.errors.body ? `edit-comment-error-${comment.id}` : undefined}
                   className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                 />
+                </MarkdownField>
                 {form.formState.errors.body ? <p id={`edit-comment-error-${comment.id}`} role="alert" className="text-sm text-danger">Write a comment of up to 5,000 characters.</p> : null}
                 {editError ? <p role="alert" className="text-sm text-danger">{editError}</p> : null}
                 <div className="flex flex-wrap items-center gap-2">
@@ -163,7 +166,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               </form>
             ) : (
               <>
-                <p className="mt-1.5 whitespace-pre-wrap wrap-anywhere text-[0.94rem] leading-6 text-text-primary"><MentionText text={comment.body} /></p>
+                <Markdown text={comment.body} className="mt-1.5 text-[0.94rem] leading-6 text-text-primary" />
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   {canReply ? (
                     <button ref={replyButtonRef} type="button" onClick={replying ? closeReply : openReply} aria-expanded={replying} aria-controls={`reply-form-${comment.id}`} className="inline-flex min-h-10 items-center gap-1.5 rounded-sm px-2 text-xs font-semibold text-brand-link hover:bg-surface-hover hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
