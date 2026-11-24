@@ -407,6 +407,7 @@ export const ModelName = {
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
   DiscussionFollow: 'DiscussionFollow',
+  DigestDelivery: 'DigestDelivery',
   SavedItem: 'SavedItem',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1170,6 +1171,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DigestDelivery: {
+      payload: Prisma.$DigestDeliveryPayload<ExtArgs>
+      fields: Prisma.DigestDeliveryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DigestDeliveryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DigestDeliveryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        findFirst: {
+          args: Prisma.DigestDeliveryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DigestDeliveryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        findMany: {
+          args: Prisma.DigestDeliveryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>[]
+        }
+        create: {
+          args: Prisma.DigestDeliveryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        createMany: {
+          args: Prisma.DigestDeliveryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DigestDeliveryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>[]
+        }
+        delete: {
+          args: Prisma.DigestDeliveryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        update: {
+          args: Prisma.DigestDeliveryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        deleteMany: {
+          args: Prisma.DigestDeliveryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DigestDeliveryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DigestDeliveryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>[]
+        }
+        upsert: {
+          args: Prisma.DigestDeliveryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        aggregate: {
+          args: Prisma.DigestDeliveryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDigestDelivery>
+        }
+        groupBy: {
+          args: Prisma.DigestDeliveryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestDeliveryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DigestDeliveryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestDeliveryCountAggregateOutputType> | number
+        }
+      }
+    }
     SavedItem: {
       payload: Prisma.$SavedItemPayload<ExtArgs>
       fields: Prisma.SavedItemFieldRefs
@@ -1674,6 +1749,21 @@ export const DiscussionFollowScalarFieldEnum = {
 export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
 
 
+export const DigestDeliveryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  digestDate: 'digestDate',
+  status: 'status',
+  providerId: 'providerId',
+  attempts: 'attempts',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DigestDeliveryScalarFieldEnum = (typeof DigestDeliveryScalarFieldEnum)[keyof typeof DigestDeliveryScalarFieldEnum]
+
+
 export const SavedItemScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1931,6 +2021,20 @@ export type ListEnumFollowStateFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'DigestDeliveryStatus'
+ */
+export type EnumDigestDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DigestDeliveryStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DigestDeliveryStatus[]'
+ */
+export type ListEnumDigestDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DigestDeliveryStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ActivityKind'
  */
 export type EnumActivityKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ActivityKind'>
@@ -2132,6 +2236,7 @@ export type GlobalOmitConfig = {
   decisionRevision?: Prisma.DecisionRevisionOmit
   decisionReview?: Prisma.DecisionReviewOmit
   discussionFollow?: Prisma.DiscussionFollowOmit
+  digestDelivery?: Prisma.DigestDeliveryOmit
   savedItem?: Prisma.SavedItemOmit
   reaction?: Prisma.ReactionOmit
   decisionSupersession?: Prisma.DecisionSupersessionOmit

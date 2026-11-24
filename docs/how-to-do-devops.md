@@ -41,6 +41,22 @@ Vercel Queues has no queue-depth API, so Commons tracks its own backlog (`server
 - Each delivery logs `notification.queue.delivered` with `waitedMs`, the time between publish and delivery.
 - When it fires: check the consumer's function logs on Vercel for `notification.queue.delivery_failed`, then the Vercel Queues dashboard for the `notification-delivery` topic. Entries older than 24 hours are dropped from the set, so a lost message stops alerting after a day.
 
+## Daily digest email
+
+The digest ([PRD](../apps/web/documentation/projects/2026-11-24-daily-digest/PRD.md)) is sent by `.github/workflows/daily-digest.yml` at 06:00 UTC, which calls `POST /api/digest/run` until it answers `done: true`. The app records one `DigestDelivery` row per member and day, so re-running the workflow never sends twice.
+
+| Setting | Where | Purpose |
+| --- | --- | --- |
+| `DIGEST_RUN_SECRET` | GitHub Actions secret **and** Vercel (Production), same value, 32+ characters | Lets the workflow start a run; without it the workflow exits with a notice and nothing is sent |
+| `RESEND_API_KEY` | Vercel (Production) | Sending; without it every digest is recorded as `HELD` |
+| `DIGEST_FROM` | Vercel (Production), optional | Sender, e.g. `Commons <digest@your-domain>`; defaults to Resend's test sender |
+| `DIGEST_DELIVERY` | Vercel (Production), optional | `allowlist` (default) or `all` once a domain is verified in Resend |
+| `DIGEST_ALLOWLIST` | Vercel (Production) | Comma-separated addresses that receive digests while `DIGEST_DELIVERY=allowlist` |
+
+Never print these values. To check a day's run, read the workflow log (counts of sent, skipped, held and failed per call) or query `DigestDelivery` by `digestDate` and `status` through the migration workflow's database access. `HELD` rows are expected until `DIGEST_DELIVERY=all`; `FAILED` rows carry the provider's error and are retried up to three times.
+
+Switching on for everyone: buy a domain, verify it in Resend (SPF and DKIM), set `DIGEST_FROM` to an address on it, then set `DIGEST_DELIVERY=all` and redeploy. No code change.
+
 ## Production database migrations
 
 Migrations reach production through `.github/workflows/migrate-production.yml`, never from a laptop.

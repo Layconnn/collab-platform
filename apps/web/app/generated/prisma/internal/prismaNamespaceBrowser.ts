@@ -61,6 +61,7 @@ export const ModelName = {
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
   DiscussionFollow: 'DiscussionFollow',
+  DigestDelivery: 'DigestDelivery',
   SavedItem: 'SavedItem',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
@@ -250,6 +251,21 @@ export const DiscussionFollowScalarFieldEnum = {
 } as const
 
 export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
+
+
+export const DigestDeliveryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  digestDate: 'digestDate',
+  status: 'status',
+  providerId: 'providerId',
+  attempts: 'attempts',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DigestDeliveryScalarFieldEnum = (typeof DigestDeliveryScalarFieldEnum)[keyof typeof DigestDeliveryScalarFieldEnum]
 
 
 export const SavedItemScalarFieldEnum = {
