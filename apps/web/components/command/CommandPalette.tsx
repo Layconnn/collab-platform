@@ -52,6 +52,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
   const { user, logout } = useAuth();
   const { setMode } = useTheme();
   const setShortcutsOpen = useUiStore((state) => state.setShortcutsOpen);
+  const setCreateWorkspaceOpen = useUiStore((state) => state.setCreateWorkspaceOpen);
   const workspaceId = pathname.match(/^\/workspace\/([^/]+)/)?.[1];
   const workspace = useWorkspaceDetail(workspaceId ?? "", Boolean(user && workspaceId));
   const workspaces = useWorkspaceSwitcherList(Boolean(user));
@@ -109,6 +110,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
       return;
     }
     if (item.action === "shortcuts") { onClose(); setShortcutsOpen(true); return; }
+    if (item.action === "new-workspace") { onClose(); setCreateWorkspaceOpen(true); return; }
     if (item.action?.startsWith("theme-")) { setMode(item.action.slice("theme-".length) as "light" | "dark" | "system"); onClose(); return; }
     if (item.action === "sign-out") {
       onClose();

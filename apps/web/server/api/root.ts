@@ -4,6 +4,7 @@ import { commentRouter } from "./routers/comment.router";
 import { discussionRouter } from "./routers/discussion.router";
 import { activityRouter } from "./routers/activity.router";
 import { searchRouter } from "./routers/search.router";
+import { homeRouter } from "./routers/home.router";
 import { decisionRouter } from "./routers/decision.router";
 import { notificationRouter } from "./routers/notification.router";
 import { workspaceRouter } from "./routers/workspace.router";
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
   notification: notificationRouter,
   activity: activityRouter,
   search: searchRouter,
+  home: homeRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -34,13 +34,17 @@ test("a new user registers, records a decision from a discussion and signs out",
     await page.getByLabel("Password", { exact: true }).fill(`smoke-password-${id}`);
     await page.getByRole("button", { name: "Create account" }).click();
     await expect(page).toHaveURL(/\/workspace$/);
-    await expect(page.getByRole("heading", { level: 1, name: "Your workspaces" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^Good (morning|afternoon|evening)/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Start with a workspace" })).toBeVisible();
+    await expect(page.getByRole("main").getByText(`smoke_${id}`, { exact: true })).toBeVisible();
   });
 
   await test.step("create a workspace", async () => {
-    await page.getByLabel("Workspace name").fill(workspaceName);
-    await page.getByLabel("Workspace address").fill(`smoke-${id}`);
-    await page.getByRole("button", { name: "Create workspace" }).click();
+    await page.getByRole("main").getByRole("button", { name: "Create a workspace" }).click();
+    const dialog = page.getByRole("dialog", { name: "Create a workspace" });
+    await dialog.getByLabel("Workspace name").fill(workspaceName);
+    await dialog.getByLabel("Workspace address").fill(`smoke-${id}`);
+    await dialog.getByRole("button", { name: "Create workspace" }).click();
     await expect(page).toHaveURL(/\/workspace\/[a-z0-9]+$/);
   });
 

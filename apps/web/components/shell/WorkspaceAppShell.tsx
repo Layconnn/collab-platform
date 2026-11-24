@@ -9,6 +9,7 @@ import { AccountMenu } from "@/components/shell/AccountMenu";
 import { AppIcon } from "@/components/common/AppIcon";
 import { WorkspaceSwitcher } from "@/components/shell/WorkspaceSwitcher";
 import { CommandPalette, ShortcutsSheet, useCommandShortcuts } from "@/components/command/CommandPalette";
+import { CreateWorkspaceDialog } from "@/components/workspace/CreateWorkspaceDialog";
 import { isMacPlatform } from "@/components/command/commandItems";
 import { NotificationDropdown } from "@/components/notification/NotificationDropdown";
 import { WorkspaceNavigation } from "@/components/workspace/WorkspaceNavigation";
@@ -23,7 +24,7 @@ function currentWorkspaceId(pathname: string) {
 }
 
 function pageContext(pathname: string) {
-  if (pathname === "/workspace") return "Workspaces";
+  if (pathname === "/workspace") return "Home";
   if (pathname.startsWith("/search")) return "Search";
   if (pathname.includes("/members")) return "Members";
   if (pathname.includes("/discussions")) return "Discussions";
@@ -216,7 +217,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
   const context = pageContext(pathname);
   const contextName = workspaceUnavailable
     ? "Workspace unavailable"
-    : workspaceName ?? (workspaceId ? "Loading workspace" : "Workspaces");
+    : workspaceName ?? (workspaceId ? "Loading workspace" : context);
 
   return (
     <div className={`min-h-screen bg-canvas text-text-primary md:grid md:transition-[grid-template-columns] md:duration-150 motion-reduce:transition-none ${sidebarExpanded ? "md:grid-cols-[16rem_minmax(0,1fr)]" : "md:grid-cols-[4.5rem_minmax(0,1fr)]"}`}>
@@ -251,7 +252,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
             <span className="min-w-0 truncate text-sm font-medium text-text-primary">{contextName}</span>
           </div>
           <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-xs text-text-muted md:flex">
-            <Link href="/workspace" className="shrink-0 hover:text-text-primary">Workspaces</Link>
+            <Link href="/workspace" className="shrink-0 hover:text-text-primary">Home</Link>
             {visibleWorkspaceId ? <><span aria-hidden="true">/</span><Link href={`/workspace/${visibleWorkspaceId}`} className="max-w-64 truncate hover:text-text-primary">{contextName}</Link></> : null}
             {visibleWorkspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span><span aria-current="page" className="text-text-secondary">{context}</span></> : null}
           </nav>
@@ -276,6 +277,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
         </main>
         <CommandPalette />
         <ShortcutsSheet />
+        <CreateWorkspaceDialog />
       </div>
 
       {mobileNavOpen ? (
