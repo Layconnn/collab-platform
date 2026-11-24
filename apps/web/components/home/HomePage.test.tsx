@@ -19,7 +19,7 @@ vi.mock("@/hooks/useHome", () => ({
   useRecentDecisions: () => ({ data: mocks.decisionsError ? undefined : { decisions: mocks.decisions }, error: mocks.decisionsError, isLoading: false, isFetching: false, refetch: mocks.refetch }),
   useDismissNeeds: () => ({ dismiss: { mutate: mocks.dismiss, isPending: false }, dismissAll: { mutate: mocks.dismissAll, isPending: false } }),
 }));
-vi.mock("@/components/workspace/WorkspaceList", () => ({ WorkspaceList: () => <p>Workspace list</p> }));
+vi.mock("@/components/home/WorkspaceCards", () => ({ WorkspaceCards: () => <p>Workspace list</p> }));
 vi.mock("@/components/workspace/CreateWorkspaceForm", () => ({ CreateWorkspaceForm: () => <p>Create form</p> }));
 
 import { HomePage, greeting, needReason } from "./HomePage";

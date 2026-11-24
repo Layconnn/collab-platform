@@ -7,8 +7,8 @@ import { useState } from "react";
 import { timeAgo } from "@/components/activity/RecentActivity";
 import { readRecent, type RecentEntry } from "@/components/command/commandItems";
 import { ErrorState } from "@/components/common/StateNotice";
+import { WorkspaceCards } from "@/components/home/WorkspaceCards";
 import { CreateWorkspaceForm } from "@/components/workspace/CreateWorkspaceForm";
-import { WorkspaceList } from "@/components/workspace/WorkspaceList";
 import { useAuth } from "@/hooks/useAuth";
 import { useDismissNeeds, useNeedsYou, useRecentDecisions } from "@/hooks/useHome";
 
@@ -192,7 +192,7 @@ export function HomePage() {
         <NeedsYou />
         <section aria-labelledby="workspace-directory-heading" className="min-w-0">
           <h2 id="workspace-directory-heading" className={`mb-4 ${sectionTitle}`}>Your workspaces</h2>
-          <WorkspaceList />
+          <WorkspaceCards />
         </section>
       </div>
       <aside className="min-w-0 space-y-10" aria-label="This week">

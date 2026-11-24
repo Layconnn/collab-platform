@@ -21,3 +21,7 @@ export function useDismissNeeds() {
   const dismissAll = trpc.home.dismissAll.useMutation({ onSettled: refresh });
   return { dismiss, dismissAll };
 }
+
+export function useWorkspacePulse() {
+  return trpc.home.pulse.useQuery();
+}
