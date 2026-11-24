@@ -3,6 +3,8 @@ import { Prisma } from "../../../app/generated/prisma/client";
 import { prisma } from "../../db/prisma";
 import { EmailError, type EmailSender } from "../email/email";
 import { appBaseUrl, renderDigest } from "./digest.email";
+import { digestSettingsFor } from "./digest.preferences";
+import { createUnsubscribeToken } from "./digest.tokens";
 import { buildDigest } from "./digest.service";
 
 // The daily run (daily digest PRD, FR-5 to FR-8). Each member gets at most one
@@ -30,6 +32,7 @@ export type DigestRunResult = {
   date: string;
   sent: number;
   skippedEmpty: number;
+  skippedOff: number;
   held: number;
   failed: number;
   // True when this call found nobody left to process today.
@@ -37,6 +40,27 @@ export type DigestRunResult = {
 };
 
 export const digestDateOf = (now: Date) => now.toISOString().slice(0, 10);
+
+// The email with its stop links (one for everything, one per workspace in the
+// digest) and the one-click unsubscribe headers mail apps use (FR-10, FR-11).
+export function composeDigestEmail(digest: Awaited<ReturnType<typeof buildDigest>> & object, now: Date) {
+  const baseUrl = appBaseUrl();
+  const allToken = createUnsubscribeToken({ userId: digest.user.id, scope: "all" }, now);
+  const workspaces = new Map<string, string>();
+  for (const item of digest.needs.items) workspaces.set(item.workspace.id, item.workspace.name);
+  for (const item of digest.decided) workspaces.set(item.workspace.id, item.workspace.name);
+  for (const item of digest.activity) workspaces.set(item.workspace.id, item.workspace.name);
+  const unsubscribeWorkspace = Object.fromEntries([...workspaces].map(([workspaceId, name]) => [
+    name,
+    `${baseUrl}/unsubscribe/${createUnsubscribeToken({ userId: digest.user.id, scope: "workspace", workspaceId }, now)}`,
+  ]));
+  const email = renderDigest(digest, { baseUrl, unsubscribeAll: `${baseUrl}/unsubscribe/${allToken}`, unsubscribeWorkspace });
+  const headers = {
+    "List-Unsubscribe": `<${baseUrl}/api/digest/unsubscribe?token=${allToken}>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
+  return { email, headers };
+}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -61,7 +85,7 @@ export async function runDigest(options: DigestRunOptions): Promise<DigestRunRes
   const date = digestDateOf(now);
   const digestDate = new Date(`${date}T00:00:00.000Z`);
   const allowed = new Set(options.allowlist.map((email) => email.trim().toLowerCase()).filter(Boolean));
-  const result: DigestRunResult = { date, sent: 0, skippedEmpty: 0, held: 0, failed: 0, done: false };
+  const result: DigestRunResult = { date, sent: 0, skippedEmpty: 0, skippedOff: 0, held: 0, failed: 0, done: false };
   const finish = (userId: string, data: Prisma.DigestDeliveryUpdateManyMutationInput) =>
     prisma.digestDelivery.updateMany({ where: { userId, digestDate, status: "SENDING" }, data });
 
@@ -91,7 +115,13 @@ export async function runDigest(options: DigestRunOptions): Promise<DigestRunRes
       cursor = user.id;
       if (!(await claim(user.id, digestDate))) continue;
       processed += 1;
-      const digest = await buildDigest(user.id, { now });
+      const settings = await digestSettingsFor(user.id);
+      if (!settings.enabled) {
+        await finish(user.id, { status: "SKIPPED_OFF" });
+        result.skippedOff += 1;
+        continue;
+      }
+      const digest = await buildDigest(user.id, { now, excludedWorkspaceIds: settings.excludedWorkspaceIds });
       if (!digest || digest.empty) {
         await finish(user.id, { status: "SKIPPED_EMPTY" });
         result.skippedEmpty += 1;
@@ -103,9 +133,9 @@ export async function runDigest(options: DigestRunOptions): Promise<DigestRunRes
         result.held += 1;
         continue;
       }
-      const email = renderDigest(digest, { baseUrl: appBaseUrl() });
+      const { email, headers } = composeDigestEmail(digest, now);
       try {
-        const sent = await options.sender({ to: user.email, subject: email.subject, html: email.html, text: email.text });
+        const sent = await options.sender({ to: user.email, subject: email.subject, html: email.html, text: email.text, headers });
         await finish(user.id, { status: "SENT", providerId: sent.id });
         result.sent += 1;
       } catch (error) {
