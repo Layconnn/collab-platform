@@ -23,6 +23,8 @@ export const decisionByIdInputSchema = z.object({
 export const listDecisionsInputSchema = z.object({
   workspaceId: id,
   status: z.enum(["PROPOSED", "DECIDED", "SUPERSEDED"]).optional(),
+  // Proposals where the viewer's review is still pending (decision reviews, FR-12).
+  waitingForMe: z.boolean().optional(),
   cursor: id.optional(),
   take: z.number().int().min(1).max(100).default(20),
 });
@@ -40,6 +42,8 @@ export const editDecisionInputSchema = decisionByIdInputSchema.extend({
 
 export const finalizeDecisionInputSchema = decisionByIdInputSchema.extend({
   expectedVersion: z.number().int().positive(),
+  // "Finalize anyway" when the review rule is not met (decision reviews, FR-9).
+  overrideReason: z.string().trim().min(10).max(2000).optional(),
 });
 
 export const deleteDecisionInputSchema = decisionByIdInputSchema.extend({
@@ -67,6 +71,38 @@ export const replacementCandidatesInputSchema = z.object({
   take: z.number().int().min(1).max(30).default(20),
 });
 
+// Decision reviews (decision reviews PRD, FR-1 to FR-4).
+export const MAX_DECISION_REVIEWERS = 10;
+const reviewNote = z.string().trim().max(2000);
+const reviewRule = z.object({
+  rule: z.enum(["ALL", "AT_LEAST"]),
+  requiredApprovals: z.number().int().min(1).max(MAX_DECISION_REVIEWERS).optional(),
+}).refine((value) => value.rule === "ALL" || value.requiredApprovals !== undefined, {
+  message: "Say how many approvals are needed.",
+  path: ["requiredApprovals"],
+});
+
+export const requestDecisionReviewInputSchema = decisionByIdInputSchema.extend({
+  reviewerIds: z.array(id).min(1).max(MAX_DECISION_REVIEWERS)
+    .refine((ids) => new Set(ids).size === ids.length, { message: "Each reviewer can be asked once." }),
+  rule: reviewRule.optional(),
+});
+
+export const setDecisionReviewRuleInputSchema = decisionByIdInputSchema.and(reviewRule);
+
+export const withdrawDecisionReviewInputSchema = decisionByIdInputSchema.extend({
+  reviewerId: id,
+});
+
+export const respondToDecisionReviewInputSchema = decisionByIdInputSchema.extend({
+  expectedVersion: z.number().int().positive(),
+  response: z.enum(["APPROVED", "OBJECTED"]),
+  note: reviewNote.optional(),
+}).refine((value) => value.response !== "OBJECTED" || Boolean(value.note), {
+  message: "Say why you object.",
+  path: ["note"],
+});
+
 export type CreateDecisionInput = z.infer<typeof createDecisionInputSchema>;
 export type DecisionByIdInput = z.infer<typeof decisionByIdInputSchema>;
 export type ListDecisionsInput = z.infer<typeof listDecisionsInputSchema>;
@@ -76,3 +112,7 @@ export type DeleteDecisionInput = z.infer<typeof deleteDecisionInputSchema>;
 export type DecisionRevisionsInput = z.infer<typeof decisionRevisionsInputSchema>;
 export type SupersedeDecisionInput = z.infer<typeof supersedeDecisionInputSchema>;
 export type ReplacementCandidatesInput = z.infer<typeof replacementCandidatesInputSchema>;
+export type RequestDecisionReviewInput = z.infer<typeof requestDecisionReviewInputSchema>;
+export type SetDecisionReviewRuleInput = z.infer<typeof setDecisionReviewRuleInputSchema>;
+export type WithdrawDecisionReviewInput = z.infer<typeof withdrawDecisionReviewInputSchema>;
+export type RespondToDecisionReviewInput = z.infer<typeof respondToDecisionReviewInputSchema>;

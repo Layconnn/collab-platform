@@ -2,9 +2,9 @@
 
 import { trpc } from "@/lib/trpc/api-client";
 
-export function useDecisionList(workspaceId: string, status?: "PROPOSED" | "DECIDED" | "SUPERSEDED") {
+export function useDecisionList(workspaceId: string, status?: "PROPOSED" | "DECIDED" | "SUPERSEDED", waitingForMe = false) {
   return trpc.decision.listByWorkspace.useInfiniteQuery(
-    { workspaceId, status, take: 20 },
+    { workspaceId, status, take: 20, ...(waitingForMe ? { waitingForMe } : {}) },
     { getNextPageParam: (page) => page.nextCursor ?? undefined, enabled: Boolean(workspaceId) },
   );
 }
@@ -41,6 +41,8 @@ export function useDecisionActions(workspaceId: string) {
       utils.decision.listByWorkspace.invalidate({ workspaceId }),
       utils.decision.getById.invalidate({ workspaceId, decisionId }),
       utils.decision.revisions.invalidate({ workspaceId, decisionId }),
+      // Edits reset reviews and finalizing closes them.
+      utils.decisionReview.list.invalidate({ workspaceId, decisionId }),
     ]);
   };
   const refreshAccess = async (error: { data?: { code?: string } | null }) => {

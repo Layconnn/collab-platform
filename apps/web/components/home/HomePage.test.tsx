@@ -161,4 +161,14 @@ describe("Home helpers", () => {
     expect(needReason(need({ kind: "OWN_PROPOSAL", at: new Date(now - DAY - 5) }) as never, now)).toBe("Your proposal · open for 1 day");
     expect(needReason(need({ kind: "MENTION", actor: null }) as never, now)).toBe("Someone mentioned you");
   });
+
+  it("puts a review request in words, linking to the decision", () => {
+    mocks.needs = { total: 1, items: [need({ id: "rv", kind: "REVIEW_REQUESTED", title: "Offer a free plan", discussionId: null, decisionId: "c000000000000000000000005", notificationId: null, at: new Date(Date.now() - 2 * DAY) })] };
+    render(<HomePage />);
+    const row = within(screen.getByRole("list", { name: "Needs you" })).getByRole("listitem");
+    expect(within(row).getByText("Review requested")).toBeTruthy();
+    expect(row.textContent).toContain("Sam asked for your review · waiting 2 days");
+    expect(within(row).getByRole("link", { name: "Offer a free plan" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/c000000000000000000000005`);
+    expect(within(row).queryByRole("button")).toBeNull();
+  });
 });

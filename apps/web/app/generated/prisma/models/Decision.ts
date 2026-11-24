@@ -27,10 +27,12 @@ export type AggregateDecision = {
 }
 
 export type DecisionAvgAggregateOutputType = {
+  requiredApprovals: number | null
   version: number | null
 }
 
 export type DecisionSumAggregateOutputType = {
+  requiredApprovals: number | null
   version: number | null
 }
 
@@ -49,6 +51,8 @@ export type DecisionMinAggregateOutputType = {
   alternatives: string | null
   followUp: string | null
   status: $Enums.DecisionStatus | null
+  reviewRule: $Enums.DecisionReviewRule | null
+  requiredApprovals: number | null
   version: number | null
   idempotencyKey: string | null
   creationPayloadHash: string | null
@@ -74,6 +78,8 @@ export type DecisionMaxAggregateOutputType = {
   alternatives: string | null
   followUp: string | null
   status: $Enums.DecisionStatus | null
+  reviewRule: $Enums.DecisionReviewRule | null
+  requiredApprovals: number | null
   version: number | null
   idempotencyKey: string | null
   creationPayloadHash: string | null
@@ -99,6 +105,8 @@ export type DecisionCountAggregateOutputType = {
   alternatives: number
   followUp: number
   status: number
+  reviewRule: number
+  requiredApprovals: number
   version: number
   idempotencyKey: number
   creationPayloadHash: number
@@ -112,10 +120,12 @@ export type DecisionCountAggregateOutputType = {
 
 
 export type DecisionAvgAggregateInputType = {
+  requiredApprovals?: true
   version?: true
 }
 
 export type DecisionSumAggregateInputType = {
+  requiredApprovals?: true
   version?: true
 }
 
@@ -134,6 +144,8 @@ export type DecisionMinAggregateInputType = {
   alternatives?: true
   followUp?: true
   status?: true
+  reviewRule?: true
+  requiredApprovals?: true
   version?: true
   idempotencyKey?: true
   creationPayloadHash?: true
@@ -159,6 +171,8 @@ export type DecisionMaxAggregateInputType = {
   alternatives?: true
   followUp?: true
   status?: true
+  reviewRule?: true
+  requiredApprovals?: true
   version?: true
   idempotencyKey?: true
   creationPayloadHash?: true
@@ -184,6 +198,8 @@ export type DecisionCountAggregateInputType = {
   alternatives?: true
   followUp?: true
   status?: true
+  reviewRule?: true
+  requiredApprovals?: true
   version?: true
   idempotencyKey?: true
   creationPayloadHash?: true
@@ -296,6 +312,8 @@ export type DecisionGroupByOutputType = {
   alternatives: string | null
   followUp: string | null
   status: $Enums.DecisionStatus
+  reviewRule: $Enums.DecisionReviewRule
+  requiredApprovals: number | null
   version: number
   idempotencyKey: string
   creationPayloadHash: string | null
@@ -344,6 +362,8 @@ export type DecisionWhereInput = {
   alternatives?: Prisma.StringNullableFilter<"Decision"> | string | null
   followUp?: Prisma.StringNullableFilter<"Decision"> | string | null
   status?: Prisma.EnumDecisionStatusFilter<"Decision"> | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFilter<"Decision"> | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.IntNullableFilter<"Decision"> | number | null
   version?: Prisma.IntFilter<"Decision"> | number
   idempotencyKey?: Prisma.StringFilter<"Decision"> | string
   creationPayloadHash?: Prisma.StringNullableFilter<"Decision"> | string | null
@@ -357,6 +377,7 @@ export type DecisionWhereInput = {
   createdBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   deletedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   revisions?: Prisma.DecisionRevisionListRelationFilter
+  reviews?: Prisma.DecisionReviewListRelationFilter
   replacementLink?: Prisma.XOR<Prisma.DecisionSupersessionNullableScalarRelationFilter, Prisma.DecisionSupersessionWhereInput> | null
   predecessorLink?: Prisma.XOR<Prisma.DecisionSupersessionNullableScalarRelationFilter, Prisma.DecisionSupersessionWhereInput> | null
 }
@@ -376,6 +397,8 @@ export type DecisionOrderByWithRelationInput = {
   alternatives?: Prisma.SortOrderInput | Prisma.SortOrder
   followUp?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  reviewRule?: Prisma.SortOrder
+  requiredApprovals?: Prisma.SortOrderInput | Prisma.SortOrder
   version?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   creationPayloadHash?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -389,6 +412,7 @@ export type DecisionOrderByWithRelationInput = {
   createdBy?: Prisma.UserOrderByWithRelationInput
   deletedBy?: Prisma.UserOrderByWithRelationInput
   revisions?: Prisma.DecisionRevisionOrderByRelationAggregateInput
+  reviews?: Prisma.DecisionReviewOrderByRelationAggregateInput
   replacementLink?: Prisma.DecisionSupersessionOrderByWithRelationInput
   predecessorLink?: Prisma.DecisionSupersessionOrderByWithRelationInput
 }
@@ -413,6 +437,8 @@ export type DecisionWhereUniqueInput = Prisma.AtLeast<{
   alternatives?: Prisma.StringNullableFilter<"Decision"> | string | null
   followUp?: Prisma.StringNullableFilter<"Decision"> | string | null
   status?: Prisma.EnumDecisionStatusFilter<"Decision"> | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFilter<"Decision"> | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.IntNullableFilter<"Decision"> | number | null
   version?: Prisma.IntFilter<"Decision"> | number
   creationPayloadHash?: Prisma.StringNullableFilter<"Decision"> | string | null
   decidedAt?: Prisma.DateTimeNullableFilter<"Decision"> | Date | string | null
@@ -425,6 +451,7 @@ export type DecisionWhereUniqueInput = Prisma.AtLeast<{
   createdBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   deletedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   revisions?: Prisma.DecisionRevisionListRelationFilter
+  reviews?: Prisma.DecisionReviewListRelationFilter
   replacementLink?: Prisma.XOR<Prisma.DecisionSupersessionNullableScalarRelationFilter, Prisma.DecisionSupersessionWhereInput> | null
   predecessorLink?: Prisma.XOR<Prisma.DecisionSupersessionNullableScalarRelationFilter, Prisma.DecisionSupersessionWhereInput> | null
 }, "id" | "idempotencyKey" | "workspaceId_id">
@@ -444,6 +471,8 @@ export type DecisionOrderByWithAggregationInput = {
   alternatives?: Prisma.SortOrderInput | Prisma.SortOrder
   followUp?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  reviewRule?: Prisma.SortOrder
+  requiredApprovals?: Prisma.SortOrderInput | Prisma.SortOrder
   version?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   creationPayloadHash?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -477,6 +506,8 @@ export type DecisionScalarWhereWithAggregatesInput = {
   alternatives?: Prisma.StringNullableWithAggregatesFilter<"Decision"> | string | null
   followUp?: Prisma.StringNullableWithAggregatesFilter<"Decision"> | string | null
   status?: Prisma.EnumDecisionStatusWithAggregatesFilter<"Decision"> | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleWithAggregatesFilter<"Decision"> | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.IntNullableWithAggregatesFilter<"Decision"> | number | null
   version?: Prisma.IntWithAggregatesFilter<"Decision"> | number
   idempotencyKey?: Prisma.StringWithAggregatesFilter<"Decision"> | string
   creationPayloadHash?: Prisma.StringNullableWithAggregatesFilter<"Decision"> | string | null
@@ -497,6 +528,8 @@ export type DecisionCreateInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -510,6 +543,7 @@ export type DecisionCreateInput = {
   createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
   deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
   revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -529,6 +563,8 @@ export type DecisionUncheckedCreateInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -538,6 +574,7 @@ export type DecisionUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -552,6 +589,8 @@ export type DecisionUpdateInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -565,6 +604,7 @@ export type DecisionUpdateInput = {
   createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
   deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
   revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -584,6 +624,8 @@ export type DecisionUncheckedUpdateInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -593,6 +635,7 @@ export type DecisionUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -612,6 +655,8 @@ export type DecisionCreateManyInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -632,6 +677,8 @@ export type DecisionUpdateManyMutationInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -657,6 +704,8 @@ export type DecisionUncheckedUpdateManyInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -697,6 +746,8 @@ export type DecisionCountOrderByAggregateInput = {
   alternatives?: Prisma.SortOrder
   followUp?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  reviewRule?: Prisma.SortOrder
+  requiredApprovals?: Prisma.SortOrder
   version?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   creationPayloadHash?: Prisma.SortOrder
@@ -708,6 +759,7 @@ export type DecisionCountOrderByAggregateInput = {
 }
 
 export type DecisionAvgOrderByAggregateInput = {
+  requiredApprovals?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
@@ -726,6 +778,8 @@ export type DecisionMaxOrderByAggregateInput = {
   alternatives?: Prisma.SortOrder
   followUp?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  reviewRule?: Prisma.SortOrder
+  requiredApprovals?: Prisma.SortOrder
   version?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   creationPayloadHash?: Prisma.SortOrder
@@ -751,6 +805,8 @@ export type DecisionMinOrderByAggregateInput = {
   alternatives?: Prisma.SortOrder
   followUp?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  reviewRule?: Prisma.SortOrder
+  requiredApprovals?: Prisma.SortOrder
   version?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   creationPayloadHash?: Prisma.SortOrder
@@ -762,6 +818,7 @@ export type DecisionMinOrderByAggregateInput = {
 }
 
 export type DecisionSumOrderByAggregateInput = {
+  requiredApprovals?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
@@ -942,6 +999,18 @@ export type EnumDecisionStatusFieldUpdateOperationsInput = {
   set?: $Enums.DecisionStatus
 }
 
+export type EnumDecisionReviewRuleFieldUpdateOperationsInput = {
+  set?: $Enums.DecisionReviewRule
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type DecisionCreateNestedOneWithoutRevisionsInput = {
   create?: Prisma.XOR<Prisma.DecisionCreateWithoutRevisionsInput, Prisma.DecisionUncheckedCreateWithoutRevisionsInput>
   connectOrCreate?: Prisma.DecisionCreateOrConnectWithoutRevisionsInput
@@ -954,6 +1023,20 @@ export type DecisionUpdateOneRequiredWithoutRevisionsNestedInput = {
   upsert?: Prisma.DecisionUpsertWithoutRevisionsInput
   connect?: Prisma.DecisionWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.DecisionUpdateToOneWithWhereWithoutRevisionsInput, Prisma.DecisionUpdateWithoutRevisionsInput>, Prisma.DecisionUncheckedUpdateWithoutRevisionsInput>
+}
+
+export type DecisionCreateNestedOneWithoutReviewsInput = {
+  create?: Prisma.XOR<Prisma.DecisionCreateWithoutReviewsInput, Prisma.DecisionUncheckedCreateWithoutReviewsInput>
+  connectOrCreate?: Prisma.DecisionCreateOrConnectWithoutReviewsInput
+  connect?: Prisma.DecisionWhereUniqueInput
+}
+
+export type DecisionUpdateOneRequiredWithoutReviewsNestedInput = {
+  create?: Prisma.XOR<Prisma.DecisionCreateWithoutReviewsInput, Prisma.DecisionUncheckedCreateWithoutReviewsInput>
+  connectOrCreate?: Prisma.DecisionCreateOrConnectWithoutReviewsInput
+  upsert?: Prisma.DecisionUpsertWithoutReviewsInput
+  connect?: Prisma.DecisionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DecisionUpdateToOneWithWhereWithoutReviewsInput, Prisma.DecisionUpdateWithoutReviewsInput>, Prisma.DecisionUncheckedUpdateWithoutReviewsInput>
 }
 
 export type DecisionCreateNestedOneWithoutReplacementLinkInput = {
@@ -994,6 +1077,8 @@ export type DecisionCreateWithoutCreatedByInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1006,6 +1091,7 @@ export type DecisionCreateWithoutCreatedByInput = {
   sourceDiscussion?: Prisma.DiscussionCreateNestedOneWithoutSourceDecisionsInput
   deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
   revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1024,6 +1110,8 @@ export type DecisionUncheckedCreateWithoutCreatedByInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1033,6 +1121,7 @@ export type DecisionUncheckedCreateWithoutCreatedByInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1057,6 +1146,8 @@ export type DecisionCreateWithoutDeletedByInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1069,6 +1160,7 @@ export type DecisionCreateWithoutDeletedByInput = {
   sourceDiscussion?: Prisma.DiscussionCreateNestedOneWithoutSourceDecisionsInput
   createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
   revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1087,6 +1179,8 @@ export type DecisionUncheckedCreateWithoutDeletedByInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1096,6 +1190,7 @@ export type DecisionUncheckedCreateWithoutDeletedByInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1144,6 +1239,8 @@ export type DecisionScalarWhereInput = {
   alternatives?: Prisma.StringNullableFilter<"Decision"> | string | null
   followUp?: Prisma.StringNullableFilter<"Decision"> | string | null
   status?: Prisma.EnumDecisionStatusFilter<"Decision"> | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFilter<"Decision"> | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.IntNullableFilter<"Decision"> | number | null
   version?: Prisma.IntFilter<"Decision"> | number
   idempotencyKey?: Prisma.StringFilter<"Decision"> | string
   creationPayloadHash?: Prisma.StringNullableFilter<"Decision"> | string | null
@@ -1180,6 +1277,8 @@ export type DecisionCreateWithoutWorkspaceInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1192,6 +1291,7 @@ export type DecisionCreateWithoutWorkspaceInput = {
   createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
   deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
   revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1210,6 +1310,8 @@ export type DecisionUncheckedCreateWithoutWorkspaceInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1219,6 +1321,7 @@ export type DecisionUncheckedCreateWithoutWorkspaceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1259,6 +1362,8 @@ export type DecisionCreateWithoutSourceDiscussionInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1271,6 +1376,7 @@ export type DecisionCreateWithoutSourceDiscussionInput = {
   createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
   deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
   revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1288,6 +1394,8 @@ export type DecisionUncheckedCreateWithoutSourceDiscussionInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1297,6 +1405,7 @@ export type DecisionUncheckedCreateWithoutSourceDiscussionInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1337,6 +1446,8 @@ export type DecisionCreateWithoutRevisionsInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1349,6 +1460,7 @@ export type DecisionCreateWithoutRevisionsInput = {
   sourceDiscussion?: Prisma.DiscussionCreateNestedOneWithoutSourceDecisionsInput
   createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
   deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1368,6 +1480,8 @@ export type DecisionUncheckedCreateWithoutRevisionsInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1376,6 +1490,7 @@ export type DecisionUncheckedCreateWithoutRevisionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
 }
@@ -1406,6 +1521,8 @@ export type DecisionUpdateWithoutRevisionsInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1418,6 +1535,7 @@ export type DecisionUpdateWithoutRevisionsInput = {
   sourceDiscussion?: Prisma.DiscussionUpdateOneWithoutSourceDecisionsNestedInput
   createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
   deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1437,6 +1555,8 @@ export type DecisionUncheckedUpdateWithoutRevisionsInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1445,6 +1565,141 @@ export type DecisionUncheckedUpdateWithoutRevisionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
+  replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
+  predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
+}
+
+export type DecisionCreateWithoutReviewsInput = {
+  id?: string
+  sourceDiscussionTitle: string
+  createdByLabel: string
+  question: string
+  outcome?: string | null
+  rationale?: string | null
+  alternatives?: string | null
+  followUp?: string | null
+  status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
+  version?: number
+  idempotencyKey: string
+  creationPayloadHash?: string | null
+  decidedAt?: Date | string | null
+  supersededAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutDecisionsInput
+  sourceDiscussion?: Prisma.DiscussionCreateNestedOneWithoutSourceDecisionsInput
+  createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
+  deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
+  revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
+  predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
+}
+
+export type DecisionUncheckedCreateWithoutReviewsInput = {
+  id?: string
+  workspaceId: string
+  sourceWorkspaceId?: string | null
+  sourceDiscussionId?: string | null
+  sourceDiscussionTitle: string
+  createdById?: string | null
+  createdByLabel: string
+  deletedById?: string | null
+  question: string
+  outcome?: string | null
+  rationale?: string | null
+  alternatives?: string | null
+  followUp?: string | null
+  status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
+  version?: number
+  idempotencyKey: string
+  creationPayloadHash?: string | null
+  decidedAt?: Date | string | null
+  supersededAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
+  predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
+}
+
+export type DecisionCreateOrConnectWithoutReviewsInput = {
+  where: Prisma.DecisionWhereUniqueInput
+  create: Prisma.XOR<Prisma.DecisionCreateWithoutReviewsInput, Prisma.DecisionUncheckedCreateWithoutReviewsInput>
+}
+
+export type DecisionUpsertWithoutReviewsInput = {
+  update: Prisma.XOR<Prisma.DecisionUpdateWithoutReviewsInput, Prisma.DecisionUncheckedUpdateWithoutReviewsInput>
+  create: Prisma.XOR<Prisma.DecisionCreateWithoutReviewsInput, Prisma.DecisionUncheckedCreateWithoutReviewsInput>
+  where?: Prisma.DecisionWhereInput
+}
+
+export type DecisionUpdateToOneWithWhereWithoutReviewsInput = {
+  where?: Prisma.DecisionWhereInput
+  data: Prisma.XOR<Prisma.DecisionUpdateWithoutReviewsInput, Prisma.DecisionUncheckedUpdateWithoutReviewsInput>
+}
+
+export type DecisionUpdateWithoutReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceDiscussionTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  question?: Prisma.StringFieldUpdateOperationsInput | string
+  outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  supersededAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutDecisionsNestedInput
+  sourceDiscussion?: Prisma.DiscussionUpdateOneWithoutSourceDecisionsNestedInput
+  createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
+  deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
+  revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
+  predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
+}
+
+export type DecisionUncheckedUpdateWithoutReviewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  sourceWorkspaceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceDiscussionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceDiscussionTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByLabel?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  question?: Prisma.StringFieldUpdateOperationsInput | string
+  outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  decidedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  supersededAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1459,6 +1714,8 @@ export type DecisionCreateWithoutReplacementLinkInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1472,6 +1729,7 @@ export type DecisionCreateWithoutReplacementLinkInput = {
   createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
   deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
   revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutReplacementDecisionInput
 }
 
@@ -1490,6 +1748,8 @@ export type DecisionUncheckedCreateWithoutReplacementLinkInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1499,6 +1759,7 @@ export type DecisionUncheckedCreateWithoutReplacementLinkInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutReplacementDecisionInput
 }
 
@@ -1517,6 +1778,8 @@ export type DecisionCreateWithoutPredecessorLinkInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1530,6 +1793,7 @@ export type DecisionCreateWithoutPredecessorLinkInput = {
   createdBy?: Prisma.UserCreateNestedOneWithoutDecisionsCreatedInput
   deletedBy?: Prisma.UserCreateNestedOneWithoutDecisionsDeletedInput
   revisions?: Prisma.DecisionRevisionCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionCreateNestedOneWithoutPreviousDecisionInput
 }
 
@@ -1548,6 +1812,8 @@ export type DecisionUncheckedCreateWithoutPredecessorLinkInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1557,6 +1823,7 @@ export type DecisionUncheckedCreateWithoutPredecessorLinkInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   revisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutDecisionInput
+  reviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutDecisionInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedCreateNestedOneWithoutPreviousDecisionInput
 }
 
@@ -1586,6 +1853,8 @@ export type DecisionUpdateWithoutReplacementLinkInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1599,6 +1868,7 @@ export type DecisionUpdateWithoutReplacementLinkInput = {
   createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
   deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
   revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
 }
 
@@ -1617,6 +1887,8 @@ export type DecisionUncheckedUpdateWithoutReplacementLinkInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1626,6 +1898,7 @@ export type DecisionUncheckedUpdateWithoutReplacementLinkInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
 }
 
@@ -1650,6 +1923,8 @@ export type DecisionUpdateWithoutPredecessorLinkInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1663,6 +1938,7 @@ export type DecisionUpdateWithoutPredecessorLinkInput = {
   createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
   deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
   revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
 }
 
@@ -1681,6 +1957,8 @@ export type DecisionUncheckedUpdateWithoutPredecessorLinkInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1690,6 +1968,7 @@ export type DecisionUncheckedUpdateWithoutPredecessorLinkInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
 }
 
@@ -1707,6 +1986,8 @@ export type DecisionCreateManyCreatedByInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1731,6 +2012,8 @@ export type DecisionCreateManyDeletedByInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1751,6 +2034,8 @@ export type DecisionUpdateWithoutCreatedByInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1763,6 +2048,7 @@ export type DecisionUpdateWithoutCreatedByInput = {
   sourceDiscussion?: Prisma.DiscussionUpdateOneWithoutSourceDecisionsNestedInput
   deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
   revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1781,6 +2067,8 @@ export type DecisionUncheckedUpdateWithoutCreatedByInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1790,6 +2078,7 @@ export type DecisionUncheckedUpdateWithoutCreatedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1808,6 +2097,8 @@ export type DecisionUncheckedUpdateManyWithoutCreatedByInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1828,6 +2119,8 @@ export type DecisionUpdateWithoutDeletedByInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1840,6 +2133,7 @@ export type DecisionUpdateWithoutDeletedByInput = {
   sourceDiscussion?: Prisma.DiscussionUpdateOneWithoutSourceDecisionsNestedInput
   createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
   revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1858,6 +2152,8 @@ export type DecisionUncheckedUpdateWithoutDeletedByInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1867,6 +2163,7 @@ export type DecisionUncheckedUpdateWithoutDeletedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1885,6 +2182,8 @@ export type DecisionUncheckedUpdateManyWithoutDeletedByInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1909,6 +2208,8 @@ export type DecisionCreateManyWorkspaceInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -1929,6 +2230,8 @@ export type DecisionUpdateWithoutWorkspaceInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1941,6 +2244,7 @@ export type DecisionUpdateWithoutWorkspaceInput = {
   createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
   deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
   revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1959,6 +2263,8 @@ export type DecisionUncheckedUpdateWithoutWorkspaceInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1968,6 +2274,7 @@ export type DecisionUncheckedUpdateWithoutWorkspaceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -1986,6 +2293,8 @@ export type DecisionUncheckedUpdateManyWithoutWorkspaceInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2009,6 +2318,8 @@ export type DecisionCreateManySourceDiscussionInput = {
   alternatives?: string | null
   followUp?: string | null
   status?: $Enums.DecisionStatus
+  reviewRule?: $Enums.DecisionReviewRule
+  requiredApprovals?: number | null
   version?: number
   idempotencyKey: string
   creationPayloadHash?: string | null
@@ -2029,6 +2340,8 @@ export type DecisionUpdateWithoutSourceDiscussionInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2041,6 +2354,7 @@ export type DecisionUpdateWithoutSourceDiscussionInput = {
   createdBy?: Prisma.UserUpdateOneWithoutDecisionsCreatedNestedInput
   deletedBy?: Prisma.UserUpdateOneWithoutDecisionsDeletedNestedInput
   revisions?: Prisma.DecisionRevisionUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -2058,6 +2372,8 @@ export type DecisionUncheckedUpdateWithoutSourceDiscussionInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2067,6 +2383,7 @@ export type DecisionUncheckedUpdateWithoutSourceDiscussionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   revisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput
+  reviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutDecisionNestedInput
   replacementLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutPreviousDecisionNestedInput
   predecessorLink?: Prisma.DecisionSupersessionUncheckedUpdateOneWithoutReplacementDecisionNestedInput
 }
@@ -2084,6 +2401,8 @@ export type DecisionUncheckedUpdateManyWithoutSourceDiscussionInput = {
   alternatives?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   followUp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumDecisionStatusFieldUpdateOperationsInput | $Enums.DecisionStatus
+  reviewRule?: Prisma.EnumDecisionReviewRuleFieldUpdateOperationsInput | $Enums.DecisionReviewRule
+  requiredApprovals?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   version?: Prisma.IntFieldUpdateOperationsInput | number
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   creationPayloadHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2101,10 +2420,12 @@ export type DecisionUncheckedUpdateManyWithoutSourceDiscussionInput = {
 
 export type DecisionCountOutputType = {
   revisions: number
+  reviews: number
 }
 
 export type DecisionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   revisions?: boolean | DecisionCountOutputTypeCountRevisionsArgs
+  reviews?: boolean | DecisionCountOutputTypeCountReviewsArgs
 }
 
 /**
@@ -2124,6 +2445,13 @@ export type DecisionCountOutputTypeCountRevisionsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.DecisionRevisionWhereInput
 }
 
+/**
+ * DecisionCountOutputType without action
+ */
+export type DecisionCountOutputTypeCountReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DecisionReviewWhereInput
+}
+
 
 export type DecisionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2140,6 +2468,8 @@ export type DecisionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   alternatives?: boolean
   followUp?: boolean
   status?: boolean
+  reviewRule?: boolean
+  requiredApprovals?: boolean
   version?: boolean
   idempotencyKey?: boolean
   creationPayloadHash?: boolean
@@ -2153,6 +2483,7 @@ export type DecisionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   createdBy?: boolean | Prisma.Decision$createdByArgs<ExtArgs>
   deletedBy?: boolean | Prisma.Decision$deletedByArgs<ExtArgs>
   revisions?: boolean | Prisma.Decision$revisionsArgs<ExtArgs>
+  reviews?: boolean | Prisma.Decision$reviewsArgs<ExtArgs>
   replacementLink?: boolean | Prisma.Decision$replacementLinkArgs<ExtArgs>
   predecessorLink?: boolean | Prisma.Decision$predecessorLinkArgs<ExtArgs>
   _count?: boolean | Prisma.DecisionCountOutputTypeDefaultArgs<ExtArgs>
@@ -2173,6 +2504,8 @@ export type DecisionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   alternatives?: boolean
   followUp?: boolean
   status?: boolean
+  reviewRule?: boolean
+  requiredApprovals?: boolean
   version?: boolean
   idempotencyKey?: boolean
   creationPayloadHash?: boolean
@@ -2202,6 +2535,8 @@ export type DecisionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   alternatives?: boolean
   followUp?: boolean
   status?: boolean
+  reviewRule?: boolean
+  requiredApprovals?: boolean
   version?: boolean
   idempotencyKey?: boolean
   creationPayloadHash?: boolean
@@ -2231,6 +2566,8 @@ export type DecisionSelectScalar = {
   alternatives?: boolean
   followUp?: boolean
   status?: boolean
+  reviewRule?: boolean
+  requiredApprovals?: boolean
   version?: boolean
   idempotencyKey?: boolean
   creationPayloadHash?: boolean
@@ -2241,13 +2578,14 @@ export type DecisionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type DecisionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workspaceId" | "sourceWorkspaceId" | "sourceDiscussionId" | "sourceDiscussionTitle" | "createdById" | "createdByLabel" | "deletedById" | "question" | "outcome" | "rationale" | "alternatives" | "followUp" | "status" | "version" | "idempotencyKey" | "creationPayloadHash" | "decidedAt" | "supersededAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["decision"]>
+export type DecisionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "workspaceId" | "sourceWorkspaceId" | "sourceDiscussionId" | "sourceDiscussionTitle" | "createdById" | "createdByLabel" | "deletedById" | "question" | "outcome" | "rationale" | "alternatives" | "followUp" | "status" | "reviewRule" | "requiredApprovals" | "version" | "idempotencyKey" | "creationPayloadHash" | "decidedAt" | "supersededAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["decision"]>
 export type DecisionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   sourceDiscussion?: boolean | Prisma.Decision$sourceDiscussionArgs<ExtArgs>
   createdBy?: boolean | Prisma.Decision$createdByArgs<ExtArgs>
   deletedBy?: boolean | Prisma.Decision$deletedByArgs<ExtArgs>
   revisions?: boolean | Prisma.Decision$revisionsArgs<ExtArgs>
+  reviews?: boolean | Prisma.Decision$reviewsArgs<ExtArgs>
   replacementLink?: boolean | Prisma.Decision$replacementLinkArgs<ExtArgs>
   predecessorLink?: boolean | Prisma.Decision$predecessorLinkArgs<ExtArgs>
   _count?: boolean | Prisma.DecisionCountOutputTypeDefaultArgs<ExtArgs>
@@ -2273,6 +2611,7 @@ export type $DecisionPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     createdBy: Prisma.$UserPayload<ExtArgs> | null
     deletedBy: Prisma.$UserPayload<ExtArgs> | null
     revisions: Prisma.$DecisionRevisionPayload<ExtArgs>[]
+    reviews: Prisma.$DecisionReviewPayload<ExtArgs>[]
     replacementLink: Prisma.$DecisionSupersessionPayload<ExtArgs> | null
     predecessorLink: Prisma.$DecisionSupersessionPayload<ExtArgs> | null
   }
@@ -2291,6 +2630,8 @@ export type $DecisionPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     alternatives: string | null
     followUp: string | null
     status: $Enums.DecisionStatus
+    reviewRule: $Enums.DecisionReviewRule
+    requiredApprovals: number | null
     version: number
     idempotencyKey: string
     creationPayloadHash: string | null
@@ -2698,6 +3039,7 @@ export interface Prisma__DecisionClient<T, Null = never, ExtArgs extends runtime
   createdBy<T extends Prisma.Decision$createdByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Decision$createdByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   deletedBy<T extends Prisma.Decision$deletedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Decision$deletedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   revisions<T extends Prisma.Decision$revisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Decision$revisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reviews<T extends Prisma.Decision$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Decision$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   replacementLink<T extends Prisma.Decision$replacementLinkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Decision$replacementLinkArgs<ExtArgs>>): Prisma.Prisma__DecisionSupersessionClient<runtime.Types.Result.GetResult<Prisma.$DecisionSupersessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   predecessorLink<T extends Prisma.Decision$predecessorLinkArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Decision$predecessorLinkArgs<ExtArgs>>): Prisma.Prisma__DecisionSupersessionClient<runtime.Types.Result.GetResult<Prisma.$DecisionSupersessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -2743,6 +3085,8 @@ export interface DecisionFieldRefs {
   readonly alternatives: Prisma.FieldRef<"Decision", 'String'>
   readonly followUp: Prisma.FieldRef<"Decision", 'String'>
   readonly status: Prisma.FieldRef<"Decision", 'DecisionStatus'>
+  readonly reviewRule: Prisma.FieldRef<"Decision", 'DecisionReviewRule'>
+  readonly requiredApprovals: Prisma.FieldRef<"Decision", 'Int'>
   readonly version: Prisma.FieldRef<"Decision", 'Int'>
   readonly idempotencyKey: Prisma.FieldRef<"Decision", 'String'>
   readonly creationPayloadHash: Prisma.FieldRef<"Decision", 'String'>
@@ -3230,6 +3574,30 @@ export type Decision$revisionsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.DecisionRevisionScalarFieldEnum | Prisma.DecisionRevisionScalarFieldEnum[]
+}
+
+/**
+ * Decision.reviews
+ */
+export type Decision$reviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DecisionReview
+   */
+  select?: Prisma.DecisionReviewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DecisionReview
+   */
+  omit?: Prisma.DecisionReviewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DecisionReviewInclude<ExtArgs> | null
+  where?: Prisma.DecisionReviewWhereInput
+  orderBy?: Prisma.DecisionReviewOrderByWithRelationInput | Prisma.DecisionReviewOrderByWithRelationInput[]
+  cursor?: Prisma.DecisionReviewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DecisionReviewScalarFieldEnum | Prisma.DecisionReviewScalarFieldEnum[]
 }
 
 /**
