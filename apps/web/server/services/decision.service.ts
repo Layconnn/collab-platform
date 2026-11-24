@@ -17,7 +17,8 @@ import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import { toPaginatedResult } from "../../src/common/utils/pagination";
 import { recordActivity } from "./activity.service";
-import { resetReviewsAfterEdit, reviewGate } from "./decision-review.service";
+import { resetReviewsAfterEdit, reviewGate, summarizeReviews } from "./decision-review.service";
+import { notificationService } from "./notification.service";
 import { assertCanDeleteDecision, assertCanEditDecision, canManageDecisions } from "./workspace.permissions";
 
 const decisionSelect = {
@@ -323,12 +324,21 @@ export const decisionService = {
         workspace: { members: { some: { userId } } },
         status: input.status,
         id: input.cursor ? { lt: input.cursor } : undefined,
+        ...(input.waitingForMe ? { status: "PROPOSED" as const, reviews: { some: { reviewerId: userId, state: "PENDING" as const } } } : {}),
       },
-      select: decisionSelect,
+      select: { ...decisionSelect, reviewRule: true, requiredApprovals: true, reviews: { select: { state: true, reviewerId: true } } },
       orderBy: { id: "desc" },
       take: input.take + 1,
     });
-    return toPaginatedResult(rows, input.take);
+    // Each item carries its review progress, when it has reviewers.
+    const items = rows.map(({ reviewRule, requiredApprovals, reviews, ...decision }) => ({
+      ...decision,
+      review: reviews.length ? {
+        ...summarizeReviews({ reviewRule, requiredApprovals }, reviews),
+        waitingForMe: reviews.some((review) => review.reviewerId === userId && review.state === "PENDING"),
+      } : null,
+    }));
+    return toPaginatedResult(items, input.take);
   },
 
   async revisions(userId: string, input: DecisionRevisionsInput) {
@@ -352,7 +362,9 @@ export const decisionService = {
   },
 
   async edit(userId: string, input: EditDecisionInput) {
-    return prisma.$transaction(async (tx) => {
+    let askedAgain: string[] = [];
+    let editorLabel = "";
+    const result = await prisma.$transaction(async (tx) => {
       const role = await requireMutationMember(tx, input.workspaceId, userId);
       await lockDecision(tx, input.workspaceId, input.decisionId);
       const current = await tx.decision.findFirst({
@@ -405,9 +417,19 @@ export const decisionService = {
       });
       // Approvals refer to what the proposal said; changing it asks again (FR-6).
       const changed = (["question", "outcome", "rationale", "alternatives"] as const).some((field) => current[field] !== updated[field]);
-      if (changed) await resetReviewsAfterEdit(tx, { workspaceId: input.workspaceId, decision: updated, actor: { userId, label: actorLabel(user) } });
+      if (changed) {
+        const reset = await resetReviewsAfterEdit(tx, { workspaceId: input.workspaceId, decision: updated, actor: { userId, label: actorLabel(user) } });
+        askedAgain = reset.flatMap((review) => (review.reviewerId ? [review.reviewerId] : []));
+        editorLabel = actorLabel(user);
+      }
       return updated;
     });
+    await notificationService.enqueueDecisionReview({
+      actorUserId: userId, workspaceId: input.workspaceId, decisionId: result.id, question: result.question,
+      type: "REVIEW_REQUESTED", recipientUserIds: askedAgain,
+      message: `${editorLabel} changed “${result.question}” since you reviewed it. Please review it again.`,
+    });
+    return result;
   },
 
   async finalize(userId: string, input: FinalizeDecisionInput) {

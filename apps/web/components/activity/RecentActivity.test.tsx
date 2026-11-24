@@ -28,7 +28,7 @@ vi.mock("@/hooks/useActivity", () => ({
   },
 }));
 
-import { RecentActivity, timeAgo } from "./RecentActivity";
+import { RecentActivity, describeActivity, timeAgo } from "./RecentActivity";
 
 const event = (overrides: Record<string, unknown>) => ({
   id: `e${Math.random().toString(36).slice(2, 10)}`,
@@ -121,3 +121,18 @@ describe("RecentActivity", () => {
     expect(timeAgo(new Date(now - 86_400_000), now)).toBe("yesterday");
   });
 });
+
+describe("review activity", () => {
+  const review = (kind: string, summary: Record<string, unknown>) => event({ kind, subjectType: "DECISION", subjectId: "c000000000000000000000003", discussion: null, summary: { question: "Offer a free plan", ...summary } }) as never;
+  const sentence = (item: never) => { const d = describeActivity(item, "c000000000000000000000001"); return [d.lead, d.tail ?? ""]; };
+
+  it("describes review events in plain language", () => {
+    expect(sentence(review("DECISION_REVIEW_REQUESTED", { reviewer: "Lee" }))).toEqual(["asked Lee to review", ""]);
+    expect(sentence(review("DECISION_REVIEW_RESPONDED", { response: "APPROVED" }))).toEqual(["approved", ""]);
+    expect(sentence(review("DECISION_REVIEW_RESPONDED", { response: "OBJECTED", note: "Too low." }))).toEqual(["objected to", ": “Too low.”"]);
+    expect(sentence(review("DECISION_REVIEW_WITHDRAWN", { reviewer: "Maya", reason: "left the workspace" }))[0]).toBe("withdrew Maya's review after they left, on");
+    expect(sentence(review("DECISION_REVIEWS_RESET", { reviewers: 2 }))[0]).toBe("changed the proposal and asked reviewers again on");
+    expect(sentence(review("DECISION_FINALIZED", { overrideReason: "Board date." }))).toEqual(["finalized", "before the review rule was met"]);
+  });
+});
+

@@ -7,7 +7,7 @@ import { prisma } from "../db/prisma";
 // Later features (decision reviews, revisit dates, open questions) add a
 // provider here without changing the endpoint or the UI (FR-6).
 
-export type NeedKind = "MENTION" | "REPLY" | "PROPOSAL_WAITING" | "OWN_PROPOSAL";
+export type NeedKind = "REVIEW_REQUESTED" | "MENTION" | "REPLY" | "PROPOSAL_WAITING" | "OWN_PROPOSAL";
 
 export type NeedItem = {
   id: string;
@@ -68,13 +68,36 @@ const replies: Provider = async ({ userId }) =>
     actor: label(n.actor), discussionId: n.discussionId, decisionId: null, at: n.createdAt, notificationId: n.id,
   }));
 
+// Reviews the user was asked for and has not answered, on open proposals
+// (decision reviews, FR-14). They leave when answered, withdrawn or closed.
+const reviewRequests: Provider = async ({ userId }) =>
+  (await prisma.decisionReview.findMany({
+    where: {
+      reviewerId: userId,
+      state: "PENDING",
+      decision: { status: "PROPOSED", deletedAt: null },
+      workspace: { members: { some: { userId } } },
+    },
+    orderBy: { updatedAt: "asc" },
+    take: PROVIDER_LIMIT,
+    select: {
+      id: true, updatedAt: true, requestedByLabel: true,
+      decision: { select: { id: true, question: true } },
+      workspace: { select: { id: true, name: true } },
+    },
+  })).map((r) => ({
+    id: `review:${r.id}`, kind: "REVIEW_REQUESTED", workspace: r.workspace, title: r.decision.question,
+    actor: r.requestedByLabel, discussionId: null, decisionId: r.decision.id, at: r.updatedAt, notificationId: null,
+  }));
+
 // Proposals someone else made, in workspaces where the user can finalize them.
+// A proposal the user was asked to review shows once, as a review request.
 const proposalsWaiting: Provider = async ({ userId }) =>
   (await prisma.decision.findMany({
     where: {
       status: "PROPOSED",
       deletedAt: null,
-      NOT: { createdById: userId },
+      NOT: [{ createdById: userId }, { reviews: { some: { reviewerId: userId, state: "PENDING" } } }],
       workspace: { members: { some: { userId, role: { in: ["OWNER", "ADMIN"] } } } },
     },
     orderBy: { createdAt: "asc" },
@@ -96,13 +119,14 @@ const ownProposals: Provider = async ({ userId }) =>
     actor: d.createdByLabel, discussionId: null, decisionId: d.id, at: d.createdAt, notificationId: null,
   }));
 
-const PROVIDERS: Provider[] = [mentions, replies, proposalsWaiting, ownProposals];
+const PROVIDERS: Provider[] = [reviewRequests, mentions, replies, proposalsWaiting, ownProposals];
 
-// Mentions, then proposals waiting more than two days, then replies, then
+// Review requests, then mentions, then proposals waiting more than two days, then replies, then
 // newer proposals, then the user's own proposals (FR-2). Notifications are
 // newest first; proposals longest-waiting first.
 export function rankNeeds(items: NeedItem[], now: Date): NeedItem[] {
   const rank = (item: NeedItem) => {
+    if (item.kind === "REVIEW_REQUESTED") return -1;
     if (item.kind === "MENTION") return 0;
     if (item.kind === "PROPOSAL_WAITING") return now.getTime() - item.at.getTime() > WAITING_URGENT_MS ? 1 : 3;
     if (item.kind === "REPLY") return 2;
@@ -111,7 +135,7 @@ export function rankNeeds(items: NeedItem[], now: Date): NeedItem[] {
   return [...items].sort((a, b) => {
     const byRank = rank(a) - rank(b);
     if (byRank) return byRank;
-    const proposal = a.kind === "PROPOSAL_WAITING" || a.kind === "OWN_PROPOSAL";
+    const proposal = a.kind === "PROPOSAL_WAITING" || a.kind === "OWN_PROPOSAL" || a.kind === "REVIEW_REQUESTED";
     return proposal ? a.at.getTime() - b.at.getTime() : b.at.getTime() - a.at.getTime();
   });
 }

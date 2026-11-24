@@ -87,7 +87,9 @@ function fanoutJobId(event: NotificationEvent): string {
       ? [event.kind, event.resource.workspaceId, event.resource.discussionId, event.resource.commentId, event.updatedAt]
       : event.kind === "comment_created"
         ? [event.kind, event.workspaceId, event.commentId]
-        : [event.kind, event.workspaceId, event.discussionId];
+        : event.kind === "decision_review"
+          ? [event.kind, event.workspaceId, event.decisionId, event.type, event.occurredAt]
+          : [event.kind, event.workspaceId, event.discussionId];
   return createHash("sha256").update(parts.join(":")).digest("hex");
 }
 

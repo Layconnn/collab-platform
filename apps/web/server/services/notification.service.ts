@@ -1,9 +1,10 @@
+import { randomUUID } from "node:crypto";
 import type {
   ListNotificationsInput,
   MarkAllNotificationsReadInput,
   MarkNotificationReadInput,
 } from "@repo/validators/notification";
-import type { NotificationType } from "../../app/generated/prisma/client";
+import type { NotificationType, Prisma } from "../../app/generated/prisma/client";
 
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
@@ -130,6 +131,20 @@ export type NotificationEvent =
       parentCommentId: string | null;
     }
   | {
+      // Decision reviews (decision reviews PRD, FR-13): reviewers when asked or
+      // asked again, the author when someone answers.
+      kind: "decision_review";
+      requestId: string;
+      actorUserId: string;
+      workspaceId: string;
+      decisionId: string;
+      question: string;
+      type: "REVIEW_REQUESTED" | "REVIEW_RESPONDED";
+      recipientUserIds: string[];
+      message: string;
+      occurredAt: string;
+    }
+  | {
       kind: "mentions_added";
       requestId: string;
       actorUserId: string;
@@ -177,6 +192,24 @@ function buildDeliveries(params: {
 // Resolves recipients against current membership. Runs in the queue consumer
 // (and in tests); it only reads, so a retried job plans the same deliveries.
 export async function planNotificationDeliveries(event: NotificationEvent): Promise<NotificationJobData[]> {
+  if (event.kind === "decision_review") {
+    // Only people who are still members, never the person who acted.
+    const members = await prisma.workspaceMember.findMany({
+      where: { workspaceId: event.workspaceId, userId: { in: event.recipientUserIds.filter((id) => id !== event.actorUserId) } },
+      select: { userId: true },
+    });
+    return members.map(({ userId }) => ({
+      dedupeKey: ["notification", event.type, userId, event.workspaceId, "decision", event.decisionId, event.occurredAt].join(":"),
+      recipientUserId: userId,
+      actorUserId: event.actorUserId,
+      workspaceId: event.workspaceId,
+      discussionId: null,
+      commentId: null,
+      type: event.type,
+      message: event.message,
+      metadata: { decisionId: event.decisionId, question: event.question },
+    }));
+  }
   if (event.kind === "mentions_added") {
     const [previous, updated] = await Promise.all([
       resolveMentionUserIds(event.resource.workspaceId, event.actorUserId, event.previousText),
@@ -281,6 +314,14 @@ async function publishEvent(event: NotificationEvent, resource: NotificationReso
 }
 
 export const notificationService = {
+  async enqueueDecisionReview(params: Omit<Extract<NotificationEvent, { kind: "decision_review" }>, "kind" | "occurredAt" | "requestId"> & { requestId?: string }): Promise<void> {
+    if (!params.recipientUserIds.length) return;
+    await publishEvent(
+      { kind: "decision_review", ...params, requestId: params.requestId ?? randomUUID(), occurredAt: new Date().toISOString() },
+      { workspaceId: params.workspaceId, discussionId: null, commentId: null },
+    );
+  },
+
   async enqueueNewMentionsFromEdit(params: {
     requestId: string;
     actorUserId: string;
@@ -345,6 +386,7 @@ export const notificationService = {
       workspaceId: string;
       discussionId: string | null;
       commentId: string | null;
+      metadata: Prisma.JsonValue | null;
       readAt: Date | null;
       createdAt: Date;
       actor: { id: string; name: string | null; username: string | null } | null;
@@ -373,6 +415,7 @@ export const notificationService = {
         workspaceId: true,
         discussionId: true,
         commentId: true,
+        metadata: true,
         readAt: true,
         createdAt: true,
         actor: {

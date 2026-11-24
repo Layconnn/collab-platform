@@ -23,6 +23,8 @@ export const decisionByIdInputSchema = z.object({
 export const listDecisionsInputSchema = z.object({
   workspaceId: id,
   status: z.enum(["PROPOSED", "DECIDED", "SUPERSEDED"]).optional(),
+  // Proposals where the viewer's review is still pending (decision reviews, FR-12).
+  waitingForMe: z.boolean().optional(),
   cursor: id.optional(),
   take: z.number().int().min(1).max(100).default(20),
 });

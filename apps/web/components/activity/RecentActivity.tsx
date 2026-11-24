@@ -76,7 +76,21 @@ export function describeActivity(item: ActivityEntry, workspaceId: string): { le
     }
     case "DECISION_PROPOSED": return { lead: "proposed", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
     case "DECISION_EDITED": return { lead: "edited the proposal", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
-    case "DECISION_FINALIZED": return { lead: "finalized", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
+    case "DECISION_FINALIZED": return {
+      lead: "finalized",
+      subject: subjectLink(`${base}/decisions/${item.subjectId}`, question),
+      ...(item.summary?.overrideReason ? { tail: "before the review rule was met" } : {}),
+      gone,
+    };
+    case "DECISION_REVIEW_REQUESTED": return { lead: `asked ${summaryText(item.summary, "reviewer", "a member")} to review`, subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
+    case "DECISION_REVIEW_RESPONDED": return item.summary?.response === "OBJECTED"
+      ? { lead: "objected to", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), tail: item.summary?.note ? `: “${summaryText(item.summary, "note", "")}”` : undefined, gone }
+      : { lead: "approved", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
+    case "DECISION_REVIEW_WITHDRAWN": return item.summary?.reason === "left the workspace"
+      ? { lead: `withdrew ${summaryText(item.summary, "reviewer", "a reviewer")}'s review after they left, on`, subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone }
+      : { lead: `withdrew the review request to ${summaryText(item.summary, "reviewer", "a reviewer")} on`, subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
+    case "DECISION_REVIEWS_RESET": return { lead: "changed the proposal and asked reviewers again on", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
+    case "DECISION_REVIEW_RULE_CHANGED": return { lead: "changed the review rule on", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
     case "DECISION_SUPERSEDED": return {
       lead: "replaced",
       subject: subjectLink(`${base}/decisions/${item.subjectId}`, question),
