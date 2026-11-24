@@ -293,8 +293,9 @@ export type RecentDecision = {
   replacement: { id: string; question: string } | null;
 };
 
-export async function recentDecisions(userId: string, now = new Date()): Promise<RecentDecision[]> {
-  const since = new Date(now.getTime() - PULSE_DAYS * DAY_MS);
+// The window is seven days for Home; the daily digest asks for one.
+export async function recentDecisions(userId: string, now = new Date(), windowMs = PULSE_DAYS * DAY_MS): Promise<RecentDecision[]> {
+  const since = new Date(now.getTime() - windowMs);
   const events = await prisma.activityEvent.findMany({
     where: {
       kind: { in: ["DECISION_FINALIZED", "DECISION_SUPERSEDED"] },
