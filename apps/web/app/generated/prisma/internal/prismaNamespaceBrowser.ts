@@ -129,7 +129,9 @@ export const CommentScalarFieldEnum = {
   depth: 'depth',
   body: 'body',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  pinnedAt: 'pinnedAt',
+  pinnedById: 'pinnedById'
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]

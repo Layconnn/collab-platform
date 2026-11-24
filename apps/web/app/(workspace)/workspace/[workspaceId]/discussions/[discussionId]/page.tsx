@@ -18,6 +18,7 @@ import { MarkdownField } from "@/components/common/MarkdownField";
 import { Markdown } from "@/components/common/Markdown";
 import { ReactionBar } from "@/components/common/ReactionBar";
 import { FollowControl } from "@/components/discussion/FollowControl";
+import { PinnedReplies } from "@/components/discussion/PinnedReplies";
 import { useDiscussionReactions } from "@/hooks/useReactions";
 import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
@@ -193,6 +194,7 @@ export default function DiscussionDetailPage() {
           <>
             <div className="mt-8 text-[0.96rem] leading-7 text-text-secondary sm:text-base">{discussion.data.body ? <Markdown text={discussion.data.body} /> : <p>This discussion has no content.</p>}</div>
             <div className="mt-5"><DiscussionReactions workspaceId={workspaceId} discussionId={discussionId} /></div>
+            <PinnedReplies workspaceId={workspaceId} discussionId={discussionId} />
           </>
         )}
         {!editing && updateError ? <p role="alert" className="mt-5 text-sm text-danger">{updateError}</p> : null}
