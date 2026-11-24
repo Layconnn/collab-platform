@@ -192,8 +192,10 @@ type DailyRow = { workspace_id: string; days_ago: number; events: number };
 
 export async function workspacePulse(userId: string, now = new Date()): Promise<WorkspacePulse[]> {
   const since = new Date(now.getTime() - PULSE_DAYS * DAY_MS);
-  // Event times are stored as UTC without a zone; compare in UTC whatever the
-  // session time zone is.
+  // Event times are stored as UTC wall-clock timestamps without a zone, and
+  // Prisma sends a Date the same way, so compare them as plain timestamps.
+  // Casting to timestamptz would read the parameter in the session's time
+  // zone and shift "now" whenever that zone is not UTC.
   const [rows, daily, proposals] = await Promise.all([
     prisma.$queryRaw<PulseRow[]>`
       SELECT w."id" AS workspace_id, w."name", m."role"::text AS role,
@@ -204,16 +206,16 @@ export async function workspacePulse(userId: string, now = new Date()): Promise<
         count(DISTINCT r."actorUserId")::int AS active_people
       FROM "WorkspaceMember" m
       JOIN "Workspace" w ON w."id" = m."workspaceId"
-      LEFT JOIN "ActivityEvent" r ON r."workspaceId" = w."id" AND r."createdAt" > (${since}::timestamptz AT TIME ZONE 'UTC') AND r."createdAt" <= (${now}::timestamptz AT TIME ZONE 'UTC')
+      LEFT JOIN "ActivityEvent" r ON r."workspaceId" = w."id" AND r."createdAt" > ${since}::timestamp AND r."createdAt" <= ${now}::timestamp
       WHERE m."userId" = ${userId}
       GROUP BY w."id", w."name", m."role"`,
     prisma.$queryRaw<DailyRow[]>`
       SELECT e."workspaceId" AS workspace_id,
-        floor(extract(epoch FROM ((${now}::timestamptz AT TIME ZONE 'UTC') - e."createdAt")) / 86400)::int AS days_ago,
+        floor(extract(epoch FROM (${now}::timestamp - e."createdAt")) / 86400)::int AS days_ago,
         count(*)::int AS events
       FROM "ActivityEvent" e
       JOIN "WorkspaceMember" m ON m."workspaceId" = e."workspaceId" AND m."userId" = ${userId}
-      WHERE e."createdAt" > (${since}::timestamptz AT TIME ZONE 'UTC') AND e."createdAt" <= (${now}::timestamptz AT TIME ZONE 'UTC')
+      WHERE e."createdAt" > ${since}::timestamp AND e."createdAt" <= ${now}::timestamp
       GROUP BY 1, 2`,
     prisma.decision.groupBy({
       by: ["workspaceId"],
