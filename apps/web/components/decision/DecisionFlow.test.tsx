@@ -28,12 +28,19 @@ const mocks = vi.hoisted(() => ({
   },
   replacementItems: [] as Array<{ id: string; question: string; status: "DECIDED" | "SUPERSEDED"; replacement: null | { replacementDecisionId: string; reason: string; authorizedByLabel: string; createdAt: Date } }>,
   effectiveDecisionId: null as string | null,
+  reviews: { summary: { rule: "ALL", needed: 0, active: 0, approved: 0, objected: 0, pending: 0, met: true }, reviews: [] as Array<{ state: string; reviewerLabel: string }> } as unknown,
   create: vi.fn(), edit: vi.fn(), finalize: vi.fn(), supersede: vi.fn(), remove: vi.fn(), push: vi.fn(), listNextPage: vi.fn(), revisionNextPage: vi.fn(), refetch: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({ useParams: () => ({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId }), useRouter: () => ({ push: mocks.push }) }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: mocks.userId } }) }));
 vi.mock("@/hooks/useWorkspace", () => ({ useWorkspaceDetail: () => ({ data: { name: "Open Atlas", viewerRole: mocks.role }, error: mocks.workspaceError }) }));
+// The Review section has its own tests; here it is a stub with a summary the
+// finalize dialog reads.
+vi.mock("@/components/decision/DecisionReviews", () => ({ DecisionReviews: () => <p>Review section</p> }));
+vi.mock("@/hooks/useDecisionReviews", () => ({
+  useDecisionReviews: () => ({ data: mocks.reviews, error: null, isLoading: false }),
+}));
 vi.mock("@/hooks/useDecision", () => ({
   useDecisionList: () => ({ data: { pages: [{ items: [mocks.decision] }] }, error: mocks.listError, isLoading: false, hasNextPage: mocks.listNext, isFetchingNextPage: false, isFetching: false, fetchNextPage: mocks.listNextPage, refetch: mocks.refetch }),
   useDecisionDetail: () => ({ data: mocks.decision, error: mocks.decisionError, isLoading: false, isFetching: false, refetch: mocks.refetch }),
@@ -54,6 +61,7 @@ describe("decision frontend flow", () => {
     mocks.decision.previousDecision = null; mocks.decision.replacementDecision = null; mocks.decision.supersession = null; mocks.replacementItems = []; mocks.effectiveDecisionId = null;
     mocks.decision.outcome = "Use TypeScript"; mocks.decision.rationale = "Shared types";
     mocks.listNext = false; mocks.revisionNext = false;
+    mocks.reviews = { summary: { rule: "ALL", needed: 0, active: 0, approved: 0, objected: 0, pending: 0, met: true }, reviews: [] };
     mocks.create.mockReset(); mocks.edit.mockReset(); mocks.finalize.mockReset(); mocks.supersede.mockReset(); mocks.remove.mockReset(); mocks.push.mockReset(); mocks.refetch.mockReset(); mocks.listNextPage.mockReset(); mocks.revisionNextPage.mockReset();
     vi.stubGlobal("requestAnimationFrame", (fn: FrameRequestCallback) => { fn(0); return 1; });
     vi.stubGlobal("crypto", { randomUUID: vi.fn().mockReturnValueOnce("key-11111111").mockReturnValueOnce("key-22222222") });
@@ -301,5 +309,21 @@ describe("decision frontend flow", () => {
     fireEvent.keyDown(dialog, { key: "Escape" });
     expect(screen.queryByRole("alertdialog")).toBeNull();
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "Delete proposal" }));
+  });
+
+  it("asks a manager for a reason before finalizing a proposal whose review rule is not met", async () => {
+    mocks.role = "ADMIN";
+    mocks.reviews = { summary: { rule: "ALL", needed: 2, active: 2, approved: 1, objected: 0, pending: 1, met: false }, reviews: [{ state: "APPROVED", reviewerLabel: "Sam" }, { state: "PENDING", reviewerLabel: "Lee" }] };
+    render(<DecisionDetailPage />);
+    expect(screen.getByText("Review section")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Finalize decision" }));
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText(/Waiting for Lee/)).toBeTruthy();
+    const confirm = within(dialog).getByRole("button", { name: "Finalize anyway" }) as HTMLButtonElement;
+    expect(confirm.disabled).toBe(true);
+    fireEvent.change(within(dialog).getByLabelText(/Why finalize anyway/), { target: { value: "Launch date fixed by the board." } });
+    expect(confirm.disabled).toBe(false);
+    fireEvent.click(confirm);
+    await waitFor(() => expect(mocks.finalize).toHaveBeenCalledWith({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId, expectedVersion: 1, overrideReason: "Launch date fixed by the board." }));
   });
 });
