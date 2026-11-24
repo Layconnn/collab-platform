@@ -41,6 +41,8 @@ export function useDecisionActions(workspaceId: string) {
       utils.decision.listByWorkspace.invalidate({ workspaceId }),
       utils.decision.getById.invalidate({ workspaceId, decisionId }),
       utils.decision.revisions.invalidate({ workspaceId, decisionId }),
+      // Edits reset reviews and finalizing closes them.
+      utils.decisionReview.list.invalidate({ workspaceId, decisionId }),
     ]);
   };
   const refreshAccess = async (error: { data?: { code?: string } | null }) => {
