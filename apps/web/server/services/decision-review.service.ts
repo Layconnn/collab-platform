@@ -11,6 +11,7 @@ import type { ActivityKind, DecisionReviewRule, DecisionReviewState, Prisma, Wor
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import { activityActorLabel, recordActivity } from "./activity.service";
+import { notificationService } from "./notification.service";
 import { canManageDecisions } from "./workspace.permissions";
 
 // Decision reviews (decision reviews PRD): a proposal's author or a manager
@@ -263,7 +264,7 @@ export const decisionReviewService = {
   },
 
   async request(userId: string, input: RequestDecisionReviewInput) {
-    await prisma.$transaction(async (tx) => {
+    const asked = await prisma.$transaction(async (tx) => {
       const role = await requireMutationMember(tx, input.workspaceId, userId);
       const decision = await lockProposal(tx, input.workspaceId, input.decisionId);
       requireOpen(decision);
@@ -309,6 +310,13 @@ export const decisionReviewService = {
         });
       }
       if (input.rule) await applyRule(tx, decision, input.rule, { workspaceId: input.workspaceId, userId, label: actorLabel });
+      return { reviewerIds: toAsk.map((member) => member.userId), question: decision.question, actorLabel };
+    });
+    // After commit, best effort: the request stands even if a notice fails.
+    await notificationService.enqueueDecisionReview({
+      actorUserId: userId, workspaceId: input.workspaceId, decisionId: input.decisionId, question: asked.question,
+      type: "REVIEW_REQUESTED", recipientUserIds: asked.reviewerIds,
+      message: `${asked.actorLabel} asked you to review “${asked.question}”.`,
     });
     return this.list(userId, input);
   },
@@ -352,7 +360,7 @@ export const decisionReviewService = {
   },
 
   async respond(userId: string, input: RespondToDecisionReviewInput) {
-    await prisma.$transaction(async (tx) => {
+    const answered = await prisma.$transaction(async (tx) => {
       await requireMutationMember(tx, input.workspaceId, userId);
       const decision = await lockProposal(tx, input.workspaceId, input.decisionId);
       const review = await tx.decisionReview.findUnique({
@@ -366,7 +374,7 @@ export const decisionReviewService = {
       }
       const note = input.note || null;
       // A repeated click or retry changes nothing and records nothing.
-      if (review.state === input.response && review.note === note && review.respondedVersion === decision.version) return;
+      if (review.state === input.response && review.note === note && review.respondedVersion === decision.version) return null;
       await tx.decisionReview.update({
         where: { id: review.id },
         data: { state: input.response, note, respondedVersion: decision.version, respondedAt: new Date() },
@@ -380,7 +388,15 @@ export const decisionReviewService = {
         subjectId: decision.id,
         summary: { question: decision.question, response: input.response, previous: review.state, note, version: decision.version },
       });
+      return { authorId: decision.createdById, question: decision.question, reviewerLabel: await label(tx, userId) };
     });
+    if (answered?.authorId) {
+      await notificationService.enqueueDecisionReview({
+        actorUserId: userId, workspaceId: input.workspaceId, decisionId: input.decisionId, question: answered.question,
+        type: "REVIEW_RESPONDED", recipientUserIds: [answered.authorId],
+        message: `${answered.reviewerLabel} ${input.response === "APPROVED" ? "approved" : "objected to"} “${answered.question}”.`,
+      });
+    }
     return this.list(userId, input);
   },
 };

@@ -26,6 +26,11 @@ redis.expire = async () => 1;
 redis.del = async () => 1;
 redis.get = async () => null;
 redis.set = async () => "OK";
+// Notifications are captured instead of queued.
+const { notificationQueue } = jiti("../queue/notification.queue.ts");
+const queued = [];
+notificationQueue.add = async (_name, payload, options) => { queued.push(payload); return { id: options.jobId }; };
+const noticesFor = (decision) => queued.filter((event) => event.kind === "decision_review" && event.decisionId === decision.id);
 
 const suffix = () => randomUUID().replaceAll("-", "");
 const createdUserIds = [];
@@ -74,6 +79,7 @@ after(async () => {
   await prisma.workspace.deleteMany({ where: { ownerId: { in: createdUserIds } } });
   for (const id of createdUserIds.reverse()) await prisma.user.deleteMany({ where: { id } });
   await prisma.$disconnect();
+  await notificationQueue.close();
   redis.disconnect();
 });
 
@@ -368,4 +374,100 @@ test("an answer racing finalization is either counted or refused, never lost", a
     assert.equal(stored.status, "PROPOSED");
     assert.equal(lees.state, answer.status === "fulfilled" ? "APPROVED" : "PENDING");
   }
+});
+
+// ---------------------------------------------------------------------------
+// Telling people: notifications, Home, lists and activity (PR 5)
+// ---------------------------------------------------------------------------
+
+const { planNotificationDeliveries } = jiti("../services/notification.service.ts");
+const { homeRouter } = jiti("./routers/home.router.ts");
+const { activityRouter } = jiti("./routers/activity.router.ts");
+const ctx = (user) => ({ user: { id: user.id }, requestId: `review-test-${suffix()}`, headers: new Headers(), requestMethod: "POST", ip: null, responseHeaders: new Headers() });
+
+test("review notices go to members only, never to the person acting, once per event", async () => {
+  const [owner, sam, maya, gone] = await Promise.all([user("Olu"), user("Sam"), user("Maya"), user("Gone")]);
+  const ws = await workspace(owner, [[sam, "MEMBER"], [maya, "MEMBER"]]);
+  const decision = await proposal(ws, sam);
+  const event = {
+    kind: "decision_review", requestId: suffix(), actorUserId: sam.id, workspaceId: ws.id, decisionId: decision.id,
+    question: decision.question, type: "REVIEW_REQUESTED", recipientUserIds: [maya.id, sam.id, gone.id],
+    message: "Sam asked you to review.", occurredAt: "2026-11-24T10:00:00.000Z",
+  };
+  const deliveries = await planNotificationDeliveries(event);
+  assert.deepEqual(deliveries.map((d) => d.recipientUserId), [maya.id]);
+  assert.deepEqual(deliveries[0].metadata, { decisionId: decision.id, question: decision.question });
+  assert.equal(deliveries[0].discussionId, null);
+  assert.deepEqual((await planNotificationDeliveries(event)).map((d) => d.dedupeKey), deliveries.map((d) => d.dedupeKey), "a retried job plans the same notices");
+  const later = await planNotificationDeliveries({ ...event, occurredAt: "2026-11-24T11:00:00.000Z" });
+  assert.notEqual(later[0].dedupeKey, deliveries[0].dedupeKey, "asking again later is a new notice");
+});
+
+test("Home lists a pending review first, once, and drops it when answered", async () => {
+  const [owner, sam, maya, lee] = await Promise.all([user("Olu"), user("Sam"), user("Maya"), user("Lee")]);
+  const ws = await workspace(owner, [[sam, "MEMBER"], [maya, "ADMIN"], [lee, "MEMBER"]]);
+  const reviewed = await proposal(ws, sam, "Reviewed one");
+  await proposal(ws, sam, "Not reviewed");
+  await caller(sam).request({ ...ids(ws, reviewed), reviewerIds: [maya.id, lee.id] });
+
+  let needs = await homeRouter.createCaller(ctx(maya)).needsYou({ all: true });
+  assert.equal(needs.items[0].kind, "REVIEW_REQUESTED");
+  assert.deepEqual([needs.items[0].title, needs.items[0].actor, needs.items[0].decisionId], ["Reviewed one", "Sam", reviewed.id]);
+  assert.equal(needs.items.filter((item) => item.decisionId === reviewed.id).length, 1, "not also listed as a proposal waiting");
+  assert.ok(needs.items.some((item) => item.kind === "PROPOSAL_WAITING" && item.title === "Not reviewed"));
+
+  await caller(maya).respond({ ...ids(ws, reviewed), expectedVersion: 1, response: "APPROVED" });
+  needs = await homeRouter.createCaller(ctx(maya)).needsYou({ all: true });
+  assert.equal(needs.items.some((item) => item.kind === "REVIEW_REQUESTED"), false);
+
+  const outsider = await user("Out");
+  const theirs = await homeRouter.createCaller(ctx(outsider)).needsYou({ all: true });
+  assert.equal(theirs.total, 0);
+  await prisma.decision.update({ where: { id: reviewed.id }, data: { deletedAt: new Date() } });
+  const lees = await homeRouter.createCaller(ctx(lee)).needsYou({ all: true });
+  assert.equal(lees.items.some((item) => item.kind === "REVIEW_REQUESTED"), false, "deleted proposals leave the list");
+});
+
+test("decision lists show review progress and filter to what waits for the viewer", async () => {
+  const { owner, sam, maya, lee, ws, decision } = await reviewed("Listed with reviews");
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  await proposal(ws, sam, "Listed without reviews");
+
+  const all = await decisions(owner).listByWorkspace({ workspaceId: ws.id, take: 20 });
+  const withReviews = all.items.find((item) => item.id === decision.id);
+  assert.deepEqual([withReviews.review.approved, withReviews.review.needed, withReviews.review.waitingForMe], [1, 2, false]);
+  assert.equal(all.items.find((item) => item.question === "Listed without reviews").review, null);
+
+  const leesQueue = await decisions(lee).listByWorkspace({ workspaceId: ws.id, take: 20, waitingForMe: true });
+  assert.deepEqual(leesQueue.items.map((item) => item.id), [decision.id]);
+  assert.equal(leesQueue.items[0].review.waitingForMe, true);
+  const mayasQueue = await decisions(maya).listByWorkspace({ workspaceId: ws.id, take: 20, waitingForMe: true });
+  assert.equal(mayasQueue.items.length, 0, "answered reviews leave the queue");
+});
+
+test("review events appear under the Decisions activity filter", async () => {
+  const { sam, maya, ws, decision } = await reviewed();
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "OBJECTED", note: "Not yet." });
+  const feed = await activityRouter.createCaller(ctx(sam)).listByWorkspace({ workspaceId: ws.id, filter: "decisions", take: 20 });
+  const kinds = feed.items.map((item) => item.kind);
+  assert.ok(kinds.includes("DECISION_REVIEW_REQUESTED"));
+  assert.ok(kinds.includes("DECISION_REVIEW_RESPONDED"));
+});
+
+test("reviewers hear when asked or asked again, and the author hears every answer", async () => {
+  const { sam, maya, lee, ws, decision } = await reviewed();
+  let notices = noticesFor(decision);
+  assert.deepEqual(notices.map((n) => [n.type, n.recipientUserIds.sort()]), [["REVIEW_REQUESTED", [maya.id, lee.id].sort()]]);
+  assert.match(notices[0].message, /^Sam asked you to review/);
+
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  notices = noticesFor(decision);
+  assert.equal(notices.length, 2, "a repeated answer sends nothing");
+  assert.deepEqual([notices[1].type, notices[1].recipientUserIds, notices[1].message], ["REVIEW_RESPONDED", [sam.id], "Maya approved “Offer a free plan for teams under five”."]);
+
+  await decisions(sam).edit({ ...ids(ws, decision), expectedVersion: 1, outcome: "Teams under ten." });
+  notices = noticesFor(decision);
+  assert.deepEqual([notices[2].type, notices[2].recipientUserIds], ["REVIEW_REQUESTED", [maya.id]], "only those who had answered are asked again");
+  assert.match(notices[2].message, /changed .* since you reviewed it/);
 });

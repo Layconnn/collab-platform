@@ -2,9 +2,9 @@
 
 import { trpc } from "@/lib/trpc/api-client";
 
-export function useDecisionList(workspaceId: string, status?: "PROPOSED" | "DECIDED" | "SUPERSEDED") {
+export function useDecisionList(workspaceId: string, status?: "PROPOSED" | "DECIDED" | "SUPERSEDED", waitingForMe = false) {
   return trpc.decision.listByWorkspace.useInfiniteQuery(
-    { workspaceId, status, take: 20 },
+    { workspaceId, status, take: 20, ...(waitingForMe ? { waitingForMe } : {}) },
     { getNextPageParam: (page) => page.nextCursor ?? undefined, enabled: Boolean(workspaceId) },
   );
 }

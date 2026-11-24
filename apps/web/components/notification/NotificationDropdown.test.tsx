@@ -34,6 +34,7 @@ const notification = {
   workspaceId,
   discussionId: discussionId as string | null,
   commentId: null,
+  metadata: null as unknown,
   readAt: null as Date | null,
   createdAt: new Date("2026-10-01T10:00:00.000Z"),
   actor: { id: "user-1", name: "Maya Chen" as string | null, username: "maya" },
@@ -326,5 +327,13 @@ describe("NotificationDropdown", () => {
     setFeed([{ ...notification, readAt: new Date("2026-10-02T11:00:00.000Z") }]);
     rerender(<ChakraProvider value={uiSystem}><NotificationDropdown compact /></ChakraProvider>);
     await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("button", { name: "Close notifications" })));
+  });
+
+  it("links a review notification to its decision", async () => {
+    setFeed([{ ...notification, type: "REVIEW_REQUESTED", message: "Sam asked you to review “Offer a free plan”.", discussionId: null, metadata: { decisionId: "c000000000000000000000009", question: "Offer a free plan" } }]);
+    renderDropdown();
+    await userEvent.click(screen.getByRole("button", { name: /notifications/i }));
+    const link = await screen.findByRole("link", { name: /Open decision for review requested notification/ });
+    expect(link.getAttribute("href")).toBe(`/workspace/${workspaceId}/decisions/c000000000000000000000009`);
   });
 });

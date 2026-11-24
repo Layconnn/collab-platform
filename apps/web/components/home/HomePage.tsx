@@ -17,7 +17,7 @@ const URGENT_MS = 2 * DAY_MS;
 
 type NeedItem = {
   id: string;
-  kind: "MENTION" | "REPLY" | "PROPOSAL_WAITING" | "OWN_PROPOSAL";
+  kind: "REVIEW_REQUESTED" | "MENTION" | "REPLY" | "PROPOSAL_WAITING" | "OWN_PROPOSAL";
   workspace: { id: string; name: string };
   title: string;
   actor: string | null;
@@ -54,6 +54,7 @@ const days = (n: number) => (n === 0 ? "less than a day" : n === 1 ? "1 day" : `
 export function needReason(item: NeedItem, now = Date.now()) {
   const who = item.actor ?? "Someone";
   switch (item.kind) {
+    case "REVIEW_REQUESTED": return `${who} asked for your review · waiting ${days(daysSince(item.at, now))}`;
     case "MENTION": return `${who} mentioned you`;
     case "REPLY": return `${who} replied to your discussion`;
     case "PROPOSAL_WAITING": return `Proposed by ${who} · waiting ${days(daysSince(item.at, now))} for a decision`;
@@ -70,6 +71,7 @@ const KIND_LABEL: Record<NeedItem["kind"], string> = {
   MENTION: "Mention",
   REPLY: "Reply",
   PROPOSAL_WAITING: "Decision needed",
+  REVIEW_REQUESTED: "Review requested",
   OWN_PROPOSAL: "Your proposal",
 };
 

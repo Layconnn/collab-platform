@@ -66,9 +66,15 @@ function NotificationRow({
   onNavigate: (item: NotificationItem) => void;
 }) {
   const actor = item.actor ? resolveUserIdentity(item.actor) : null;
+  const decisionId = item.metadata && typeof item.metadata === "object" && !Array.isArray(item.metadata)
+    ? (item.metadata as Record<string, unknown>).decisionId
+    : undefined;
   const href = item.discussionId
     ? `/workspace/${item.workspaceId}/discussions/${item.discussionId}`
-    : null;
+    : typeof decisionId === "string"
+      ? `/workspace/${item.workspaceId}/decisions/${decisionId}`
+      : null;
+  const target = item.discussionId ? "discussion" : "decision";
   const date = new Date(item.createdAt);
   const formattedDate = Number.isNaN(date.valueOf())
     ? null
@@ -141,11 +147,11 @@ function NotificationRow({
               <Link
                 ref={linkRef}
                 href={href}
-                aria-label={`Open discussion for ${titles[item.type].toLowerCase()} notification${actor ? ` from ${actor.label}` : ""}${formattedDate ? `, ${formattedDate}` : ""}`}
+                aria-label={`Open ${target} for ${titles[item.type].toLowerCase()} notification${actor ? ` from ${actor.label}` : ""}${formattedDate ? `, ${formattedDate}` : ""}`}
                 onClick={() => onNavigate(item)}
                 className="inline-flex min-h-11 items-center gap-1 rounded text-xs font-semibold text-brand-link hover:text-brand-link-hover focus-visible:ring-2 focus-visible:ring-focus-ring"
               >
-                Open discussion <ArrowUpRight aria-hidden="true" size={13} />
+                Open {target} <ArrowUpRight aria-hidden="true" size={13} />
               </Link>
             ) : null}
             {unread ? (
