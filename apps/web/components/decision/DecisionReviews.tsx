@@ -3,6 +3,7 @@
 import { Check, CircleDashed, MinusCircle, UserPlus, X } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 
+import { Markdown } from "@/components/common/Markdown";
 import { Modal } from "@/components/common/Modal";
 import { ErrorState, LoadingState } from "@/components/common/StateNotice";
 import { DecisionDate } from "@/components/decision/decisionUI";
@@ -220,7 +221,7 @@ export function DecisionReviews({ workspaceId, decisionId, authorId }: { workspa
         {data.reviews.map((review) => <li key={`${review.reviewerId ?? review.reviewerLabel}-${review.createdAt.toString()}`} className="flex flex-wrap items-start gap-x-3 gap-y-2 border-b border-border-subtle py-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2"><span className={`text-sm font-semibold ${review.state === "WITHDRAWN" ? "text-text-muted line-through" : "text-text-primary"}`}>{review.reviewerLabel}</span><StateBadge state={review.state} />{review.stale ? <span className="text-xs text-text-muted">answered an earlier version</span> : null}</div>
-            {review.note ? <p className="mt-1 whitespace-pre-wrap wrap-anywhere text-sm text-text-secondary">“{review.note}”</p> : null}
+            {review.note ? <div className="mt-1 border-l-2 border-border-subtle pl-3 text-sm text-text-secondary"><Markdown text={review.note} /></div> : null}
             <p className="mt-1 text-xs text-text-muted">{review.respondedAt ? <>Answered <DecisionDate value={review.respondedAt} /></> : <>Asked by {review.requestedByLabel} · <DecisionDate value={review.createdAt} /></>}</p>
           </div>
           {data.viewer.canManage && review.state !== "WITHDRAWN" && review.reviewerId ? <button type="button" onClick={() => withdraw.mutate({ workspaceId, decisionId, reviewerId: review.reviewerId! })} disabled={withdraw.isPending} aria-label={`Withdraw review request to ${review.reviewerLabel}`} className={`${button} text-text-secondary hover:bg-surface-hover`}>Withdraw</button> : null}

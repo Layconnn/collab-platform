@@ -13,8 +13,9 @@ import { CommentList } from "@/components/comment/CommentList";
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
 import { discussionActionError } from "@/components/discussion/discussionErrors";
 import { useCommentList } from "@/hooks/useComment";
-import { MentionText } from "@/components/common/MentionText";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
+import { MarkdownField } from "@/components/common/MarkdownField";
+import { Markdown } from "@/components/common/Markdown";
 import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { useAuth } from "@/hooks/useAuth";
@@ -168,7 +169,9 @@ export default function DiscussionDetailPage() {
             </div>
             <div>
               <label htmlFor="edit-discussion-body" className="block text-sm font-semibold text-text-primary">Context</label>
+              <MarkdownField>
               <MentionTextarea workspaceId={workspaceId} registration={form.register("body")} value={editBody ?? ""} onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })} id="edit-discussion-body" rows={7} maxLength={5000} disabled={update.isPending} aria-invalid={Boolean(form.formState.errors.body)} aria-describedby={form.formState.errors.body ? "edit-discussion-body-error" : undefined} className="mt-2 min-h-36 w-full resize-y rounded-sm border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60" />
+              </MarkdownField>
               {form.formState.errors.body ? <p id="edit-discussion-body-error" role="alert" className="mt-1 text-sm text-danger">Add context of up to 5,000 characters.</p> : null}
             </div>
             {updateError ? <p role="alert" className="text-sm text-danger">{updateError}</p> : null}
@@ -178,7 +181,7 @@ export default function DiscussionDetailPage() {
             </div>
           </form>
         ) : (
-          <div className="mt-8 whitespace-pre-wrap wrap-anywhere text-[0.96rem] leading-7 text-text-secondary sm:text-base"><MentionText text={discussion.data.body || "This discussion has no content."} /></div>
+          <div className="mt-8 text-[0.96rem] leading-7 text-text-secondary sm:text-base">{discussion.data.body ? <Markdown text={discussion.data.body} /> : <p>This discussion has no content.</p>}</div>
         )}
         {!editing && updateError ? <p role="alert" className="mt-5 text-sm text-danger">{updateError}</p> : null}
         {removeError ? <p role="alert" className="mt-5 text-sm text-danger">{removeError}</p> : null}
