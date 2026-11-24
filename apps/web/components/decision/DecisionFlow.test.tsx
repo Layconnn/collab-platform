@@ -33,6 +33,7 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(), edit: vi.fn(), finalize: vi.fn(), supersede: vi.fn(), remove: vi.fn(), push: vi.fn(), listNextPage: vi.fn(), revisionNextPage: vi.fn(), refetch: vi.fn(),
 }));
 
+vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
 vi.mock("next/navigation", () => ({ useParams: () => ({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId }), useRouter: () => ({ push: mocks.push }) }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: mocks.userId } }) }));
 vi.mock("@/hooks/useWorkspace", () => ({ useWorkspaceDetail: () => ({ data: { name: "Open Atlas", viewerRole: mocks.role }, error: mocks.workspaceError }) }));

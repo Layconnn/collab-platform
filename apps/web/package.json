@@ -26,6 +26,7 @@
     "test:reaction-api": "node --test server/api/reaction.integration.test.mjs",
     "test:follow-api": "node --test server/api/follow.integration.test.mjs",
     "test:pin-api": "node --test server/api/pin.integration.test.mjs",
+    "test:saved-api": "node --test server/api/saved.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },

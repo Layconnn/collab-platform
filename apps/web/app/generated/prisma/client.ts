@@ -92,6 +92,11 @@ export type DecisionReview = Prisma.DecisionReviewModel
  */
 export type DiscussionFollow = Prisma.DiscussionFollowModel
 /**
+ * Model SavedItem
+ * 
+ */
+export type SavedItem = Prisma.SavedItemModel
+/**
  * Model Reaction
  * 
  */

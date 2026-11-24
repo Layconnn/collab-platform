@@ -89,3 +89,24 @@ export const setPinnedReplyInputSchema = z.object({
 
 export type PinnedRepliesInput = z.infer<typeof pinnedRepliesInputSchema>;
 export type SetPinnedReplyInput = z.infer<typeof setPinnedReplyInputSchema>;
+
+// Saved items (Markdown, reactions, follow and pin PRD, FR-16 to FR-18).
+const savedTarget = z.object({
+  workspaceId: z.string().cuid(),
+  discussionId: z.string().cuid().optional(),
+  commentId: z.string().cuid().optional(),
+  decisionId: z.string().cuid().optional(),
+}).refine((value) => [value.discussionId, value.commentId, value.decisionId].filter(Boolean).length === 1, { message: "Save one discussion, reply or decision." });
+
+export const setSavedInputSchema = savedTarget.and(z.object({ saved: z.boolean() }));
+
+export const savedInWorkspaceInputSchema = z.object({ workspaceId: z.string().cuid() });
+
+export const listSavedInputSchema = z.object({
+  cursor: z.string().cuid().optional(),
+  take: z.number().int().min(1).max(50).default(20),
+});
+
+export type SetSavedInput = z.infer<typeof setSavedInputSchema>;
+export type SavedInWorkspaceInput = z.infer<typeof savedInWorkspaceInputSchema>;
+export type ListSavedInput = z.infer<typeof listSavedInputSchema>;

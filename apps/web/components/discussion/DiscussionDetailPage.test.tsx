@@ -26,6 +26,7 @@ const mocks = vi.hoisted(() => ({
   refetchDiscussion: vi.fn(),
 }));
 
+vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
 vi.mock("@/components/discussion/FollowControl", () => ({ FollowControl: () => null }));
 const pinMocks = vi.hoisted(() => ({ canPin: false, items: [] as Array<{ commentId: string; excerpt: string; author: string; pinnedBy: string | null }>, mutate: vi.fn() }));
 vi.mock("@/hooks/usePins", () => ({
