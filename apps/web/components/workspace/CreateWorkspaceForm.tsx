@@ -36,36 +36,6 @@ export function CreateWorkspaceForm() {
     }
   }, [name, setValue, manuallyEditedSlug]);
 
-  useEffect(() => {
-    let frame = 0;
-    const focusCreation = () => {
-      if (window.location.hash !== "#new-workspace") return;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        document
-          .getElementById("new-workspace")
-          ?.scrollIntoView?.({ block: "start" });
-        document
-          .getElementById("new-workspace-name")
-          ?.focus({ preventScroll: true });
-      });
-    };
-    const onAnchorClick = (event: MouseEvent) => {
-      if (!(event.target instanceof Element)) return;
-      if (event.target.closest('a[href="#new-workspace"], a[href="/workspace#new-workspace"]')) {
-        focusCreation();
-      }
-    };
-    focusCreation();
-    window.addEventListener("hashchange", focusCreation);
-    document.addEventListener("click", onAnchorClick);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("hashchange", focusCreation);
-      document.removeEventListener("click", onAnchorClick);
-    };
-  }, []);
-
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (submittingRef.current || redirecting) {
       event.preventDefault();

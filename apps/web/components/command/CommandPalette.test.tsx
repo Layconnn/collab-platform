@@ -224,6 +224,16 @@ describe("CommandPalette live search", () => {
     expect(options().at(-1)).toBe("See all results for “new workspace”");
   });
 
+  it("opens the create-workspace dialog in place", () => {
+    useUiStore.setState({ isCreateWorkspaceOpen: false });
+    render(<Host />);
+    press("k", { ctrlKey: true });
+    fireEvent.change(combobox(), { target: { value: "new workspace" } });
+    fireEvent.keyDown(combobox(), { key: "Enter" });
+    expect(useUiStore.getState().isCreateWorkspaceOpen).toBe(true);
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
   it("opens a result and offers the full search page", () => {
     vi.useFakeTimers();
     const view = render(<Host />);

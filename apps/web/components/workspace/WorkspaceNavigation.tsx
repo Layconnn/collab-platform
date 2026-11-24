@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AppIcon, type AppIconName } from "@/components/common/AppIcon";
+import { useUiStore } from "@/stores/ui.store";
 
 type NavItem = { label: string; href: string; icon: AppIconName; active: boolean };
 
@@ -16,6 +17,7 @@ export function WorkspaceNavigation({
   collapsed?: boolean;
   onNavigate?: () => void;
 }) {
+  const setCreateWorkspaceOpen = useUiStore((state) => state.setCreateWorkspaceOpen);
   const pathname = usePathname();
   const items: NavItem[] = [
     {
@@ -57,16 +59,16 @@ export function WorkspaceNavigation({
           {!collapsed ? <span className="truncate">{item.label}</span> : null}
         </Link>
       ))}
-      <Link
-        href="/workspace#new-workspace"
+      <button
+        type="button"
         aria-label={collapsed ? "Create a workspace" : undefined}
         title={collapsed ? "Create a workspace" : undefined}
-        onClick={onNavigate}
-        className={`mt-3 flex min-h-10 items-center gap-3 border-l-2 border-transparent px-2.5 text-sm font-medium text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center" : ""}`}
+        onClick={() => { onNavigate?.(); setCreateWorkspaceOpen(true); }}
+        className={`mt-3 flex w-full min-h-10 items-center gap-3 border-l-2 border-transparent px-2.5 text-sm font-medium text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center" : ""}`}
       >
         <AppIcon name="plus" />
         {!collapsed ? <span className="truncate">Create workspace</span> : null}
-      </Link>
+      </button>
     </nav>
   );
 }

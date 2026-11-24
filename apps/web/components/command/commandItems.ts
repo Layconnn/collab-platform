@@ -12,7 +12,7 @@ export type CommandItem = {
   keywords?: string;
   // Navigation target; items without one run `action` instead.
   href?: string;
-  action?: "theme-light" | "theme-dark" | "theme-system" | "shortcuts" | "sign-out";
+  action?: "theme-light" | "theme-dark" | "theme-system" | "shortcuts" | "sign-out" | "new-workspace";
 };
 
 export type CommandContext = {
@@ -39,7 +39,7 @@ export function buildCommands(context: CommandContext): CommandItem[] {
   }
   items.push(
     { id: "search", group: "Actions", label: "Search everything", keywords: "find look up", href: "/search" },
-    { id: "new-workspace", group: "Actions", label: "New workspace", keywords: "create add", href: "/workspace#new-workspace" },
+    { id: "new-workspace", group: "Actions", label: "New workspace", keywords: "create add", action: "new-workspace" },
     { id: "all-workspaces", group: "Actions", label: "All workspaces", keywords: "list switch", href: "/workspace" },
     { id: "theme-light", group: "Actions", label: "Switch to light theme", keywords: "appearance mode colour color", action: "theme-light" },
     { id: "theme-dark", group: "Actions", label: "Switch to dark theme", keywords: "appearance mode colour color night", action: "theme-dark" },
