@@ -1,6 +1,6 @@
 # PRD: Decision reviews
 
-Status: draft 2026-11-24 · Horizon 1 · Issue #105
+Status: approved 2026-11-24 (defaults confirmed by the author) · Horizon 1 · Issue #105
 
 ## Problem
 
@@ -139,20 +139,20 @@ Changes to existing data: `Decision` gains `reviewRule` (`ALL` or `AT_LEAST`, de
 
 ## Risks and open questions
 
-Each question has a proposed default; the author confirms or changes it before work starts.
+Each question had a proposed default; the author confirmed all of them on 2026-11-24.
 
-- **Should an unmet rule block finalizing?** Default: yes, with "Finalize anyway" for managers and a required, recorded reason. Without the block a review is advisory and easy to skip; without the override a team is stuck when a reviewer is away.
-- **Should edits reset approvals?** Default: yes, when the question, outcome, rationale or alternatives change, like dismissing stale reviews on a pull request. Follow-up changes do not reset.
-- **Can the author review their own proposal?** Default: no.
-- **Who can be asked?** Default: any member of the workspace, up to 10 per proposal.
+- **Should an unmet rule block finalizing?** Decided: yes, with "Finalize anyway" for managers and a required, recorded reason. Without the block a review is advisory and easy to skip; without the override a team is stuck when a reviewer is away.
+- **Should edits reset approvals?** Decided: yes, when the question, outcome, rationale or alternatives change, like dismissing stale reviews on a pull request. Follow-up changes do not reset.
+- **Can the author review their own proposal?** Decided: no.
+- **Who can be asked?** Decided: any member of the workspace, up to 10 per proposal.
 - **The migration.** The release adds enum values and a table. It is additive, and the current code ignores the new columns, so it is safe in either deploy order; the release still asks for the approval page to be open before merging.
 
 ## Delivery plan
 
 | # | Pull request | Requirements |
 | --- | --- | --- |
-| 1 | `Commons: Decision Records: PRD for decision reviews` — this document | — |
-| 2 | `Commons: Decision Records: store reviewers and their responses` — `DecisionReview`, the rule, the migration, request, respond, withdraw and the version checks, with real-database tests | FR-1 to FR-5, FR-7, NFR-1 to NFR-3 |
-| 3 | `Commons: Decision Records: reset reviews on edits and gate finalizing on the rule` — stale resets, the finalize check, "finalize anyway" with a reason, closing requests on finalize, supersede and delete | FR-6, FR-8 to FR-10 |
-| 4 | `Commons: Decision Records: show and answer reviews on the decision page` — the Review section, request dialog with member picker, approve and object, the finalize-anyway dialog, review history | FR-11, NFR-4 |
-| 5 | `Commons: Decision Records: tell reviewers and authors about reviews` — notifications, "Review requested" on Home, list progress and "Waiting for my review", activity wording | FR-12 to FR-15 |
+| 1 (#105) | `Commons: Decision Records: PRD for decision reviews` — this document | — |
+| 2 (#107) | `Commons: Decision Records: store reviewers and their responses` — `DecisionReview`, the rule, the migration, request, respond, withdraw and the version checks, with real-database tests | FR-1 to FR-5, FR-7, NFR-1 to NFR-3 |
+| 3 (#108) | `Commons: Decision Records: reset reviews on edits and gate finalizing on the rule` — stale resets, the finalize check, "finalize anyway" with a reason, closing requests on finalize, supersede and delete | FR-6, FR-8 to FR-10 |
+| 4 (#109) | `Commons: Decision Records: show and answer reviews on the decision page` — the Review section, request dialog with member picker, approve and object, the finalize-anyway dialog, review history | FR-11, NFR-4 |
+| 5 (#110) | `Commons: Decision Records: tell reviewers and authors about reviews` — notifications, "Review requested" on Home, list progress and "Waiting for my review", activity wording | FR-12 to FR-15 |

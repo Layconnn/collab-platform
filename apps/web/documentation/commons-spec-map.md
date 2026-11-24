@@ -23,7 +23,7 @@ Multi-pull-request work lives in `projects/YYYY-MM-DD-<name>/` with a `PRD.md` (
 
 - [2026-11-23 Event log, universal search and Cmd-K](./projects/2026-11-23-search-and-activity/PRD.md) — Horizon 1, delivered: event log #78, recent activity #79, search index #80, search page #81, Cmd-K palette #82, live palette results (this project's last pull request).
 - [2026-11-23 The new Home](./projects/2026-11-23-home/PRD.md) — Horizon 1, delivered: needs you #93, pulse #94, decided this week #95, Home page #96, pulse time-zone fix #98, workspace cards #99, first run and create dialog #100; released in #101.
-- [2026-11-24 Decision reviews](./projects/2026-11-24-decision-reviews/PRD.md) — Horizon 1, draft.
+- [2026-11-24 Decision reviews](./projects/2026-11-24-decision-reviews/PRD.md) — Horizon 1, approved.
 
 ## Operations
 
