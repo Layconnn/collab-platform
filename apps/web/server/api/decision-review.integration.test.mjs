@@ -259,3 +259,113 @@ test("summaries follow the rule", () => {
   const atLeast = summarizeReviews({ reviewRule: "AT_LEAST", requiredApprovals: 3 }, states("APPROVED", "APPROVED"));
   assert.deepEqual([atLeast.needed, atLeast.met], [2, true], "N is capped at the reviewers asked");
 });
+
+// ---------------------------------------------------------------------------
+// Edits send a proposal back for review; finalizing follows the rule (PR 3)
+// ---------------------------------------------------------------------------
+
+const { decisionRouter } = jiti("./routers/decision.router.ts");
+function decisions(user) {
+  return decisionRouter.createCaller({
+    user: { id: user.id }, requestId: `review-test-${suffix()}`, headers: new Headers(),
+    requestMethod: "POST", ip: null, responseHeaders: new Headers(),
+  });
+}
+
+async function reviewed(question = "Offer a free plan for teams under five") {
+  const [owner, sam, maya, lee] = await Promise.all([user("Olu"), user("Sam"), user("Maya"), user("Lee")]);
+  const ws = await workspace(owner, [[sam, "MEMBER"], [maya, "ADMIN"], [lee, "MEMBER"]]);
+  const decision = await proposal(ws, sam, question);
+  await caller(sam).request({ ...ids(ws, decision), reviewerIds: [maya.id, lee.id] });
+  return { owner, sam, maya, lee, ws, decision };
+}
+
+test("changing what a proposal says asks everyone again; changing the follow-up does not", async () => {
+  const { sam, maya, lee, ws, decision } = await reviewed();
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  await caller(lee).respond({ ...ids(ws, decision), expectedVersion: 1, response: "OBJECTED", note: "Five is too low." });
+
+  await decisions(sam).edit({ ...ids(ws, decision), expectedVersion: 1, followUp: "Announce on Monday." });
+  let view = await caller(sam).list(ids(ws, decision));
+  assert.deepEqual(view.reviews.map((r) => r.state), ["APPROVED", "OBJECTED"], "follow-up edits keep answers");
+  assert.deepEqual(view.reviews.map((r) => r.stale), [true, true], "but they now refer to an earlier version");
+
+  await decisions(sam).edit({ ...ids(ws, decision), expectedVersion: 2, outcome: "Teams under ten." });
+  view = await caller(sam).list(ids(ws, decision));
+  assert.deepEqual(view.reviews.map((r) => [r.state, r.note]), [["PENDING", null], ["PENDING", null]]);
+  assert.equal(view.summary.met, false);
+  const reset = (await events(decision)).filter((e) => e.kind === "DECISION_REVIEWS_RESET");
+  assert.equal(reset.length, 1);
+  assert.deepEqual([reset[0].summary.reviewers, reset[0].summary.version], [2, 3]);
+  // The earlier answers are still in the history.
+  assert.ok(view.history.some((e) => e.kind === "DECISION_REVIEW_RESPONDED" && e.summary.note === "Five is too low."));
+  await rejects(caller(lee).respond({ ...ids(ws, decision), expectedVersion: 2, response: "APPROVED" }), "CONFLICT");
+  await caller(lee).respond({ ...ids(ws, decision), expectedVersion: 3, response: "APPROVED" });
+});
+
+test("finalizing waits for the rule, unless a manager gives a reason", async () => {
+  const { owner, sam, maya, lee, ws, decision } = await reviewed();
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+
+  await assert.rejects(decisions(owner).finalize({ ...ids(ws, decision), expectedVersion: 1 }), (error) => {
+    assert.equal(error.code, "CONFLICT");
+    assert.match(error.message, /Waiting for Lee/);
+    return true;
+  });
+  await rejects(decisions(sam).finalize({ ...ids(ws, decision), expectedVersion: 1, overrideReason: "Launch date is fixed." }), "FORBIDDEN");
+  await assert.rejects(decisions(owner).finalize({ ...ids(ws, decision), expectedVersion: 1, overrideReason: "short" }));
+
+  const finalized = await decisions(owner).finalize({ ...ids(ws, decision), expectedVersion: 1, overrideReason: "Launch date fixed by the board." });
+  assert.equal(finalized.status, "DECIDED");
+  const { items } = await decisions(owner).revisions(ids(ws, decision));
+  assert.equal(items.at(-1).overrideReason, "Launch date fixed by the board.");
+  const event = await prisma.activityEvent.findFirst({ where: { subjectId: decision.id, kind: "DECISION_FINALIZED" } });
+  assert.deepEqual([event.summary.overrideReason, event.summary.waitingFor], ["Launch date fixed by the board.", "Lee"]);
+  // Pending requests are closed with the proposal: nothing can be answered now.
+  await rejects(caller(lee).respond({ ...ids(ws, decision), expectedVersion: 2, response: "APPROVED" }), "CONFLICT");
+  assert.equal((await caller(lee).list(ids(ws, decision))).viewer.canRespond, false);
+});
+
+test("a met rule, or no reviewers, finalizes as before and ignores a reason", async () => {
+  const { owner, maya, lee, ws, decision } = await reviewed();
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  await caller(lee).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  await decisions(owner).finalize({ ...ids(ws, decision), expectedVersion: 1, overrideReason: "Not needed, all approved." });
+  const { items } = await decisions(owner).revisions(ids(ws, decision));
+  assert.equal(items.at(-1).overrideReason, null);
+
+  const plain = await proposal(ws, owner, "No reviewers");
+  const done = await decisions(owner).finalize({ ...ids(ws, plain), expectedVersion: 1 });
+  assert.equal(done.status, "DECIDED");
+});
+
+test("an objection under 'at least N' does not block once enough have approved", async () => {
+  const { owner, sam, maya, lee, ws, decision } = await reviewed();
+  await caller(sam).setRule({ ...ids(ws, decision), rule: "AT_LEAST", requiredApprovals: 1 });
+  await caller(lee).respond({ ...ids(ws, decision), expectedVersion: 1, response: "OBJECTED", note: "Prefer ten." });
+  await assert.rejects(decisions(owner).finalize({ ...ids(ws, decision), expectedVersion: 1 }), /needs 1 approval and has 0/);
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  const done = await decisions(owner).finalize({ ...ids(ws, decision), expectedVersion: 1 });
+  assert.equal(done.status, "DECIDED");
+});
+
+test("an answer racing finalization is either counted or refused, never lost", async () => {
+  const { owner, maya, lee, ws, decision } = await reviewed();
+  await caller(maya).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" });
+  const [answer, finalize] = await Promise.allSettled([
+    caller(lee).respond({ ...ids(ws, decision), expectedVersion: 1, response: "APPROVED" }),
+    decisions(owner).finalize({ ...ids(ws, decision), expectedVersion: 1 }),
+  ]);
+  const stored = await prisma.decision.findUniqueOrThrow({ where: { id: decision.id } });
+  const lees = await prisma.decisionReview.findFirstOrThrow({ where: { decisionId: decision.id, reviewerId: lee.id } });
+  if (finalize.status === "fulfilled") {
+    // Finalizing could only succeed after Lee's approval was committed.
+    assert.equal(answer.status, "fulfilled");
+    assert.equal(lees.state, "APPROVED");
+    assert.equal(stored.status, "DECIDED");
+  } else {
+    assert.equal(finalize.reason.code, "CONFLICT");
+    assert.equal(stored.status, "PROPOSED");
+    assert.equal(lees.state, answer.status === "fulfilled" ? "APPROVED" : "PENDING");
+  }
+});
