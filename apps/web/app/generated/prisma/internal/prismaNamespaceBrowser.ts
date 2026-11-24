@@ -60,6 +60,9 @@ export const ModelName = {
   Decision: 'Decision',
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
+  DiscussionFollow: 'DiscussionFollow',
+  SavedItem: 'SavedItem',
+  Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
   ActivityEvent: 'ActivityEvent'
 } as const
@@ -127,7 +130,9 @@ export const CommentScalarFieldEnum = {
   depth: 'depth',
   body: 'body',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  pinnedAt: 'pinnedAt',
+  pinnedById: 'pinnedById'
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
@@ -232,6 +237,45 @@ export const DecisionReviewScalarFieldEnum = {
 } as const
 
 export type DecisionReviewScalarFieldEnum = (typeof DecisionReviewScalarFieldEnum)[keyof typeof DecisionReviewScalarFieldEnum]
+
+
+export const DiscussionFollowScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  userId: 'userId',
+  state: 'state',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
+
+
+export const SavedItemScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  decisionId: 'decisionId',
+  createdAt: 'createdAt'
+} as const
+
+export type SavedItemScalarFieldEnum = (typeof SavedItemScalarFieldEnum)[keyof typeof SavedItemScalarFieldEnum]
+
+
+export const ReactionScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  userId: 'userId',
+  emoji: 'emoji',
+  createdAt: 'createdAt'
+} as const
+
+export type ReactionScalarFieldEnum = (typeof ReactionScalarFieldEnum)[keyof typeof ReactionScalarFieldEnum]
 
 
 export const DecisionSupersessionScalarFieldEnum = {

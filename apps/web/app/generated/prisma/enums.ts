@@ -38,6 +38,14 @@ export const DecisionStatus = {
 export type DecisionStatus = (typeof DecisionStatus)[keyof typeof DecisionStatus]
 
 
+export const FollowState = {
+  FOLLOWING: 'FOLLOWING',
+  MUTED: 'MUTED'
+} as const
+
+export type FollowState = (typeof FollowState)[keyof typeof FollowState]
+
+
 export const DecisionReviewRule = {
   ALL: 'ALL',
   AT_LEAST: 'AT_LEAST'
@@ -89,7 +97,9 @@ export const ActivityKind = {
   DECISION_REVIEW_RESPONDED: 'DECISION_REVIEW_RESPONDED',
   DECISION_REVIEW_WITHDRAWN: 'DECISION_REVIEW_WITHDRAWN',
   DECISION_REVIEWS_RESET: 'DECISION_REVIEWS_RESET',
-  DECISION_REVIEW_RULE_CHANGED: 'DECISION_REVIEW_RULE_CHANGED'
+  DECISION_REVIEW_RULE_CHANGED: 'DECISION_REVIEW_RULE_CHANGED',
+  COMMENT_PINNED: 'COMMENT_PINNED',
+  COMMENT_UNPINNED: 'COMMENT_UNPINNED'
 } as const
 
 export type ActivityKind = (typeof ActivityKind)[keyof typeof ActivityKind]

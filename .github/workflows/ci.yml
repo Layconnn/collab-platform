@@ -129,6 +129,14 @@ jobs:
         run: pnpm -C apps/web run test:home-api
       - name: Decision reviews API (real database)
         run: pnpm -C apps/web run test:decision-review-api
+      - name: Reactions API (real database)
+        run: pnpm -C apps/web run test:reaction-api
+      - name: Follow and mute API (real database)
+        run: pnpm -C apps/web run test:follow-api
+      - name: Pinned replies API (real database)
+        run: pnpm -C apps/web run test:pin-api
+      - name: Saved items API (real database)
+        run: pnpm -C apps/web run test:saved-api
 
   frontend-tests:
     name: Frontend tests

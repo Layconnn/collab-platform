@@ -207,6 +207,10 @@ export type UserWhereInput = {
   decisionRevisions?: Prisma.DecisionRevisionListRelationFilter
   supersessionsAuthorized?: Prisma.DecisionSupersessionListRelationFilter
   decisionReviews?: Prisma.DecisionReviewListRelationFilter
+  reactions?: Prisma.ReactionListRelationFilter
+  discussionFollows?: Prisma.DiscussionFollowListRelationFilter
+  commentsPinned?: Prisma.CommentListRelationFilter
+  savedItems?: Prisma.SavedItemListRelationFilter
   decisionReviewsRequested?: Prisma.DecisionReviewListRelationFilter
   notificationsReceived?: Prisma.NotificationListRelationFilter
   notificationsSent?: Prisma.NotificationListRelationFilter
@@ -230,6 +234,10 @@ export type UserOrderByWithRelationInput = {
   decisionRevisions?: Prisma.DecisionRevisionOrderByRelationAggregateInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionOrderByRelationAggregateInput
   decisionReviews?: Prisma.DecisionReviewOrderByRelationAggregateInput
+  reactions?: Prisma.ReactionOrderByRelationAggregateInput
+  discussionFollows?: Prisma.DiscussionFollowOrderByRelationAggregateInput
+  commentsPinned?: Prisma.CommentOrderByRelationAggregateInput
+  savedItems?: Prisma.SavedItemOrderByRelationAggregateInput
   decisionReviewsRequested?: Prisma.DecisionReviewOrderByRelationAggregateInput
   notificationsReceived?: Prisma.NotificationOrderByRelationAggregateInput
   notificationsSent?: Prisma.NotificationOrderByRelationAggregateInput
@@ -256,6 +264,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   decisionRevisions?: Prisma.DecisionRevisionListRelationFilter
   supersessionsAuthorized?: Prisma.DecisionSupersessionListRelationFilter
   decisionReviews?: Prisma.DecisionReviewListRelationFilter
+  reactions?: Prisma.ReactionListRelationFilter
+  discussionFollows?: Prisma.DiscussionFollowListRelationFilter
+  commentsPinned?: Prisma.CommentListRelationFilter
+  savedItems?: Prisma.SavedItemListRelationFilter
   decisionReviewsRequested?: Prisma.DecisionReviewListRelationFilter
   notificationsReceived?: Prisma.NotificationListRelationFilter
   notificationsSent?: Prisma.NotificationListRelationFilter
@@ -305,6 +317,10 @@ export type UserCreateInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -328,6 +344,10 @@ export type UserUncheckedCreateInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -351,6 +371,10 @@ export type UserUpdateInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -374,6 +398,10 @@ export type UserUncheckedUpdateInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -496,12 +524,28 @@ export type UserCreateNestedOneWithoutCommentsInput = {
   connect?: Prisma.UserWhereUniqueInput
 }
 
+export type UserCreateNestedOneWithoutCommentsPinnedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommentsPinnedInput, Prisma.UserUncheckedCreateWithoutCommentsPinnedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommentsPinnedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutCommentsNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutCommentsInput, Prisma.UserUncheckedCreateWithoutCommentsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommentsInput
   upsert?: Prisma.UserUpsertWithoutCommentsInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommentsInput, Prisma.UserUpdateWithoutCommentsInput>, Prisma.UserUncheckedUpdateWithoutCommentsInput>
+}
+
+export type UserUpdateOneWithoutCommentsPinnedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommentsPinnedInput, Prisma.UserUncheckedCreateWithoutCommentsPinnedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommentsPinnedInput
+  upsert?: Prisma.UserUpsertWithoutCommentsPinnedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommentsPinnedInput, Prisma.UserUpdateWithoutCommentsPinnedInput>, Prisma.UserUncheckedUpdateWithoutCommentsPinnedInput>
 }
 
 export type UserCreateNestedOneWithoutNotificationsReceivedInput = {
@@ -628,6 +672,48 @@ export type UserUpdateOneWithoutDecisionReviewsRequestedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDecisionReviewsRequestedInput, Prisma.UserUpdateWithoutDecisionReviewsRequestedInput>, Prisma.UserUncheckedUpdateWithoutDecisionReviewsRequestedInput>
 }
 
+export type UserCreateNestedOneWithoutDiscussionFollowsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDiscussionFollowsInput, Prisma.UserUncheckedCreateWithoutDiscussionFollowsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDiscussionFollowsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDiscussionFollowsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDiscussionFollowsInput, Prisma.UserUncheckedCreateWithoutDiscussionFollowsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDiscussionFollowsInput
+  upsert?: Prisma.UserUpsertWithoutDiscussionFollowsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDiscussionFollowsInput, Prisma.UserUpdateWithoutDiscussionFollowsInput>, Prisma.UserUncheckedUpdateWithoutDiscussionFollowsInput>
+}
+
+export type UserCreateNestedOneWithoutSavedItemsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedItemsInput, Prisma.UserUncheckedCreateWithoutSavedItemsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedItemsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSavedItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSavedItemsInput, Prisma.UserUncheckedCreateWithoutSavedItemsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedItemsInput
+  upsert?: Prisma.UserUpsertWithoutSavedItemsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSavedItemsInput, Prisma.UserUpdateWithoutSavedItemsInput>, Prisma.UserUncheckedUpdateWithoutSavedItemsInput>
+}
+
+export type UserCreateNestedOneWithoutReactionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReactionsInput, Prisma.UserUncheckedCreateWithoutReactionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReactionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutReactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReactionsInput, Prisma.UserUncheckedCreateWithoutReactionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReactionsInput
+  upsert?: Prisma.UserUpsertWithoutReactionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReactionsInput, Prisma.UserUpdateWithoutReactionsInput>, Prisma.UserUncheckedUpdateWithoutReactionsInput>
+}
+
 export type UserCreateNestedOneWithoutSupersessionsAuthorizedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSupersessionsAuthorizedInput, Prisma.UserUncheckedCreateWithoutSupersessionsAuthorizedInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSupersessionsAuthorizedInput
@@ -676,6 +762,10 @@ export type UserCreateWithoutOwnedSpacesInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -698,6 +788,10 @@ export type UserUncheckedCreateWithoutOwnedSpacesInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -736,6 +830,10 @@ export type UserUpdateWithoutOwnedSpacesInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -758,6 +856,10 @@ export type UserUncheckedUpdateWithoutOwnedSpacesInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -780,6 +882,10 @@ export type UserCreateWithoutDiscussionsInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -802,6 +908,10 @@ export type UserUncheckedCreateWithoutDiscussionsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -840,6 +950,10 @@ export type UserUpdateWithoutDiscussionsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -862,6 +976,10 @@ export type UserUncheckedUpdateWithoutDiscussionsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -884,6 +1002,10 @@ export type UserCreateWithoutCommentsInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -906,6 +1028,10 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -915,6 +1041,63 @@ export type UserUncheckedCreateWithoutCommentsInput = {
 export type UserCreateOrConnectWithoutCommentsInput = {
   where: Prisma.UserWhereUniqueInput
   create: Prisma.XOR<Prisma.UserCreateWithoutCommentsInput, Prisma.UserUncheckedCreateWithoutCommentsInput>
+}
+
+export type UserCreateWithoutCommentsPinnedInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutCommentsPinnedInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutCommentsPinnedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommentsPinnedInput, Prisma.UserUncheckedCreateWithoutCommentsPinnedInput>
 }
 
 export type UserUpsertWithoutCommentsInput = {
@@ -944,6 +1127,10 @@ export type UserUpdateWithoutCommentsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -966,6 +1153,73 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserUpsertWithoutCommentsPinnedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCommentsPinnedInput, Prisma.UserUncheckedUpdateWithoutCommentsPinnedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommentsPinnedInput, Prisma.UserUncheckedCreateWithoutCommentsPinnedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCommentsPinnedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCommentsPinnedInput, Prisma.UserUncheckedUpdateWithoutCommentsPinnedInput>
+}
+
+export type UserUpdateWithoutCommentsPinnedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCommentsPinnedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -989,6 +1243,10 @@ export type UserCreateWithoutNotificationsReceivedInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
@@ -1011,6 +1269,10 @@ export type UserUncheckedCreateWithoutNotificationsReceivedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
@@ -1038,6 +1300,10 @@ export type UserCreateWithoutNotificationsSentInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
@@ -1060,6 +1326,10 @@ export type UserUncheckedCreateWithoutNotificationsSentInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
@@ -1098,6 +1368,10 @@ export type UserUpdateWithoutNotificationsReceivedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
@@ -1120,6 +1394,10 @@ export type UserUncheckedUpdateWithoutNotificationsReceivedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1153,6 +1431,10 @@ export type UserUpdateWithoutNotificationsSentInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
@@ -1175,6 +1457,10 @@ export type UserUncheckedUpdateWithoutNotificationsSentInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1196,6 +1482,10 @@ export type UserCreateWithoutMembershipsInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1218,6 +1508,10 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1256,6 +1550,10 @@ export type UserUpdateWithoutMembershipsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1278,6 +1576,10 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1300,6 +1602,10 @@ export type UserCreateWithoutDecisionsCreatedInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1322,6 +1628,10 @@ export type UserUncheckedCreateWithoutDecisionsCreatedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1349,6 +1659,10 @@ export type UserCreateWithoutDecisionsDeletedInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1371,6 +1685,10 @@ export type UserUncheckedCreateWithoutDecisionsDeletedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1409,6 +1727,10 @@ export type UserUpdateWithoutDecisionsCreatedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1431,6 +1753,10 @@ export type UserUncheckedUpdateWithoutDecisionsCreatedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1464,6 +1790,10 @@ export type UserUpdateWithoutDecisionsDeletedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1486,6 +1816,10 @@ export type UserUncheckedUpdateWithoutDecisionsDeletedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1508,6 +1842,10 @@ export type UserCreateWithoutDecisionRevisionsInput = {
   decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1530,6 +1868,10 @@ export type UserUncheckedCreateWithoutDecisionRevisionsInput = {
   decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1568,6 +1910,10 @@ export type UserUpdateWithoutDecisionRevisionsInput = {
   decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1590,6 +1936,10 @@ export type UserUncheckedUpdateWithoutDecisionRevisionsInput = {
   decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1612,6 +1962,10 @@ export type UserCreateWithoutDecisionReviewsInput = {
   decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1634,6 +1988,10 @@ export type UserUncheckedCreateWithoutDecisionReviewsInput = {
   decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1662,6 +2020,10 @@ export type UserCreateWithoutDecisionReviewsRequestedInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
@@ -1684,6 +2046,10 @@ export type UserUncheckedCreateWithoutDecisionReviewsRequestedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
@@ -1721,6 +2087,10 @@ export type UserUpdateWithoutDecisionReviewsInput = {
   decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1743,6 +2113,10 @@ export type UserUncheckedUpdateWithoutDecisionReviewsInput = {
   decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1777,6 +2151,10 @@ export type UserUpdateWithoutDecisionReviewsRequestedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
@@ -1799,6 +2177,370 @@ export type UserUncheckedUpdateWithoutDecisionReviewsRequestedInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutDiscussionFollowsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutDiscussionFollowsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutDiscussionFollowsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDiscussionFollowsInput, Prisma.UserUncheckedCreateWithoutDiscussionFollowsInput>
+}
+
+export type UserUpsertWithoutDiscussionFollowsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDiscussionFollowsInput, Prisma.UserUncheckedUpdateWithoutDiscussionFollowsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDiscussionFollowsInput, Prisma.UserUncheckedCreateWithoutDiscussionFollowsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDiscussionFollowsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDiscussionFollowsInput, Prisma.UserUncheckedUpdateWithoutDiscussionFollowsInput>
+}
+
+export type UserUpdateWithoutDiscussionFollowsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDiscussionFollowsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutSavedItemsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutSavedItemsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutSavedItemsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedItemsInput, Prisma.UserUncheckedCreateWithoutSavedItemsInput>
+}
+
+export type UserUpsertWithoutSavedItemsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSavedItemsInput, Prisma.UserUncheckedUpdateWithoutSavedItemsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSavedItemsInput, Prisma.UserUncheckedCreateWithoutSavedItemsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSavedItemsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSavedItemsInput, Prisma.UserUncheckedUpdateWithoutSavedItemsInput>
+}
+
+export type UserUpdateWithoutSavedItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSavedItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutReactionsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutReactionsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutReactionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReactionsInput, Prisma.UserUncheckedCreateWithoutReactionsInput>
+}
+
+export type UserUpsertWithoutReactionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReactionsInput, Prisma.UserUncheckedUpdateWithoutReactionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReactionsInput, Prisma.UserUncheckedCreateWithoutReactionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReactionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReactionsInput, Prisma.UserUncheckedUpdateWithoutReactionsInput>
+}
+
+export type UserUpdateWithoutReactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1820,6 +2562,10 @@ export type UserCreateWithoutSupersessionsAuthorizedInput = {
   decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1842,6 +2588,10 @@ export type UserUncheckedCreateWithoutSupersessionsAuthorizedInput = {
   decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1880,6 +2630,10 @@ export type UserUpdateWithoutSupersessionsAuthorizedInput = {
   decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1902,6 +2656,10 @@ export type UserUncheckedUpdateWithoutSupersessionsAuthorizedInput = {
   decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1925,6 +2683,10 @@ export type UserCreateWithoutActivityEventsInput = {
   decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1947,6 +2709,10 @@ export type UserUncheckedCreateWithoutActivityEventsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1985,6 +2751,10 @@ export type UserUpdateWithoutActivityEventsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -2007,6 +2777,10 @@ export type UserUncheckedUpdateWithoutActivityEventsInput = {
   decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
   supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -2027,6 +2801,10 @@ export type UserCountOutputType = {
   decisionRevisions: number
   supersessionsAuthorized: number
   decisionReviews: number
+  reactions: number
+  discussionFollows: number
+  commentsPinned: number
+  savedItems: number
   decisionReviewsRequested: number
   notificationsReceived: number
   notificationsSent: number
@@ -2043,6 +2821,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   decisionRevisions?: boolean | UserCountOutputTypeCountDecisionRevisionsArgs
   supersessionsAuthorized?: boolean | UserCountOutputTypeCountSupersessionsAuthorizedArgs
   decisionReviews?: boolean | UserCountOutputTypeCountDecisionReviewsArgs
+  reactions?: boolean | UserCountOutputTypeCountReactionsArgs
+  discussionFollows?: boolean | UserCountOutputTypeCountDiscussionFollowsArgs
+  commentsPinned?: boolean | UserCountOutputTypeCountCommentsPinnedArgs
+  savedItems?: boolean | UserCountOutputTypeCountSavedItemsArgs
   decisionReviewsRequested?: boolean | UserCountOutputTypeCountDecisionReviewsRequestedArgs
   notificationsReceived?: boolean | UserCountOutputTypeCountNotificationsReceivedArgs
   notificationsSent?: boolean | UserCountOutputTypeCountNotificationsSentArgs
@@ -2125,6 +2907,34 @@ export type UserCountOutputTypeCountDecisionReviewsArgs<ExtArgs extends runtime.
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountReactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReactionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDiscussionFollowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DiscussionFollowWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCommentsPinnedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSavedItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedItemWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountDecisionReviewsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.DecisionReviewWhereInput
 }
@@ -2168,6 +2978,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   decisionRevisions?: boolean | Prisma.User$decisionRevisionsArgs<ExtArgs>
   supersessionsAuthorized?: boolean | Prisma.User$supersessionsAuthorizedArgs<ExtArgs>
   decisionReviews?: boolean | Prisma.User$decisionReviewsArgs<ExtArgs>
+  reactions?: boolean | Prisma.User$reactionsArgs<ExtArgs>
+  discussionFollows?: boolean | Prisma.User$discussionFollowsArgs<ExtArgs>
+  commentsPinned?: boolean | Prisma.User$commentsPinnedArgs<ExtArgs>
+  savedItems?: boolean | Prisma.User$savedItemsArgs<ExtArgs>
   decisionReviewsRequested?: boolean | Prisma.User$decisionReviewsRequestedArgs<ExtArgs>
   notificationsReceived?: boolean | Prisma.User$notificationsReceivedArgs<ExtArgs>
   notificationsSent?: boolean | Prisma.User$notificationsSentArgs<ExtArgs>
@@ -2216,6 +3030,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   decisionRevisions?: boolean | Prisma.User$decisionRevisionsArgs<ExtArgs>
   supersessionsAuthorized?: boolean | Prisma.User$supersessionsAuthorizedArgs<ExtArgs>
   decisionReviews?: boolean | Prisma.User$decisionReviewsArgs<ExtArgs>
+  reactions?: boolean | Prisma.User$reactionsArgs<ExtArgs>
+  discussionFollows?: boolean | Prisma.User$discussionFollowsArgs<ExtArgs>
+  commentsPinned?: boolean | Prisma.User$commentsPinnedArgs<ExtArgs>
+  savedItems?: boolean | Prisma.User$savedItemsArgs<ExtArgs>
   decisionReviewsRequested?: boolean | Prisma.User$decisionReviewsRequestedArgs<ExtArgs>
   notificationsReceived?: boolean | Prisma.User$notificationsReceivedArgs<ExtArgs>
   notificationsSent?: boolean | Prisma.User$notificationsSentArgs<ExtArgs>
@@ -2237,6 +3055,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     decisionRevisions: Prisma.$DecisionRevisionPayload<ExtArgs>[]
     supersessionsAuthorized: Prisma.$DecisionSupersessionPayload<ExtArgs>[]
     decisionReviews: Prisma.$DecisionReviewPayload<ExtArgs>[]
+    reactions: Prisma.$ReactionPayload<ExtArgs>[]
+    discussionFollows: Prisma.$DiscussionFollowPayload<ExtArgs>[]
+    commentsPinned: Prisma.$CommentPayload<ExtArgs>[]
+    savedItems: Prisma.$SavedItemPayload<ExtArgs>[]
     decisionReviewsRequested: Prisma.$DecisionReviewPayload<ExtArgs>[]
     notificationsReceived: Prisma.$NotificationPayload<ExtArgs>[]
     notificationsSent: Prisma.$NotificationPayload<ExtArgs>[]
@@ -2653,6 +3475,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   decisionRevisions<T extends Prisma.User$decisionRevisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$decisionRevisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   supersessionsAuthorized<T extends Prisma.User$supersessionsAuthorizedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$supersessionsAuthorizedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionSupersessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   decisionReviews<T extends Prisma.User$decisionReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$decisionReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  reactions<T extends Prisma.User$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  discussionFollows<T extends Prisma.User$discussionFollowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$discussionFollowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DiscussionFollowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  commentsPinned<T extends Prisma.User$commentsPinnedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsPinnedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedItems<T extends Prisma.User$savedItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   decisionReviewsRequested<T extends Prisma.User$decisionReviewsRequestedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$decisionReviewsRequestedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationsReceived<T extends Prisma.User$notificationsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationsSent<T extends Prisma.User$notificationsSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3299,6 +4125,102 @@ export type User$decisionReviewsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.DecisionReviewScalarFieldEnum | Prisma.DecisionReviewScalarFieldEnum[]
+}
+
+/**
+ * User.reactions
+ */
+export type User$reactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Reaction
+   */
+  select?: Prisma.ReactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Reaction
+   */
+  omit?: Prisma.ReactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReactionInclude<ExtArgs> | null
+  where?: Prisma.ReactionWhereInput
+  orderBy?: Prisma.ReactionOrderByWithRelationInput | Prisma.ReactionOrderByWithRelationInput[]
+  cursor?: Prisma.ReactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReactionScalarFieldEnum | Prisma.ReactionScalarFieldEnum[]
+}
+
+/**
+ * User.discussionFollows
+ */
+export type User$discussionFollowsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DiscussionFollow
+   */
+  select?: Prisma.DiscussionFollowSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DiscussionFollow
+   */
+  omit?: Prisma.DiscussionFollowOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DiscussionFollowInclude<ExtArgs> | null
+  where?: Prisma.DiscussionFollowWhereInput
+  orderBy?: Prisma.DiscussionFollowOrderByWithRelationInput | Prisma.DiscussionFollowOrderByWithRelationInput[]
+  cursor?: Prisma.DiscussionFollowWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DiscussionFollowScalarFieldEnum | Prisma.DiscussionFollowScalarFieldEnum[]
+}
+
+/**
+ * User.commentsPinned
+ */
+export type User$commentsPinnedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Comment
+   */
+  select?: Prisma.CommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Comment
+   */
+  omit?: Prisma.CommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommentInclude<ExtArgs> | null
+  where?: Prisma.CommentWhereInput
+  orderBy?: Prisma.CommentOrderByWithRelationInput | Prisma.CommentOrderByWithRelationInput[]
+  cursor?: Prisma.CommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
+}
+
+/**
+ * User.savedItems
+ */
+export type User$savedItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedItem
+   */
+  select?: Prisma.SavedItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedItem
+   */
+  omit?: Prisma.SavedItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedItemInclude<ExtArgs> | null
+  where?: Prisma.SavedItemWhereInput
+  orderBy?: Prisma.SavedItemOrderByWithRelationInput | Prisma.SavedItemOrderByWithRelationInput[]
+  cursor?: Prisma.SavedItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedItemScalarFieldEnum | Prisma.SavedItemScalarFieldEnum[]
 }
 
 /**

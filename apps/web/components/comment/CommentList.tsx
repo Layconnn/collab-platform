@@ -2,7 +2,7 @@
 
 import { Menu, Portal } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronDown, CornerDownRight, Ellipsis, LoaderCircle, MessageCircle, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, CornerDownRight, Ellipsis, LoaderCircle, MessageCircle, Pencil, Trash2, Pin, PinOff } from "lucide-react";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -10,8 +10,13 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { updateCommentInputSchema, type UpdateCommentInput } from "@repo/validators/comment";
 import { commentActionError } from "@/components/comment/commentErrors";
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
-import { MentionText } from "@/components/common/MentionText";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
+import { MarkdownField } from "@/components/common/MarkdownField";
+import { Markdown } from "@/components/common/Markdown";
+import { ReactionBar } from "@/components/common/ReactionBar";
+import { usePinnedReplies, useSetPin } from "@/hooks/usePins";
+import { SaveButton } from "@/components/common/SaveButton";
+import { useDiscussionReactions } from "@/hooks/useReactions";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { ErrorState } from "@/components/common/StateNotice";
 import { useCommentActions, useCommentList } from "@/hooks/useComment";
@@ -45,6 +50,12 @@ function CommentSkeleton({ label }: { label: string }) {
 
 function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDenied }: { comment: CommentItem; discussionId: string; workspaceId: string; viewer: Viewer; onAccessDenied?: () => void }) {
   const { update, remove } = useCommentActions(discussionId, workspaceId);
+  // One query for the whole discussion, shared by every reply.
+  const reactions = useDiscussionReactions(workspaceId, discussionId);
+  const pins = usePinnedReplies(workspaceId, discussionId);
+  const setPin = useSetPin(workspaceId, discussionId);
+  const pinned = Boolean(pins.data?.items.some((item) => item.commentId === comment.id));
+  const pinLimitReached = Boolean(pins.data && pins.data.items.length >= pins.data.max);
   const [showReplies, setShowReplies] = useState(false);
   const [openedReplies, setOpenedReplies] = useState(false);
   const [replying, setReplying] = useState(false);
@@ -126,7 +137,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
   };
 
   return (
-    <li className="min-w-0">
+    <li className="min-w-0" id={`comment-${comment.id}`}>
       <article ref={articleRef} tabIndex={-1} aria-label={`Comment by ${authorName}`} className={`min-w-0 focus-visible:outline-2 focus-visible:outline-focus-ring ${comment.depth ? "py-3.5" : "border-b border-border-subtle py-4"}`}>
         <div className="flex min-w-0 items-start gap-3">
           <UserAvatar name={author.avatarName} className="size-8 sm:size-9" />
@@ -137,10 +148,12 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               <span aria-hidden="true" className="text-text-muted">/</span>
               <time dateTime={createdAt.toISOString()} className="text-text-muted">{dateLabel(createdAt)}</time>
               {edited ? <span className="text-text-muted">Edited</span> : null}
+              {pinned ? <span className="inline-flex items-center gap-1 font-semibold text-brand-link"><Pin size={12} aria-hidden="true" /> Pinned</span> : null}
             </div>
             {editing && canManage ? (
               <form onSubmit={onSubmit} className="mt-3 space-y-2.5" noValidate>
                 <label htmlFor={`edit-comment-${comment.id}`} className="block text-sm font-semibold text-text-primary">Edit comment</label>
+                <MarkdownField>
                 <MentionTextarea
                   workspaceId={workspaceId}
                   registration={form.register("body")}
@@ -154,6 +167,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                   aria-describedby={form.formState.errors.body ? `edit-comment-error-${comment.id}` : undefined}
                   className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                 />
+                </MarkdownField>
                 {form.formState.errors.body ? <p id={`edit-comment-error-${comment.id}`} role="alert" className="text-sm text-danger">Write a comment of up to 5,000 characters.</p> : null}
                 {editError ? <p role="alert" className="text-sm text-danger">{editError}</p> : null}
                 <div className="flex flex-wrap items-center gap-2">
@@ -163,8 +177,15 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               </form>
             ) : (
               <>
-                <p className="mt-1.5 whitespace-pre-wrap wrap-anywhere text-[0.94rem] leading-6 text-text-primary"><MentionText text={comment.body} /></p>
+                <Markdown text={comment.body} className="mt-1.5 text-[0.94rem] leading-6 text-text-primary" />
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <ReactionBar workspaceId={workspaceId} discussionId={discussionId} commentId={comment.id} reactions={reactions.data?.comments[comment.id] ?? []} disabled={!reactions.data} />
+                  <SaveButton workspaceId={workspaceId} target={{ commentId: comment.id }} label="reply" compact />
+                  {pins.data?.canPin ? (
+                    <button type="button" onClick={() => setPin.mutate({ workspaceId, commentId: comment.id, pinned: !pinned })} disabled={setPin.isPending || (!pinned && pinLimitReached)} aria-pressed={pinned} title={!pinned && pinLimitReached ? `At most ${pins.data.max} replies can be pinned` : undefined} className="inline-flex min-h-10 items-center gap-1.5 rounded-sm px-2 text-xs font-semibold text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-50">
+                      {pinned ? <PinOff size={14} aria-hidden="true" /> : <Pin size={14} aria-hidden="true" />} {pinned ? "Unpin" : "Pin"}
+                    </button>
+                  ) : null}
                   {canReply ? (
                     <button ref={replyButtonRef} type="button" onClick={replying ? closeReply : openReply} aria-expanded={replying} aria-controls={`reply-form-${comment.id}`} className="inline-flex min-h-10 items-center gap-1.5 rounded-sm px-2 text-xs font-semibold text-brand-link hover:bg-surface-hover hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
                       <CornerDownRight size={14} aria-hidden="true" /> {replying ? "Cancel reply" : "Reply"}

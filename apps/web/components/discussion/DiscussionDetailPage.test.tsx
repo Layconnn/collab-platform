@@ -26,6 +26,18 @@ const mocks = vi.hoisted(() => ({
   refetchDiscussion: vi.fn(),
 }));
 
+vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
+vi.mock("@/components/discussion/FollowControl", () => ({ FollowControl: () => null }));
+const pinMocks = vi.hoisted(() => ({ canPin: false, items: [] as Array<{ commentId: string; excerpt: string; author: string; pinnedBy: string | null }>, mutate: vi.fn() }));
+vi.mock("@/hooks/usePins", () => ({
+  usePinnedReplies: () => ({ data: { canPin: pinMocks.canPin, max: 3, items: pinMocks.items } }),
+  useSetPin: () => ({ mutate: pinMocks.mutate, isPending: false }),
+}));
+vi.mock("@/hooks/useReactions", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useDiscussionReactions: () => ({ data: { discussion: [], comments: {} } }),
+  useSetReaction: () => ({ mutate: vi.fn() }),
+}));
 vi.mock("next/navigation", () => ({
   useParams: () => ({ workspaceId: "c000000000000000000000002", discussionId: "c000000000000000000000001" }),
   useRouter: () => ({ replace: mocks.replace }),

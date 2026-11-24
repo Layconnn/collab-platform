@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { editDecisionInputSchema } from "@repo/validators/decision";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateNotice";
 import { DecisionReviews } from "@/components/decision/DecisionReviews";
+import { SaveButton } from "@/components/common/SaveButton";
 import { DeleteDecisionDialog } from "@/components/decision/DeleteDecisionDialog";
 import { DecisionDate, DecisionSection, DecisionStatus, decisionError } from "@/components/decision/decisionUI";
 import { decisionDraftSchema, DecisionFields, optionalEdit, type DecisionDraft } from "@/components/decision/decisionFields";
@@ -120,7 +121,7 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
   return <main className="mx-auto w-full min-w-0 max-w-[52rem] pb-16">
     <Link href={`/workspace/${workspaceId}/decisions`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-brand-link hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring"><ArrowLeft size={16} aria-hidden="true" /> Back to decisions</Link>
     <article className="mt-6">
-      <div className="flex flex-wrap items-center gap-3"><p className="text-xs font-semibold uppercase text-brand-link">Decision</p><DecisionStatus status={record.status} /><span className="text-xs text-text-muted">Version {record.version}</span></div>
+      <div className="flex flex-wrap items-center gap-3"><p className="text-xs font-semibold uppercase text-brand-link">Decision</p><DecisionStatus status={record.status} /><span className="text-xs text-text-muted">Version {record.version}</span><span className="ml-auto"><SaveButton workspaceId={workspaceId} target={{ decisionId }} label="decision" /></span></div>
       <h1 ref={headingRef} tabIndex={-1} className="mt-3 wrap-anywhere text-[1.85rem] font-semibold leading-tight text-text-primary outline-none sm:text-[2.35rem]">{record.question}</h1>
       <p className="mt-6 text-sm text-text-secondary">Proposed by <strong className="text-text-primary">{record.createdByLabel}</strong> · <DecisionDate value={record.createdAt} /></p>
       {record.decidedAt ? <p className="mt-1 text-sm text-text-secondary">Finalized {finalization ? <>by <strong className="text-text-primary">{finalization.actorLabel}</strong> · </> : null}<DecisionDate value={record.decidedAt} />{!finalization && revisions.hasNextPage ? " · Load more history to see who finalized it" : !finalization && !revisions.isLoading && !revisions.error ? " · Finalizer unavailable" : null}</p> : null}

@@ -16,6 +16,17 @@ const mocks = vi.hoisted(() => ({
   removeError: null as Error | null,
 }));
 
+const pinMocks = vi.hoisted(() => ({ canPin: false, items: [] as Array<{ commentId: string; excerpt: string; author: string; pinnedBy: string | null }>, mutate: vi.fn() }));
+vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
+vi.mock("@/hooks/usePins", () => ({
+  usePinnedReplies: () => ({ data: { canPin: pinMocks.canPin, max: 3, items: pinMocks.items } }),
+  useSetPin: () => ({ mutate: pinMocks.mutate, isPending: false }),
+}));
+vi.mock("@/hooks/useReactions", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useDiscussionReactions: () => ({ data: { discussion: [], comments: {} } }),
+  useSetReaction: () => ({ mutate: vi.fn() }),
+}));
 vi.mock("@/hooks/useComment", () => ({
   useCommentList: (_discussionId: string, parentId?: string, enabled = true) => {
     if (parentId && enabled) mocks.loadedParents.add(parentId);
@@ -211,6 +222,20 @@ describe("CommentList", () => {
     rendered.rerender(<ChakraProvider value={uiSystem}><CommentList discussionId={discussionId} workspaceId={workspaceId} viewer={{ ...viewer, canAct: false }} query={query()} onAccessDenied={onAccessDenied} /></ChakraProvider>);
     expect(screen.queryByRole("textbox", { name: "Reply draft" })).toBeNull();
     await waitFor(() => expect(onAccessDenied).toHaveBeenCalled());
+  });
+
+  it("lets those who can pin pin or unpin a reply, and marks pinned replies", () => {
+    pinMocks.canPin = true; pinMocks.items = []; pinMocks.mutate.mockReset();
+    const rendered = render(view());
+    fireEvent.click(screen.getByRole("button", { name: "Pin" }));
+    expect(pinMocks.mutate).toHaveBeenCalledWith({ workspaceId: expect.any(String), commentId: root.id, pinned: true });
+    pinMocks.items = [{ commentId: root.id, excerpt: "x", author: "Maya Chen", pinnedBy: "Sam" }];
+    rendered.rerender(view());
+    expect(screen.getByRole("button", { name: "Unpin" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getAllByText("Pinned").length).toBeGreaterThan(0);
+    pinMocks.canPin = false; pinMocks.items = [];
+    rendered.rerender(view());
+    expect(screen.queryByRole("button", { name: /^(Pin|Unpin)$/ })).toBeNull();
   });
 
   it("hides actions from a non-author member and allows author or manager actions", async () => {

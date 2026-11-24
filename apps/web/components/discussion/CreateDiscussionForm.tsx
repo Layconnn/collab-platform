@@ -13,6 +13,7 @@ import {
 
 import { useDiscussionActions } from "@/hooks/useDiscussion";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
+import { MarkdownField } from "@/components/common/MarkdownField";
 import { discussionActionError } from "@/components/discussion/discussionErrors";
 
 export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { workspaceId: string; onCancel: () => void; open?: boolean }) {
@@ -80,6 +81,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
       </div>
       <div>
         <label htmlFor="discussion-body" className="block text-sm font-semibold text-text-primary">Context</label>
+        <MarkdownField>
         <MentionTextarea
           workspaceId={workspaceId}
           registration={form.register("body")}
@@ -94,8 +96,9 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           disabled={busy}
           maxLength={5000}
         />
+        </MarkdownField>
         <div className="mt-1 flex flex-wrap items-start justify-between gap-2 text-xs text-text-muted">
-          <p id="discussion-body-help">Plain text. Keep the important details together.</p>
+          <p id="discussion-body-help">Keep the important details together. Markdown and @mentions work.</p>
           <span>{form.watch("body").length}/5000</span>
         </div>
         {form.formState.errors.body ? <p id="discussion-body-error" role="alert" className="mt-1.5 text-sm text-danger">Please add some context within the allowed length.</p> : null}

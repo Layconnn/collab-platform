@@ -21,7 +21,8 @@ Dated documents named `YYYY-MM-DD-<investigation|issue|incident>-<topic>.md`:
 
 Multi-pull-request work lives in `projects/YYYY-MM-DD-<name>/` with a `PRD.md` (requirements with stable IDs such as `FR-1`, `NFR-1`) and an optional `planning/` folder.
 
-- [2026-11-23 Event log, universal search and Cmd-K](./projects/2026-11-23-search-and-activity/PRD.md) — Horizon 1, delivered: event log #78, recent activity #79, search index #80, search page #81, Cmd-K palette #82, live palette results (this project's last pull request).
+- [2026-11-23 Event log, universal search and Cmd-K](./projects/2026-11-23-search-and-activity/PRD.md) — Horizon 1, delivered: event log #78, recent activity #79, search index #80, search page #81, Cmd-K palette #82, live palette results (this project's last pull request); released in #116.
+- [2026-11-24 Markdown, reactions, follow and pin](./projects/2026-11-24-markdown-reactions-follow-pin/PRD.md) — Horizon 1, delivered: PRD #118, Markdown #124, reactions #125, follow and mute #126, pinned replies #127, saved items (this project's last pull request).
 - [2026-11-23 The new Home](./projects/2026-11-23-home/PRD.md) — Horizon 1, delivered: needs you #93, pulse #94, decided this week #95, Home page #96, pulse time-zone fix #98, workspace cards #99, first run and create dialog #100; released in #101.
 - [2026-11-24 Decision reviews](./projects/2026-11-24-decision-reviews/PRD.md) — Horizon 1, delivered: PRD #106, reviewers and answers #111 (the migration), resets and the finalize gate #112, Review section #113, notifications, Home, lists and activity (this project's last pull request).
 
