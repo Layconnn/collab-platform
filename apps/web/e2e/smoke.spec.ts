@@ -17,7 +17,7 @@ test("the landing page invites people to sign up", async ({ page }) => {
 });
 
 test("signed-out visitors are sent to sign in from every signed-in page", async ({ page }) => {
-  for (const path of ["/workspace", "/search", "/saved"]) {
+  for (const path of ["/workspace", "/search", "/saved", "/settings/email"]) {
     await page.goto(path);
     await expect(page).toHaveURL((url) => url.pathname === "/login" && url.searchParams.get("next") === path);
   }

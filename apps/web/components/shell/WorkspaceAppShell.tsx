@@ -27,6 +27,7 @@ function pageContext(pathname: string) {
   if (pathname === "/workspace") return "Home";
   if (pathname.startsWith("/search")) return "Search";
   if (pathname.startsWith("/saved")) return "Saved";
+  if (pathname.startsWith("/settings")) return "Settings";
   if (pathname.includes("/members")) return "Members";
   if (pathname.includes("/discussions")) return "Discussions";
   return "Overview";

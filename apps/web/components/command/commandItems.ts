@@ -39,6 +39,7 @@ export function buildCommands(context: CommandContext): CommandItem[] {
   }
   items.push(
     { id: "search", group: "Actions", label: "Search everything", keywords: "find look up", href: "/search" },
+    { id: "email-settings", group: "Actions", label: "Email settings", keywords: "digest notifications preferences unsubscribe", href: "/settings/email" },
     { id: "saved", group: "Actions", label: "Saved items", keywords: "bookmarks later starred favourites favorites", href: "/saved" },
     { id: "new-workspace", group: "Actions", label: "New workspace", keywords: "create add", action: "new-workspace" },
     { id: "all-workspaces", group: "Actions", label: "All workspaces", keywords: "list switch", href: "/workspace" },

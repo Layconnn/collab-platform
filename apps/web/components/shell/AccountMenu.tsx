@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { AppIcon } from "@/components/common/AppIcon";
 import { UserAvatar } from "@/components/common/UserAvatar";
@@ -43,7 +44,8 @@ export function AccountMenu({
           <p className="truncate text-xs text-text-muted">{user.email}</p>
         </div>
         <ThemeModePicker className="border-b border-border-subtle px-2 py-3" />
-        <div className="pt-2">
+        <Link href="/settings/email" className="mt-2 flex min-h-10 items-center rounded-sm px-2 text-sm font-medium text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring">Email settings</Link>
+        <div className="pt-1">
           <SignOutButton />
         </div>
       </div>
