@@ -72,3 +72,20 @@ export const setDiscussionFollowInputSchema = discussionFollowInputSchema.extend
 
 export type DiscussionFollowInput = z.infer<typeof discussionFollowInputSchema>;
 export type SetDiscussionFollowInput = z.infer<typeof setDiscussionFollowInputSchema>;
+
+// Pinned replies (Markdown, reactions, follow and pin PRD, FR-13 to FR-15).
+export const MAX_PINNED_REPLIES = 3;
+
+export const pinnedRepliesInputSchema = z.object({
+  workspaceId: z.string().cuid(),
+  discussionId: z.string().cuid(),
+});
+
+export const setPinnedReplyInputSchema = z.object({
+  workspaceId: z.string().cuid(),
+  commentId: z.string().cuid(),
+  pinned: z.boolean(),
+});
+
+export type PinnedRepliesInput = z.infer<typeof pinnedRepliesInputSchema>;
+export type SetPinnedReplyInput = z.infer<typeof setPinnedReplyInputSchema>;

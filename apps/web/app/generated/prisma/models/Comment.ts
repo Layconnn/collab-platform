@@ -44,6 +44,8 @@ export type CommentMinAggregateOutputType = {
   body: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  pinnedAt: Date | null
+  pinnedById: string | null
 }
 
 export type CommentMaxAggregateOutputType = {
@@ -56,6 +58,8 @@ export type CommentMaxAggregateOutputType = {
   body: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  pinnedAt: Date | null
+  pinnedById: string | null
 }
 
 export type CommentCountAggregateOutputType = {
@@ -68,6 +72,8 @@ export type CommentCountAggregateOutputType = {
   body: number
   createdAt: number
   updatedAt: number
+  pinnedAt: number
+  pinnedById: number
   _all: number
 }
 
@@ -90,6 +96,8 @@ export type CommentMinAggregateInputType = {
   body?: true
   createdAt?: true
   updatedAt?: true
+  pinnedAt?: true
+  pinnedById?: true
 }
 
 export type CommentMaxAggregateInputType = {
@@ -102,6 +110,8 @@ export type CommentMaxAggregateInputType = {
   body?: true
   createdAt?: true
   updatedAt?: true
+  pinnedAt?: true
+  pinnedById?: true
 }
 
 export type CommentCountAggregateInputType = {
@@ -114,6 +124,8 @@ export type CommentCountAggregateInputType = {
   body?: true
   createdAt?: true
   updatedAt?: true
+  pinnedAt?: true
+  pinnedById?: true
   _all?: true
 }
 
@@ -213,6 +225,8 @@ export type CommentGroupByOutputType = {
   body: string
   createdAt: Date
   updatedAt: Date
+  pinnedAt: Date | null
+  pinnedById: string | null
   _count: CommentCountAggregateOutputType | null
   _avg: CommentAvgAggregateOutputType | null
   _sum: CommentSumAggregateOutputType | null
@@ -248,6 +262,8 @@ export type CommentWhereInput = {
   body?: Prisma.StringFilter<"Comment"> | string
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
+  pinnedAt?: Prisma.DateTimeNullableFilter<"Comment"> | Date | string | null
+  pinnedById?: Prisma.StringNullableFilter<"Comment"> | string | null
   discussion?: Prisma.XOR<Prisma.DiscussionScalarRelationFilter, Prisma.DiscussionWhereInput>
   workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -255,6 +271,7 @@ export type CommentWhereInput = {
   replies?: Prisma.CommentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   reactions?: Prisma.ReactionListRelationFilter
+  pinnedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type CommentOrderByWithRelationInput = {
@@ -267,6 +284,8 @@ export type CommentOrderByWithRelationInput = {
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  pinnedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  pinnedById?: Prisma.SortOrderInput | Prisma.SortOrder
   discussion?: Prisma.DiscussionOrderByWithRelationInput
   workspace?: Prisma.WorkspaceOrderByWithRelationInput
   author?: Prisma.UserOrderByWithRelationInput
@@ -274,6 +293,7 @@ export type CommentOrderByWithRelationInput = {
   replies?: Prisma.CommentOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   reactions?: Prisma.ReactionOrderByRelationAggregateInput
+  pinnedBy?: Prisma.UserOrderByWithRelationInput
 }
 
 export type CommentWhereUniqueInput = Prisma.AtLeast<{
@@ -289,6 +309,8 @@ export type CommentWhereUniqueInput = Prisma.AtLeast<{
   body?: Prisma.StringFilter<"Comment"> | string
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
+  pinnedAt?: Prisma.DateTimeNullableFilter<"Comment"> | Date | string | null
+  pinnedById?: Prisma.StringNullableFilter<"Comment"> | string | null
   discussion?: Prisma.XOR<Prisma.DiscussionScalarRelationFilter, Prisma.DiscussionWhereInput>
   workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -296,6 +318,7 @@ export type CommentWhereUniqueInput = Prisma.AtLeast<{
   replies?: Prisma.CommentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   reactions?: Prisma.ReactionListRelationFilter
+  pinnedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
 export type CommentOrderByWithAggregationInput = {
@@ -308,6 +331,8 @@ export type CommentOrderByWithAggregationInput = {
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  pinnedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  pinnedById?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CommentCountOrderByAggregateInput
   _avg?: Prisma.CommentAvgOrderByAggregateInput
   _max?: Prisma.CommentMaxOrderByAggregateInput
@@ -328,6 +353,8 @@ export type CommentScalarWhereWithAggregatesInput = {
   body?: Prisma.StringWithAggregatesFilter<"Comment"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Comment"> | Date | string
+  pinnedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Comment"> | Date | string | null
+  pinnedById?: Prisma.StringNullableWithAggregatesFilter<"Comment"> | string | null
 }
 
 export type CommentCreateInput = {
@@ -336,6 +363,7 @@ export type CommentCreateInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
   author: Prisma.UserCreateNestedOneWithoutCommentsInput
@@ -343,6 +371,7 @@ export type CommentCreateInput = {
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateInput = {
@@ -355,6 +384,8 @@ export type CommentUncheckedCreateInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
@@ -366,6 +397,7 @@ export type CommentUpdateInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
@@ -373,6 +405,7 @@ export type CommentUpdateInput = {
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateInput = {
@@ -385,6 +418,8 @@ export type CommentUncheckedUpdateInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
@@ -400,6 +435,8 @@ export type CommentCreateManyInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
 }
 
 export type CommentUpdateManyMutationInput = {
@@ -408,6 +445,7 @@ export type CommentUpdateManyMutationInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type CommentUncheckedUpdateManyInput = {
@@ -420,6 +458,8 @@ export type CommentUncheckedUpdateManyInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CommentListRelationFilter = {
@@ -447,6 +487,8 @@ export type CommentCountOrderByAggregateInput = {
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  pinnedAt?: Prisma.SortOrder
+  pinnedById?: Prisma.SortOrder
 }
 
 export type CommentAvgOrderByAggregateInput = {
@@ -463,6 +505,8 @@ export type CommentMaxOrderByAggregateInput = {
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  pinnedAt?: Prisma.SortOrder
+  pinnedById?: Prisma.SortOrder
 }
 
 export type CommentMinOrderByAggregateInput = {
@@ -475,6 +519,8 @@ export type CommentMinOrderByAggregateInput = {
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  pinnedAt?: Prisma.SortOrder
+  pinnedById?: Prisma.SortOrder
 }
 
 export type CommentSumOrderByAggregateInput = {
@@ -488,10 +534,24 @@ export type CommentCreateNestedManyWithoutAuthorInput = {
   connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
 }
 
+export type CommentCreateNestedManyWithoutPinnedByInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutPinnedByInput, Prisma.CommentUncheckedCreateWithoutPinnedByInput> | Prisma.CommentCreateWithoutPinnedByInput[] | Prisma.CommentUncheckedCreateWithoutPinnedByInput[]
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutPinnedByInput | Prisma.CommentCreateOrConnectWithoutPinnedByInput[]
+  createMany?: Prisma.CommentCreateManyPinnedByInputEnvelope
+  connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+}
+
 export type CommentUncheckedCreateNestedManyWithoutAuthorInput = {
   create?: Prisma.XOR<Prisma.CommentCreateWithoutAuthorInput, Prisma.CommentUncheckedCreateWithoutAuthorInput> | Prisma.CommentCreateWithoutAuthorInput[] | Prisma.CommentUncheckedCreateWithoutAuthorInput[]
   connectOrCreate?: Prisma.CommentCreateOrConnectWithoutAuthorInput | Prisma.CommentCreateOrConnectWithoutAuthorInput[]
   createMany?: Prisma.CommentCreateManyAuthorInputEnvelope
+  connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+}
+
+export type CommentUncheckedCreateNestedManyWithoutPinnedByInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutPinnedByInput, Prisma.CommentUncheckedCreateWithoutPinnedByInput> | Prisma.CommentCreateWithoutPinnedByInput[] | Prisma.CommentUncheckedCreateWithoutPinnedByInput[]
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutPinnedByInput | Prisma.CommentCreateOrConnectWithoutPinnedByInput[]
+  createMany?: Prisma.CommentCreateManyPinnedByInputEnvelope
   connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
 }
 
@@ -509,6 +569,20 @@ export type CommentUpdateManyWithoutAuthorNestedInput = {
   deleteMany?: Prisma.CommentScalarWhereInput | Prisma.CommentScalarWhereInput[]
 }
 
+export type CommentUpdateManyWithoutPinnedByNestedInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutPinnedByInput, Prisma.CommentUncheckedCreateWithoutPinnedByInput> | Prisma.CommentCreateWithoutPinnedByInput[] | Prisma.CommentUncheckedCreateWithoutPinnedByInput[]
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutPinnedByInput | Prisma.CommentCreateOrConnectWithoutPinnedByInput[]
+  upsert?: Prisma.CommentUpsertWithWhereUniqueWithoutPinnedByInput | Prisma.CommentUpsertWithWhereUniqueWithoutPinnedByInput[]
+  createMany?: Prisma.CommentCreateManyPinnedByInputEnvelope
+  set?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  disconnect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  delete?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  update?: Prisma.CommentUpdateWithWhereUniqueWithoutPinnedByInput | Prisma.CommentUpdateWithWhereUniqueWithoutPinnedByInput[]
+  updateMany?: Prisma.CommentUpdateManyWithWhereWithoutPinnedByInput | Prisma.CommentUpdateManyWithWhereWithoutPinnedByInput[]
+  deleteMany?: Prisma.CommentScalarWhereInput | Prisma.CommentScalarWhereInput[]
+}
+
 export type CommentUncheckedUpdateManyWithoutAuthorNestedInput = {
   create?: Prisma.XOR<Prisma.CommentCreateWithoutAuthorInput, Prisma.CommentUncheckedCreateWithoutAuthorInput> | Prisma.CommentCreateWithoutAuthorInput[] | Prisma.CommentUncheckedCreateWithoutAuthorInput[]
   connectOrCreate?: Prisma.CommentCreateOrConnectWithoutAuthorInput | Prisma.CommentCreateOrConnectWithoutAuthorInput[]
@@ -520,6 +594,20 @@ export type CommentUncheckedUpdateManyWithoutAuthorNestedInput = {
   connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
   update?: Prisma.CommentUpdateWithWhereUniqueWithoutAuthorInput | Prisma.CommentUpdateWithWhereUniqueWithoutAuthorInput[]
   updateMany?: Prisma.CommentUpdateManyWithWhereWithoutAuthorInput | Prisma.CommentUpdateManyWithWhereWithoutAuthorInput[]
+  deleteMany?: Prisma.CommentScalarWhereInput | Prisma.CommentScalarWhereInput[]
+}
+
+export type CommentUncheckedUpdateManyWithoutPinnedByNestedInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutPinnedByInput, Prisma.CommentUncheckedCreateWithoutPinnedByInput> | Prisma.CommentCreateWithoutPinnedByInput[] | Prisma.CommentUncheckedCreateWithoutPinnedByInput[]
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutPinnedByInput | Prisma.CommentCreateOrConnectWithoutPinnedByInput[]
+  upsert?: Prisma.CommentUpsertWithWhereUniqueWithoutPinnedByInput | Prisma.CommentUpsertWithWhereUniqueWithoutPinnedByInput[]
+  createMany?: Prisma.CommentCreateManyPinnedByInputEnvelope
+  set?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  disconnect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  delete?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
+  update?: Prisma.CommentUpdateWithWhereUniqueWithoutPinnedByInput | Prisma.CommentUpdateWithWhereUniqueWithoutPinnedByInput[]
+  updateMany?: Prisma.CommentUpdateManyWithWhereWithoutPinnedByInput | Prisma.CommentUpdateManyWithWhereWithoutPinnedByInput[]
   deleteMany?: Prisma.CommentScalarWhereInput | Prisma.CommentScalarWhereInput[]
 }
 
@@ -635,6 +723,10 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type CommentUpdateOneWithoutRepliesNestedInput = {
   create?: Prisma.XOR<Prisma.CommentCreateWithoutRepliesInput, Prisma.CommentUncheckedCreateWithoutRepliesInput>
   connectOrCreate?: Prisma.CommentCreateOrConnectWithoutRepliesInput
@@ -711,12 +803,14 @@ export type CommentCreateWithoutAuthorInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateWithoutAuthorInput = {
@@ -728,6 +822,8 @@ export type CommentUncheckedCreateWithoutAuthorInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
@@ -740,6 +836,48 @@ export type CommentCreateOrConnectWithoutAuthorInput = {
 
 export type CommentCreateManyAuthorInputEnvelope = {
   data: Prisma.CommentCreateManyAuthorInput | Prisma.CommentCreateManyAuthorInput[]
+  skipDuplicates?: boolean
+}
+
+export type CommentCreateWithoutPinnedByInput = {
+  id?: string
+  depth?: number
+  body: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
+  author: Prisma.UserCreateNestedOneWithoutCommentsInput
+  parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
+  replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+}
+
+export type CommentUncheckedCreateWithoutPinnedByInput = {
+  id?: string
+  discussionId: string
+  workspaceId: string
+  authorId: string
+  parentCommentId?: string | null
+  depth?: number
+  body: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+}
+
+export type CommentCreateOrConnectWithoutPinnedByInput = {
+  where: Prisma.CommentWhereUniqueInput
+  create: Prisma.XOR<Prisma.CommentCreateWithoutPinnedByInput, Prisma.CommentUncheckedCreateWithoutPinnedByInput>
+}
+
+export type CommentCreateManyPinnedByInputEnvelope = {
+  data: Prisma.CommentCreateManyPinnedByInput | Prisma.CommentCreateManyPinnedByInput[]
   skipDuplicates?: boolean
 }
 
@@ -772,6 +910,24 @@ export type CommentScalarWhereInput = {
   body?: Prisma.StringFilter<"Comment"> | string
   createdAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Comment"> | Date | string
+  pinnedAt?: Prisma.DateTimeNullableFilter<"Comment"> | Date | string | null
+  pinnedById?: Prisma.StringNullableFilter<"Comment"> | string | null
+}
+
+export type CommentUpsertWithWhereUniqueWithoutPinnedByInput = {
+  where: Prisma.CommentWhereUniqueInput
+  update: Prisma.XOR<Prisma.CommentUpdateWithoutPinnedByInput, Prisma.CommentUncheckedUpdateWithoutPinnedByInput>
+  create: Prisma.XOR<Prisma.CommentCreateWithoutPinnedByInput, Prisma.CommentUncheckedCreateWithoutPinnedByInput>
+}
+
+export type CommentUpdateWithWhereUniqueWithoutPinnedByInput = {
+  where: Prisma.CommentWhereUniqueInput
+  data: Prisma.XOR<Prisma.CommentUpdateWithoutPinnedByInput, Prisma.CommentUncheckedUpdateWithoutPinnedByInput>
+}
+
+export type CommentUpdateManyWithWhereWithoutPinnedByInput = {
+  where: Prisma.CommentScalarWhereInput
+  data: Prisma.XOR<Prisma.CommentUpdateManyMutationInput, Prisma.CommentUncheckedUpdateManyWithoutPinnedByInput>
 }
 
 export type CommentCreateWithoutWorkspaceInput = {
@@ -780,12 +936,14 @@ export type CommentCreateWithoutWorkspaceInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
   author: Prisma.UserCreateNestedOneWithoutCommentsInput
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateWithoutWorkspaceInput = {
@@ -797,6 +955,8 @@ export type CommentUncheckedCreateWithoutWorkspaceInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
@@ -834,12 +994,14 @@ export type CommentCreateWithoutDiscussionInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
   author: Prisma.UserCreateNestedOneWithoutCommentsInput
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateWithoutDiscussionInput = {
@@ -851,6 +1013,8 @@ export type CommentUncheckedCreateWithoutDiscussionInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
@@ -888,12 +1052,14 @@ export type CommentCreateWithoutRepliesInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
   author: Prisma.UserCreateNestedOneWithoutCommentsInput
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateWithoutRepliesInput = {
@@ -906,6 +1072,8 @@ export type CommentUncheckedCreateWithoutRepliesInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
 }
@@ -921,12 +1089,14 @@ export type CommentCreateWithoutParentCommentInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
   author: Prisma.UserCreateNestedOneWithoutCommentsInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateWithoutParentCommentInput = {
@@ -938,6 +1108,8 @@ export type CommentUncheckedCreateWithoutParentCommentInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
@@ -970,12 +1142,14 @@ export type CommentUpdateWithoutRepliesInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutRepliesInput = {
@@ -988,6 +1162,8 @@ export type CommentUncheckedUpdateWithoutRepliesInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
 }
@@ -1014,12 +1190,14 @@ export type CommentCreateWithoutNotificationsInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
   author: Prisma.UserCreateNestedOneWithoutCommentsInput
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateWithoutNotificationsInput = {
@@ -1032,6 +1210,8 @@ export type CommentUncheckedCreateWithoutNotificationsInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
 }
@@ -1058,12 +1238,14 @@ export type CommentUpdateWithoutNotificationsInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutNotificationsInput = {
@@ -1076,6 +1258,8 @@ export type CommentUncheckedUpdateWithoutNotificationsInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
 }
@@ -1086,12 +1270,14 @@ export type CommentCreateWithoutReactionsInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
   discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
   workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
   author: Prisma.UserCreateNestedOneWithoutCommentsInput
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
 export type CommentUncheckedCreateWithoutReactionsInput = {
@@ -1104,6 +1290,8 @@ export type CommentUncheckedCreateWithoutReactionsInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
 }
@@ -1130,12 +1318,14 @@ export type CommentUpdateWithoutReactionsInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutReactionsInput = {
@@ -1148,6 +1338,8 @@ export type CommentUncheckedUpdateWithoutReactionsInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
 }
@@ -1161,6 +1353,21 @@ export type CommentCreateManyAuthorInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
+}
+
+export type CommentCreateManyPinnedByInput = {
+  id?: string
+  discussionId: string
+  workspaceId: string
+  authorId: string
+  parentCommentId?: string | null
+  depth?: number
+  body: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pinnedAt?: Date | string | null
 }
 
 export type CommentUpdateWithoutAuthorInput = {
@@ -1169,12 +1376,14 @@ export type CommentUpdateWithoutAuthorInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutAuthorInput = {
@@ -1186,6 +1395,8 @@ export type CommentUncheckedUpdateWithoutAuthorInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
@@ -1200,6 +1411,53 @@ export type CommentUncheckedUpdateManyWithoutAuthorInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type CommentUpdateWithoutPinnedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  depth?: Prisma.IntFieldUpdateOperationsInput | number
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
+  author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
+  parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
+  replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+}
+
+export type CommentUncheckedUpdateWithoutPinnedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discussionId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentCommentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  depth?: Prisma.IntFieldUpdateOperationsInput | number
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+}
+
+export type CommentUncheckedUpdateManyWithoutPinnedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discussionId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentCommentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  depth?: Prisma.IntFieldUpdateOperationsInput | number
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type CommentCreateManyWorkspaceInput = {
@@ -1211,6 +1469,8 @@ export type CommentCreateManyWorkspaceInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
 }
 
 export type CommentUpdateWithoutWorkspaceInput = {
@@ -1219,12 +1479,14 @@ export type CommentUpdateWithoutWorkspaceInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutWorkspaceInput = {
@@ -1236,6 +1498,8 @@ export type CommentUncheckedUpdateWithoutWorkspaceInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
@@ -1250,6 +1514,8 @@ export type CommentUncheckedUpdateManyWithoutWorkspaceInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CommentCreateManyDiscussionInput = {
@@ -1261,6 +1527,8 @@ export type CommentCreateManyDiscussionInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
 }
 
 export type CommentUpdateWithoutDiscussionInput = {
@@ -1269,12 +1537,14 @@ export type CommentUpdateWithoutDiscussionInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutDiscussionInput = {
@@ -1286,6 +1556,8 @@ export type CommentUncheckedUpdateWithoutDiscussionInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
@@ -1300,6 +1572,8 @@ export type CommentUncheckedUpdateManyWithoutDiscussionInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CommentCreateManyParentCommentInput = {
@@ -1311,6 +1585,8 @@ export type CommentCreateManyParentCommentInput = {
   body: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
 }
 
 export type CommentUpdateWithoutParentCommentInput = {
@@ -1319,12 +1595,14 @@ export type CommentUpdateWithoutParentCommentInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
   author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutParentCommentInput = {
@@ -1336,6 +1614,8 @@ export type CommentUncheckedUpdateWithoutParentCommentInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
@@ -1350,6 +1630,8 @@ export type CommentUncheckedUpdateManyWithoutParentCommentInput = {
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1411,6 +1693,8 @@ export type CommentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   body?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  pinnedAt?: boolean
+  pinnedById?: boolean
   discussion?: boolean | Prisma.DiscussionDefaultArgs<ExtArgs>
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1418,6 +1702,7 @@ export type CommentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   replies?: boolean | Prisma.Comment$repliesArgs<ExtArgs>
   notifications?: boolean | Prisma.Comment$notificationsArgs<ExtArgs>
   reactions?: boolean | Prisma.Comment$reactionsArgs<ExtArgs>
+  pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
   _count?: boolean | Prisma.CommentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["comment"]>
 
@@ -1431,10 +1716,13 @@ export type CommentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   body?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  pinnedAt?: boolean
+  pinnedById?: boolean
   discussion?: boolean | Prisma.DiscussionDefaultArgs<ExtArgs>
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   parentComment?: boolean | Prisma.Comment$parentCommentArgs<ExtArgs>
+  pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
 }, ExtArgs["result"]["comment"]>
 
 export type CommentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1447,10 +1735,13 @@ export type CommentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   body?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  pinnedAt?: boolean
+  pinnedById?: boolean
   discussion?: boolean | Prisma.DiscussionDefaultArgs<ExtArgs>
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   parentComment?: boolean | Prisma.Comment$parentCommentArgs<ExtArgs>
+  pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
 }, ExtArgs["result"]["comment"]>
 
 export type CommentSelectScalar = {
@@ -1463,9 +1754,11 @@ export type CommentSelectScalar = {
   body?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  pinnedAt?: boolean
+  pinnedById?: boolean
 }
 
-export type CommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discussionId" | "workspaceId" | "authorId" | "parentCommentId" | "depth" | "body" | "createdAt" | "updatedAt", ExtArgs["result"]["comment"]>
+export type CommentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "discussionId" | "workspaceId" | "authorId" | "parentCommentId" | "depth" | "body" | "createdAt" | "updatedAt" | "pinnedAt" | "pinnedById", ExtArgs["result"]["comment"]>
 export type CommentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   discussion?: boolean | Prisma.DiscussionDefaultArgs<ExtArgs>
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
@@ -1474,6 +1767,7 @@ export type CommentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   replies?: boolean | Prisma.Comment$repliesArgs<ExtArgs>
   notifications?: boolean | Prisma.Comment$notificationsArgs<ExtArgs>
   reactions?: boolean | Prisma.Comment$reactionsArgs<ExtArgs>
+  pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
   _count?: boolean | Prisma.CommentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CommentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1481,12 +1775,14 @@ export type CommentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   parentComment?: boolean | Prisma.Comment$parentCommentArgs<ExtArgs>
+  pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
 }
 export type CommentIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   discussion?: boolean | Prisma.DiscussionDefaultArgs<ExtArgs>
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   parentComment?: boolean | Prisma.Comment$parentCommentArgs<ExtArgs>
+  pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
 }
 
 export type $CommentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1499,6 +1795,7 @@ export type $CommentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     replies: Prisma.$CommentPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     reactions: Prisma.$ReactionPayload<ExtArgs>[]
+    pinnedBy: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1510,6 +1807,8 @@ export type $CommentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     body: string
     createdAt: Date
     updatedAt: Date
+    pinnedAt: Date | null
+    pinnedById: string | null
   }, ExtArgs["result"]["comment"]>
   composites: {}
 }
@@ -1911,6 +2210,7 @@ export interface Prisma__CommentClient<T, Null = never, ExtArgs extends runtime.
   replies<T extends Prisma.Comment$repliesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$repliesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Comment$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reactions<T extends Prisma.Comment$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pinnedBy<T extends Prisma.Comment$pinnedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$pinnedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1949,6 +2249,8 @@ export interface CommentFieldRefs {
   readonly body: Prisma.FieldRef<"Comment", 'String'>
   readonly createdAt: Prisma.FieldRef<"Comment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Comment", 'DateTime'>
+  readonly pinnedAt: Prisma.FieldRef<"Comment", 'DateTime'>
+  readonly pinnedById: Prisma.FieldRef<"Comment", 'String'>
 }
     
 
@@ -2438,6 +2740,25 @@ export type Comment$reactionsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.ReactionScalarFieldEnum | Prisma.ReactionScalarFieldEnum[]
+}
+
+/**
+ * Comment.pinnedBy
+ */
+export type Comment$pinnedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

@@ -74,6 +74,16 @@ export function describeActivity(item: ActivityEntry, workspaceId: string): { le
         : plain("a deleted discussion");
       return { lead, subject };
     }
+    case "COMMENT_PINNED":
+    case "COMMENT_UNPINNED": {
+      const discussionId = summaryText(item.summary, "discussionId", "");
+      const title = item.discussion?.title ?? summaryText(item.summary, "title", "a discussion");
+      return {
+        lead: item.kind === "COMMENT_PINNED" ? "pinned a reply in" : "unpinned a reply in",
+        subject: discussionId ? subjectLink(`${base}/discussions/${discussionId}`, title) : plain(title),
+        tail: item.summary?.excerpt ? `: “${summaryText(item.summary, "excerpt", "")}”` : undefined,
+      };
+    }
     case "DECISION_PROPOSED": return { lead: "proposed", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
     case "DECISION_EDITED": return { lead: "edited the proposal", subject: subjectLink(`${base}/decisions/${item.subjectId}`, question), gone };
     case "DECISION_FINALIZED": return {

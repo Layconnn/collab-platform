@@ -27,6 +27,11 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("@/components/discussion/FollowControl", () => ({ FollowControl: () => null }));
+const pinMocks = vi.hoisted(() => ({ canPin: false, items: [] as Array<{ commentId: string; excerpt: string; author: string; pinnedBy: string | null }>, mutate: vi.fn() }));
+vi.mock("@/hooks/usePins", () => ({
+  usePinnedReplies: () => ({ data: { canPin: pinMocks.canPin, max: 3, items: pinMocks.items } }),
+  useSetPin: () => ({ mutate: pinMocks.mutate, isPending: false }),
+}));
 vi.mock("@/hooks/useReactions", async (importOriginal) => ({
   ...(await importOriginal<object>()),
   useDiscussionReactions: () => ({ data: { discussion: [], comments: {} } }),

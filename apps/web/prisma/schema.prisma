@@ -77,6 +77,7 @@ model User {
   decisionReviews DecisionReview[] @relation("DecisionReviewer")
   reactions       Reaction[]
   discussionFollows DiscussionFollow[]
+  commentsPinned  Comment[] @relation("CommentPinner")
   decisionReviewsRequested DecisionReview[] @relation("DecisionReviewRequester")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
@@ -153,12 +154,18 @@ model Comment {
   searchVector    Unsupported("tsvector")? @default(dbgenerated())
 
   reactions       Reaction[]
+  // Pinned to the top of its discussion by the author or a manager
+  // (Markdown, reactions, follow and pin PRD, FR-13 to FR-15).
+  pinnedAt        DateTime?
+  pinnedById      String?
+  pinnedBy        User?      @relation("CommentPinner", fields: [pinnedById], references: [id], onDelete: SetNull)
 
   @@index([searchVector], type: Gin)
 
   @@index([discussionId, parentCommentId, id(sort: Desc)])
   @@index([workspaceId, discussionId, id(sort: Desc)])
   @@index([authorId, createdAt])
+  @@index([discussionId, pinnedAt])
   // Recommended (optional): @@index([discussionId, createdAt]) for chronological thread views.
 }
 
@@ -387,6 +394,8 @@ enum ActivityKind {
   DECISION_REVIEW_WITHDRAWN
   DECISION_REVIEWS_RESET
   DECISION_REVIEW_RULE_CHANGED
+  COMMENT_PINNED
+  COMMENT_UNPINNED
 }
 
 enum ActivitySubjectType {
