@@ -1,6 +1,6 @@
 # PRD: Markdown, reactions, follow and pin
 
-Status: draft 2026-11-24 · Horizon 1 · Issue #117
+Status: approved 2026-11-24 (defaults confirmed by the author) · Horizon 1 · Issue #117
 
 ## Problem
 
@@ -146,21 +146,21 @@ Emoji are validated against the fixed set on the server. Each feature adds a sma
 
 ## Risks and open questions
 
-Each question has a proposed default; the author confirms or changes it before work starts.
+Each question had a proposed default; the author confirmed all of them on 2026-11-24.
 
-- **Changing who hears about replies.** Default: followers only (FR-10), with authors and repliers following automatically and existing threads backfilled. Members who were relying on hearing about every reply will hear less; following is one click.
-- **Existing text that looks like Markdown.** A line starting with `#` or `-`, or words wrapped in `*`, will now be formatted. Default: accept it; content stays as written and single newlines are kept (FR-5), so most text looks the same.
-- **Library and bundle size.** Default: `react-markdown` with `remark-gfm`, `remark-breaks` and `rehype-sanitize`, and a highlighter loaded on demand; checked against NFR-3 in the first pull request.
-- **Search snippets** show raw Markdown syntax (`**`, `#`). Default: accept for now; stripping syntax from snippets is a small follow-up.
-- **Reaction set.** Default: the eight emoji in FR-6; a picker with more comes later if people ask.
+- **Changing who hears about replies.** Decided: followers only (FR-10), with authors and repliers following automatically and existing threads backfilled. Members who were relying on hearing about every reply will hear less; following is one click.
+- **Existing text that looks like Markdown.** A line starting with `#` or `-`, or words wrapped in `*`, will now be formatted. Decided: accept it; content stays as written and single newlines are kept (FR-5), so most text looks the same.
+- **Library and bundle size.** Decided: `react-markdown` with `remark-gfm`, `remark-breaks` and `rehype-sanitize`, and a highlighter loaded on demand; checked against NFR-3 in the first pull request.
+- **Search snippets** show raw Markdown syntax (`**`, `#`). Decided: accept for now; stripping syntax from snippets is a small follow-up.
+- **Reaction set.** Decided: the eight emoji in FR-6; a picker with more comes later if people ask.
 
 ## Delivery plan
 
 | # | Pull request | Requirements |
 | --- | --- | --- |
-| 1 | `Commons: Discussions: PRD for Markdown, reactions, follow and pin` — this document | — |
-| 2 | `Commons: Discussions: render Markdown in discussions, replies and decisions` — safe renderer, mentions, code highlighting on demand, Write and Preview in every composer | FR-1 to FR-5, NFR-1, NFR-3 |
-| 3 | `Commons: Discussions: react to discussions and replies` — `Reaction`, toggle API, loading with the thread, reaction bar | FR-6 to FR-8, NFR-2, NFR-4, NFR-5 |
-| 4 | `Commons: Notifications: notify followers of replies and let members mute` — `DiscussionFollow` with backfill, automatic follows, fan-out change, Follow and Mute controls | FR-9 to FR-12, NFR-2 |
-| 5 | `Commons: Threaded Comments: pin replies to the top of a discussion` — pin fields, API, pinned strip, events | FR-13 to FR-15 |
-| 6 | `Commons: Home: save discussions, replies and decisions for later` — `SavedItem`, save controls, Saved page, sidebar and Ctrl K | FR-16 to FR-18 |
+| 1 (#117) | `Commons: Discussions: PRD for Markdown, reactions, follow and pin` — this document | — |
+| 2 (#119) | `Commons: Discussions: render Markdown in discussions, replies and decisions` — safe renderer, mentions, code highlighting on demand, Write and Preview in every composer | FR-1 to FR-5, NFR-1, NFR-3 |
+| 3 (#120) | `Commons: Discussions: react to discussions and replies` — `Reaction`, toggle API, loading with the thread, reaction bar | FR-6 to FR-8, NFR-2, NFR-4, NFR-5 |
+| 4 (#121) | `Commons: Notifications: notify followers of replies and let members mute` — `DiscussionFollow` with backfill, automatic follows, fan-out change, Follow and Mute controls | FR-9 to FR-12, NFR-2 |
+| 5 (#122) | `Commons: Threaded Comments: pin replies to the top of a discussion` — pin fields, API, pinned strip, events | FR-13 to FR-15 |
+| 6 (#123) | `Commons: Home: save discussions, replies and decisions for later` — `SavedItem`, save controls, Saved page, sidebar and Ctrl K | FR-16 to FR-18 |
