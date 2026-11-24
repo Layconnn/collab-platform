@@ -16,9 +16,11 @@ test("the landing page invites people to sign up", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Create account" })).toBeVisible();
 });
 
-test("signed-out visitors are sent to sign in", async ({ page }) => {
-  await page.goto("/workspace");
-  await expect(page).toHaveURL(/\/login\?next=%2Fworkspace$/);
+test("signed-out visitors are sent to sign in from every signed-in page", async ({ page }) => {
+  for (const path of ["/workspace", "/search", "/saved"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL((url) => url.pathname === "/login" && url.searchParams.get("next") === path);
+  }
 });
 
 test("a new user registers, records a decision from a discussion and signs out", async ({ page }) => {
