@@ -24,7 +24,11 @@ export function useCommentActions(discussionId: string, workspaceId: string) {
       await Promise.allSettled([refresh(), utils.discussion.getById.invalidate({ discussionId })]);
     }
   };
-  const create = trpc.comment.create.useMutation({ onSuccess: refresh, onError: refreshAfterRejection });
+  // Replying follows the discussion on the server, so its follow state changes too.
+  const create = trpc.comment.create.useMutation({
+    onSuccess: () => Promise.all([refresh(), utils.follow.get.invalidate({ workspaceId, discussionId })]),
+    onError: refreshAfterRejection,
+  });
   const update = trpc.comment.update.useMutation({
     onSuccess: async (comment) => {
       await Promise.all([refresh(), utils.comment.getById.invalidate({ commentId: comment.id })]);

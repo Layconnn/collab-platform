@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
   refreshDiscussion: vi.fn(async () => {}),
   refreshWorkspace: vi.fn(async () => {}),
   refreshRoles: vi.fn(async () => {}),
+  refreshFollow: vi.fn(async () => {}),
   createOnSuccess: null as null | (() => Promise<unknown>),
   createOnError: null as null | ((error: Rejection) => Promise<void>),
   updateOnError: null as null | ((error: Rejection) => Promise<void>),
@@ -22,6 +23,7 @@ vi.mock("@/lib/trpc/api-client", () => ({
         getById: { invalidate: mocks.refreshComment },
       },
       discussion: { getById: { invalidate: mocks.refreshDiscussion } },
+      follow: { get: { invalidate: mocks.refreshFollow } },
       workspace: {
         getById: { invalidate: mocks.refreshWorkspace },
         listForUser: { invalidate: mocks.refreshRoles },
@@ -44,12 +46,15 @@ describe("useCommentActions scoped refresh", () => {
     mocks.refreshDiscussion.mockClear();
     mocks.refreshWorkspace.mockClear();
     mocks.refreshRoles.mockClear();
+    mocks.refreshFollow.mockClear();
   });
 
   it("refreshes only this discussion's comment queries after a write", async () => {
     renderHook(() => useCommentActions("discussion-1", "workspace-1"));
     await act(async () => { await mocks.createOnSuccess?.(); });
     expect(mocks.refreshComments).toHaveBeenCalledWith({ discussionId: "discussion-1" });
+    // Replying follows the discussion, so its follow state is refreshed too.
+    expect(mocks.refreshFollow).toHaveBeenCalledWith({ workspaceId: "workspace-1", discussionId: "discussion-1" });
     expect(mocks.refreshDiscussion).not.toHaveBeenCalled();
     expect(mocks.refreshRoles).not.toHaveBeenCalled();
   });
