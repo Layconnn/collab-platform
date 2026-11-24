@@ -11,7 +11,11 @@ if (!databaseUrl || !new URL(databaseUrl).pathname.endsWith("_decision_test")) {
   throw new Error("Set DECISION_TEST_DATABASE_URL to an isolated database ending in _decision_test.");
 }
 process.env.NODE_ENV = "test";
-process.env.DATABASE_URL = databaseUrl;
+// Run in a session time zone far from UTC, as a developer's local database
+// might, so time comparisons that depend on the session's zone fail here.
+const sessionUrl = new URL(databaseUrl);
+sessionUrl.searchParams.set("options", "-c TimeZone=Pacific/Kiritimati");
+process.env.DATABASE_URL = sessionUrl.toString();
 process.env.REDIS_URL ??= "redis://localhost:6379";
 process.env.JWT_SECRET ??= "test-jwt-secret-123456789";
 
@@ -203,6 +207,17 @@ test("pulse counts the last seven days per workspace, by kind and by day", async
   );
   assert.deepEqual(pulse.daily, [1, 0, 0, 0, 0, 2, 2]);
   assert.ok(Date.now() - new Date(pulse.lastActivityAt).getTime() < 1 * HOUR + 60_000);
+});
+
+test("pulse counts an event from seconds ago in the last 24 hours, whatever the session time zone", async () => {
+  const [zone] = await prisma.$queryRaw`SELECT current_setting('TimeZone') AS tz`;
+  assert.equal(zone.tz, "Pacific/Kiritimati", "the suite runs in a non-UTC session");
+  const [maya] = await Promise.all([user("Maya")]);
+  const ws = await workspace(maya, []);
+  await event(ws, maya, "DISCUSSION_CREATED", 5_000);
+  const [pulse] = (await caller(maya.id).pulse()).workspaces;
+  assert.equal(pulse.discussionsStarted, 1);
+  assert.deepEqual(pulse.daily, [0, 0, 0, 0, 0, 0, 1]);
 });
 
 test("pulse orders workspaces by recent activity and shows quiet ones last with zeros", async () => {
