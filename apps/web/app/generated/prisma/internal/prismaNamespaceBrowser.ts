@@ -59,6 +59,7 @@ export const ModelName = {
   WorkspaceMember: 'WorkspaceMember',
   Decision: 'Decision',
   DecisionRevision: 'DecisionRevision',
+  DecisionReview: 'DecisionReview',
   DecisionSupersession: 'DecisionSupersession',
   ActivityEvent: 'ActivityEvent'
 } as const
@@ -178,6 +179,8 @@ export const DecisionScalarFieldEnum = {
   alternatives: 'alternatives',
   followUp: 'followUp',
   status: 'status',
+  reviewRule: 'reviewRule',
+  requiredApprovals: 'requiredApprovals',
   version: 'version',
   idempotencyKey: 'idempotencyKey',
   creationPayloadHash: 'creationPayloadHash',
@@ -199,6 +202,7 @@ export const DecisionRevisionScalarFieldEnum = {
   actorUserId: 'actorUserId',
   actorLabel: 'actorLabel',
   reason: 'reason',
+  overrideReason: 'overrideReason',
   question: 'question',
   outcome: 'outcome',
   rationale: 'rationale',
@@ -209,6 +213,25 @@ export const DecisionRevisionScalarFieldEnum = {
 } as const
 
 export type DecisionRevisionScalarFieldEnum = (typeof DecisionRevisionScalarFieldEnum)[keyof typeof DecisionRevisionScalarFieldEnum]
+
+
+export const DecisionReviewScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  decisionId: 'decisionId',
+  reviewerId: 'reviewerId',
+  reviewerLabel: 'reviewerLabel',
+  requestedById: 'requestedById',
+  requestedByLabel: 'requestedByLabel',
+  state: 'state',
+  note: 'note',
+  respondedVersion: 'respondedVersion',
+  respondedAt: 'respondedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DecisionReviewScalarFieldEnum = (typeof DecisionReviewScalarFieldEnum)[keyof typeof DecisionReviewScalarFieldEnum]
 
 
 export const DecisionSupersessionScalarFieldEnum = {

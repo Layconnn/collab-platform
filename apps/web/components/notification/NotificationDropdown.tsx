@@ -29,6 +29,8 @@ const titles: Record<NotificationItem["type"], string> = {
   DISCUSSION_CREATED: "New discussion",
   COMMENT_CREATED: "New reply",
   MENTION: "Mention",
+  REVIEW_REQUESTED: "Review requested",
+  REVIEW_RESPONDED: "Review response",
 };
 
 function NotificationSkeleton() {

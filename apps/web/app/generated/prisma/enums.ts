@@ -21,7 +21,9 @@ export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole]
 export const NotificationType = {
   DISCUSSION_CREATED: 'DISCUSSION_CREATED',
   COMMENT_CREATED: 'COMMENT_CREATED',
-  MENTION: 'MENTION'
+  MENTION: 'MENTION',
+  REVIEW_REQUESTED: 'REVIEW_REQUESTED',
+  REVIEW_RESPONDED: 'REVIEW_RESPONDED'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
@@ -34,6 +36,24 @@ export const DecisionStatus = {
 } as const
 
 export type DecisionStatus = (typeof DecisionStatus)[keyof typeof DecisionStatus]
+
+
+export const DecisionReviewRule = {
+  ALL: 'ALL',
+  AT_LEAST: 'AT_LEAST'
+} as const
+
+export type DecisionReviewRule = (typeof DecisionReviewRule)[keyof typeof DecisionReviewRule]
+
+
+export const DecisionReviewState = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  OBJECTED: 'OBJECTED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type DecisionReviewState = (typeof DecisionReviewState)[keyof typeof DecisionReviewState]
 
 
 export const DecisionRevisionAction = {
@@ -64,7 +84,12 @@ export const ActivityKind = {
   DECISION_EDITED: 'DECISION_EDITED',
   DECISION_FINALIZED: 'DECISION_FINALIZED',
   DECISION_SUPERSEDED: 'DECISION_SUPERSEDED',
-  DECISION_DELETED: 'DECISION_DELETED'
+  DECISION_DELETED: 'DECISION_DELETED',
+  DECISION_REVIEW_REQUESTED: 'DECISION_REVIEW_REQUESTED',
+  DECISION_REVIEW_RESPONDED: 'DECISION_REVIEW_RESPONDED',
+  DECISION_REVIEW_WITHDRAWN: 'DECISION_REVIEW_WITHDRAWN',
+  DECISION_REVIEWS_RESET: 'DECISION_REVIEWS_RESET',
+  DECISION_REVIEW_RULE_CHANGED: 'DECISION_REVIEW_RULE_CHANGED'
 } as const
 
 export type ActivityKind = (typeof ActivityKind)[keyof typeof ActivityKind]

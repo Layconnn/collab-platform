@@ -25,6 +25,7 @@ import {
   recordWorkspacePermissionAudit,
 } from "../observability/security-events";
 import { memberLabel, recordActivity } from "./activity.service";
+import { withdrawReviewsForMember } from "./decision-review.service";
 import { getMembershipRole, requireWorkspaceAction } from "./workspace.access";
 import {
   WORKSPACE_ACTIONS,
@@ -581,6 +582,8 @@ export const workspaceService = {
           },
         },
       });
+      // Open review requests leave with the member (decision reviews, FR-7).
+      await withdrawReviewsForMember(tx, input.workspaceId, input.userId, { userId: actorUserId, label: await memberLabel(tx, actorUserId) });
       await recordActivity(tx, {
         workspaceId: input.workspaceId,
         actorUserId,
