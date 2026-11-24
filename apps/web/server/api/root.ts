@@ -8,6 +8,7 @@ import { homeRouter } from "./routers/home.router";
 import { decisionRouter } from "./routers/decision.router";
 import { decisionReviewRouter } from "./routers/decision-review.router";
 import { reactionRouter } from "./routers/reaction.router";
+import { followRouter } from "./routers/follow.router";
 import { notificationRouter } from "./routers/notification.router";
 import { workspaceRouter } from "./routers/workspace.router";
 
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   decision: decisionRouter,
   decisionReview: decisionReviewRouter,
   reaction: reactionRouter,
+  follow: followRouter,
   comment: commentRouter,
   notification: notificationRouter,
   activity: activityRouter,

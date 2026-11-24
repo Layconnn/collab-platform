@@ -26,6 +26,7 @@ const mocks = vi.hoisted(() => ({
   refetchDiscussion: vi.fn(),
 }));
 
+vi.mock("@/components/discussion/FollowControl", () => ({ FollowControl: () => null }));
 vi.mock("@/hooks/useReactions", async (importOriginal) => ({
   ...(await importOriginal<object>()),
   useDiscussionReactions: () => ({ data: { discussion: [], comments: {} } }),

@@ -24,6 +24,7 @@
     "test:home-api": "node --test server/api/home.integration.test.mjs",
     "test:decision-review-api": "node --test server/api/decision-review.integration.test.mjs",
     "test:reaction-api": "node --test server/api/reaction.integration.test.mjs",
+    "test:follow-api": "node --test server/api/follow.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },

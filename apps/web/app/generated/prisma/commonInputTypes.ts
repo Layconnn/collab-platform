@@ -342,6 +342,23 @@ export type EnumDecisionReviewStateWithAggregatesFilter<$PrismaModel = never> = 
   _max?: Prisma.NestedEnumDecisionReviewStateFilter<$PrismaModel>
 }
 
+export type EnumFollowStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.FollowState | Prisma.EnumFollowStateFieldRefInput<$PrismaModel>
+  in?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFollowStateFilter<$PrismaModel> | $Enums.FollowState
+}
+
+export type EnumFollowStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FollowState | Prisma.EnumFollowStateFieldRefInput<$PrismaModel>
+  in?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFollowStateWithAggregatesFilter<$PrismaModel> | $Enums.FollowState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFollowStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFollowStateFilter<$PrismaModel>
+}
+
 export type EnumActivityKindFilter<$PrismaModel = never> = {
   equals?: $Enums.ActivityKind | Prisma.EnumActivityKindFieldRefInput<$PrismaModel>
   in?: $Enums.ActivityKind[] | Prisma.ListEnumActivityKindFieldRefInput<$PrismaModel>
@@ -688,6 +705,23 @@ export type NestedEnumDecisionReviewStateWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumDecisionReviewStateFilter<$PrismaModel>
   _max?: Prisma.NestedEnumDecisionReviewStateFilter<$PrismaModel>
+}
+
+export type NestedEnumFollowStateFilter<$PrismaModel = never> = {
+  equals?: $Enums.FollowState | Prisma.EnumFollowStateFieldRefInput<$PrismaModel>
+  in?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFollowStateFilter<$PrismaModel> | $Enums.FollowState
+}
+
+export type NestedEnumFollowStateWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.FollowState | Prisma.EnumFollowStateFieldRefInput<$PrismaModel>
+  in?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  notIn?: $Enums.FollowState[] | Prisma.ListEnumFollowStateFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumFollowStateWithAggregatesFilter<$PrismaModel> | $Enums.FollowState
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumFollowStateFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumFollowStateFilter<$PrismaModel>
 }
 
 export type NestedEnumActivityKindFilter<$PrismaModel = never> = {

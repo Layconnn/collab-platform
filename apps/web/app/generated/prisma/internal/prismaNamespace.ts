@@ -406,6 +406,7 @@ export const ModelName = {
   Decision: 'Decision',
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
+  DiscussionFollow: 'DiscussionFollow',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
   ActivityEvent: 'ActivityEvent'
@@ -424,7 +425,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "reaction" | "decisionSupersession" | "activityEvent"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "reaction" | "decisionSupersession" | "activityEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1094,6 +1095,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DiscussionFollow: {
+      payload: Prisma.$DiscussionFollowPayload<ExtArgs>
+      fields: Prisma.DiscussionFollowFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DiscussionFollowFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DiscussionFollowFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>
+        }
+        findFirst: {
+          args: Prisma.DiscussionFollowFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DiscussionFollowFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>
+        }
+        findMany: {
+          args: Prisma.DiscussionFollowFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>[]
+        }
+        create: {
+          args: Prisma.DiscussionFollowCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>
+        }
+        createMany: {
+          args: Prisma.DiscussionFollowCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DiscussionFollowCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>[]
+        }
+        delete: {
+          args: Prisma.DiscussionFollowDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>
+        }
+        update: {
+          args: Prisma.DiscussionFollowUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>
+        }
+        deleteMany: {
+          args: Prisma.DiscussionFollowDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DiscussionFollowUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DiscussionFollowUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>[]
+        }
+        upsert: {
+          args: Prisma.DiscussionFollowUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionFollowPayload>
+        }
+        aggregate: {
+          args: Prisma.DiscussionFollowAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDiscussionFollow>
+        }
+        groupBy: {
+          args: Prisma.DiscussionFollowGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DiscussionFollowGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DiscussionFollowCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DiscussionFollowCountAggregateOutputType> | number
+        }
+      }
+    }
     Reaction: {
       payload: Prisma.$ReactionPayload<ExtArgs>
       fields: Prisma.ReactionFieldRefs
@@ -1509,6 +1584,19 @@ export const DecisionReviewScalarFieldEnum = {
 export type DecisionReviewScalarFieldEnum = (typeof DecisionReviewScalarFieldEnum)[keyof typeof DecisionReviewScalarFieldEnum]
 
 
+export const DiscussionFollowScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  userId: 'userId',
+  state: 'state',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
+
+
 export const ReactionScalarFieldEnum = {
   id: 'id',
   workspaceId: 'workspaceId',
@@ -1739,6 +1827,20 @@ export type ListEnumDecisionReviewStateFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'FollowState'
+ */
+export type EnumFollowStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowState'>
+    
+
+
+/**
+ * Reference to a field of type 'FollowState[]'
+ */
+export type ListEnumFollowStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowState[]'>
+    
+
+
+/**
  * Reference to a field of type 'ActivityKind'
  */
 export type EnumActivityKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ActivityKind'>
@@ -1939,6 +2041,7 @@ export type GlobalOmitConfig = {
   decision?: Prisma.DecisionOmit
   decisionRevision?: Prisma.DecisionRevisionOmit
   decisionReview?: Prisma.DecisionReviewOmit
+  discussionFollow?: Prisma.DiscussionFollowOmit
   reaction?: Prisma.ReactionOmit
   decisionSupersession?: Prisma.DecisionSupersessionOmit
   activityEvent?: Prisma.ActivityEventOmit

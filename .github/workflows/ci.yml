@@ -131,6 +131,8 @@ jobs:
         run: pnpm -C apps/web run test:decision-review-api
       - name: Reactions API (real database)
         run: pnpm -C apps/web run test:reaction-api
+      - name: Follow and mute API (real database)
+        run: pnpm -C apps/web run test:follow-api
 
   frontend-tests:
     name: Frontend tests
