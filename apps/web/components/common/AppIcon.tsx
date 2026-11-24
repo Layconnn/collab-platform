@@ -14,6 +14,7 @@ import {
   Users,
   X,
   type LucideIcon,
+  Bookmark,
 } from "lucide-react";
 
 export type AppIconName =
@@ -30,7 +31,8 @@ export type AppIconName =
   | "panel-open"
   | "chevron"
   | "logout"
-  | "search";
+  | "search"
+  | "saved";
 
 const icons: Record<AppIconName, LucideIcon> = {
   home: House,
@@ -47,6 +49,7 @@ const icons: Record<AppIconName, LucideIcon> = {
   chevron: ChevronDown,
   logout: LogOut,
   search: Search,
+  saved: Bookmark,
 };
 
 export function AppIcon({ name, className = "size-4" }: { name: AppIconName; className?: string }) {

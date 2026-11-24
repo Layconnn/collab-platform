@@ -18,6 +18,7 @@ import { MarkdownField } from "@/components/common/MarkdownField";
 import { Markdown } from "@/components/common/Markdown";
 import { ReactionBar } from "@/components/common/ReactionBar";
 import { FollowControl } from "@/components/discussion/FollowControl";
+import { SaveButton } from "@/components/common/SaveButton";
 import { PinnedReplies } from "@/components/discussion/PinnedReplies";
 import { useDiscussionReactions } from "@/hooks/useReactions";
 import { ErrorState } from "@/components/common/StateNotice";
@@ -167,7 +168,7 @@ export default function DiscussionDetailPage() {
             <span className="block truncate font-semibold text-text-primary">{author.label}</span>
             <span className="block text-xs text-text-muted"><time dateTime={createdAt.toISOString()}>{dateLabel(createdAt)}</time>{wasUpdated ? <> / Updated <time dateTime={updatedAt.toISOString()}>{dateLabel(updatedAt)}</time></> : null}</span>
           </div>
-          <div className="ml-auto"><FollowControl workspaceId={workspaceId} discussionId={discussionId} /></div>
+          <div className="ml-auto flex flex-wrap items-center gap-2"><SaveButton workspaceId={workspaceId} target={{ discussionId }} label="discussion" /><FollowControl workspaceId={workspaceId} discussionId={discussionId} /></div>
         </div>
 
         {editing && canManage ? (

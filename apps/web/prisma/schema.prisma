@@ -78,6 +78,7 @@ model User {
   reactions       Reaction[]
   discussionFollows DiscussionFollow[]
   commentsPinned  Comment[] @relation("CommentPinner")
+  savedItems      SavedItem[]
   decisionReviewsRequested DecisionReview[] @relation("DecisionReviewRequester")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
@@ -101,6 +102,7 @@ model Workspace {
   decisionReviews DecisionReview[]
   reactions       Reaction[]
   discussionFollows DiscussionFollow[]
+  savedItems      SavedItem[]
   notifications Notification[]
   activityEvents ActivityEvent[]
 
@@ -126,6 +128,7 @@ model Discussion {
 
   reactions   Reaction[]
   follows     DiscussionFollow[]
+  savedItems  SavedItem[]
 
   @@index([searchVector], type: Gin)
   @@index([workspaceId, createdAt])
@@ -154,6 +157,7 @@ model Comment {
   searchVector    Unsupported("tsvector")? @default(dbgenerated())
 
   reactions       Reaction[]
+  savedItems  SavedItem[]
   // Pinned to the top of its discussion by the author or a manager
   // (Markdown, reactions, follow and pin PRD, FR-13 to FR-15).
   pinnedAt        DateTime?
@@ -249,6 +253,7 @@ model Decision {
   deletedBy                User?          @relation("DecisionDeleter", fields: [deletedById], references: [id], onDelete: SetNull)
   revisions                DecisionRevision[]
   reviews                  DecisionReview[]
+  savedItems               SavedItem[]
   replacementLink          DecisionSupersession? @relation("PreviousDecision")
   predecessorLink          DecisionSupersession? @relation("ReplacementDecision")
 
@@ -330,6 +335,31 @@ model DiscussionFollow {
 
   @@unique([discussionId, userId])
   @@index([userId])
+}
+
+// A discussion, reply or decision a member saved for later (Markdown,
+// reactions, follow and pin PRD, FR-16 to FR-18). Private to the member.
+// Exactly one target is set (CHECK constraint in the migration); saved items
+// are deleted with their discussion or reply, and hidden for deleted decisions.
+model SavedItem {
+  id           String      @id @default(cuid())
+  userId       String
+  workspaceId  String
+  discussionId String?
+  commentId    String?
+  decisionId   String?
+  createdAt    DateTime    @default(now())
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  discussion   Discussion? @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  comment      Comment?    @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  decision     Decision?   @relation(fields: [workspaceId, decisionId], references: [workspaceId, id], onDelete: Cascade)
+
+  @@unique([userId, discussionId])
+  @@unique([userId, commentId])
+  @@unique([userId, decisionId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, workspaceId])
 }
 
 // An emoji reaction on a discussion or a reply (Markdown PRD, FR-6 to FR-8).

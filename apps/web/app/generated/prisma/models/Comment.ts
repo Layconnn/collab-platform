@@ -271,6 +271,7 @@ export type CommentWhereInput = {
   replies?: Prisma.CommentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   reactions?: Prisma.ReactionListRelationFilter
+  savedItems?: Prisma.SavedItemListRelationFilter
   pinnedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
@@ -293,6 +294,7 @@ export type CommentOrderByWithRelationInput = {
   replies?: Prisma.CommentOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   reactions?: Prisma.ReactionOrderByRelationAggregateInput
+  savedItems?: Prisma.SavedItemOrderByRelationAggregateInput
   pinnedBy?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -318,6 +320,7 @@ export type CommentWhereUniqueInput = Prisma.AtLeast<{
   replies?: Prisma.CommentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   reactions?: Prisma.ReactionListRelationFilter
+  savedItems?: Prisma.SavedItemListRelationFilter
   pinnedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
@@ -371,6 +374,7 @@ export type CommentCreateInput = {
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -389,6 +393,7 @@ export type CommentUncheckedCreateInput = {
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentUpdateInput = {
@@ -405,6 +410,7 @@ export type CommentUpdateInput = {
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -423,6 +429,7 @@ export type CommentUncheckedUpdateInput = {
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentCreateManyInput = {
@@ -781,6 +788,22 @@ export type CommentUpdateOneWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CommentUpdateToOneWithWhereWithoutNotificationsInput, Prisma.CommentUpdateWithoutNotificationsInput>, Prisma.CommentUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type CommentCreateNestedOneWithoutSavedItemsInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutSavedItemsInput, Prisma.CommentUncheckedCreateWithoutSavedItemsInput>
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutSavedItemsInput
+  connect?: Prisma.CommentWhereUniqueInput
+}
+
+export type CommentUpdateOneWithoutSavedItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.CommentCreateWithoutSavedItemsInput, Prisma.CommentUncheckedCreateWithoutSavedItemsInput>
+  connectOrCreate?: Prisma.CommentCreateOrConnectWithoutSavedItemsInput
+  upsert?: Prisma.CommentUpsertWithoutSavedItemsInput
+  disconnect?: Prisma.CommentWhereInput | boolean
+  delete?: Prisma.CommentWhereInput | boolean
+  connect?: Prisma.CommentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CommentUpdateToOneWithWhereWithoutSavedItemsInput, Prisma.CommentUpdateWithoutSavedItemsInput>, Prisma.CommentUncheckedUpdateWithoutSavedItemsInput>
+}
+
 export type CommentCreateNestedOneWithoutReactionsInput = {
   create?: Prisma.XOR<Prisma.CommentCreateWithoutReactionsInput, Prisma.CommentUncheckedCreateWithoutReactionsInput>
   connectOrCreate?: Prisma.CommentCreateOrConnectWithoutReactionsInput
@@ -810,6 +833,7 @@ export type CommentCreateWithoutAuthorInput = {
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -827,6 +851,7 @@ export type CommentUncheckedCreateWithoutAuthorInput = {
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutAuthorInput = {
@@ -853,6 +878,7 @@ export type CommentCreateWithoutPinnedByInput = {
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
 }
 
 export type CommentUncheckedCreateWithoutPinnedByInput = {
@@ -869,6 +895,7 @@ export type CommentUncheckedCreateWithoutPinnedByInput = {
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutPinnedByInput = {
@@ -943,6 +970,7 @@ export type CommentCreateWithoutWorkspaceInput = {
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -960,6 +988,7 @@ export type CommentUncheckedCreateWithoutWorkspaceInput = {
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutWorkspaceInput = {
@@ -1001,6 +1030,7 @@ export type CommentCreateWithoutDiscussionInput = {
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -1018,6 +1048,7 @@ export type CommentUncheckedCreateWithoutDiscussionInput = {
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutDiscussionInput = {
@@ -1059,6 +1090,7 @@ export type CommentCreateWithoutRepliesInput = {
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -1076,6 +1108,7 @@ export type CommentUncheckedCreateWithoutRepliesInput = {
   pinnedById?: string | null
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutRepliesInput = {
@@ -1096,6 +1129,7 @@ export type CommentCreateWithoutParentCommentInput = {
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -1113,6 +1147,7 @@ export type CommentUncheckedCreateWithoutParentCommentInput = {
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutParentCommentInput = {
@@ -1149,6 +1184,7 @@ export type CommentUpdateWithoutRepliesInput = {
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -1166,6 +1202,7 @@ export type CommentUncheckedUpdateWithoutRepliesInput = {
   pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUpsertWithWhereUniqueWithoutParentCommentInput = {
@@ -1197,6 +1234,7 @@ export type CommentCreateWithoutNotificationsInput = {
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -1214,6 +1252,7 @@ export type CommentUncheckedCreateWithoutNotificationsInput = {
   pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutNotificationsInput = {
@@ -1245,6 +1284,7 @@ export type CommentUpdateWithoutNotificationsInput = {
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -1262,6 +1302,91 @@ export type CommentUncheckedUpdateWithoutNotificationsInput = {
   pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
+}
+
+export type CommentCreateWithoutSavedItemsInput = {
+  id?: string
+  depth?: number
+  body: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  discussion: Prisma.DiscussionCreateNestedOneWithoutCommentsInput
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutCommentsInput
+  author: Prisma.UserCreateNestedOneWithoutCommentsInput
+  parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
+  replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutCommentInput
+  pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
+}
+
+export type CommentUncheckedCreateWithoutSavedItemsInput = {
+  id?: string
+  discussionId: string
+  workspaceId: string
+  authorId: string
+  parentCommentId?: string | null
+  depth?: number
+  body: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  pinnedAt?: Date | string | null
+  pinnedById?: string | null
+  replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutCommentInput
+}
+
+export type CommentCreateOrConnectWithoutSavedItemsInput = {
+  where: Prisma.CommentWhereUniqueInput
+  create: Prisma.XOR<Prisma.CommentCreateWithoutSavedItemsInput, Prisma.CommentUncheckedCreateWithoutSavedItemsInput>
+}
+
+export type CommentUpsertWithoutSavedItemsInput = {
+  update: Prisma.XOR<Prisma.CommentUpdateWithoutSavedItemsInput, Prisma.CommentUncheckedUpdateWithoutSavedItemsInput>
+  create: Prisma.XOR<Prisma.CommentCreateWithoutSavedItemsInput, Prisma.CommentUncheckedCreateWithoutSavedItemsInput>
+  where?: Prisma.CommentWhereInput
+}
+
+export type CommentUpdateToOneWithWhereWithoutSavedItemsInput = {
+  where?: Prisma.CommentWhereInput
+  data: Prisma.XOR<Prisma.CommentUpdateWithoutSavedItemsInput, Prisma.CommentUncheckedUpdateWithoutSavedItemsInput>
+}
+
+export type CommentUpdateWithoutSavedItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  depth?: Prisma.IntFieldUpdateOperationsInput | number
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  discussion?: Prisma.DiscussionUpdateOneRequiredWithoutCommentsNestedInput
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutCommentsNestedInput
+  author?: Prisma.UserUpdateOneRequiredWithoutCommentsNestedInput
+  parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
+  replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
+}
+
+export type CommentUncheckedUpdateWithoutSavedItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  discussionId?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  parentCommentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  depth?: Prisma.IntFieldUpdateOperationsInput | number
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pinnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentCreateWithoutReactionsInput = {
@@ -1277,6 +1402,7 @@ export type CommentCreateWithoutReactionsInput = {
   parentComment?: Prisma.CommentCreateNestedOneWithoutRepliesInput
   replies?: Prisma.CommentCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCommentInput
   pinnedBy?: Prisma.UserCreateNestedOneWithoutCommentsPinnedInput
 }
 
@@ -1294,6 +1420,7 @@ export type CommentUncheckedCreateWithoutReactionsInput = {
   pinnedById?: string | null
   replies?: Prisma.CommentUncheckedCreateNestedManyWithoutParentCommentInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCommentInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCommentInput
 }
 
 export type CommentCreateOrConnectWithoutReactionsInput = {
@@ -1325,6 +1452,7 @@ export type CommentUpdateWithoutReactionsInput = {
   parentComment?: Prisma.CommentUpdateOneWithoutRepliesNestedInput
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -1342,6 +1470,7 @@ export type CommentUncheckedUpdateWithoutReactionsInput = {
   pinnedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentCreateManyAuthorInput = {
@@ -1383,6 +1512,7 @@ export type CommentUpdateWithoutAuthorInput = {
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -1400,6 +1530,7 @@ export type CommentUncheckedUpdateWithoutAuthorInput = {
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutAuthorInput = {
@@ -1429,6 +1560,7 @@ export type CommentUpdateWithoutPinnedByInput = {
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateWithoutPinnedByInput = {
@@ -1445,6 +1577,7 @@ export type CommentUncheckedUpdateWithoutPinnedByInput = {
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutPinnedByInput = {
@@ -1486,6 +1619,7 @@ export type CommentUpdateWithoutWorkspaceInput = {
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -1503,6 +1637,7 @@ export type CommentUncheckedUpdateWithoutWorkspaceInput = {
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutWorkspaceInput = {
@@ -1544,6 +1679,7 @@ export type CommentUpdateWithoutDiscussionInput = {
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -1561,6 +1697,7 @@ export type CommentUncheckedUpdateWithoutDiscussionInput = {
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutDiscussionInput = {
@@ -1602,6 +1739,7 @@ export type CommentUpdateWithoutParentCommentInput = {
   replies?: Prisma.CommentUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCommentNestedInput
   pinnedBy?: Prisma.UserUpdateOneWithoutCommentsPinnedNestedInput
 }
 
@@ -1619,6 +1757,7 @@ export type CommentUncheckedUpdateWithoutParentCommentInput = {
   replies?: Prisma.CommentUncheckedUpdateManyWithoutParentCommentNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCommentNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutCommentNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCommentNestedInput
 }
 
 export type CommentUncheckedUpdateManyWithoutParentCommentInput = {
@@ -1643,12 +1782,14 @@ export type CommentCountOutputType = {
   replies: number
   notifications: number
   reactions: number
+  savedItems: number
 }
 
 export type CommentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   replies?: boolean | CommentCountOutputTypeCountRepliesArgs
   notifications?: boolean | CommentCountOutputTypeCountNotificationsArgs
   reactions?: boolean | CommentCountOutputTypeCountReactionsArgs
+  savedItems?: boolean | CommentCountOutputTypeCountSavedItemsArgs
 }
 
 /**
@@ -1682,6 +1823,13 @@ export type CommentCountOutputTypeCountReactionsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.ReactionWhereInput
 }
 
+/**
+ * CommentCountOutputType without action
+ */
+export type CommentCountOutputTypeCountSavedItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SavedItemWhereInput
+}
+
 
 export type CommentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1702,6 +1850,7 @@ export type CommentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   replies?: boolean | Prisma.Comment$repliesArgs<ExtArgs>
   notifications?: boolean | Prisma.Comment$notificationsArgs<ExtArgs>
   reactions?: boolean | Prisma.Comment$reactionsArgs<ExtArgs>
+  savedItems?: boolean | Prisma.Comment$savedItemsArgs<ExtArgs>
   pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
   _count?: boolean | Prisma.CommentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["comment"]>
@@ -1767,6 +1916,7 @@ export type CommentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   replies?: boolean | Prisma.Comment$repliesArgs<ExtArgs>
   notifications?: boolean | Prisma.Comment$notificationsArgs<ExtArgs>
   reactions?: boolean | Prisma.Comment$reactionsArgs<ExtArgs>
+  savedItems?: boolean | Prisma.Comment$savedItemsArgs<ExtArgs>
   pinnedBy?: boolean | Prisma.Comment$pinnedByArgs<ExtArgs>
   _count?: boolean | Prisma.CommentCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1795,6 +1945,7 @@ export type $CommentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     replies: Prisma.$CommentPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     reactions: Prisma.$ReactionPayload<ExtArgs>[]
+    savedItems: Prisma.$SavedItemPayload<ExtArgs>[]
     pinnedBy: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2210,6 +2361,7 @@ export interface Prisma__CommentClient<T, Null = never, ExtArgs extends runtime.
   replies<T extends Prisma.Comment$repliesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$repliesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Comment$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reactions<T extends Prisma.Comment$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  savedItems<T extends Prisma.Comment$savedItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$savedItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pinnedBy<T extends Prisma.Comment$pinnedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Comment$pinnedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2740,6 +2892,30 @@ export type Comment$reactionsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.ReactionScalarFieldEnum | Prisma.ReactionScalarFieldEnum[]
+}
+
+/**
+ * Comment.savedItems
+ */
+export type Comment$savedItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SavedItem
+   */
+  select?: Prisma.SavedItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SavedItem
+   */
+  omit?: Prisma.SavedItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SavedItemInclude<ExtArgs> | null
+  where?: Prisma.SavedItemWhereInput
+  orderBy?: Prisma.SavedItemOrderByWithRelationInput | Prisma.SavedItemOrderByWithRelationInput[]
+  cursor?: Prisma.SavedItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SavedItemScalarFieldEnum | Prisma.SavedItemScalarFieldEnum[]
 }
 
 /**

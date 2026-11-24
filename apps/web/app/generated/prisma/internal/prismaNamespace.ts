@@ -407,6 +407,7 @@ export const ModelName = {
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
   DiscussionFollow: 'DiscussionFollow',
+  SavedItem: 'SavedItem',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
   ActivityEvent: 'ActivityEvent'
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "reaction" | "decisionSupersession" | "activityEvent"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1169,6 +1170,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SavedItem: {
+      payload: Prisma.$SavedItemPayload<ExtArgs>
+      fields: Prisma.SavedItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SavedItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SavedItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>
+        }
+        findFirst: {
+          args: Prisma.SavedItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SavedItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>
+        }
+        findMany: {
+          args: Prisma.SavedItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>[]
+        }
+        create: {
+          args: Prisma.SavedItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>
+        }
+        createMany: {
+          args: Prisma.SavedItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SavedItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>[]
+        }
+        delete: {
+          args: Prisma.SavedItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>
+        }
+        update: {
+          args: Prisma.SavedItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.SavedItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SavedItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SavedItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.SavedItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SavedItemPayload>
+        }
+        aggregate: {
+          args: Prisma.SavedItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSavedItem>
+        }
+        groupBy: {
+          args: Prisma.SavedItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SavedItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SavedItemCountAggregateOutputType> | number
+        }
+      }
+    }
     Reaction: {
       payload: Prisma.$ReactionPayload<ExtArgs>
       fields: Prisma.ReactionFieldRefs
@@ -1597,6 +1672,19 @@ export const DiscussionFollowScalarFieldEnum = {
 } as const
 
 export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
+
+
+export const SavedItemScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  decisionId: 'decisionId',
+  createdAt: 'createdAt'
+} as const
+
+export type SavedItemScalarFieldEnum = (typeof SavedItemScalarFieldEnum)[keyof typeof SavedItemScalarFieldEnum]
 
 
 export const ReactionScalarFieldEnum = {
@@ -2044,6 +2132,7 @@ export type GlobalOmitConfig = {
   decisionRevision?: Prisma.DecisionRevisionOmit
   decisionReview?: Prisma.DecisionReviewOmit
   discussionFollow?: Prisma.DiscussionFollowOmit
+  savedItem?: Prisma.SavedItemOmit
   reaction?: Prisma.ReactionOmit
   decisionSupersession?: Prisma.DecisionSupersessionOmit
   activityEvent?: Prisma.ActivityEventOmit

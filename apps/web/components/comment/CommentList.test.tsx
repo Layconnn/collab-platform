@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 const pinMocks = vi.hoisted(() => ({ canPin: false, items: [] as Array<{ commentId: string; excerpt: string; author: string; pinnedBy: string | null }>, mutate: vi.fn() }));
+vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
 vi.mock("@/hooks/usePins", () => ({
   usePinnedReplies: () => ({ data: { canPin: pinMocks.canPin, max: 3, items: pinMocks.items } }),
   useSetPin: () => ({ mutate: pinMocks.mutate, isPending: false }),

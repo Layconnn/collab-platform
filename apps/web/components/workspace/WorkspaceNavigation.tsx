@@ -32,6 +32,12 @@ export function WorkspaceNavigation({
       icon: "search",
       active: pathname.startsWith("/search"),
     },
+    {
+      label: "Saved",
+      href: "/saved",
+      icon: "saved",
+      active: pathname.startsWith("/saved"),
+    },
   ];
 
   if (workspaceId) {
