@@ -253,3 +253,91 @@ test("the run endpoint refuses callers without the shared secret", async () => {
     env.DIGEST_RUN_SECRET = saved;
   }
 });
+
+// ---------------------------------------------------------------------------
+// Preferences and unsubscribe (PR 4)
+// ---------------------------------------------------------------------------
+
+const { createUnsubscribeToken, readUnsubscribeToken, UNSUBSCRIBE_TTL_MS } = jiti("../services/digest/digest.tokens.ts");
+const { digestPreferences, digestSettingsFor } = jiti("../services/digest/digest.preferences.ts");
+
+test("unsubscribe tokens are scoped, expire, and break when changed", () => {
+  const now = new Date("2031-01-01T00:00:00Z");
+  const all = createUnsubscribeToken({ userId: "u1", scope: "all" }, now);
+  const ws = createUnsubscribeToken({ userId: "u1", scope: "workspace", workspaceId: "w1" }, now);
+  assert.deepEqual(readUnsubscribeToken(all, now), { userId: "u1", scope: "all" });
+  assert.deepEqual(readUnsubscribeToken(ws, now), { userId: "u1", scope: "workspace", workspaceId: "w1" });
+  assert.equal(readUnsubscribeToken(all, new Date(now.getTime() + UNSUBSCRIBE_TTL_MS + 1)), null, "expired");
+  const [payload, signature] = all.split(".");
+  const forged = Buffer.from(JSON.stringify({ u: "someone-else", s: "all", e: now.getTime() + 1e9 })).toString("base64url");
+  assert.equal(readUnsubscribeToken(`${forged}.${signature}`, now), null, "a changed payload fails");
+  assert.equal(readUnsubscribeToken(`${payload}.${signature.slice(0, -2)}xx`, now), null, "a changed signature fails");
+  assert.equal(readUnsubscribeToken("not-a-token", now), null);
+  assert.equal(readUnsubscribeToken(`${all}.extra`, now), null);
+});
+
+test("preferences turn the digest off, leave out a workspace, and only for the member's own workspaces", async () => {
+  const [maya, sam, outsider] = await Promise.all([user("Maya"), user("Sam"), user("Out")]);
+  const platform = await workspace(sam, [[maya, "MEMBER"]], "Platform");
+  const other = await workspace(outsider, [], "Other");
+  let prefs = await digestPreferences.get(maya.id);
+  assert.equal(prefs.enabled, true, "on by default");
+  assert.deepEqual(prefs.workspaces.map((w) => [w.name, w.included]), [["Platform", true]]);
+  prefs = await digestPreferences.setWorkspace(maya.id, platform.id, false);
+  assert.deepEqual(prefs.workspaces.map((w) => w.included), [false]);
+  await digestPreferences.setWorkspace(maya.id, platform.id, false);
+  assert.equal(await prisma.digestWorkspaceOptOut.count({ where: { userId: maya.id } }), 1, "idempotent");
+  await assert.rejects(digestPreferences.setWorkspace(maya.id, other.id, false), (error) => error.code === "NOT_FOUND");
+  prefs = await digestPreferences.setEnabled(maya.id, false);
+  assert.equal(prefs.enabled, false);
+  assert.deepEqual(await digestSettingsFor(maya.id), { enabled: false, excludedWorkspaceIds: [platform.id] });
+});
+
+test("links in the email stop digests without signing in, and can be undone", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(sam, [[maya, "MEMBER"]], "Marketing");
+  const wsToken = createUnsubscribeToken({ userId: maya.id, scope: "workspace", workspaceId: ws.id });
+  assert.deepEqual(await digestPreferences.describeToken(wsToken), { scope: "workspace", workspaceName: "Marketing" });
+  await digestPreferences.applyToken(wsToken);
+  assert.deepEqual((await digestSettingsFor(maya.id)).excludedWorkspaceIds, [ws.id]);
+  await digestPreferences.applyToken(wsToken, true);
+  assert.deepEqual((await digestSettingsFor(maya.id)).excludedWorkspaceIds, []);
+  const allToken = createUnsubscribeToken({ userId: maya.id, scope: "all" });
+  await digestPreferences.applyToken(allToken);
+  assert.equal((await digestSettingsFor(maya.id)).enabled, false);
+  await assert.rejects(digestPreferences.applyToken("bad.token"), (error) => error.code === "BAD_REQUEST");
+});
+
+test("the run skips members who turned it off and leaves out workspaces they excluded", async () => {
+  const { busy, ws, sam } = await teamWithNews();
+  const second = await workspace(sam, [[busy, "MEMBER"]], "Second");
+  await event(second, sam, "COMMENT_CREATED", HOUR);
+  await digestPreferences.setWorkspace(busy.id, second.id, false);
+  const first = fakeSender();
+  await run({ sender: first.sender, onlyUserIds: [busy.id] });
+  const email = first.sent[0];
+  assert.ok(email.html.includes("Platform") && !email.html.includes("Second"), "an excluded workspace is left out");
+  assert.match(email.headers["List-Unsubscribe"], /^<http.+\/api\/digest\/unsubscribe\?token=.+>$/);
+  assert.equal(email.headers["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
+  assert.ok(email.html.includes("Stop daily digests") && email.html.includes("Stop digests for Platform"));
+
+  await digestPreferences.setEnabled(busy.id, false);
+  const later = fakeSender();
+  const result = await run({ sender: later.sender, now: new Date(Date.now() + 24 * HOUR), onlyUserIds: [busy.id] });
+  assert.deepEqual([result.skippedOff, later.sent.length], [1, 0]);
+  void ws;
+});
+
+test("one-click unsubscribe works by POST only; opening the link changes nothing", async () => {
+  const [maya] = await Promise.all([user("Maya")]);
+  const { POST, GET } = jiti("../../app/api/digest/unsubscribe/route.ts");
+  const token = createUnsubscribeToken({ userId: maya.id, scope: "all" });
+  const url = `https://commons.test/api/digest/unsubscribe?token=${token}`;
+  const opened = await GET(new Request(url));
+  assert.equal(opened.status, 303);
+  assert.match(opened.headers.get("location"), /\/unsubscribe\//);
+  assert.equal((await digestSettingsFor(maya.id)).enabled, true, "a GET does not unsubscribe");
+  assert.equal((await POST(new Request(url, { method: "POST", body: "List-Unsubscribe=One-Click" }))).status, 200);
+  assert.equal((await digestSettingsFor(maya.id)).enabled, false);
+  assert.equal((await POST(new Request("https://commons.test/api/digest/unsubscribe?token=bad", { method: "POST" }))).status, 400);
+});

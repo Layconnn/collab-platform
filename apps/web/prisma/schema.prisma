@@ -89,6 +89,8 @@ model User {
   commentsPinned  Comment[] @relation("CommentPinner")
   savedItems      SavedItem[]
   digestDeliveries DigestDelivery[]
+  digestPreference DigestPreference?
+  digestOptOuts   DigestWorkspaceOptOut[]
   decisionReviewsRequested DecisionReview[] @relation("DecisionReviewRequester")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
@@ -113,6 +115,7 @@ model Workspace {
   reactions       Reaction[]
   discussionFollows DiscussionFollow[]
   savedItems      SavedItem[]
+  digestOptOuts   DigestWorkspaceOptOut[]
   notifications Notification[]
   activityEvents ActivityEvent[]
 
@@ -345,6 +348,26 @@ model DiscussionFollow {
 
   @@unique([discussionId, userId])
   @@index([userId])
+}
+
+// Daily digest preferences (daily digest PRD, FR-9): no row means on.
+model DigestPreference {
+  userId    String   @id
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// A workspace a member left out of their digest (FR-9, FR-10).
+model DigestWorkspaceOptOut {
+  id          String    @id @default(cuid())
+  userId      String
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
 }
 
 // One row per member and day of the daily digest (daily digest PRD, FR-6 to

@@ -68,6 +68,16 @@ export type DecisionReview = Prisma.DecisionReviewModel
  */
 export type DiscussionFollow = Prisma.DiscussionFollowModel
 /**
+ * Model DigestPreference
+ * 
+ */
+export type DigestPreference = Prisma.DigestPreferenceModel
+/**
+ * Model DigestWorkspaceOptOut
+ * 
+ */
+export type DigestWorkspaceOptOut = Prisma.DigestWorkspaceOptOutModel
+/**
  * Model DigestDelivery
  * 
  */
