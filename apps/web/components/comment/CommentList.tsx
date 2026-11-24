@@ -13,6 +13,8 @@ import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
 import { Markdown } from "@/components/common/Markdown";
+import { ReactionBar } from "@/components/common/ReactionBar";
+import { useDiscussionReactions } from "@/hooks/useReactions";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { ErrorState } from "@/components/common/StateNotice";
 import { useCommentActions, useCommentList } from "@/hooks/useComment";
@@ -46,6 +48,8 @@ function CommentSkeleton({ label }: { label: string }) {
 
 function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDenied }: { comment: CommentItem; discussionId: string; workspaceId: string; viewer: Viewer; onAccessDenied?: () => void }) {
   const { update, remove } = useCommentActions(discussionId, workspaceId);
+  // One query for the whole discussion, shared by every reply.
+  const reactions = useDiscussionReactions(workspaceId, discussionId);
   const [showReplies, setShowReplies] = useState(false);
   const [openedReplies, setOpenedReplies] = useState(false);
   const [replying, setReplying] = useState(false);
@@ -168,6 +172,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               <>
                 <Markdown text={comment.body} className="mt-1.5 text-[0.94rem] leading-6 text-text-primary" />
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <ReactionBar workspaceId={workspaceId} discussionId={discussionId} commentId={comment.id} reactions={reactions.data?.comments[comment.id] ?? []} disabled={!reactions.data} />
                   {canReply ? (
                     <button ref={replyButtonRef} type="button" onClick={replying ? closeReply : openReply} aria-expanded={replying} aria-controls={`reply-form-${comment.id}`} className="inline-flex min-h-10 items-center gap-1.5 rounded-sm px-2 text-xs font-semibold text-brand-link hover:bg-surface-hover hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
                       <CornerDownRight size={14} aria-hidden="true" /> {replying ? "Cancel reply" : "Reply"}

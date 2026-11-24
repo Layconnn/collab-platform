@@ -129,6 +129,8 @@ jobs:
         run: pnpm -C apps/web run test:home-api
       - name: Decision reviews API (real database)
         run: pnpm -C apps/web run test:decision-review-api
+      - name: Reactions API (real database)
+        run: pnpm -C apps/web run test:reaction-api
 
   frontend-tests:
     name: Frontend tests

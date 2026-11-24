@@ -16,6 +16,11 @@ const mocks = vi.hoisted(() => ({
   removeError: null as Error | null,
 }));
 
+vi.mock("@/hooks/useReactions", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useDiscussionReactions: () => ({ data: { discussion: [], comments: {} } }),
+  useSetReaction: () => ({ mutate: vi.fn() }),
+}));
 vi.mock("@/hooks/useComment", () => ({
   useCommentList: (_discussionId: string, parentId?: string, enabled = true) => {
     if (parentId && enabled) mocks.loadedParents.add(parentId);

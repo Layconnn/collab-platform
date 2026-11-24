@@ -26,6 +26,11 @@ const mocks = vi.hoisted(() => ({
   refetchDiscussion: vi.fn(),
 }));
 
+vi.mock("@/hooks/useReactions", async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useDiscussionReactions: () => ({ data: { discussion: [], comments: {} } }),
+  useSetReaction: () => ({ mutate: vi.fn() }),
+}));
 vi.mock("next/navigation", () => ({
   useParams: () => ({ workspaceId: "c000000000000000000000002", discussionId: "c000000000000000000000001" }),
   useRouter: () => ({ replace: mocks.replace }),
