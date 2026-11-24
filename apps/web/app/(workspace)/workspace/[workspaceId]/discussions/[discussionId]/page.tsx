@@ -16,6 +16,8 @@ import { useCommentList } from "@/hooks/useComment";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
 import { Markdown } from "@/components/common/Markdown";
+import { ReactionBar } from "@/components/common/ReactionBar";
+import { useDiscussionReactions } from "@/hooks/useReactions";
 import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { useAuth } from "@/hooks/useAuth";
@@ -46,6 +48,11 @@ function DiscussionSkeleton() {
       </div>
     </div>
   );
+}
+
+function DiscussionReactions({ workspaceId, discussionId }: { workspaceId: string; discussionId: string }) {
+  const reactions = useDiscussionReactions(workspaceId, discussionId);
+  return <ReactionBar workspaceId={workspaceId} discussionId={discussionId} reactions={reactions.data?.discussion ?? []} disabled={!reactions.data} />;
 }
 
 export default function DiscussionDetailPage() {
@@ -181,7 +188,10 @@ export default function DiscussionDetailPage() {
             </div>
           </form>
         ) : (
-          <div className="mt-8 text-[0.96rem] leading-7 text-text-secondary sm:text-base">{discussion.data.body ? <Markdown text={discussion.data.body} /> : <p>This discussion has no content.</p>}</div>
+          <>
+            <div className="mt-8 text-[0.96rem] leading-7 text-text-secondary sm:text-base">{discussion.data.body ? <Markdown text={discussion.data.body} /> : <p>This discussion has no content.</p>}</div>
+            <div className="mt-5"><DiscussionReactions workspaceId={workspaceId} discussionId={discussionId} /></div>
+          </>
         )}
         {!editing && updateError ? <p role="alert" className="mt-5 text-sm text-danger">{updateError}</p> : null}
         {removeError ? <p role="alert" className="mt-5 text-sm text-danger">{removeError}</p> : null}

@@ -63,6 +63,11 @@ export type DecisionRevision = Prisma.DecisionRevisionModel
  */
 export type DecisionReview = Prisma.DecisionReviewModel
 /**
+ * Model Reaction
+ * 
+ */
+export type Reaction = Prisma.ReactionModel
+/**
  * Model DecisionSupersession
  * 
  */

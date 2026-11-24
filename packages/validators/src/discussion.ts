@@ -35,3 +35,27 @@ export type UpdateDiscussionInput = z.infer<typeof updateDiscussionInputSchema>;
 export type GetDiscussionByIdInput = z.infer<typeof getDiscussionByIdInputSchema>;
 export type DeleteDiscussionInput = z.infer<typeof deleteDiscussionInputSchema>;
 export type ListDiscussionsInput = z.infer<typeof listDiscussionsInputSchema>;
+
+// Reactions (Markdown, reactions, follow and pin PRD, FR-6). The same eight
+// emoji are enforced by a CHECK constraint in the database.
+export const REACTION_EMOJI = ["👍", "❤️", "🎉", "😄", "🤔", "👀", "🚀", "✅"] as const;
+
+const reactionTarget = z.object({
+  workspaceId: z.string().cuid(),
+  discussionId: z.string().cuid().optional(),
+  commentId: z.string().cuid().optional(),
+}).refine((value) => Boolean(value.discussionId) !== Boolean(value.commentId), { message: "React to one discussion or one reply." });
+
+// Sets the member's reaction on or off; repeating a request changes nothing.
+export const setReactionInputSchema = reactionTarget.and(z.object({
+  emoji: z.enum(REACTION_EMOJI),
+  active: z.boolean(),
+}));
+
+export const discussionReactionsInputSchema = z.object({
+  workspaceId: z.string().cuid(),
+  discussionId: z.string().cuid(),
+});
+
+export type SetReactionInput = z.infer<typeof setReactionInputSchema>;
+export type DiscussionReactionsInput = z.infer<typeof discussionReactionsInputSchema>;
