@@ -61,6 +61,9 @@ export const ModelName = {
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
   DiscussionFollow: 'DiscussionFollow',
+  DigestPreference: 'DigestPreference',
+  DigestWorkspaceOptOut: 'DigestWorkspaceOptOut',
+  DigestDelivery: 'DigestDelivery',
   SavedItem: 'SavedItem',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
@@ -250,6 +253,40 @@ export const DiscussionFollowScalarFieldEnum = {
 } as const
 
 export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
+
+
+export const DigestPreferenceScalarFieldEnum = {
+  userId: 'userId',
+  enabled: 'enabled',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DigestPreferenceScalarFieldEnum = (typeof DigestPreferenceScalarFieldEnum)[keyof typeof DigestPreferenceScalarFieldEnum]
+
+
+export const DigestWorkspaceOptOutScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  createdAt: 'createdAt'
+} as const
+
+export type DigestWorkspaceOptOutScalarFieldEnum = (typeof DigestWorkspaceOptOutScalarFieldEnum)[keyof typeof DigestWorkspaceOptOutScalarFieldEnum]
+
+
+export const DigestDeliveryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  digestDate: 'digestDate',
+  status: 'status',
+  providerId: 'providerId',
+  attempts: 'attempts',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DigestDeliveryScalarFieldEnum = (typeof DigestDeliveryScalarFieldEnum)[keyof typeof DigestDeliveryScalarFieldEnum]
 
 
 export const SavedItemScalarFieldEnum = {

@@ -33,6 +33,15 @@ enum DecisionStatus {
   SUPERSEDED
 }
 
+enum DigestDeliveryStatus {
+  SENDING
+  SENT
+  SKIPPED_EMPTY
+  SKIPPED_OFF
+  HELD
+  FAILED
+}
+
 enum FollowState {
   FOLLOWING
   MUTED
@@ -79,6 +88,9 @@ model User {
   discussionFollows DiscussionFollow[]
   commentsPinned  Comment[] @relation("CommentPinner")
   savedItems      SavedItem[]
+  digestDeliveries DigestDelivery[]
+  digestPreference DigestPreference?
+  digestOptOuts   DigestWorkspaceOptOut[]
   decisionReviewsRequested DecisionReview[] @relation("DecisionReviewRequester")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
@@ -103,6 +115,7 @@ model Workspace {
   reactions       Reaction[]
   discussionFollows DiscussionFollow[]
   savedItems      SavedItem[]
+  digestOptOuts   DigestWorkspaceOptOut[]
   notifications Notification[]
   activityEvents ActivityEvent[]
 
@@ -335,6 +348,46 @@ model DiscussionFollow {
 
   @@unique([discussionId, userId])
   @@index([userId])
+}
+
+// Daily digest preferences (daily digest PRD, FR-9): no row means on.
+model DigestPreference {
+  userId    String   @id
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// A workspace a member left out of their digest (FR-9, FR-10).
+model DigestWorkspaceOptOut {
+  id          String    @id @default(cuid())
+  userId      String
+  workspaceId String
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+}
+
+// One row per member and day of the daily digest (daily digest PRD, FR-6 to
+// FR-8): the unique key makes sending at most once a day, and the row records
+// what happened. SENDING claims the row before sending, so overlapping runs
+// never both send; HELD means built but not sent because of the allow list.
+model DigestDelivery {
+  id          String               @id @default(cuid())
+  userId      String
+  digestDate  DateTime             @db.Date
+  status      DigestDeliveryStatus
+  providerId  String?
+  attempts    Int                  @default(0)
+  error       String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, digestDate])
+  @@index([digestDate, status])
 }
 
 // A discussion, reply or decision a member saved for later (Markdown,

@@ -407,6 +407,9 @@ export const ModelName = {
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
   DiscussionFollow: 'DiscussionFollow',
+  DigestPreference: 'DigestPreference',
+  DigestWorkspaceOptOut: 'DigestWorkspaceOptOut',
+  DigestDelivery: 'DigestDelivery',
   SavedItem: 'SavedItem',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
@@ -426,7 +429,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1170,6 +1173,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DigestPreference: {
+      payload: Prisma.$DigestPreferencePayload<ExtArgs>
+      fields: Prisma.DigestPreferenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DigestPreferenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DigestPreferenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>
+        }
+        findFirst: {
+          args: Prisma.DigestPreferenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DigestPreferenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>
+        }
+        findMany: {
+          args: Prisma.DigestPreferenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>[]
+        }
+        create: {
+          args: Prisma.DigestPreferenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>
+        }
+        createMany: {
+          args: Prisma.DigestPreferenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DigestPreferenceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>[]
+        }
+        delete: {
+          args: Prisma.DigestPreferenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>
+        }
+        update: {
+          args: Prisma.DigestPreferenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>
+        }
+        deleteMany: {
+          args: Prisma.DigestPreferenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DigestPreferenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DigestPreferenceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>[]
+        }
+        upsert: {
+          args: Prisma.DigestPreferenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestPreferencePayload>
+        }
+        aggregate: {
+          args: Prisma.DigestPreferenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDigestPreference>
+        }
+        groupBy: {
+          args: Prisma.DigestPreferenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestPreferenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DigestPreferenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestPreferenceCountAggregateOutputType> | number
+        }
+      }
+    }
+    DigestWorkspaceOptOut: {
+      payload: Prisma.$DigestWorkspaceOptOutPayload<ExtArgs>
+      fields: Prisma.DigestWorkspaceOptOutFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DigestWorkspaceOptOutFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DigestWorkspaceOptOutFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>
+        }
+        findFirst: {
+          args: Prisma.DigestWorkspaceOptOutFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DigestWorkspaceOptOutFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>
+        }
+        findMany: {
+          args: Prisma.DigestWorkspaceOptOutFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>[]
+        }
+        create: {
+          args: Prisma.DigestWorkspaceOptOutCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>
+        }
+        createMany: {
+          args: Prisma.DigestWorkspaceOptOutCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DigestWorkspaceOptOutCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>[]
+        }
+        delete: {
+          args: Prisma.DigestWorkspaceOptOutDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>
+        }
+        update: {
+          args: Prisma.DigestWorkspaceOptOutUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>
+        }
+        deleteMany: {
+          args: Prisma.DigestWorkspaceOptOutDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DigestWorkspaceOptOutUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DigestWorkspaceOptOutUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>[]
+        }
+        upsert: {
+          args: Prisma.DigestWorkspaceOptOutUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestWorkspaceOptOutPayload>
+        }
+        aggregate: {
+          args: Prisma.DigestWorkspaceOptOutAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDigestWorkspaceOptOut>
+        }
+        groupBy: {
+          args: Prisma.DigestWorkspaceOptOutGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestWorkspaceOptOutGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DigestWorkspaceOptOutCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestWorkspaceOptOutCountAggregateOutputType> | number
+        }
+      }
+    }
+    DigestDelivery: {
+      payload: Prisma.$DigestDeliveryPayload<ExtArgs>
+      fields: Prisma.DigestDeliveryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DigestDeliveryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DigestDeliveryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        findFirst: {
+          args: Prisma.DigestDeliveryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DigestDeliveryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        findMany: {
+          args: Prisma.DigestDeliveryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>[]
+        }
+        create: {
+          args: Prisma.DigestDeliveryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        createMany: {
+          args: Prisma.DigestDeliveryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DigestDeliveryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>[]
+        }
+        delete: {
+          args: Prisma.DigestDeliveryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        update: {
+          args: Prisma.DigestDeliveryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        deleteMany: {
+          args: Prisma.DigestDeliveryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DigestDeliveryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DigestDeliveryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>[]
+        }
+        upsert: {
+          args: Prisma.DigestDeliveryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DigestDeliveryPayload>
+        }
+        aggregate: {
+          args: Prisma.DigestDeliveryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDigestDelivery>
+        }
+        groupBy: {
+          args: Prisma.DigestDeliveryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestDeliveryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DigestDeliveryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DigestDeliveryCountAggregateOutputType> | number
+        }
+      }
+    }
     SavedItem: {
       payload: Prisma.$SavedItemPayload<ExtArgs>
       fields: Prisma.SavedItemFieldRefs
@@ -1674,6 +1899,40 @@ export const DiscussionFollowScalarFieldEnum = {
 export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
 
 
+export const DigestPreferenceScalarFieldEnum = {
+  userId: 'userId',
+  enabled: 'enabled',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DigestPreferenceScalarFieldEnum = (typeof DigestPreferenceScalarFieldEnum)[keyof typeof DigestPreferenceScalarFieldEnum]
+
+
+export const DigestWorkspaceOptOutScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  workspaceId: 'workspaceId',
+  createdAt: 'createdAt'
+} as const
+
+export type DigestWorkspaceOptOutScalarFieldEnum = (typeof DigestWorkspaceOptOutScalarFieldEnum)[keyof typeof DigestWorkspaceOptOutScalarFieldEnum]
+
+
+export const DigestDeliveryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  digestDate: 'digestDate',
+  status: 'status',
+  providerId: 'providerId',
+  attempts: 'attempts',
+  error: 'error',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DigestDeliveryScalarFieldEnum = (typeof DigestDeliveryScalarFieldEnum)[keyof typeof DigestDeliveryScalarFieldEnum]
+
+
 export const SavedItemScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1931,6 +2190,27 @@ export type ListEnumFollowStateFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'DigestDeliveryStatus'
+ */
+export type EnumDigestDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DigestDeliveryStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DigestDeliveryStatus[]'
+ */
+export type ListEnumDigestDeliveryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DigestDeliveryStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ActivityKind'
  */
 export type EnumActivityKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ActivityKind'>
@@ -2132,6 +2412,9 @@ export type GlobalOmitConfig = {
   decisionRevision?: Prisma.DecisionRevisionOmit
   decisionReview?: Prisma.DecisionReviewOmit
   discussionFollow?: Prisma.DiscussionFollowOmit
+  digestPreference?: Prisma.DigestPreferenceOmit
+  digestWorkspaceOptOut?: Prisma.DigestWorkspaceOptOutOmit
+  digestDelivery?: Prisma.DigestDeliveryOmit
   savedItem?: Prisma.SavedItemOmit
   reaction?: Prisma.ReactionOmit
   decisionSupersession?: Prisma.DecisionSupersessionOmit

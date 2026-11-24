@@ -1,0 +1,42 @@
+name: Daily digest
+
+# Sends the daily digest email at 06:00 UTC (daily digest PRD). Each call to
+# /api/digest/run processes members for up to about 45 seconds and answers
+# done: false until a call finds nobody left; at most one email per member a
+# day is enforced by the app, so re-running this workflow is safe.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    name: Send today's digests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Call /api/digest/run until done
+        env:
+          RUN_URL: https://collab-platform-web.vercel.app/api/digest/run
+          DIGEST_RUN_SECRET: ${{ secrets.DIGEST_RUN_SECRET }}
+        run: |
+          if [ -z "$DIGEST_RUN_SECRET" ]; then
+            echo "::notice::DIGEST_RUN_SECRET is not set; the daily digest is not switched on yet."
+            exit 0
+          fi
+          for call in $(seq 1 30); do
+            code=$(curl -sS -o body.json -w '%{http_code}' --retry 2 --retry-delay 10 --max-time 90 \
+              -X POST -H "Authorization: Bearer $DIGEST_RUN_SECRET" "$RUN_URL" || echo "000")
+            echo "Call $call: HTTP $code $(cat body.json 2>/dev/null)"
+            if [ "$code" != "200" ]; then
+              echo "::error::The digest run failed (HTTP $code). See docs/how-to-do-devops.md."
+              exit 1
+            fi
+            if [ "$(jq -r '.done' body.json)" = "true" ]; then exit 0; fi
+          done
+          echo "::error::The digest run did not finish in 30 calls."
+          exit 1

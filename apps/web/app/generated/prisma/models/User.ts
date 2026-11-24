@@ -211,6 +211,9 @@ export type UserWhereInput = {
   discussionFollows?: Prisma.DiscussionFollowListRelationFilter
   commentsPinned?: Prisma.CommentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
+  digestDeliveries?: Prisma.DigestDeliveryListRelationFilter
+  digestPreference?: Prisma.XOR<Prisma.DigestPreferenceNullableScalarRelationFilter, Prisma.DigestPreferenceWhereInput> | null
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutListRelationFilter
   decisionReviewsRequested?: Prisma.DecisionReviewListRelationFilter
   notificationsReceived?: Prisma.NotificationListRelationFilter
   notificationsSent?: Prisma.NotificationListRelationFilter
@@ -238,6 +241,9 @@ export type UserOrderByWithRelationInput = {
   discussionFollows?: Prisma.DiscussionFollowOrderByRelationAggregateInput
   commentsPinned?: Prisma.CommentOrderByRelationAggregateInput
   savedItems?: Prisma.SavedItemOrderByRelationAggregateInput
+  digestDeliveries?: Prisma.DigestDeliveryOrderByRelationAggregateInput
+  digestPreference?: Prisma.DigestPreferenceOrderByWithRelationInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutOrderByRelationAggregateInput
   decisionReviewsRequested?: Prisma.DecisionReviewOrderByRelationAggregateInput
   notificationsReceived?: Prisma.NotificationOrderByRelationAggregateInput
   notificationsSent?: Prisma.NotificationOrderByRelationAggregateInput
@@ -268,6 +274,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   discussionFollows?: Prisma.DiscussionFollowListRelationFilter
   commentsPinned?: Prisma.CommentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
+  digestDeliveries?: Prisma.DigestDeliveryListRelationFilter
+  digestPreference?: Prisma.XOR<Prisma.DigestPreferenceNullableScalarRelationFilter, Prisma.DigestPreferenceWhereInput> | null
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutListRelationFilter
   decisionReviewsRequested?: Prisma.DecisionReviewListRelationFilter
   notificationsReceived?: Prisma.NotificationListRelationFilter
   notificationsSent?: Prisma.NotificationListRelationFilter
@@ -321,6 +330,9 @@ export type UserCreateInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -348,6 +360,9 @@ export type UserUncheckedCreateInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -375,6 +390,9 @@ export type UserUpdateInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -402,6 +420,9 @@ export type UserUncheckedUpdateInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -686,6 +707,48 @@ export type UserUpdateOneRequiredWithoutDiscussionFollowsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDiscussionFollowsInput, Prisma.UserUpdateWithoutDiscussionFollowsInput>, Prisma.UserUncheckedUpdateWithoutDiscussionFollowsInput>
 }
 
+export type UserCreateNestedOneWithoutDigestPreferenceInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDigestPreferenceInput, Prisma.UserUncheckedCreateWithoutDigestPreferenceInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDigestPreferenceInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDigestPreferenceNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDigestPreferenceInput, Prisma.UserUncheckedCreateWithoutDigestPreferenceInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDigestPreferenceInput
+  upsert?: Prisma.UserUpsertWithoutDigestPreferenceInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDigestPreferenceInput, Prisma.UserUpdateWithoutDigestPreferenceInput>, Prisma.UserUncheckedUpdateWithoutDigestPreferenceInput>
+}
+
+export type UserCreateNestedOneWithoutDigestOptOutsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDigestOptOutsInput, Prisma.UserUncheckedCreateWithoutDigestOptOutsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDigestOptOutsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDigestOptOutsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDigestOptOutsInput, Prisma.UserUncheckedCreateWithoutDigestOptOutsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDigestOptOutsInput
+  upsert?: Prisma.UserUpsertWithoutDigestOptOutsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDigestOptOutsInput, Prisma.UserUpdateWithoutDigestOptOutsInput>, Prisma.UserUncheckedUpdateWithoutDigestOptOutsInput>
+}
+
+export type UserCreateNestedOneWithoutDigestDeliveriesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDigestDeliveriesInput, Prisma.UserUncheckedCreateWithoutDigestDeliveriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDigestDeliveriesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDigestDeliveriesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDigestDeliveriesInput, Prisma.UserUncheckedCreateWithoutDigestDeliveriesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDigestDeliveriesInput
+  upsert?: Prisma.UserUpsertWithoutDigestDeliveriesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDigestDeliveriesInput, Prisma.UserUpdateWithoutDigestDeliveriesInput>, Prisma.UserUncheckedUpdateWithoutDigestDeliveriesInput>
+}
+
 export type UserCreateNestedOneWithoutSavedItemsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSavedItemsInput, Prisma.UserUncheckedCreateWithoutSavedItemsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSavedItemsInput
@@ -766,6 +829,9 @@ export type UserCreateWithoutOwnedSpacesInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -792,6 +858,9 @@ export type UserUncheckedCreateWithoutOwnedSpacesInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -834,6 +903,9 @@ export type UserUpdateWithoutOwnedSpacesInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -860,6 +932,9 @@ export type UserUncheckedUpdateWithoutOwnedSpacesInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -886,6 +961,9 @@ export type UserCreateWithoutDiscussionsInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -912,6 +990,9 @@ export type UserUncheckedCreateWithoutDiscussionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -954,6 +1035,9 @@ export type UserUpdateWithoutDiscussionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -980,6 +1064,9 @@ export type UserUncheckedUpdateWithoutDiscussionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1006,6 +1093,9 @@ export type UserCreateWithoutCommentsInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1032,6 +1122,9 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1063,6 +1156,9 @@ export type UserCreateWithoutCommentsPinnedInput = {
   reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1089,6 +1185,9 @@ export type UserUncheckedCreateWithoutCommentsPinnedInput = {
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1131,6 +1230,9 @@ export type UserUpdateWithoutCommentsInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1157,6 +1259,9 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1194,6 +1299,9 @@ export type UserUpdateWithoutCommentsPinnedInput = {
   reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1220,6 +1328,9 @@ export type UserUncheckedUpdateWithoutCommentsPinnedInput = {
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1247,6 +1358,9 @@ export type UserCreateWithoutNotificationsReceivedInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
@@ -1273,6 +1387,9 @@ export type UserUncheckedCreateWithoutNotificationsReceivedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
@@ -1304,6 +1421,9 @@ export type UserCreateWithoutNotificationsSentInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
@@ -1330,6 +1450,9 @@ export type UserUncheckedCreateWithoutNotificationsSentInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
@@ -1372,6 +1495,9 @@ export type UserUpdateWithoutNotificationsReceivedInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
@@ -1398,6 +1524,9 @@ export type UserUncheckedUpdateWithoutNotificationsReceivedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1435,6 +1564,9 @@ export type UserUpdateWithoutNotificationsSentInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
@@ -1461,6 +1593,9 @@ export type UserUncheckedUpdateWithoutNotificationsSentInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
@@ -1486,6 +1621,9 @@ export type UserCreateWithoutMembershipsInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1512,6 +1650,9 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1554,6 +1695,9 @@ export type UserUpdateWithoutMembershipsInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1580,6 +1724,9 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1606,6 +1753,9 @@ export type UserCreateWithoutDecisionsCreatedInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1632,6 +1782,9 @@ export type UserUncheckedCreateWithoutDecisionsCreatedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1663,6 +1816,9 @@ export type UserCreateWithoutDecisionsDeletedInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1689,6 +1845,9 @@ export type UserUncheckedCreateWithoutDecisionsDeletedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1731,6 +1890,9 @@ export type UserUpdateWithoutDecisionsCreatedInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1757,6 +1919,9 @@ export type UserUncheckedUpdateWithoutDecisionsCreatedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1794,6 +1959,9 @@ export type UserUpdateWithoutDecisionsDeletedInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1820,6 +1988,9 @@ export type UserUncheckedUpdateWithoutDecisionsDeletedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1846,6 +2017,9 @@ export type UserCreateWithoutDecisionRevisionsInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1872,6 +2046,9 @@ export type UserUncheckedCreateWithoutDecisionRevisionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -1914,6 +2091,9 @@ export type UserUpdateWithoutDecisionRevisionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -1940,6 +2120,9 @@ export type UserUncheckedUpdateWithoutDecisionRevisionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -1966,6 +2149,9 @@ export type UserCreateWithoutDecisionReviewsInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -1992,6 +2178,9 @@ export type UserUncheckedCreateWithoutDecisionReviewsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -2024,6 +2213,9 @@ export type UserCreateWithoutDecisionReviewsRequestedInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
@@ -2050,6 +2242,9 @@ export type UserUncheckedCreateWithoutDecisionReviewsRequestedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
@@ -2091,6 +2286,9 @@ export type UserUpdateWithoutDecisionReviewsInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -2117,6 +2315,9 @@ export type UserUncheckedUpdateWithoutDecisionReviewsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -2155,6 +2356,9 @@ export type UserUpdateWithoutDecisionReviewsRequestedInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
@@ -2181,6 +2385,9 @@ export type UserUncheckedUpdateWithoutDecisionReviewsRequestedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
@@ -2206,6 +2413,9 @@ export type UserCreateWithoutDiscussionFollowsInput = {
   reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -2232,6 +2442,9 @@ export type UserUncheckedCreateWithoutDiscussionFollowsInput = {
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -2274,6 +2487,9 @@ export type UserUpdateWithoutDiscussionFollowsInput = {
   reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -2300,6 +2516,405 @@ export type UserUncheckedUpdateWithoutDiscussionFollowsInput = {
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutDigestPreferenceInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutDigestPreferenceInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutDigestPreferenceInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDigestPreferenceInput, Prisma.UserUncheckedCreateWithoutDigestPreferenceInput>
+}
+
+export type UserUpsertWithoutDigestPreferenceInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDigestPreferenceInput, Prisma.UserUncheckedUpdateWithoutDigestPreferenceInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDigestPreferenceInput, Prisma.UserUncheckedCreateWithoutDigestPreferenceInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDigestPreferenceInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDigestPreferenceInput, Prisma.UserUncheckedUpdateWithoutDigestPreferenceInput>
+}
+
+export type UserUpdateWithoutDigestPreferenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDigestPreferenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutDigestOptOutsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutDigestOptOutsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutDigestOptOutsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDigestOptOutsInput, Prisma.UserUncheckedCreateWithoutDigestOptOutsInput>
+}
+
+export type UserUpsertWithoutDigestOptOutsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDigestOptOutsInput, Prisma.UserUncheckedUpdateWithoutDigestOptOutsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDigestOptOutsInput, Prisma.UserUncheckedCreateWithoutDigestOptOutsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDigestOptOutsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDigestOptOutsInput, Prisma.UserUncheckedUpdateWithoutDigestOptOutsInput>
+}
+
+export type UserUpdateWithoutDigestOptOutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDigestOptOutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateWithoutDigestDeliveriesInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutDigestDeliveriesInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutDigestDeliveriesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDigestDeliveriesInput, Prisma.UserUncheckedCreateWithoutDigestDeliveriesInput>
+}
+
+export type UserUpsertWithoutDigestDeliveriesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDigestDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDigestDeliveriesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDigestDeliveriesInput, Prisma.UserUncheckedCreateWithoutDigestDeliveriesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDigestDeliveriesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDigestDeliveriesInput, Prisma.UserUncheckedUpdateWithoutDigestDeliveriesInput>
+}
+
+export type UserUpdateWithoutDigestDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDigestDeliveriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -2326,6 +2941,9 @@ export type UserCreateWithoutSavedItemsInput = {
   reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -2352,6 +2970,9 @@ export type UserUncheckedCreateWithoutSavedItemsInput = {
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -2394,6 +3015,9 @@ export type UserUpdateWithoutSavedItemsInput = {
   reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -2420,6 +3044,9 @@ export type UserUncheckedUpdateWithoutSavedItemsInput = {
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -2446,6 +3073,9 @@ export type UserCreateWithoutReactionsInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -2472,6 +3102,9 @@ export type UserUncheckedCreateWithoutReactionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -2514,6 +3147,9 @@ export type UserUpdateWithoutReactionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -2540,6 +3176,9 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -2566,6 +3205,9 @@ export type UserCreateWithoutSupersessionsAuthorizedInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -2592,6 +3234,9 @@ export type UserUncheckedCreateWithoutSupersessionsAuthorizedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -2634,6 +3279,9 @@ export type UserUpdateWithoutSupersessionsAuthorizedInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -2660,6 +3308,9 @@ export type UserUncheckedUpdateWithoutSupersessionsAuthorizedInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -2687,6 +3338,9 @@ export type UserCreateWithoutActivityEventsInput = {
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
@@ -2713,6 +3367,9 @@ export type UserUncheckedCreateWithoutActivityEventsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
   commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
   notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
   notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
@@ -2755,6 +3412,9 @@ export type UserUpdateWithoutActivityEventsInput = {
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
@@ -2781,6 +3441,9 @@ export type UserUncheckedUpdateWithoutActivityEventsInput = {
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
   commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
   decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
   notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
   notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
@@ -2805,6 +3468,8 @@ export type UserCountOutputType = {
   discussionFollows: number
   commentsPinned: number
   savedItems: number
+  digestDeliveries: number
+  digestOptOuts: number
   decisionReviewsRequested: number
   notificationsReceived: number
   notificationsSent: number
@@ -2825,6 +3490,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   discussionFollows?: boolean | UserCountOutputTypeCountDiscussionFollowsArgs
   commentsPinned?: boolean | UserCountOutputTypeCountCommentsPinnedArgs
   savedItems?: boolean | UserCountOutputTypeCountSavedItemsArgs
+  digestDeliveries?: boolean | UserCountOutputTypeCountDigestDeliveriesArgs
+  digestOptOuts?: boolean | UserCountOutputTypeCountDigestOptOutsArgs
   decisionReviewsRequested?: boolean | UserCountOutputTypeCountDecisionReviewsRequestedArgs
   notificationsReceived?: boolean | UserCountOutputTypeCountNotificationsReceivedArgs
   notificationsSent?: boolean | UserCountOutputTypeCountNotificationsSentArgs
@@ -2935,6 +3602,20 @@ export type UserCountOutputTypeCountSavedItemsArgs<ExtArgs extends runtime.Types
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountDigestDeliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DigestDeliveryWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDigestOptOutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DigestWorkspaceOptOutWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountDecisionReviewsRequestedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.DecisionReviewWhereInput
 }
@@ -2982,6 +3663,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   discussionFollows?: boolean | Prisma.User$discussionFollowsArgs<ExtArgs>
   commentsPinned?: boolean | Prisma.User$commentsPinnedArgs<ExtArgs>
   savedItems?: boolean | Prisma.User$savedItemsArgs<ExtArgs>
+  digestDeliveries?: boolean | Prisma.User$digestDeliveriesArgs<ExtArgs>
+  digestPreference?: boolean | Prisma.User$digestPreferenceArgs<ExtArgs>
+  digestOptOuts?: boolean | Prisma.User$digestOptOutsArgs<ExtArgs>
   decisionReviewsRequested?: boolean | Prisma.User$decisionReviewsRequestedArgs<ExtArgs>
   notificationsReceived?: boolean | Prisma.User$notificationsReceivedArgs<ExtArgs>
   notificationsSent?: boolean | Prisma.User$notificationsSentArgs<ExtArgs>
@@ -3034,6 +3718,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   discussionFollows?: boolean | Prisma.User$discussionFollowsArgs<ExtArgs>
   commentsPinned?: boolean | Prisma.User$commentsPinnedArgs<ExtArgs>
   savedItems?: boolean | Prisma.User$savedItemsArgs<ExtArgs>
+  digestDeliveries?: boolean | Prisma.User$digestDeliveriesArgs<ExtArgs>
+  digestPreference?: boolean | Prisma.User$digestPreferenceArgs<ExtArgs>
+  digestOptOuts?: boolean | Prisma.User$digestOptOutsArgs<ExtArgs>
   decisionReviewsRequested?: boolean | Prisma.User$decisionReviewsRequestedArgs<ExtArgs>
   notificationsReceived?: boolean | Prisma.User$notificationsReceivedArgs<ExtArgs>
   notificationsSent?: boolean | Prisma.User$notificationsSentArgs<ExtArgs>
@@ -3059,6 +3746,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     discussionFollows: Prisma.$DiscussionFollowPayload<ExtArgs>[]
     commentsPinned: Prisma.$CommentPayload<ExtArgs>[]
     savedItems: Prisma.$SavedItemPayload<ExtArgs>[]
+    digestDeliveries: Prisma.$DigestDeliveryPayload<ExtArgs>[]
+    digestPreference: Prisma.$DigestPreferencePayload<ExtArgs> | null
+    digestOptOuts: Prisma.$DigestWorkspaceOptOutPayload<ExtArgs>[]
     decisionReviewsRequested: Prisma.$DecisionReviewPayload<ExtArgs>[]
     notificationsReceived: Prisma.$NotificationPayload<ExtArgs>[]
     notificationsSent: Prisma.$NotificationPayload<ExtArgs>[]
@@ -3479,6 +4169,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   discussionFollows<T extends Prisma.User$discussionFollowsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$discussionFollowsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DiscussionFollowPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   commentsPinned<T extends Prisma.User$commentsPinnedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsPinnedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedItems<T extends Prisma.User$savedItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$savedItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  digestDeliveries<T extends Prisma.User$digestDeliveriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$digestDeliveriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DigestDeliveryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  digestPreference<T extends Prisma.User$digestPreferenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$digestPreferenceArgs<ExtArgs>>): Prisma.Prisma__DigestPreferenceClient<runtime.Types.Result.GetResult<Prisma.$DigestPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  digestOptOuts<T extends Prisma.User$digestOptOutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$digestOptOutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DigestWorkspaceOptOutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   decisionReviewsRequested<T extends Prisma.User$decisionReviewsRequestedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$decisionReviewsRequestedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationsReceived<T extends Prisma.User$notificationsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationsSent<T extends Prisma.User$notificationsSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4221,6 +4914,73 @@ export type User$savedItemsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.SavedItemScalarFieldEnum | Prisma.SavedItemScalarFieldEnum[]
+}
+
+/**
+ * User.digestDeliveries
+ */
+export type User$digestDeliveriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DigestDelivery
+   */
+  select?: Prisma.DigestDeliverySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DigestDelivery
+   */
+  omit?: Prisma.DigestDeliveryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DigestDeliveryInclude<ExtArgs> | null
+  where?: Prisma.DigestDeliveryWhereInput
+  orderBy?: Prisma.DigestDeliveryOrderByWithRelationInput | Prisma.DigestDeliveryOrderByWithRelationInput[]
+  cursor?: Prisma.DigestDeliveryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DigestDeliveryScalarFieldEnum | Prisma.DigestDeliveryScalarFieldEnum[]
+}
+
+/**
+ * User.digestPreference
+ */
+export type User$digestPreferenceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DigestPreference
+   */
+  select?: Prisma.DigestPreferenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DigestPreference
+   */
+  omit?: Prisma.DigestPreferenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DigestPreferenceInclude<ExtArgs> | null
+  where?: Prisma.DigestPreferenceWhereInput
+}
+
+/**
+ * User.digestOptOuts
+ */
+export type User$digestOptOutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DigestWorkspaceOptOut
+   */
+  select?: Prisma.DigestWorkspaceOptOutSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DigestWorkspaceOptOut
+   */
+  omit?: Prisma.DigestWorkspaceOptOutOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DigestWorkspaceOptOutInclude<ExtArgs> | null
+  where?: Prisma.DigestWorkspaceOptOutWhereInput
+  orderBy?: Prisma.DigestWorkspaceOptOutOrderByWithRelationInput | Prisma.DigestWorkspaceOptOutOrderByWithRelationInput[]
+  cursor?: Prisma.DigestWorkspaceOptOutWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DigestWorkspaceOptOutScalarFieldEnum | Prisma.DigestWorkspaceOptOutScalarFieldEnum[]
 }
 
 /**

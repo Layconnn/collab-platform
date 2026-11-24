@@ -13,5 +13,5 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Every signed-in page outside /workspace must be listed here.
-  matcher: ["/workspace/:path*", "/search", "/saved"],
+  matcher: ["/workspace/:path*", "/search", "/saved", "/settings/:path*"],
 };
