@@ -17,6 +17,7 @@ import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import { toPaginatedResult } from "../../src/common/utils/pagination";
 import { recordActivity } from "./activity.service";
+import { resetReviewsAfterEdit, reviewGate } from "./decision-review.service";
 import { assertCanDeleteDecision, assertCanEditDecision, canManageDecisions } from "./workspace.permissions";
 
 const decisionSelect = {
@@ -53,6 +54,7 @@ const revisionSelect = {
   alternatives: true,
   followUp: true,
   status: true,
+  overrideReason: true,
   createdAt: true,
 } as const;
 
@@ -67,6 +69,16 @@ async function requireMember(db: Tx | typeof prisma, workspaceId: string, userId
   });
   if (!member) throw new AppError("NOT_FOUND", "Decision not found.");
   return member.role;
+}
+
+// Orders a content change or finalization against review requests and
+// answers, which lock the same row.
+async function lockDecision(tx: Tx, workspaceId: string, decisionId: string) {
+  await tx.$queryRaw`
+    SELECT "id" FROM "Decision"
+    WHERE "workspaceId" = ${workspaceId} AND "id" = ${decisionId} AND "deletedAt" IS NULL
+    FOR UPDATE
+  `;
 }
 
 async function requireMutationMember(tx: Tx, workspaceId: string, userId: string): Promise<WorkspaceRole> {
@@ -342,9 +354,10 @@ export const decisionService = {
   async edit(userId: string, input: EditDecisionInput) {
     return prisma.$transaction(async (tx) => {
       const role = await requireMutationMember(tx, input.workspaceId, userId);
+      await lockDecision(tx, input.workspaceId, input.decisionId);
       const current = await tx.decision.findFirst({
         where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null },
-        select: { status: true, createdById: true, version: true },
+        select: { status: true, createdById: true, version: true, question: true, outcome: true, rationale: true, alternatives: true },
       });
       if (!current) throw new AppError("NOT_FOUND", "Decision not found.");
       if (current.status !== "PROPOSED") throw new AppError("CONFLICT", "Finalized decisions cannot be edited.");
@@ -390,6 +403,9 @@ export const decisionService = {
         subjectId: updated.id,
         summary: { question: updated.question, status: updated.status },
       });
+      // Approvals refer to what the proposal said; changing it asks again (FR-6).
+      const changed = (["question", "outcome", "rationale", "alternatives"] as const).some((field) => current[field] !== updated[field]);
+      if (changed) await resetReviewsAfterEdit(tx, { workspaceId: input.workspaceId, decision: updated, actor: { userId, label: actorLabel(user) } });
       return updated;
     });
   },
@@ -397,9 +413,10 @@ export const decisionService = {
   async finalize(userId: string, input: FinalizeDecisionInput) {
     return prisma.$transaction(async (tx) => {
       const role = await requireMutationMember(tx, input.workspaceId, userId);
+      await lockDecision(tx, input.workspaceId, input.decisionId);
       const current = await tx.decision.findFirst({
         where: { id: input.decisionId, workspaceId: input.workspaceId, deletedAt: null },
-        select: { status: true, outcome: true, rationale: true, version: true },
+        select: { status: true, outcome: true, rationale: true, version: true, reviewRule: true, requiredApprovals: true },
       });
       if (!current) throw new AppError("NOT_FOUND", "Decision not found.");
       if (!canManageDecisions(role)) throw new AppError("FORBIDDEN", "Only a workspace manager can finalize decisions.");
@@ -408,6 +425,10 @@ export const decisionService = {
       if (!current.outcome?.trim() || !current.rationale?.trim()) {
         throw new AppError("BAD_REQUEST", "Outcome and rationale are required before finalization.");
       }
+      // The review rule must be met, unless a manager finalizes anyway with a reason (FR-9).
+      const gate = await reviewGate(tx, input.decisionId, current);
+      const overrideReason = gate.met ? null : input.overrideReason ?? null;
+      if (!gate.met && !overrideReason) throw new AppError("CONFLICT", gate.message);
       const updatedCount = await tx.decision.updateMany({
         where: { id: input.decisionId, workspaceId: input.workspaceId, status: "PROPOSED", deletedAt: null, version: input.expectedVersion },
         data: { status: "DECIDED", decidedAt: new Date(), version: { increment: 1 } },
@@ -424,6 +445,7 @@ export const decisionService = {
           action: "FINALIZE",
           actorUserId: userId,
           actorLabel: actorLabel(user),
+          overrideReason,
           question: updated.question,
           outcome: updated.outcome,
           rationale: updated.rationale,
@@ -439,7 +461,7 @@ export const decisionService = {
         kind: "DECISION_FINALIZED",
         subjectType: "DECISION",
         subjectId: updated.id,
-        summary: { question: updated.question, status: updated.status },
+        summary: { question: updated.question, status: updated.status, ...(overrideReason ? { overrideReason, waitingFor: gate.waitingFor } : {}) },
       });
       return updated;
     });

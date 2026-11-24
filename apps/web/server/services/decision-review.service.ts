@@ -167,6 +167,56 @@ export async function withdrawReviewsForMember(tx: Tx, workspaceId: string, memb
   return reviews.length;
 }
 
+// After an edit to what a proposal says, every answered request waits again;
+// the earlier answers stay in the history (FR-6).
+export async function resetReviewsAfterEdit(
+  tx: Tx,
+  input: { workspaceId: string; decision: { id: string; question: string; version: number }; actor: { userId: string; label: string } },
+) {
+  const answered = await tx.decisionReview.findMany({
+    where: { decisionId: input.decision.id, state: { in: ["APPROVED", "OBJECTED"] } },
+    select: { id: true, reviewerId: true, reviewerLabel: true },
+  });
+  if (!answered.length) return [];
+  await tx.decisionReview.updateMany({
+    where: { id: { in: answered.map((review) => review.id) } },
+    data: { state: "PENDING", note: null, respondedAt: null },
+  });
+  await recordActivity(tx, {
+    workspaceId: input.workspaceId,
+    actorUserId: input.actor.userId,
+    actorLabel: input.actor.label,
+    kind: "DECISION_REVIEWS_RESET",
+    subjectType: "DECISION",
+    subjectId: input.decision.id,
+    summary: { question: input.decision.question, reviewers: answered.length, version: input.decision.version },
+  });
+  return answered;
+}
+
+// Whether a proposal may be finalized under its review rule, and who it is
+// waiting for when not.
+export async function reviewGate(
+  tx: Tx,
+  decisionId: string,
+  decision: { reviewRule: DecisionReviewRule; requiredApprovals: number | null },
+) {
+  const reviews = await tx.decisionReview.findMany({
+    where: { decisionId },
+    select: { state: true, reviewerLabel: true },
+    orderBy: { createdAt: "asc" },
+  });
+  const summary = summarizeReviews(decision, reviews);
+  const waitingFor = reviews
+    .filter((review) => review.state === "PENDING" || review.state === "OBJECTED")
+    .map((review) => review.reviewerLabel)
+    .join(", ");
+  const message = summary.met ? "" : decision.reviewRule === "ALL"
+    ? `Everyone asked must approve first. Waiting for ${waitingFor}. A manager can finalize anyway with a reason.`
+    : `This proposal needs ${summary.needed} ${summary.needed === 1 ? "approval" : "approvals"} and has ${summary.approved}. A manager can finalize anyway with a reason.`;
+  return { met: summary.met, summary, waitingFor, message };
+}
+
 export const decisionReviewService = {
   async list(userId: string, input: DecisionByIdInput) {
     const membership = await prisma.workspaceMember.findUnique({

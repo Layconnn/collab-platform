@@ -40,6 +40,8 @@ export const editDecisionInputSchema = decisionByIdInputSchema.extend({
 
 export const finalizeDecisionInputSchema = decisionByIdInputSchema.extend({
   expectedVersion: z.number().int().positive(),
+  // "Finalize anyway" when the review rule is not met (decision reviews, FR-9).
+  overrideReason: z.string().trim().min(10).max(2000).optional(),
 });
 
 export const deleteDecisionInputSchema = decisionByIdInputSchema.extend({
