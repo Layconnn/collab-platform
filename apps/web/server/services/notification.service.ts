@@ -13,6 +13,7 @@ import {
   recordNotificationOperation,
 } from "../observability/security-events";
 import { enqueueNotificationFanout, type NotificationJobData } from "../queue/notification.queue";
+import { discussionFollowerIds } from "./follow.service";
 import { extractMentions, normalizeUsername } from "../utils/mentions";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 
@@ -254,10 +255,15 @@ export async function planNotificationDeliveries(event: NotificationEvent): Prom
     });
   }
 
-  const mentions = await resolveMentionUserIds(event.workspaceId, event.actorUserId, event.body);
+  // Replies go to the discussion's followers and to anyone mentioned; members
+  // who muted the discussion hear only when mentioned (FR-10, FR-11).
+  const [mentions, followers] = await Promise.all([
+    resolveMentionUserIds(event.workspaceId, event.actorUserId, event.body),
+    discussionFollowerIds(event.workspaceId, event.discussionId),
+  ]);
   return buildDeliveries({
     actorUserId: event.actorUserId,
-    recipients,
+    recipients: recipients.filter((userId) => followers.has(userId) || mentions.has(userId)),
     mentions,
     resource: { workspaceId: event.workspaceId, discussionId: event.discussionId, commentId: event.commentId },
     genericType: "COMMENT_CREATED",

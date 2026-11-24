@@ -59,3 +59,16 @@ export const discussionReactionsInputSchema = z.object({
 
 export type SetReactionInput = z.infer<typeof setReactionInputSchema>;
 export type DiscussionReactionsInput = z.infer<typeof discussionReactionsInputSchema>;
+
+// Following and muting (Markdown, reactions, follow and pin PRD, FR-9 to FR-12).
+export const discussionFollowInputSchema = z.object({
+  workspaceId: z.string().cuid(),
+  discussionId: z.string().cuid(),
+});
+
+export const setDiscussionFollowInputSchema = discussionFollowInputSchema.extend({
+  status: z.enum(["FOLLOWING", "MUTED", "NONE"]),
+});
+
+export type DiscussionFollowInput = z.infer<typeof discussionFollowInputSchema>;
+export type SetDiscussionFollowInput = z.infer<typeof setDiscussionFollowInputSchema>;

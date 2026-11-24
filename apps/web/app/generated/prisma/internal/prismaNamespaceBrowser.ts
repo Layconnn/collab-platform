@@ -60,6 +60,7 @@ export const ModelName = {
   Decision: 'Decision',
   DecisionRevision: 'DecisionRevision',
   DecisionReview: 'DecisionReview',
+  DiscussionFollow: 'DiscussionFollow',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
   ActivityEvent: 'ActivityEvent'
@@ -233,6 +234,19 @@ export const DecisionReviewScalarFieldEnum = {
 } as const
 
 export type DecisionReviewScalarFieldEnum = (typeof DecisionReviewScalarFieldEnum)[keyof typeof DecisionReviewScalarFieldEnum]
+
+
+export const DiscussionFollowScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  userId: 'userId',
+  state: 'state',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DiscussionFollowScalarFieldEnum = (typeof DiscussionFollowScalarFieldEnum)[keyof typeof DiscussionFollowScalarFieldEnum]
 
 
 export const ReactionScalarFieldEnum = {

@@ -17,6 +17,7 @@ import {
   recordDiscussionPermissionDenied,
 } from "../observability/security-events";
 import { activityActorLabel, recordActivity } from "./activity.service";
+import { followOnParticipation } from "./follow.service";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
 import { requireWorkspaceAction as requireMemberAction } from "./workspace.access";
@@ -149,6 +150,7 @@ export const discussionService = {
             updatedAt: true,
           },
         });
+        await followOnParticipation(tx, { workspaceId: input.workspaceId, discussionId: created.id, userId });
         await recordActivity(tx, {
           workspaceId: created.workspaceId,
           actorUserId: userId,

@@ -17,6 +17,7 @@ import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
 import { Markdown } from "@/components/common/Markdown";
 import { ReactionBar } from "@/components/common/ReactionBar";
+import { FollowControl } from "@/components/discussion/FollowControl";
 import { useDiscussionReactions } from "@/hooks/useReactions";
 import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
@@ -159,12 +160,13 @@ export default function DiscussionDetailPage() {
             </Menu.Root>
           ) : null}
         </div>
-        <div className="mt-6 flex min-w-0 items-center gap-3">
+        <div className="mt-6 flex min-w-0 flex-wrap items-center gap-3">
           <UserAvatar name={author.avatarName} className="size-9" />
           <div className="min-w-0 text-sm leading-5">
             <span className="block truncate font-semibold text-text-primary">{author.label}</span>
             <span className="block text-xs text-text-muted"><time dateTime={createdAt.toISOString()}>{dateLabel(createdAt)}</time>{wasUpdated ? <> / Updated <time dateTime={updatedAt.toISOString()}>{dateLabel(updatedAt)}</time></> : null}</span>
           </div>
+          <div className="ml-auto"><FollowControl workspaceId={workspaceId} discussionId={discussionId} /></div>
         </div>
 
         {editing && canManage ? (

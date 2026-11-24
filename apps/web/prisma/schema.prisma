@@ -33,6 +33,11 @@ enum DecisionStatus {
   SUPERSEDED
 }
 
+enum FollowState {
+  FOLLOWING
+  MUTED
+}
+
 enum DecisionReviewRule {
   ALL
   AT_LEAST
@@ -71,6 +76,7 @@ model User {
   supersessionsAuthorized DecisionSupersession[] @relation("DecisionSupersessionAuthorizer")
   decisionReviews DecisionReview[] @relation("DecisionReviewer")
   reactions       Reaction[]
+  discussionFollows DiscussionFollow[]
   decisionReviewsRequested DecisionReview[] @relation("DecisionReviewRequester")
   notificationsReceived Notification[] @relation("NotificationRecipient")
   notificationsSent     Notification[] @relation("NotificationActor")
@@ -93,6 +99,7 @@ model Workspace {
   decisions   Decision[]
   decisionReviews DecisionReview[]
   reactions       Reaction[]
+  discussionFollows DiscussionFollow[]
   notifications Notification[]
   activityEvents ActivityEvent[]
 
@@ -117,6 +124,7 @@ model Discussion {
   searchVector  Unsupported("tsvector")? @default(dbgenerated())
 
   reactions   Reaction[]
+  follows     DiscussionFollow[]
 
   @@index([searchVector], type: Gin)
   @@index([workspaceId, createdAt])
@@ -296,6 +304,25 @@ model DecisionReview {
   @@unique([decisionId, reviewerId])
   @@index([workspaceId, decisionId])
   @@index([reviewerId, state])
+}
+
+// Who hears about new replies in a discussion (Markdown, reactions, follow and
+// pin PRD, FR-9 to FR-12). FOLLOWING gets reply notifications; MUTED gets
+// none and is not re-followed by replying. Mentions notify either way.
+model DiscussionFollow {
+  id           String      @id @default(cuid())
+  workspaceId  String
+  discussionId String
+  userId       String
+  state        FollowState @default(FOLLOWING)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  discussion   Discussion  @relation(fields: [workspaceId, discussionId], references: [workspaceId, id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([discussionId, userId])
+  @@index([userId])
 }
 
 // An emoji reaction on a discussion or a reply (Markdown PRD, FR-6 to FR-8).

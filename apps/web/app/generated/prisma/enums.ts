@@ -38,6 +38,14 @@ export const DecisionStatus = {
 export type DecisionStatus = (typeof DecisionStatus)[keyof typeof DecisionStatus]
 
 
+export const FollowState = {
+  FOLLOWING: 'FOLLOWING',
+  MUTED: 'MUTED'
+} as const
+
+export type FollowState = (typeof FollowState)[keyof typeof FollowState]
+
+
 export const DecisionReviewRule = {
   ALL: 'ALL',
   AT_LEAST: 'AT_LEAST'

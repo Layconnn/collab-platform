@@ -14,6 +14,17 @@ const jiti = createJiti(import.meta.url);
 
 const { appRouter } = jiti("./root.ts");
 const { prisma } = jiti("../db/prisma.ts");
+
+// Discussion follows, kept in memory (Markdown, reactions, follow and pin PRD).
+const fakeFollows = [];
+prisma.discussionFollow.upsert = async ({ where, create }) => {
+  const key = where.discussionId_userId;
+  let follow = fakeFollows.find((f) => f.discussionId === key.discussionId && f.userId === key.userId);
+  if (!follow) { follow = { ...create }; fakeFollows.push(follow); }
+  return follow;
+};
+prisma.discussionFollow.findMany = async ({ where }) =>
+  fakeFollows.filter((f) => f.discussionId === where.discussionId && (!where.state || f.state === where.state)).map((f) => ({ userId: f.userId }));
 const { Prisma } = jiti("../../app/generated/prisma/client.ts");
 const { redis, redisCache } = jiti("../cache/redis.ts");
 const { notificationQueue } = jiti("../queue/notification.queue.ts");
