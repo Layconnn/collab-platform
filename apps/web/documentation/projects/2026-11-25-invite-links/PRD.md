@@ -1,6 +1,6 @@
 # PRD: Invite links
 
-Status: draft for approval · Horizon 1 · Issue #152
+Status: approved 2026-11-25 (defaults confirmed by the author) · Horizon 1 · Issue #152
 
 ## Problem
 
@@ -112,7 +112,7 @@ Nothing new: tables in the existing database, pages in the existing app.
 
 ## Risks and open questions
 
-Each question has a proposed default for the author to confirm.
+Each question had a proposed default; the author confirmed all of them on 2026-11-25.
 
 - **Showing a link again.** Default: no. Only the hash is stored, so a link is shown once, at creation, with Copy; to share it again, a manager creates a new one. The alternative, storing tokens so they can be copied any time (as Slack does), is simpler for managers but means a database leak exposes working links.
 - **Who may create links.** Default: owners and admins, matching who may add members today. Letting every member invite is common in chat tools; it can be a workspace setting later.
@@ -124,6 +124,6 @@ Each question has a proposed default for the author to confirm.
 | # | Pull request | Requirements |
 | --- | --- | --- |
 | 1 (#152) | `Commons: Workspaces and Membership: PRD for invite links` — this document; also marks file uploads delivered in the spec map | — |
-| 2 | `Commons: Workspaces and Membership: create, revoke and redeem invite links` — the two tables and migration, the service and router (create, list, revoke, describe, join), rate limits, the notification and event, real-database tests | FR-1 to FR-5, FR-8 to FR-11, NFR-1 to NFR-3 |
-| 3 | `Commons: Workspaces and Membership: invite people from the Members page` — the Invite people dialog, copy once, the list with uses and expiry, revoke | FR-1, FR-3, FR-4 |
-| 4 | `Commons: Identity and Access: join a workspace from an invite link` — the public join page, `next` on registration and sign-in, already-a-member and not-working states, the end-to-end journey with a second user | FR-6, FR-7, FR-9, FR-11, NFR-4 |
+| 2 (#155) | `Commons: Workspaces and Membership: create, revoke and redeem invite links` — the two tables and migration, the service and router (create, list, revoke, describe, join), rate limits, the notification and event, real-database tests | FR-1 to FR-5, FR-8 to FR-11, NFR-1 to NFR-3 |
+| 3 (#156) | `Commons: Workspaces and Membership: invite people from the Members page` — the Invite people dialog, copy once, the list with uses and expiry, revoke | FR-1, FR-3, FR-4 |
+| 4 (#157) | `Commons: Identity and Access: join a workspace from an invite link` — the public join page, `next` on registration and sign-in, already-a-member and not-working states, the end-to-end journey with a second user | FR-6, FR-7, FR-9, FR-11, NFR-4 |
