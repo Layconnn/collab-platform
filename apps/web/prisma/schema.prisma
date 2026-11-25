@@ -293,6 +293,8 @@ model DecisionRevision {
   reason         String?
   // Set when a manager finalized without the review rule being met (FR-9).
   overrideReason String?
+  // The decision's file names at this revision (file uploads PRD, FR-11).
+  fileNames      String[]               @default([])
   question       String
   outcome        String?
   rationale      String?

@@ -291,6 +291,8 @@ export type RecentDecision = {
   at: Date;
   // For a superseded decision: what replaced it, when it still exists.
   replacement: { id: string; question: string } | null;
+  // How many files it has; never their content (file uploads PRD, FR-10).
+  files: number;
 };
 
 // The window is seven days for Home; the daily digest asks for one.
@@ -315,7 +317,7 @@ export async function recentDecisions(userId: string, now = new Date(), windowMs
     .filter((id): id is string => typeof id === "string");
   const decisions = await prisma.decision.findMany({
     where: { id: { in: [...latest.keys(), ...replacementIds] }, deletedAt: null },
-    select: { id: true, question: true },
+    select: { id: true, question: true, _count: { select: { attachments: true } } },
   });
   const live = new Map(decisions.map((decision) => [decision.id, decision]));
 
@@ -333,6 +335,7 @@ export async function recentDecisions(userId: string, now = new Date(), windowMs
       actor: event.actorLabel,
       at: event.createdAt,
       replacement: event.kind === "DECISION_SUPERSEDED" && replacement ? { id: replacement.id, question: replacement.question } : null,
+      files: decision._count.attachments,
     });
     if (result.length === RECENT_DECISIONS_LIMIT) break;
   }

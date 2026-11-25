@@ -9,6 +9,7 @@ import { reviewProgress } from "@/components/decision/DecisionReviews";
 import { DecisionDate, DecisionStatus } from "@/components/decision/decisionUI";
 import { useDecisionList } from "@/hooks/useDecision";
 import { useWorkspaceDetail } from "@/hooks/useWorkspace";
+import { FileCount } from "@/components/files/FileCount";
 
 type StatusFilter = "ALL" | "MINE" | "PROPOSED" | "DECIDED" | "SUPERSEDED";
 
@@ -46,7 +47,7 @@ export default function DecisionsPage() {
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1"><DecisionStatus status={decision.status} />{decision.status === "DECIDED" ? <span className="text-xs font-semibold text-brand-link">Current decision</span> : null}<h3 className="min-w-0 flex-1 wrap-anywhere text-[0.95rem] font-semibold leading-5 text-text-primary group-hover:text-brand-link sm:text-base">{decision.question}</h3></div>
         {decision.status === "PROPOSED" && decision.review ? <p className={`mt-1.5 text-xs font-semibold ${decision.review.waitingForMe ? "text-brand-link" : decision.review.met ? "text-success" : "text-text-secondary"}`}>{decision.review.waitingForMe ? "Your review is requested · " : "Review · "}{reviewProgress(decision.review)}</p> : null}
         <p className="mt-2 line-clamp-2 whitespace-pre-wrap wrap-anywhere text-sm leading-6 text-text-secondary">{decision.outcome || "Outcome still being shaped."}</p>
-        <p className="mt-2 flex min-w-0 flex-wrap gap-x-2 gap-y-0.5 wrap-anywhere text-xs leading-5 text-text-muted"><span>Proposed by {decision.createdByLabel}</span><span aria-hidden="true">/</span><span>Updated <DecisionDate value={decision.updatedAt} /></span><span aria-hidden="true">/</span><span>{decision.sourceDiscussionId ? `From ${decision.sourceDiscussionTitle}` : `Source unavailable: ${decision.sourceDiscussionTitle}`}</span></p>
+        <p className="mt-2 flex min-w-0 flex-wrap gap-x-2 gap-y-0.5 wrap-anywhere text-xs leading-5 text-text-muted"><span>Proposed by {decision.createdByLabel}</span><span aria-hidden="true">/</span><span>Updated <DecisionDate value={decision.updatedAt} /></span>{decision.attachments.length ? <><span aria-hidden="true">/</span><FileCount count={decision.attachments.length} /></> : null}<span aria-hidden="true">/</span><span>{decision.sourceDiscussionId ? `From ${decision.sourceDiscussionTitle}` : `Source unavailable: ${decision.sourceDiscussionTitle}`}</span></p>
       </Link>
     </li>)}</ol> : null}
     {decisions.hasNextPage ? <div className="border-t border-border-subtle py-6 text-center"><button type="button" disabled={decisions.isFetchingNextPage} onClick={() => void decisions.fetchNextPage()} className="min-h-11 rounded-sm border border-border px-5 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{decisions.isFetchingNextPage ? "Loading..." : "Load more decisions"}</button></div> : null}

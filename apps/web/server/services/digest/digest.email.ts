@@ -15,6 +15,9 @@ export type DigestLinks = {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+// A count only; the digest never carries file content (file uploads PRD, FR-10).
+const filesNote = (files: number | undefined) => (files ? ` · ${files} ${files === 1 ? "file" : "files"}` : "");
+
 export function escapeHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
@@ -76,7 +79,7 @@ export function renderDigest(digest: Digest, links: DigestLinks): { subject: str
   const decidedHtml = digest.decided.map((item) => row(
     item.question,
     `${links.baseUrl}/workspace/${item.workspace.id}/decisions/${item.decisionId}`,
-    `${item.action === "SUPERSEDED" ? `Replaced${item.replacement ? ` by “${item.replacement.question}”` : ""}` : "Finalized"} by ${item.actor} · ${item.workspace.name}`,
+    `${item.action === "SUPERSEDED" ? `Replaced${item.replacement ? ` by “${item.replacement.question}”` : ""}` : "Finalized"} by ${item.actor} · ${item.workspace.name}${filesNote(item.files)}`,
   )).join("");
   const activityHtml = digest.activity.map((item) => row(item.workspace.name, `${links.baseUrl}/workspace/${item.workspace.id}`, activityLine(item))).join("");
 
@@ -113,7 +116,7 @@ ${digest.activity.length ? section("In your workspaces", activityHtml) : ""}
   }
   if (digest.decided.length) {
     lines.push("DECIDED IN THE LAST DAY");
-    for (const item of digest.decided) lines.push(`- ${item.question}`, `  ${item.action === "SUPERSEDED" ? "Replaced" : "Finalized"} by ${item.actor} · ${item.workspace.name}`, `  ${links.baseUrl}/workspace/${item.workspace.id}/decisions/${item.decisionId}`);
+    for (const item of digest.decided) lines.push(`- ${item.question}`, `  ${item.action === "SUPERSEDED" ? "Replaced" : "Finalized"} by ${item.actor} · ${item.workspace.name}${filesNote(item.files)}`, `  ${links.baseUrl}/workspace/${item.workspace.id}/decisions/${item.decisionId}`);
     lines.push("");
   }
   if (digest.activity.length) {

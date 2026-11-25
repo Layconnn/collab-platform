@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "@/server/api/root";
+import { FileCount } from "@/components/files/FileCount";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { resolveUserIdentity } from "@/lib/user-identity";
 
@@ -53,6 +54,7 @@ export function DiscussionRow({
               <span className="max-w-full truncate text-text-secondary">{author.label}</span>
               <span aria-hidden="true">/</span>
               <time dateTime={createdAt.toISOString()}>{dateLabel(createdAt)}</time>
+              {discussion.files ? <><span aria-hidden="true">/</span><FileCount count={discussion.files} /></> : null}
               {!compact && wasUpdated ? (
                 <>
                   <span aria-hidden="true">/</span>

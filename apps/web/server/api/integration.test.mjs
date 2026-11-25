@@ -843,7 +843,7 @@ test("workspace + discussion + comment integration flow", async () => {
     assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["id", "name", "username"]);
 
     // 3. User B creates discussion in workspace.
-    state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v2:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v3:start:20`, JSON.stringify({}));
     const discussion = await callerB.discussion.create({
       workspaceId: workspace.id,
       title: "Integration Discussion",
@@ -851,7 +851,7 @@ test("workspace + discussion + comment integration flow", async () => {
     });
     assert.equal(discussion.workspaceId, workspace.id);
     assert.equal(discussion.author.username, "user_b");
-    assert.equal(state.redisKeyValues.has(`workspace:${workspace.id}:discussions:v2:start:20`), false);
+    assert.equal(state.redisKeyValues.has(`workspace:${workspace.id}:discussions:v3:start:20`), false);
     assert.ok(state.notificationJobs.some((job) => job.name === "deliver" && job.payload.type === "DISCUSSION_CREATED" && job.payload.recipientUserId === userA));
 
     // 4. User A creates root comment.

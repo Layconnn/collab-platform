@@ -72,8 +72,9 @@ test("a new user registers, records a decision from a discussion and signs out",
   await test.step("reply with a screenshot", async () => {
     // A 1x1 PNG, uploaded through the local-folder storage (FILES_LOCAL_DIR).
     const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
-    await page.locator('input[type="file"]').first().setInputFiles({ name: "screen.png", mimeType: "image/png", buffer: png });
-    const attached = page.getByRole("list", { name: "Attached files" });
+    const composer = page.getByRole("region", { name: "Add your perspective" });
+    await composer.locator('input[type="file"]').setInputFiles({ name: "screen.png", mimeType: "image/png", buffer: png });
+    const attached = composer.getByRole("list", { name: "Attached files" });
     await expect(attached.getByText(/^Image · \d+ B$/)).toBeVisible();
     await page.getByRole("button", { name: "Post comment" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Comment posted." })).toBeVisible();

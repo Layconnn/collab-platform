@@ -213,6 +213,9 @@ function projectDiscussionWithSelect(row, select) {
       selected.author = projectAuthor(author, select.author.select);
       continue;
     }
+    // This in-memory store has no files.
+    if (key === "attachments") { selected.attachments = []; continue; }
+    if (key === "_count") { selected._count = { attachments: 0 }; continue; }
     selected[key] = row[key];
   }
   return selected;

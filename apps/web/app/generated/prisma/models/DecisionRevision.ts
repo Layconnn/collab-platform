@@ -79,6 +79,7 @@ export type DecisionRevisionCountAggregateOutputType = {
   actorLabel: number
   reason: number
   overrideReason: number
+  fileNames: number
   question: number
   outcome: number
   rationale: number
@@ -143,6 +144,7 @@ export type DecisionRevisionCountAggregateInputType = {
   actorLabel?: true
   reason?: true
   overrideReason?: true
+  fileNames?: true
   question?: true
   outcome?: true
   rationale?: true
@@ -248,6 +250,7 @@ export type DecisionRevisionGroupByOutputType = {
   actorLabel: string
   reason: string | null
   overrideReason: string | null
+  fileNames: string[]
   question: string
   outcome: string | null
   rationale: string | null
@@ -289,6 +292,7 @@ export type DecisionRevisionWhereInput = {
   actorLabel?: Prisma.StringFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   overrideReason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
+  fileNames?: Prisma.StringNullableListFilter<"DecisionRevision">
   question?: Prisma.StringFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
@@ -309,6 +313,7 @@ export type DecisionRevisionOrderByWithRelationInput = {
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
   overrideReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileNames?: Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrderInput | Prisma.SortOrder
   rationale?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -333,6 +338,7 @@ export type DecisionRevisionWhereUniqueInput = Prisma.AtLeast<{
   actorLabel?: Prisma.StringFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   overrideReason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
+  fileNames?: Prisma.StringNullableListFilter<"DecisionRevision">
   question?: Prisma.StringFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
@@ -353,6 +359,7 @@ export type DecisionRevisionOrderByWithAggregationInput = {
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
   overrideReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileNames?: Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrderInput | Prisma.SortOrder
   rationale?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -379,6 +386,7 @@ export type DecisionRevisionScalarWhereWithAggregatesInput = {
   actorLabel?: Prisma.StringWithAggregatesFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
   overrideReason?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
+  fileNames?: Prisma.StringNullableListFilter<"DecisionRevision">
   question?: Prisma.StringWithAggregatesFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableWithAggregatesFilter<"DecisionRevision"> | string | null
@@ -395,6 +403,7 @@ export type DecisionRevisionCreateInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -415,6 +424,7 @@ export type DecisionRevisionUncheckedCreateInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -431,6 +441,7 @@ export type DecisionRevisionUpdateInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -451,6 +462,7 @@ export type DecisionRevisionUncheckedUpdateInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -469,6 +481,7 @@ export type DecisionRevisionCreateManyInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -485,6 +498,7 @@ export type DecisionRevisionUpdateManyMutationInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -503,6 +517,7 @@ export type DecisionRevisionUncheckedUpdateManyInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -522,6 +537,14 @@ export type DecisionRevisionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type DecisionRevisionDecisionIdVersionCompoundUniqueInput = {
   decisionId: string
   version: number
@@ -536,6 +559,7 @@ export type DecisionRevisionCountOrderByAggregateInput = {
   actorLabel?: Prisma.SortOrder
   reason?: Prisma.SortOrder
   overrideReason?: Prisma.SortOrder
+  fileNames?: Prisma.SortOrder
   question?: Prisma.SortOrder
   outcome?: Prisma.SortOrder
   rationale?: Prisma.SortOrder
@@ -673,8 +697,17 @@ export type DecisionRevisionUncheckedUpdateManyWithoutDecisionNestedInput = {
   deleteMany?: Prisma.DecisionRevisionScalarWhereInput | Prisma.DecisionRevisionScalarWhereInput[]
 }
 
+export type DecisionRevisionCreatefileNamesInput = {
+  set: string[]
+}
+
 export type EnumDecisionRevisionActionFieldUpdateOperationsInput = {
   set?: $Enums.DecisionRevisionAction
+}
+
+export type DecisionRevisionUpdatefileNamesInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type DecisionRevisionCreateWithoutActorInput = {
@@ -684,6 +717,7 @@ export type DecisionRevisionCreateWithoutActorInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -702,6 +736,7 @@ export type DecisionRevisionUncheckedCreateWithoutActorInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -749,6 +784,7 @@ export type DecisionRevisionScalarWhereInput = {
   actorLabel?: Prisma.StringFilter<"DecisionRevision"> | string
   reason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   overrideReason?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
+  fileNames?: Prisma.StringNullableListFilter<"DecisionRevision">
   question?: Prisma.StringFilter<"DecisionRevision"> | string
   outcome?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
   rationale?: Prisma.StringNullableFilter<"DecisionRevision"> | string | null
@@ -765,6 +801,7 @@ export type DecisionRevisionCreateWithoutDecisionInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -783,6 +820,7 @@ export type DecisionRevisionUncheckedCreateWithoutDecisionInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -826,6 +864,7 @@ export type DecisionRevisionCreateManyActorInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -842,6 +881,7 @@ export type DecisionRevisionUpdateWithoutActorInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -860,6 +900,7 @@ export type DecisionRevisionUncheckedUpdateWithoutActorInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -877,6 +918,7 @@ export type DecisionRevisionUncheckedUpdateManyWithoutActorInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -894,6 +936,7 @@ export type DecisionRevisionCreateManyDecisionInput = {
   actorLabel: string
   reason?: string | null
   overrideReason?: string | null
+  fileNames?: Prisma.DecisionRevisionCreatefileNamesInput | string[]
   question: string
   outcome?: string | null
   rationale?: string | null
@@ -910,6 +953,7 @@ export type DecisionRevisionUpdateWithoutDecisionInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -928,6 +972,7 @@ export type DecisionRevisionUncheckedUpdateWithoutDecisionInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -945,6 +990,7 @@ export type DecisionRevisionUncheckedUpdateManyWithoutDecisionInput = {
   actorLabel?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   overrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileNames?: Prisma.DecisionRevisionUpdatefileNamesInput | string[]
   question?: Prisma.StringFieldUpdateOperationsInput | string
   outcome?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rationale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -965,6 +1011,7 @@ export type DecisionRevisionSelect<ExtArgs extends runtime.Types.Extensions.Inte
   actorLabel?: boolean
   reason?: boolean
   overrideReason?: boolean
+  fileNames?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -985,6 +1032,7 @@ export type DecisionRevisionSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   actorLabel?: boolean
   reason?: boolean
   overrideReason?: boolean
+  fileNames?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -1005,6 +1053,7 @@ export type DecisionRevisionSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   actorLabel?: boolean
   reason?: boolean
   overrideReason?: boolean
+  fileNames?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -1025,6 +1074,7 @@ export type DecisionRevisionSelectScalar = {
   actorLabel?: boolean
   reason?: boolean
   overrideReason?: boolean
+  fileNames?: boolean
   question?: boolean
   outcome?: boolean
   rationale?: boolean
@@ -1034,7 +1084,7 @@ export type DecisionRevisionSelectScalar = {
   createdAt?: boolean
 }
 
-export type DecisionRevisionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "decisionId" | "version" | "action" | "actorUserId" | "actorLabel" | "reason" | "overrideReason" | "question" | "outcome" | "rationale" | "alternatives" | "followUp" | "status" | "createdAt", ExtArgs["result"]["decisionRevision"]>
+export type DecisionRevisionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "decisionId" | "version" | "action" | "actorUserId" | "actorLabel" | "reason" | "overrideReason" | "fileNames" | "question" | "outcome" | "rationale" | "alternatives" | "followUp" | "status" | "createdAt", ExtArgs["result"]["decisionRevision"]>
 export type DecisionRevisionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   decision?: boolean | Prisma.DecisionDefaultArgs<ExtArgs>
   actor?: boolean | Prisma.DecisionRevision$actorArgs<ExtArgs>
@@ -1063,6 +1113,7 @@ export type $DecisionRevisionPayload<ExtArgs extends runtime.Types.Extensions.In
     actorLabel: string
     reason: string | null
     overrideReason: string | null
+    fileNames: string[]
     question: string
     outcome: string | null
     rationale: string | null
@@ -1503,6 +1554,7 @@ export interface DecisionRevisionFieldRefs {
   readonly actorLabel: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly reason: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly overrideReason: Prisma.FieldRef<"DecisionRevision", 'String'>
+  readonly fileNames: Prisma.FieldRef<"DecisionRevision", 'String[]'>
   readonly question: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly outcome: Prisma.FieldRef<"DecisionRevision", 'String'>
   readonly rationale: Prisma.FieldRef<"DecisionRevision", 'String'>

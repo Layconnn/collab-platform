@@ -213,6 +213,7 @@ export const DecisionRevisionScalarFieldEnum = {
   actorLabel: 'actorLabel',
   reason: 'reason',
   overrideReason: 'overrideReason',
+  fileNames: 'fileNames',
   question: 'question',
   outcome: 'outcome',
   rationale: 'rationale',

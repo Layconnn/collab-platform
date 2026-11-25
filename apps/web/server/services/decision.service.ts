@@ -17,6 +17,7 @@ import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import { toPaginatedResult } from "../../src/common/utils/pagination";
 import { recordActivity } from "./activity.service";
+import { attachmentService, attachmentsSelect, newUploadIds } from "./files/attachment.service";
 import { resetReviewsAfterEdit, reviewGate, summarizeReviews } from "./decision-review.service";
 import { notificationService } from "./notification.service";
 import { assertCanDeleteDecision, assertCanEditDecision, canManageDecisions } from "./workspace.permissions";
@@ -33,6 +34,7 @@ const decisionSelect = {
   rationale: true,
   alternatives: true,
   followUp: true,
+  attachments: attachmentsSelect,
   status: true,
   version: true,
   decidedAt: true,
@@ -56,12 +58,19 @@ const revisionSelect = {
   followUp: true,
   status: true,
   overrideReason: true,
+  fileNames: true,
   createdAt: true,
 } as const;
 
 const linkedDecisionSelect = { id: true, question: true, status: true, version: true, deletedAt: true } as const;
 
 type Tx = Prisma.TransactionClient;
+
+// The decision's file names now, for its revision snapshot (FR-11).
+async function fileNames(tx: Tx, decisionId: string) {
+  const files = await tx.attachment.findMany({ where: { decisionId }, orderBy: { position: "asc" }, select: { fileName: true } });
+  return files.map((file) => file.fileName);
+}
 
 async function requireMember(db: Tx | typeof prisma, workspaceId: string, userId: string) {
   const member = await db.workspaceMember.findUnique({
@@ -148,6 +157,7 @@ export const decisionService = {
 
     const existing = await replay();
     if (existing) return existing;
+    const attachmentIds = await attachmentService.verifyUploads(userId, input.workspaceId, input.attachmentIds ?? []);
 
     try {
       return await prisma.$transaction(async (tx) => {
@@ -179,6 +189,10 @@ export const decisionService = {
           },
           select: decisionSelect,
         });
+        if (attachmentIds.length) {
+          await attachmentService.attach(tx, { userId, workspaceId: input.workspaceId, attachmentIds, target: { decisionId: created.id } });
+          created.attachments = await tx.attachment.findMany({ where: { decisionId: created.id }, ...attachmentsSelect });
+        }
         await tx.decisionRevision.create({
           data: {
             decisionId: created.id,
@@ -191,6 +205,7 @@ export const decisionService = {
             rationale: created.rationale,
             alternatives: created.alternatives,
             followUp: created.followUp,
+            fileNames: await fileNames(tx, created.id),
             status: created.status,
           },
         });
@@ -364,6 +379,12 @@ export const decisionService = {
   async edit(userId: string, input: EditDecisionInput) {
     let askedAgain: string[] = [];
     let editorLabel = "";
+    const target = { decisionId: input.decisionId };
+    if (input.attachmentIds) {
+      const member = await prisma.workspaceMember.findUnique({ where: { workspaceId_userId: { workspaceId: input.workspaceId, userId } }, select: { id: true } });
+      if (!member) throw new AppError("NOT_FOUND", "Decision not found.");
+      await attachmentService.verifyUploads(userId, input.workspaceId, await newUploadIds(target, input.attachmentIds));
+    }
     const result = await prisma.$transaction(async (tx) => {
       const role = await requireMutationMember(tx, input.workspaceId, userId);
       await lockDecision(tx, input.workspaceId, input.decisionId);
@@ -375,6 +396,10 @@ export const decisionService = {
       if (current.status !== "PROPOSED") throw new AppError("CONFLICT", "Finalized decisions cannot be edited.");
       assertCanEditDecision(role, current.createdById === userId);
       if (current.version !== input.expectedVersion) throw new AppError("CONFLICT", "Decision changed. Reload and try again.");
+      const files = input.attachmentIds
+        ? await attachmentService.sync(tx, { userId, workspaceId: input.workspaceId, target, desired: input.attachmentIds })
+        : null;
+      const filesChanged = Boolean(files && (files.added || files.removed || files.reordered));
       const updatedCount = await tx.decision.updateMany({
         where: { id: input.decisionId, workspaceId: input.workspaceId, status: "PROPOSED", deletedAt: null, version: input.expectedVersion },
         data: {
@@ -403,6 +428,7 @@ export const decisionService = {
           rationale: updated.rationale,
           alternatives: updated.alternatives,
           followUp: updated.followUp,
+          fileNames: await fileNames(tx, updated.id),
           status: updated.status,
         },
       });
@@ -413,10 +439,11 @@ export const decisionService = {
         kind: "DECISION_EDITED",
         subjectType: "DECISION",
         subjectId: updated.id,
-        summary: { question: updated.question, status: updated.status },
+        summary: { question: updated.question, status: updated.status, ...(files && (files.added || files.removed) ? { filesAdded: files.added, filesRemoved: files.removed } : {}) },
       });
-      // Approvals refer to what the proposal said; changing it asks again (FR-6).
-      const changed = (["question", "outcome", "rationale", "alternatives"] as const).some((field) => current[field] !== updated[field]);
+      // Approvals refer to what the proposal said, files included; changing it
+      // asks again (decision reviews FR-6).
+      const changed = filesChanged || (["question", "outcome", "rationale", "alternatives"] as const).some((field) => current[field] !== updated[field]);
       if (changed) {
         const reset = await resetReviewsAfterEdit(tx, { workspaceId: input.workspaceId, decision: updated, actor: { userId, label: actorLabel(user) } });
         askedAgain = reset.flatMap((review) => (review.reviewerId ? [review.reviewerId] : []));
@@ -473,6 +500,7 @@ export const decisionService = {
           rationale: updated.rationale,
           alternatives: updated.alternatives,
           followUp: updated.followUp,
+          fileNames: await fileNames(tx, updated.id),
           status: updated.status,
         },
       });
@@ -535,8 +563,8 @@ export const decisionService = {
           data: { workspaceId: input.workspaceId, previousDecisionId: old.id, replacementDecisionId: replacement.id, reason: input.reason, authorizedById: userId, authorizedByLabel: label, createdAt: now },
         });
         await tx.decisionRevision.createMany({ data: [
-          { decisionId: old.id, version: old.version + 1, action: "SUPERSEDE", actorUserId: userId, actorLabel: label, reason: input.reason, question: old.question, outcome: old.outcome, rationale: old.rationale, alternatives: old.alternatives, followUp: old.followUp, status: "SUPERSEDED", createdAt: now },
-          { decisionId: replacement.id, version: replacement.version + 1, action: "SUPERSEDE", actorUserId: userId, actorLabel: label, reason: input.reason, question: replacement.question, outcome: replacement.outcome, rationale: replacement.rationale, alternatives: replacement.alternatives, followUp: replacement.followUp, status: "DECIDED", createdAt: now },
+          { decisionId: old.id, version: old.version + 1, action: "SUPERSEDE", actorUserId: userId, actorLabel: label, reason: input.reason, question: old.question, outcome: old.outcome, rationale: old.rationale, alternatives: old.alternatives, followUp: old.followUp, fileNames: await fileNames(tx, old.id), status: "SUPERSEDED", createdAt: now },
+          { decisionId: replacement.id, version: replacement.version + 1, action: "SUPERSEDE", actorUserId: userId, actorLabel: label, reason: input.reason, question: replacement.question, outcome: replacement.outcome, rationale: replacement.rationale, alternatives: replacement.alternatives, followUp: replacement.followUp, fileNames: await fileNames(tx, replacement.id), status: "DECIDED", createdAt: now },
         ] });
         await recordActivity(tx, {
           workspaceId: input.workspaceId,
@@ -596,6 +624,7 @@ export const decisionService = {
           rationale: current.rationale,
           alternatives: current.alternatives,
           followUp: current.followUp,
+          fileNames: await fileNames(tx, current.id),
           status: current.status,
         },
       });
