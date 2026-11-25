@@ -126,3 +126,11 @@ export const ActivitySubjectType = {
 } as const
 
 export type ActivitySubjectType = (typeof ActivitySubjectType)[keyof typeof ActivitySubjectType]
+
+
+export const AttachmentStatus = {
+  PENDING: 'PENDING',
+  ATTACHED: 'ATTACHED'
+} as const
+
+export type AttachmentStatus = (typeof AttachmentStatus)[keyof typeof AttachmentStatus]

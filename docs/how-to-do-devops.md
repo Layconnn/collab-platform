@@ -57,6 +57,30 @@ Never print these values. To check a day's run, read the workflow log (counts of
 
 Switching on for everyone: buy a domain, verify it in Resend (SPF and DKIM), set `DIGEST_FROM` to an address on it, then set `DIGEST_DELIVERY=all` and redeploy. No code change.
 
+## File uploads (Cloudflare R2)
+
+Attachments ([PRD](../apps/web/documentation/projects/2026-11-25-file-uploads/PRD.md)) live in a private R2 bucket. The browser uploads straight to R2 with a signed URL valid for 10 minutes; downloads go through `GET /api/files/<id>`, which checks membership and redirects to a signed URL valid for 5 minutes. Without all four R2 settings, attaching is switched off and the app behaves as before.
+
+| Setting | Where | Purpose |
+| --- | --- | --- |
+| `R2_ACCOUNT_ID` | Vercel (Production) | The Cloudflare account id (R2 overview page, right-hand side) |
+| `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | Vercel (Production) | An R2 API token with **Object Read & Write** on this bucket only |
+| `R2_BUCKET` | Vercel (Production) | The bucket name, e.g. `commons-files` |
+
+One-time setup in Cloudflare:
+
+1. **R2 → Create bucket**, e.g. `commons-files`, location automatic. Leave public access **off**.
+2. Bucket **Settings → CORS policy**, so browsers may upload from the app:
+   ```json
+   [{ "AllowedOrigins": ["https://collab-platform-web.vercel.app"], "AllowedMethods": ["PUT"], "AllowedHeaders": ["content-type"], "MaxAgeSeconds": 3600 }]
+   ```
+3. **R2 → Manage API tokens → Create API token**: permission *Object Read & Write*, applied to this bucket only. Copy the access key id and secret into Vercel; they are shown once.
+4. Redeploy.
+
+Clean-up: `.github/workflows/files-cleanup.yml` runs at 06:30 UTC with the same `DIGEST_RUN_SECRET` and calls `POST /api/files/cleanup` until `done: true`. Deleting an attachment row (removed from its post, or its post or workspace deleted) queues its key in `DeletedFile` through a database trigger; the job deletes those objects and any upload not attached within 24 hours. A key that fails to delete stays queued for the next run.
+
+Limits (`packages/validators/src/files.ts`): 10 MB per file, 10 files per post, 1 GB per workspace. R2's free plan covers 10 GB stored, 1 million writes and 10 million reads a month, with free downloads.
+
 ## Production database migrations
 
 Migrations reach production through `.github/workflows/migrate-production.yml`, never from a laptop.

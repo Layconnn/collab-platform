@@ -12,6 +12,7 @@ import { followRouter } from "./routers/follow.router";
 import { pinRouter } from "./routers/pin.router";
 import { savedRouter } from "./routers/saved.router";
 import { digestRouter } from "./routers/digest.router";
+import { attachmentRouter } from "./routers/attachment.router";
 import { notificationRouter } from "./routers/notification.router";
 import { workspaceRouter } from "./routers/workspace.router";
 
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   pin: pinRouter,
   saved: savedRouter,
   digest: digestRouter,
+  attachment: attachmentRouter,
   comment: commentRouter,
   notification: notificationRouter,
   activity: activityRouter,
