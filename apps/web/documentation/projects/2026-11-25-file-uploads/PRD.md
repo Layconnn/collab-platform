@@ -1,6 +1,6 @@
 # PRD: File uploads
 
-Status: draft for approval · Horizon 1 · Issue #143
+Status: approved 2026-11-25 (defaults confirmed by the author) · Horizon 1 · Issue #143
 
 ## Problem
 
@@ -132,7 +132,7 @@ Workspace usage is the sum of `size` over its non-deleting attachments, checked 
 
 ## Risks and open questions
 
-Each question has a proposed default for the author to confirm.
+Each question had a proposed default; the author confirmed all of them on 2026-11-25.
 
 - **Storage provider.** Decided by the author on 2026-11-25: Cloudflare R2, private bucket, signed URLs. Vercel Blob was the alternative (no card, but 1 GB and a 30-day lock-out when a Hobby limit is hit).
 - **Malicious files.** Without scanning, a member could upload a harmful document. Default: restrict types (FR-5), never render anything but images inline, serve the rest as downloads with `nosniff`, and leave scanning to a paid horizon. Only workspace members can upload, and only to their own workspace.
@@ -146,6 +146,6 @@ Each question has a proposed default for the author to confirm.
 | # | Pull request | Requirements |
 | --- | --- | --- |
 | 1 (#143) | `Commons: Discussions: PRD for file uploads` — this document | — |
-| 2 | `Commons: Files: store files privately in R2` — `Attachment` model and migration, the storage adapter with an in-memory fake, upload URLs with limits and type checks, the download route, the clean-up job and its workflow, setup steps in the devops guide | FR-2, FR-4, FR-5, FR-8, FR-12, NFR-1 to NFR-3, NFR-6, NFR-7 |
-| 3 | `Commons: Discussions: attach files to discussions and replies` — composer attach, drag and drop, paste and progress; saving with attachments; display, the image viewer; file-only replies; activity events | FR-1, FR-3, FR-6, FR-7, FR-9, FR-11, FR-13, NFR-4, NFR-5 |
-| 4 | `Commons: Decision Records: attach files to decisions` — the decision form and page, revision entries, counts on Home, search and the digest, workspace usage on settings | FR-1, FR-3, FR-10, FR-11 |
+| 2 (#145) | `Commons: Files: store files privately in R2` — `Attachment` model and migration, the storage adapter with an in-memory fake, upload URLs with limits and type checks, the download route, the clean-up job and its workflow, setup steps in the devops guide | FR-2, FR-4, FR-5, FR-8, FR-12, NFR-1 to NFR-3, NFR-6, NFR-7 |
+| 3 (#146) | `Commons: Discussions: attach files to discussions and replies` — composer attach, drag and drop, paste and progress; saving with attachments; display, the image viewer; file-only replies; activity events | FR-1, FR-3, FR-6, FR-7, FR-9, FR-11, FR-13, NFR-4, NFR-5 |
+| 4 (#147) | `Commons: Decision Records: attach files to decisions` — the decision form and page, revision entries, counts on Home, search and the digest, workspace usage on settings | FR-1, FR-3, FR-10, FR-11 |
