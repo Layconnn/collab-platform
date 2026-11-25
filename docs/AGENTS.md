@@ -8,6 +8,7 @@ Before planning code changes, read `apps/web/documentation/commons-spec-map.md`,
 - Next.js App Router + TypeScript monorepo, tRPC thin routers/services, Prisma/PostgreSQL, shared Zod validators, Redis, BullMQ.
 - React Query = server state. Zustand = UI-only state. URL = active workspace. React Hook Form + Zod for forms.
 - Preserve tenant isolation, server-side RBAC, safe errors, scoped queries, validation and tested idempotency.
+- Dashboard pages are full width (`max-w-none`, no page-level cap) and are built to a Slack, Notion and GitHub level of design, not the current minimal style; see "Dashboard layout" in [`docs/DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 - Tailwind v4 handles reset; Chakra v3 uses `preflight: false`. Preserve theme architecture and `#192D20` canonical brand with accessible theme-aware action variants.
 - Do not reintroduce development Turbopack until the Windows nested-route problem has been checked; local `next dev --webpack` is deliberate.
 - Do not run Docker PostgreSQL or separate Docker notification-worker against the populated Windows dev database; follow current `docs/DEVELOPMENT.md`.
