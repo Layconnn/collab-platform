@@ -53,6 +53,33 @@ any page added beside them).
    phones. See the redesign PRD,
    [`apps/web/documentation/projects/2026-11-25-dashboard-redesign/PRD.md`](../apps/web/documentation/projects/2026-11-25-dashboard-redesign/PRD.md).
 
+### Canopy tokens and building blocks
+
+Defined in `apps/web/styles/globals.css` (light in `:root`, dark in
+`[data-theme="dark"]`) and named for Tailwind in `apps/web/app/globals.css`.
+`components/theme/BrandTokens.test.tsx` checks every text pair below for AA
+contrast in both themes.
+
+| Purpose | Tailwind names |
+| --- | --- |
+| Work surfaces | `bg-canvas`, `bg-surface`, `bg-surface-subtle`, `bg-surface-hover`, `bg-surface-active`, `border-border`, `border-border-subtle` |
+| Text | `text-text-primary`, `text-text-secondary`, `text-text-muted` |
+| Forest sidebar | `bg-sidebar`, `text-sidebar-text`, `text-sidebar-text-strong`, `text-sidebar-muted`, `bg-sidebar-hover`, `bg-sidebar-active`, `bg-sidebar-field`, `border-sidebar-line`, `bg-sidebar-live` |
+| Needs you (coral) | `bg-attention` + `text-on-attention` (badges), `bg-attention-soft` + `text-attention-text` (pills, waiting states) |
+| Decision status | `bg-status-proposal` + `text-on-status-proposal`, `bg-status-decided` + `text-on-status-decided`, `bg-status-replaced` + `text-on-status-replaced` |
+| Live and callouts | `bg-live`, `bg-callout`, `border-callout-line` |
+| Elevation | `shadow-card`, `shadow-lift`, `shadow-float` |
+| Type | `font-serif` (Instrument Serif, page titles only), `type-canopy-title`, `type-canopy-label` (mono section labels) |
+| Glass | `glass-bar` (top bar), `glass-float` (floating composers and action bars, palette, menus, toasts); both fall back to solid without `backdrop-filter` or under reduced transparency |
+| Motion | `canopy-rise`, `canopy-stagger` (children rise in 40 ms steps), `canopy-lift`, `canopy-zoom`, `canopy-row`, `canopy-live`, `canopy-grow`; all off under reduced motion |
+
+Building blocks in `apps/web/components/ui/`: `Button` and `ButtonLink`
+(primary, secondary, ghost, danger), `PageIntro` (the standard page header),
+`StatusPill`, `CountBadge`, `LiveDot`, `SectionLabel`, `Kbd`, `Card`,
+`ContextPanel`, `SegmentedControl`, `AvatarStack`, `TableFrame` and
+`tableClasses`. Use them before writing new styles; add to them when a page
+needs something they lack.
+
 Marketing and authentication pages (the landing page, sign-in, registration,
 the join and unsubscribe cards) are outside these rules.
 
