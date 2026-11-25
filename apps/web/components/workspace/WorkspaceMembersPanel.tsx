@@ -16,6 +16,7 @@ import { Menu, Portal } from "@chakra-ui/react";
 
 import type { AppRouter } from "@/server/api/root";
 import { AddMemberForm } from "@/components/workspace/AddMemberForm";
+import { InviteLinks } from "@/components/workspace/InviteLinks";
 import { useAuth } from "@/hooks/useAuth";
 import { useWorkspaceDetail } from "@/hooks/useWorkspace";
 import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
@@ -513,6 +514,11 @@ export function WorkspaceMembersPanel({
             ) : null}
           </section>
           <aside className="min-w-0 space-y-6 border-t border-border-subtle pt-6 xl:border-l xl:border-t-0 xl:pl-7 xl:pt-0">
+            {workspace.data?.viewerRole === "OWNER" || workspace.data?.viewerRole === "ADMIN" ? (
+              <div className="border-b border-border-subtle pb-6">
+                <InviteLinks workspaceId={workspaceId} />
+              </div>
+            ) : null}
             <div>
               <p className="text-xs font-semibold uppercase text-brand-link">
                 Participation
