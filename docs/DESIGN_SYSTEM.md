@@ -41,6 +41,18 @@ any page added beside them).
    known debt for the dashboard redesign project (see the roadmap); do not
    copy their layout into new pages.
 
+4. **One header everywhere.** The approved reference is the discussion page of
+   the "Canopy" redesign: a glass top bar (breadcrumb left, actions right), then
+   a small Geist Mono uppercase label, an Instrument Serif page title and one
+   plain meta line, with mono uppercase section labels below. Every dashboard
+   page uses this pattern. The forest sidebar is final and the same on every
+   page.
+5. **Settings follow X's web settings.** A category list (with search and a
+   one-line description per category) beside the selected category's grouped
+   setting rows, with deeper pages inside that column and a single column on
+   phones. See the redesign PRD,
+   [`apps/web/documentation/projects/2026-11-25-dashboard-redesign/PRD.md`](../apps/web/documentation/projects/2026-11-25-dashboard-redesign/PRD.md).
+
 Marketing and authentication pages (the landing page, sign-in, registration,
 the join and unsubscribe cards) are outside these rules.
 

@@ -1,6 +1,6 @@
 # PRD: The dashboard redesign ("Canopy")
 
-Status: draft for approval · Horizon 1 · Issue #164
+Status: approved 2026-11-25 (direction, round 2 and defaults confirmed by the author) · Horizon 1 · Issue #164
 
 ## Problem
 
@@ -10,7 +10,7 @@ Evidence:
 
 - 10 page containers are capped at `max-w-[52rem]`, more at `max-w-2xl` to `max-w-6xl`; half the screen is empty on a laptop.
 - The Horizon 1 gate is a test team using Commons daily for a week. First impressions decide whether the second day happens.
-- The author approved a direction on 2026-11-25: the "Canopy" design canvas (Home, a discussion, the decisions list), kept privately by the author. It is the reference for this PRD; the docs rule "Dashboard layout" in `docs/DESIGN_SYSTEM.md` records the full-width decision.
+- The author approved a direction on 2026-11-25: the "Canopy" design canvas, kept privately by the author. After a first round (Home, a discussion, the decisions list), the author kept the discussion page and asked for Home and Decisions to be redone in its style; round 2 ("Home v2" and "Decisions v2" on the canvas) was approved with no changes. The canvas is the visual reference for this PRD; the docs rule "Dashboard layout" in `docs/DESIGN_SYSTEM.md` records the full-width decision.
 
 ## Goals
 
@@ -29,6 +29,11 @@ Evidence:
 ## The design language
 
 Named "Canopy". These rules are the source of truth for every pull request in this project; they move into `docs/DESIGN_SYSTEM.md` with the tokens (PR 2).
+
+**Approved references**
+- The discussion page (canvas "Discussion · dark"), "Home v2" and "Decisions v2" are the approved designs. Round 1's Home and Decisions are superseded.
+- The sidebar is final as designed and stays the same on every page.
+- **The discussion's header is the standard for every page**: the glass top bar (breadcrumb left, page actions right) and the page header below it (a small Geist Mono uppercase label, the Instrument Serif title, one plain meta line of facts), followed by small mono uppercase section labels and, where a page has one, a right context panel set off by a hairline. Every page in this project uses exactly this header pattern, type and spacing.
 
 **Structure**
 - A deep forest sidebar (`#13231A` light, `#10201A` dark) on every theme: workspace switcher, search and jump (Ctrl K), primary navigation (Home, Inbox, Saved), the current workspace's pages with counts, the member's workspaces with activity dots, and the account card. It is the strongest Commons signature.
@@ -60,18 +65,34 @@ Each redesigned page keeps its current features, tests and accessibility, and fo
 | Area | Today | Redesign |
 | --- | --- | --- |
 | Shell | Light sidebar, plain header, capped content | Forest sidebar with counts and workspace dots, glass top bar with breadcrumb and actions, full-width frame with an optional context panel, phone drawer |
-| Home (`/workspace`) | Stacked sections in a column | Serif greeting with today's summary chips; Needs you as a filterable queue with kind icons and Done; Decided this week as cards; right panel with each workspace's pulse and recent activity; first-run guide in the same language |
+| Home (`/workspace`) | Stacked sections in a column | "Home v2": a briefing you act on in place. Needs you as rich cards (a review request shows the outcome and reasoning with Approve and Object; a mention shows the quote with a one-line reply; a waiting proposal offers Ask for review and Finalize); Pick up where you left off; right panel with This week (a timeline of decisions, replacements and joins) and each workspace's 7-day activity; first-run guide in the same language |
 | Workspace overview | Navigation cards | Workspace header with members and pulse; recent discussions and decisions side by side; activity feed in the panel |
 | Discussions list | Rows in a column | Full-width list with unread dots, reply counts, files, last activity and author; filters; the new-discussion composer as a sheet |
 | Discussion | Single column thread | Serif title, body, files and reactions; threaded replies with hover states and pinned markers; a floating glass composer; right panel for the decision (or "propose one"), people, files and pinned replies |
-| Decisions list | Rows in a column | Status tabs with counts, filter box, a table (question, source, status pill, review progress, updated), a preview panel with the record and Approve or Object |
-| Decision | Long column | Record layout: status, question and outcome up top; rationale, alternatives and files; reviews and the finalize flow in the panel; revision history as a timeline; replacement chain |
+| Decisions | Rows in a column, and a separate long record page | "Decisions v2": the list and the record side by side. The list (grouped Waiting on you, Proposals, Decided, Replaced, with a filter) on the left; the selected record on the right: status and version, serif title, the outcome in a callout, rationale and alternatives side by side, files, the review with progress and reviewer cards, history; a floating glass action bar when the member's review is due. The record also has its own URL for direct links |
+| Decision (direct link) | Long column | The same record as in Decisions v2, opened with the list beside it on wide screens and alone on narrow ones; edit, finalize, supersede and delete flows in the same language; the full revision history and replacement chain |
 | Members | Directory and side forms | Member table with roles and joined dates; invite links and adding by username in the panel |
 | Search | Results list | Full-width results with type filters and highlighted snippets; a preview panel |
 | Saved | List | Grouped list with type icons and workspace, quick unsave |
-| Settings → Email | Single column | A settings layout (section navigation on the left, ready for more settings), the digest switches and the preview |
+| Settings (`/settings/**`) | Email only, single column | The X-style settings area below |
 | Overlays | Various | Command palette, notifications, account menu, create-workspace and other dialogs, menus and toasts in one glass style |
 | States | Mixed | Skeletons that match each layout, empty states with one clear action, error states with retry, in the same language |
+
+## Settings, in the pattern of X
+
+Decided by the author on 2026-11-25: Commons gets a full settings area with the same pattern as X's (formerly Twitter) web settings, with room for many settings.
+
+- **Layout**: the Commons sidebar stays; the content area becomes two columns. Left, a settings column with a serif "Settings" title, a search field ("Search settings") and the list of categories, each a row with an icon, a name and a one-line description, the open one highlighted. Right, the selected category: its title, an intro line, and its settings as grouped rows (a label, a short description, the current value or a switch, and a chevron for a deeper page). Deeper pages slide in within the right column with a back arrow. On phones the category list is a page of its own and each category opens full width, as on X.
+- **Categories** (names may be refined in the settings PRD):
+  - **Your account**: name, username, email, password, and signing out of other sessions.
+  - **Notifications**: in-app notifications by type and by workspace, the daily digest (today's Settings → Email), quiet hours.
+  - **Workspaces**: default workspace on sign-in, leaving a workspace, per-workspace notification overrides.
+  - **Appearance**: theme (light, dark, system), reduced motion, start page.
+  - **Privacy and security**: active sessions and devices, sign out everywhere, recent security events for the account.
+  - **Data**: download your data; delete your account.
+  - **About**: version, terms, privacy, keyboard shortcuts.
+- **In this project**: the settings layout, navigation, search across setting names, and every setting that exists today moved into it: the daily digest and its workspaces (Notifications), theme (Appearance, today in the account menu), password change (Your account). Categories whose settings are not built yet do not appear until they have at least one working setting.
+- **After this project**: a separate settings PRD adds the remaining settings (it absorbs Horizon 1's "notification preferences"), each needing its own data and permissions.
 
 ## Requirements
 
@@ -83,6 +104,8 @@ Each redesigned page keeps its current features, tests and accessibility, and fo
 | FR-4 | Every page and overlay in the table above redesigned, with no page-level width cap (`docs/DESIGN_SYSTEM.md`, "Dashboard layout"). |
 | FR-5 | Context panels stack below the main content under 1100 px; the sidebar becomes a drawer under 768 px; nothing scrolls sideways at 390 px except wide tables inside their own box. |
 | FR-6 | Light and dark are designed together; every screen in the delivery plan is reviewed in both, on desktop and phone. |
+| FR-7 | Every page uses the discussion's header pattern (glass top bar with breadcrumb and actions; mono label, serif title and meta line; mono section labels) and the final sidebar. |
+| FR-8 | Settings follow the X pattern above: category list with search and descriptions, grouped setting rows, deeper pages within the detail column, one column on phones; every existing setting lives there. |
 | NFR-1 | Accessibility: WCAG 2.2 AA contrast, visible focus on every control, landmarks and headings per page, real buttons and links, no information by colour alone. Existing accessibility tests keep passing. |
 | NFR-2 | Motion: only transform and opacity, 340 ms at most, none under reduced motion; glass has a solid fallback. |
 | NFR-3 | Performance: no layout shift from animations or fonts (font `display: swap` with metric fallbacks); client JavaScript per route does not grow by more than 5 kB gzipped from this project. |
@@ -99,14 +122,14 @@ None. No schema, API or permission changes. Preview panels use data the pages al
 
 ## Risks and open questions
 
-Each question has a proposed default for the author to confirm.
+The author confirmed every default on 2026-11-25.
 
 - **Forest sidebar in light and dark.** Decided by the author on 2026-11-25 (approved with the canvas).
 - **Serif page titles.** Decided by the author on 2026-11-25 (approved with the canvas). Instrument Serif is added through `next/font`.
-- **Inbox in the sidebar.** The canvas shows Inbox with a count. Default: it opens the existing notifications panel; a full Inbox page is a later project.
-- **Order of work.** Default: tokens and primitives first, then the shell, so every page after it is built on the new frame; then pages by daily use (Home, discussions, decisions, then the rest).
+- **Inbox in the sidebar.** Decided (author, 2026-11-25): it opens the existing notifications panel; a full Inbox page is a later project.
+- **Order of work.** Decided (author, 2026-11-25): tokens and primitives first, then the shell, so every page after it is built on the new frame; then pages by daily use (Home, discussions, decisions, then the rest).
 - **Chakra components** (menus) stay for behaviour and are restyled; replacing them is out of scope.
-- **Risk: a long-lived mixed look.** Between the shell and the last page, some pages will look newer than others. Default: ship each page to `dev` as it is ready and release in two batches (shell plus Home and discussions; then the rest), so production never shows the half-way state for long.
+- **Risk: a long-lived mixed look.** Decided (author, 2026-11-25): ship each page to `dev` as it is ready and release in two batches (shell plus Home and discussions; then the rest), so production never shows the half-way state for long.
 
 ## Delivery plan
 
@@ -116,12 +139,12 @@ Each question has a proposed default for the author to confirm.
 | 2 | `Platform: Design System: Canopy tokens, motion, glass and primitives` — tokens light and dark, Instrument Serif, motion and glass utilities with reduced-motion and fallback, the shared primitives with tests, `docs/DESIGN_SYSTEM.md` updated | FR-1, FR-2, NFR-2, NFR-3 |
 | 3 | `Platform: Design System: the Canopy shell` — forest sidebar, glass top bar, full-width frame with context panel, phone drawer | FR-3, FR-5, FR-6, NFR-1 |
 | 4 | `Platform: Design System: overlays in Canopy` — command palette, notifications, account menu, dialogs, menus, toasts | FR-4, NFR-2 |
-| 5 | `Commons: Home: redesign Home` | FR-4, FR-6 |
+| 5 | `Commons: Home: redesign Home as a briefing` — Home v2 | FR-4, FR-6, FR-7 |
 | 6 | `Commons: Discussions: redesign the discussions list and composer` | FR-4, FR-6 |
 | 7 | `Commons: Discussions: redesign the discussion page` — thread, floating composer, context panel | FR-4, FR-5, FR-6 |
-| 8 | `Commons: Decision Records: redesign the decisions list` — tabs, table, preview panel | FR-4, FR-6 |
-| 9 | `Commons: Decision Records: redesign the decision page` — record, reviews, history, replacements | FR-4, FR-6 |
+| 8 | `Commons: Decision Records: redesign decisions as a list beside the record` — Decisions v2: grouped list, the record, review and history, floating action bar | FR-4, FR-6, FR-7 |
+| 9 | `Commons: Decision Records: redesign the decision flows` — direct-link record, edit, finalize, supersede and delete, full history and replacement chain | FR-4, FR-6, FR-7 |
 | 10 | `Commons: Workspaces and Membership: redesign the workspace overview and members` | FR-4, FR-6 |
 | 11 | `Commons: Search: redesign search and saved` | FR-4, FR-6 |
-| 12 | `Commons: Notifications: redesign email settings in a settings layout` | FR-4, FR-6 |
+| 12 | `Platform: Design System: settings in the pattern of X` — the settings layout, category list with search, grouped rows and deeper pages; the digest, theme and password moved in | FR-6, FR-8 |
 | 13 | `Platform: Design System: states, accessibility and motion audit` — skeletons, empty and error states everywhere, an accessibility and reduced-motion pass, final screenshots | NFR-1, NFR-2, NFR-4 |
