@@ -309,6 +309,12 @@ export async function recordPermissionEscalationAttempt(data: BaseEvent & {
   }
 }
 
+// Someone opened or tried to join with a link that does not work (invite
+// links PRD, NFR-2). Never logs the token.
+export async function recordInviteLookupFailure(data: BaseEvent & { userId: string | null; ip: string | null; action: "describe" | "join" }): Promise<void> {
+  logSecurityEvent("WARN", "security.invite.lookup_failed", { ...data });
+}
+
 export async function recordRateLimitHit(data: BaseEvent & {
   userId: string;
   routeKey: string;

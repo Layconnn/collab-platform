@@ -13,6 +13,7 @@ import { pinRouter } from "./routers/pin.router";
 import { savedRouter } from "./routers/saved.router";
 import { digestRouter } from "./routers/digest.router";
 import { attachmentRouter } from "./routers/attachment.router";
+import { inviteRouter } from "./routers/invite.router";
 import { notificationRouter } from "./routers/notification.router";
 import { workspaceRouter } from "./routers/workspace.router";
 
@@ -28,6 +29,7 @@ export const appRouter = createTRPCRouter({
   saved: savedRouter,
   digest: digestRouter,
   attachment: attachmentRouter,
+  invite: inviteRouter,
   comment: commentRouter,
   notification: notificationRouter,
   activity: activityRouter,

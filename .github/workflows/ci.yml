@@ -141,6 +141,8 @@ jobs:
         run: pnpm -C apps/web run test:digest-api
       - name: File uploads (real database)
         run: pnpm -C apps/web run test:files-api
+      - name: Invite links (real database)
+        run: pnpm -C apps/web run test:invite-api
 
   frontend-tests:
     name: Frontend tests

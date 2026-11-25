@@ -136,3 +136,13 @@ export type Attachment = Prisma.AttachmentModel
  * 
  */
 export type DeletedFile = Prisma.DeletedFileModel
+/**
+ * Model WorkspaceInvite
+ * 
+ */
+export type WorkspaceInvite = Prisma.WorkspaceInviteModel
+/**
+ * Model WorkspaceInviteUse
+ * 
+ */
+export type WorkspaceInviteUse = Prisma.WorkspaceInviteUseModel

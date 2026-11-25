@@ -69,7 +69,9 @@ export const ModelName = {
   DecisionSupersession: 'DecisionSupersession',
   ActivityEvent: 'ActivityEvent',
   Attachment: 'Attachment',
-  DeletedFile: 'DeletedFile'
+  DeletedFile: 'DeletedFile',
+  WorkspaceInvite: 'WorkspaceInvite',
+  WorkspaceInviteUse: 'WorkspaceInviteUse'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -373,6 +375,33 @@ export const DeletedFileScalarFieldEnum = {
 } as const
 
 export type DeletedFileScalarFieldEnum = (typeof DeletedFileScalarFieldEnum)[keyof typeof DeletedFileScalarFieldEnum]
+
+
+export const WorkspaceInviteScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  createdById: 'createdById',
+  tokenHash: 'tokenHash',
+  role: 'role',
+  name: 'name',
+  maxUses: 'maxUses',
+  uses: 'uses',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type WorkspaceInviteScalarFieldEnum = (typeof WorkspaceInviteScalarFieldEnum)[keyof typeof WorkspaceInviteScalarFieldEnum]
+
+
+export const WorkspaceInviteUseScalarFieldEnum = {
+  id: 'id',
+  inviteId: 'inviteId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type WorkspaceInviteUseScalarFieldEnum = (typeof WorkspaceInviteUseScalarFieldEnum)[keyof typeof WorkspaceInviteUseScalarFieldEnum]
 
 
 export const SortOrder = {
