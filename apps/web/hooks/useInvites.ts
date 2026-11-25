@@ -11,3 +11,14 @@ export function useInvites(workspaceId: string, enabled = true) {
   const revoke = trpc.invite.revoke.useMutation({ onSettled: refresh });
   return { list, create, revoke };
 }
+
+// The join page (invite links PRD, FR-6 to FR-9). `ready` waits for the
+// session check, so the answer knows whether the viewer is already a member.
+export function useInviteLink(token: string, ready = true) {
+  const utils = trpc.useUtils();
+  const describe = trpc.invite.describe.useQuery({ token }, { enabled: ready, retry: false, refetchOnWindowFocus: false });
+  const join = trpc.invite.join.useMutation({
+    onSuccess: () => Promise.all([utils.workspace.listForUser.invalidate(), utils.home.invalidate()]),
+  });
+  return { describe, join };
+}
