@@ -34,6 +34,8 @@ export type SearchResult = {
   status: "PROPOSED" | "DECIDED" | "SUPERSEDED" | null;
   author: string;
   discussionId: string | null;
+  // How many files the result has (file uploads PRD, FR-10).
+  files: number;
   updatedAt: Date;
 };
 
@@ -78,6 +80,21 @@ function decodeCursor(cursor: string | undefined) {
   if (!cursor) return 0;
   const offset = Number(Buffer.from(cursor, "base64url").toString());
   return Number.isInteger(offset) && offset >= 0 && offset <= MAX_OFFSET ? offset : 0;
+}
+
+// File counts for a page of results, by result id.
+async function fileCounts(rows: Array<{ type: string; id: string }>) {
+  const ids = (type: string) => rows.filter((row) => row.type === type).map((row) => row.id);
+  const [discussions, comments, decisions] = await Promise.all([
+    prisma.attachment.groupBy({ by: ["discussionId"], where: { discussionId: { in: ids("DISCUSSION") } }, _count: true }),
+    prisma.attachment.groupBy({ by: ["commentId"], where: { commentId: { in: ids("COMMENT") } }, _count: true }),
+    prisma.attachment.groupBy({ by: ["decisionId"], where: { decisionId: { in: ids("DECISION") } }, _count: true }),
+  ]);
+  return new Map<string, number>([
+    ...discussions.map((row) => [row.discussionId!, row._count] as const),
+    ...comments.map((row) => [row.commentId!, row._count] as const),
+    ...decisions.map((row) => [row.decisionId!, row._count] as const),
+  ]);
 }
 
 // Keeps a snippet short without cutting a highlight in half.
@@ -183,6 +200,7 @@ export const searchService = {
 
     const page = rows.slice(0, input.take);
     const next = offset + input.take;
+    const files = await fileCounts(page);
     return {
       items: page.map((row) => ({
         type: row.type,
@@ -193,6 +211,7 @@ export const searchService = {
         status: row.status,
         author: row.author,
         discussionId: row.discussion_id,
+        files: files.get(row.id) ?? 0,
         updatedAt: row.updated_at,
       })),
       nextCursor: rows.length > input.take && next <= MAX_OFFSET ? encodeCursor(next) : null,

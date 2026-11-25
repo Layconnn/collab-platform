@@ -413,7 +413,9 @@ export const ModelName = {
   SavedItem: 'SavedItem',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
-  ActivityEvent: 'ActivityEvent'
+  ActivityEvent: 'ActivityEvent',
+  Attachment: 'Attachment',
+  DeletedFile: 'DeletedFile'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -429,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent" | "attachment" | "deletedFile"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1691,6 +1693,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Attachment: {
+      payload: Prisma.$AttachmentPayload<ExtArgs>
+      fields: Prisma.AttachmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AttachmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AttachmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>
+        }
+        findFirst: {
+          args: Prisma.AttachmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AttachmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>
+        }
+        findMany: {
+          args: Prisma.AttachmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>[]
+        }
+        create: {
+          args: Prisma.AttachmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>
+        }
+        createMany: {
+          args: Prisma.AttachmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AttachmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>[]
+        }
+        delete: {
+          args: Prisma.AttachmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>
+        }
+        update: {
+          args: Prisma.AttachmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.AttachmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AttachmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AttachmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.AttachmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AttachmentPayload>
+        }
+        aggregate: {
+          args: Prisma.AttachmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAttachment>
+        }
+        groupBy: {
+          args: Prisma.AttachmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AttachmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AttachmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AttachmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    DeletedFile: {
+      payload: Prisma.$DeletedFilePayload<ExtArgs>
+      fields: Prisma.DeletedFileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DeletedFileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DeletedFileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>
+        }
+        findFirst: {
+          args: Prisma.DeletedFileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DeletedFileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>
+        }
+        findMany: {
+          args: Prisma.DeletedFileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>[]
+        }
+        create: {
+          args: Prisma.DeletedFileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>
+        }
+        createMany: {
+          args: Prisma.DeletedFileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DeletedFileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>[]
+        }
+        delete: {
+          args: Prisma.DeletedFileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>
+        }
+        update: {
+          args: Prisma.DeletedFileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>
+        }
+        deleteMany: {
+          args: Prisma.DeletedFileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DeletedFileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DeletedFileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>[]
+        }
+        upsert: {
+          args: Prisma.DeletedFileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeletedFilePayload>
+        }
+        aggregate: {
+          args: Prisma.DeletedFileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDeletedFile>
+        }
+        groupBy: {
+          args: Prisma.DeletedFileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeletedFileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DeletedFileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DeletedFileCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1855,6 +2005,7 @@ export const DecisionRevisionScalarFieldEnum = {
   actorLabel: 'actorLabel',
   reason: 'reason',
   overrideReason: 'overrideReason',
+  fileNames: 'fileNames',
   question: 'question',
   outcome: 'outcome',
   rationale: 'rationale',
@@ -1986,6 +2137,34 @@ export const ActivityEventScalarFieldEnum = {
 } as const
 
 export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
+
+
+export const AttachmentScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  uploaderId: 'uploaderId',
+  key: 'key',
+  fileName: 'fileName',
+  contentType: 'contentType',
+  size: 'size',
+  status: 'status',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  decisionId: 'decisionId',
+  position: 'position',
+  createdAt: 'createdAt',
+  attachedAt: 'attachedAt'
+} as const
+
+export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
+
+
+export const DeletedFileScalarFieldEnum = {
+  key: 'key',
+  deletedAt: 'deletedAt'
+} as const
+
+export type DeletedFileScalarFieldEnum = (typeof DeletedFileScalarFieldEnum)[keyof typeof DeletedFileScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2239,6 +2418,20 @@ export type ListEnumActivitySubjectTypeFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'AttachmentStatus'
+ */
+export type EnumAttachmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AttachmentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'AttachmentStatus[]'
+ */
+export type ListEnumAttachmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AttachmentStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2419,6 +2612,8 @@ export type GlobalOmitConfig = {
   reaction?: Prisma.ReactionOmit
   decisionSupersession?: Prisma.DecisionSupersessionOmit
   activityEvent?: Prisma.ActivityEventOmit
+  attachment?: Prisma.AttachmentOmit
+  deletedFile?: Prisma.DeletedFileOmit
 }
 
 /* Types for Logging */

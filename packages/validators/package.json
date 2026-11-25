@@ -12,7 +12,8 @@
     "./auth": "./src/auth.ts",
     "./activity": "./src/activity.ts",
     "./search": "./src/search.ts",
-    "./home": "./src/home.ts"
+    "./home": "./src/home.ts",
+    "./files": "./src/files.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

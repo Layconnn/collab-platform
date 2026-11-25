@@ -16,6 +16,7 @@ import {
   recordCommentPermissionDenied,
 } from "../observability/security-events";
 import { activityActorLabel, recordActivity } from "./activity.service";
+import { attachmentService, attachmentsSelect, newUploadIds, type PublicAttachment } from "./files/attachment.service";
 import { followOnParticipation } from "./follow.service";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
@@ -51,6 +52,7 @@ type PublicComment = {
     name: string | null;
     username: string;
   };
+  attachments: PublicAttachment[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -65,7 +67,7 @@ type CreateIdempotencyResult = {
 };
 
 function commentByIdKey(commentId: string): string {
-  return `comment:v2:${commentId}`;
+  return `comment:v3:${commentId}`;
 }
 
 function discussionCommentListKey(
@@ -74,7 +76,7 @@ function discussionCommentListKey(
   cursor: string | undefined,
   take: number,
 ): string {
-  return `discussion:${discussionId}:comments:v2:${parentCommentId ?? "root"}:${cursor ?? "start"}:${take}`;
+  return `discussion:${discussionId}:comments:v3:${parentCommentId ?? "root"}:${cursor ?? "start"}:${take}`;
 }
 
 async function invalidateCommentCaches(
@@ -154,6 +156,7 @@ async function getCommentByIdWithWorkspace(
       parentCommentId: true,
       depth: true,
       body: true,
+      attachments: attachmentsSelect,
       author: {
         select: {
           id: true,
@@ -251,8 +254,9 @@ export const commentService = {
         ? await validateParentComment(input.discussionId, input.parentCommentId)
         : 0;
 
+      const attachmentIds = await attachmentService.verifyUploads(userId, discussion.workspaceId, input.attachmentIds ?? []);
       const comment = await prisma.$transaction(async (tx) => {
-        const created = await tx.comment.create({
+        const draft = await tx.comment.create({
           data: {
             discussionId: input.discussionId,
             workspaceId: discussion.workspaceId,
@@ -267,6 +271,7 @@ export const commentService = {
             parentCommentId: true,
             depth: true,
             body: true,
+            attachments: attachmentsSelect,
             author: {
               select: {
                 id: true,
@@ -278,6 +283,10 @@ export const commentService = {
             updatedAt: true,
           },
         });
+        await attachmentService.attach(tx, { userId, workspaceId: discussion.workspaceId, attachmentIds, target: { commentId: draft.id } });
+        const created = attachmentIds.length
+          ? { ...draft, attachments: await tx.attachment.findMany({ where: { commentId: draft.id }, ...attachmentsSelect }) }
+          : draft;
         await followOnParticipation(tx, { workspaceId: discussion.workspaceId, discussionId: input.discussionId, userId });
         await recordActivity(tx, {
           workspaceId: discussion.workspaceId,
@@ -286,7 +295,7 @@ export const commentService = {
           kind: "COMMENT_CREATED",
           subjectType: "COMMENT",
           subjectId: created.id,
-          summary: { discussionId: created.discussionId },
+          summary: { discussionId: created.discussionId, ...(attachmentIds.length ? { files: attachmentIds.length } : {}) },
         });
         return created;
       });
@@ -318,7 +327,7 @@ export const commentService = {
           workspaceId: discussion.workspaceId,
           discussionId: comment.discussionId,
           commentId: comment.id,
-          body: comment.body,
+          body: comment.body || comment.attachments.map((file) => file.fileName).join(", "),
           parentCommentId: comment.parentCommentId,
         });
       } catch (error) {
@@ -420,6 +429,7 @@ export const commentService = {
         parentCommentId: true,
         depth: true,
         body: true,
+        attachments: attachmentsSelect,
         author: {
           select: {
             id: true,
@@ -645,7 +655,18 @@ export const commentService = {
       );
     }
 
+    const target = { commentId: comment.id };
+    if (input.attachmentIds) {
+      await attachmentService.verifyUploads(userId, comment.workspaceId, await newUploadIds(target, input.attachmentIds));
+    }
     const updated = await prisma.$transaction(async (tx) => {
+      const files = input.attachmentIds
+        ? await attachmentService.sync(tx, { userId, workspaceId: comment.workspaceId, target, desired: input.attachmentIds })
+        : null;
+      // A reply keeps text or at least one file (FR-6).
+      if (!input.body.trim() && (files ? files.count === 0 : (await tx.attachment.count({ where: target })) === 0)) {
+        throw new AppError("BAD_REQUEST", "Write a reply or attach a file.");
+      }
       const changed = await tx.comment.update({
         where: { id: input.commentId },
         data: {
@@ -657,6 +678,7 @@ export const commentService = {
           parentCommentId: true,
           depth: true,
           body: true,
+          attachments: attachmentsSelect,
           author: {
             select: {
               id: true,
@@ -675,7 +697,7 @@ export const commentService = {
         kind: "COMMENT_UPDATED",
         subjectType: "COMMENT",
         subjectId: changed.id,
-        summary: { discussionId: changed.discussionId },
+        summary: { discussionId: changed.discussionId, ...(files && (files.added || files.removed) ? { filesAdded: files.added, filesRemoved: files.removed } : {}) },
       });
       return changed;
     });

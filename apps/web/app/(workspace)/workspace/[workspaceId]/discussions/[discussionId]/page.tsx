@@ -16,6 +16,9 @@ import { useCommentList } from "@/hooks/useComment";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
 import { Markdown } from "@/components/common/Markdown";
+import { AttachmentComposer } from "@/components/files/AttachmentComposer";
+import { Attachments } from "@/components/files/Attachments";
+import { uploadBlocker, useUploader } from "@/hooks/useAttachments";
 import { ReactionBar } from "@/components/common/ReactionBar";
 import { FollowControl } from "@/components/discussion/FollowControl";
 import { SaveButton } from "@/components/common/SaveButton";
@@ -81,6 +84,8 @@ export default function DiscussionDetailPage() {
     shouldFocusError: true,
   });
   const editBody = useWatch({ control: form.control, name: "body" });
+  const uploader = useUploader(workspaceId);
+  const [filesProblem, setFilesProblem] = useState<string | null>(null);
   const role = workspace.data?.viewerRole;
   const canManageOthers = role === "OWNER" || role === "ADMIN";
   const denied = threadAccessDenied || discussionDenied || comments.error?.data?.code === "FORBIDDEN" || comments.error?.data?.code === "UNAUTHORIZED";
@@ -92,6 +97,8 @@ export default function DiscussionDetailPage() {
     if (!discussion.data) return;
     update.reset();
     form.reset({ discussionId, title: discussion.data.title, body: discussion.data.body });
+    uploader.reset(discussion.data.attachments);
+    setFilesProblem(null);
     setEditing(true);
     requestAnimationFrame(() => form.setFocus("title"));
   };
@@ -101,9 +108,15 @@ export default function DiscussionDetailPage() {
     requestAnimationFrame(() => menuTriggerRef.current?.focus());
   };
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const problem = uploadBlocker(uploader);
+    setFilesProblem(problem);
+    if (problem) {
+      event.preventDefault();
+      return;
+    }
     void form.handleSubmit(async (values) => {
       try {
-        await update.mutateAsync(values);
+        await update.mutateAsync({ ...values, attachmentIds: uploader.attachmentIds });
         setEditing(false);
         requestAnimationFrame(() => menuTriggerRef.current?.focus());
       } catch (error) {
@@ -180,9 +193,12 @@ export default function DiscussionDetailPage() {
             </div>
             <div>
               <label htmlFor="edit-discussion-body" className="block text-sm font-semibold text-text-primary">Context</label>
+              <AttachmentComposer uploader={uploader} disabled={update.isPending}>
               <MarkdownField>
               <MentionTextarea workspaceId={workspaceId} registration={form.register("body")} value={editBody ?? ""} onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })} id="edit-discussion-body" rows={7} maxLength={5000} disabled={update.isPending} aria-invalid={Boolean(form.formState.errors.body)} aria-describedby={form.formState.errors.body ? "edit-discussion-body-error" : undefined} className="mt-2 min-h-36 w-full resize-y rounded-sm border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60" />
               </MarkdownField>
+              </AttachmentComposer>
+              {filesProblem ? <p role="alert" className="mt-1 text-sm text-danger">{filesProblem}</p> : null}
               {form.formState.errors.body ? <p id="edit-discussion-body-error" role="alert" className="mt-1 text-sm text-danger">Add context of up to 5,000 characters.</p> : null}
             </div>
             {updateError ? <p role="alert" className="text-sm text-danger">{updateError}</p> : null}
@@ -193,7 +209,7 @@ export default function DiscussionDetailPage() {
           </form>
         ) : (
           <>
-            <div className="mt-8 text-[0.96rem] leading-7 text-text-secondary sm:text-base">{discussion.data.body ? <Markdown text={discussion.data.body} /> : <p>This discussion has no content.</p>}</div>
+            <div className="mt-8 text-[0.96rem] leading-7 text-text-secondary sm:text-base">{discussion.data.body ? <Markdown text={discussion.data.body} /> : <p>This discussion has no content.</p>}<Attachments attachments={discussion.data.attachments} /></div>
             <div className="mt-5"><DiscussionReactions workspaceId={workspaceId} discussionId={discussionId} /></div>
             <PinnedReplies workspaceId={workspaceId} discussionId={discussionId} />
           </>

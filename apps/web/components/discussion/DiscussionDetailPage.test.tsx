@@ -26,6 +26,12 @@ const mocks = vi.hoisted(() => ({
   refetchDiscussion: vi.fn(),
 }));
 
+// File uploads are covered in components/files; here they are switched off.
+vi.mock("@/hooks/useAttachments", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/hooks/useAttachments")>()),
+  useAttachmentConfig: () => ({ data: { enabled: false } }),
+  useUploader: () => ({ items: [], notice: null, add: () => {}, remove: () => {}, retry: () => {}, reset: () => {}, attachmentIds: [], uploading: false, failed: false }),
+}));
 vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
 vi.mock("@/components/discussion/FollowControl", () => ({ FollowControl: () => null }));
 const pinMocks = vi.hoisted(() => ({ canPin: false, items: [] as Array<{ commentId: string; excerpt: string; author: string; pinnedBy: string | null }>, mutate: vi.fn() }));

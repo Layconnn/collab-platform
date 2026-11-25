@@ -68,122 +68,125 @@ enum DecisionRevisionAction {
 }
 
 model User {
-  id            String            @id @default(cuid())
-  email         String            @unique
-  username      String            @unique
-  passwordHash  String?
-  name          String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  ownedSpaces   Workspace[]
-  memberships   WorkspaceMember[]
-  discussions   Discussion[]
-  comments      Comment[]
-  decisionsCreated Decision[] @relation("DecisionCreator")
-  decisionsDeleted Decision[] @relation("DecisionDeleter")
-  decisionRevisions DecisionRevision[] @relation("DecisionRevisionActor")
-  supersessionsAuthorized DecisionSupersession[] @relation("DecisionSupersessionAuthorizer")
-  decisionReviews DecisionReview[] @relation("DecisionReviewer")
-  reactions       Reaction[]
-  discussionFollows DiscussionFollow[]
-  commentsPinned  Comment[] @relation("CommentPinner")
-  savedItems      SavedItem[]
-  digestDeliveries DigestDelivery[]
-  digestPreference DigestPreference?
-  digestOptOuts   DigestWorkspaceOptOut[]
-  decisionReviewsRequested DecisionReview[] @relation("DecisionReviewRequester")
-  notificationsReceived Notification[] @relation("NotificationRecipient")
-  notificationsSent     Notification[] @relation("NotificationActor")
-  activityEvents        ActivityEvent[]
+  id                       String                  @id @default(cuid())
+  email                    String                  @unique
+  username                 String                  @unique
+  passwordHash             String?
+  name                     String?
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+  ownedSpaces              Workspace[]
+  memberships              WorkspaceMember[]
+  discussions              Discussion[]
+  comments                 Comment[]
+  decisionsCreated         Decision[]              @relation("DecisionCreator")
+  decisionsDeleted         Decision[]              @relation("DecisionDeleter")
+  decisionRevisions        DecisionRevision[]      @relation("DecisionRevisionActor")
+  supersessionsAuthorized  DecisionSupersession[]  @relation("DecisionSupersessionAuthorizer")
+  decisionReviews          DecisionReview[]        @relation("DecisionReviewer")
+  reactions                Reaction[]
+  discussionFollows        DiscussionFollow[]
+  commentsPinned           Comment[]               @relation("CommentPinner")
+  savedItems               SavedItem[]
+  digestDeliveries         DigestDelivery[]
+  digestPreference         DigestPreference?
+  digestOptOuts            DigestWorkspaceOptOut[]
+  decisionReviewsRequested DecisionReview[]        @relation("DecisionReviewRequester")
+  notificationsReceived    Notification[]          @relation("NotificationRecipient")
+  notificationsSent        Notification[]          @relation("NotificationActor")
+  activityEvents           ActivityEvent[]
+  attachmentsUploaded      Attachment[]
 }
 
 model Workspace {
-  id          String            @id @default(cuid())
-  name        String
-  slug        String            @unique
-  ownerId     String
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  id                String                  @id @default(cuid())
+  name              String
+  slug              String                  @unique
+  ownerId           String
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
   // Restrict: deleting a user must not silently delete the workspaces they own.
   // Transfer ownership or delete the workspace first.
-  owner       User              @relation(fields: [ownerId], references: [id], onDelete: Restrict)
-  members     WorkspaceMember[]
-  discussions Discussion[]
-  comments    Comment[]
-  decisions   Decision[]
-  decisionReviews DecisionReview[]
-  reactions       Reaction[]
+  owner             User                    @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  members           WorkspaceMember[]
+  discussions       Discussion[]
+  comments          Comment[]
+  decisions         Decision[]
+  decisionReviews   DecisionReview[]
+  reactions         Reaction[]
   discussionFollows DiscussionFollow[]
-  savedItems      SavedItem[]
-  digestOptOuts   DigestWorkspaceOptOut[]
-  notifications Notification[]
-  activityEvents ActivityEvent[]
+  savedItems        SavedItem[]
+  digestOptOuts     DigestWorkspaceOptOut[]
+  notifications     Notification[]
+  activityEvents    ActivityEvent[]
+  attachments       Attachment[]
+  // Recommended (optional): @@index([createdAt]) for global recent-workspaces feeds.
 
   @@index([ownerId, createdAt])
-  // Recommended (optional): @@index([createdAt]) for global recent-workspaces feeds.
 }
 
 model Discussion {
-  id          String    @id @default(cuid())
-  workspaceId String
-  authorId    String
-  title       String
-  body        String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  comments    Comment[]
-  sourceDecisions Decision[]
-  notifications Notification[]
-  // Full-text search vector, generated by PostgreSQL (migration 20261123_search_indexes).
-  searchVector  Unsupported("tsvector")? @default(dbgenerated())
-
-  reactions   Reaction[]
-  follows     DiscussionFollow[]
-  savedItems  SavedItem[]
-
-  @@index([searchVector], type: Gin)
-  @@index([workspaceId, createdAt])
-  @@unique([workspaceId, id])
-  @@index([authorId, createdAt])
-  // Recommended (optional): @@index([workspaceId, updatedAt]) for active-discussion sort views.
-}
-
-model Comment {
-  id              String    @id @default(cuid())
-  discussionId    String
+  id              String                   @id @default(cuid())
   workspaceId     String
   authorId        String
-  parentCommentId String?
-  depth           Int       @default(0)
+  title           String
   body            String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  discussion      Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
-  workspace       Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  author          User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  parentComment   Comment?   @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
-  replies         Comment[]  @relation("CommentReplies")
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  workspace       Workspace                @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  author          User                     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments        Comment[]
+  sourceDecisions Decision[]
   notifications   Notification[]
   // Full-text search vector, generated by PostgreSQL (migration 20261123_search_indexes).
   searchVector    Unsupported("tsvector")? @default(dbgenerated())
 
-  reactions       Reaction[]
+  reactions   Reaction[]
+  follows     DiscussionFollow[]
   savedItems  SavedItem[]
+  attachments Attachment[]
+  // Recommended (optional): @@index([workspaceId, updatedAt]) for active-discussion sort views.
+
+  @@unique([workspaceId, id])
+  @@index([searchVector], type: Gin)
+  @@index([workspaceId, createdAt])
+  @@index([authorId, createdAt])
+}
+
+model Comment {
+  id              String                   @id @default(cuid())
+  discussionId    String
+  workspaceId     String
+  authorId        String
+  parentCommentId String?
+  depth           Int                      @default(0)
+  body            String
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  discussion      Discussion               @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  workspace       Workspace                @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  author          User                     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentComment   Comment?                 @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies         Comment[]                @relation("CommentReplies")
+  notifications   Notification[]
+  // Full-text search vector, generated by PostgreSQL (migration 20261123_search_indexes).
+  searchVector    Unsupported("tsvector")? @default(dbgenerated())
+
+  reactions   Reaction[]
+  savedItems  SavedItem[]
+  attachments Attachment[]
   // Pinned to the top of its discussion by the author or a manager
   // (Markdown, reactions, follow and pin PRD, FR-13 to FR-15).
-  pinnedAt        DateTime?
-  pinnedById      String?
-  pinnedBy        User?      @relation("CommentPinner", fields: [pinnedById], references: [id], onDelete: SetNull)
+  pinnedAt    DateTime?
+  pinnedById  String?
+  pinnedBy    User?        @relation("CommentPinner", fields: [pinnedById], references: [id], onDelete: SetNull)
+  // Recommended (optional): @@index([discussionId, createdAt]) for chronological thread views.
 
   @@index([searchVector], type: Gin)
-
   @@index([discussionId, parentCommentId, id(sort: Desc)])
   @@index([workspaceId, discussionId, id(sort: Desc)])
   @@index([authorId, createdAt])
   @@index([discussionId, pinnedAt])
-  // Recommended (optional): @@index([discussionId, createdAt]) for chronological thread views.
 }
 
 model Notification {
@@ -205,28 +208,28 @@ model Notification {
   workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   discussion      Discussion?      @relation(fields: [discussionId], references: [id], onDelete: SetNull)
   comment         Comment?         @relation(fields: [commentId], references: [id], onDelete: SetNull)
+  // Recommended (optional): @@index([recipientUserId, createdAt]) for time-sorted analytics.
 
   @@index([recipientUserId, id(sort: Desc)])
   @@index([recipientUserId, readAt, id(sort: Desc)])
   @@index([workspaceId, recipientUserId, id(sort: Desc)])
   @@index([discussionId, recipientUserId, id(sort: Desc)])
-  // Recommended (optional): @@index([recipientUserId, createdAt]) for time-sorted analytics.
 }
 
 model WorkspaceMember {
-  id          String         @id @default(cuid())
+  id          String        @id @default(cuid())
   workspaceId String
   userId      String
-  role        WorkspaceRole  @default(MEMBER)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceRole @default(MEMBER)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Recommended (optional): @@index([userId, workspaceId, role]) for permission-heavy joins.
 
   @@unique([workspaceId, userId])
   @@index([workspaceId, role])
   @@index([userId, createdAt])
-  // Recommended (optional): @@index([userId, workspaceId, role]) for permission-heavy joins.
 }
 
 // Decisions remain workspace records when their source discussion is deleted.
@@ -234,70 +237,73 @@ model WorkspaceMember {
 // and supersession rows are kept in the reviewed SQL migration because Prisma
 // cannot express them. CASCADE and SET NULL actions themselves remain immediate.
 model Decision {
-  id                       String         @id @default(cuid())
-  workspaceId              String
-  sourceWorkspaceId        String?
-  sourceDiscussionId       String?
-  sourceDiscussionTitle    String
-  createdById              String?
-  createdByLabel           String
-  deletedById              String?
-  question                 String
-  outcome                  String?
-  rationale                String?
-  alternatives             String?
-  followUp                 String?
-  status                   DecisionStatus @default(PROPOSED)
+  id                    String                @id @default(cuid())
+  workspaceId           String
+  sourceWorkspaceId     String?
+  sourceDiscussionId    String?
+  sourceDiscussionTitle String
+  createdById           String?
+  createdByLabel        String
+  deletedById           String?
+  question              String
+  outcome               String?
+  rationale             String?
+  alternatives          String?
+  followUp              String?
+  status                DecisionStatus        @default(PROPOSED)
   // Review rule (decision reviews PRD, FR-2): everyone asked must approve, or
   // at least requiredApprovals of them. Only meaningful once reviewers exist.
-  reviewRule               DecisionReviewRule @default(ALL)
-  requiredApprovals        Int?
-  version                  Int            @default(1)
-  idempotencyKey           String         @unique
-  creationPayloadHash      String?
-  decidedAt                DateTime?
-  supersededAt             DateTime?
-  deletedAt                DateTime?
-  createdAt                DateTime       @default(now())
-  updatedAt                DateTime       @updatedAt
-  workspace                Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  sourceDiscussion         Discussion?    @relation(fields: [sourceWorkspaceId, sourceDiscussionId], references: [workspaceId, id], onDelete: SetNull)
-  createdBy                User?          @relation("DecisionCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  deletedBy                User?          @relation("DecisionDeleter", fields: [deletedById], references: [id], onDelete: SetNull)
-  revisions                DecisionRevision[]
-  reviews                  DecisionReview[]
-  savedItems               SavedItem[]
-  replacementLink          DecisionSupersession? @relation("PreviousDecision")
-  predecessorLink          DecisionSupersession? @relation("ReplacementDecision")
+  reviewRule            DecisionReviewRule    @default(ALL)
+  requiredApprovals     Int?
+  version               Int                   @default(1)
+  idempotencyKey        String                @unique
+  creationPayloadHash   String?
+  decidedAt             DateTime?
+  supersededAt          DateTime?
+  deletedAt             DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  workspace             Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  sourceDiscussion      Discussion?           @relation(fields: [sourceWorkspaceId, sourceDiscussionId], references: [workspaceId, id], onDelete: SetNull)
+  createdBy             User?                 @relation("DecisionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  deletedBy             User?                 @relation("DecisionDeleter", fields: [deletedById], references: [id], onDelete: SetNull)
+  revisions             DecisionRevision[]
+  reviews               DecisionReview[]
+  savedItems            SavedItem[]
+  attachments           Attachment[]
+  replacementLink       DecisionSupersession? @relation("PreviousDecision")
+  predecessorLink       DecisionSupersession? @relation("ReplacementDecision")
 
   // Full-text search vector, generated by PostgreSQL (migration 20261123_search_indexes).
-  searchVector             Unsupported("tsvector")? @default(dbgenerated())
+  searchVector Unsupported("tsvector")? @default(dbgenerated())
 
-  @@index([searchVector], type: Gin)
   @@unique([workspaceId, id])
+  @@index([searchVector], type: Gin)
   @@index([workspaceId, status, id(sort: Desc)])
   @@index([sourceWorkspaceId, sourceDiscussionId])
 }
 
 model DecisionRevision {
-  id            String                 @id @default(cuid())
-  decisionId    String
-  version       Int
-  action        DecisionRevisionAction
-  actorUserId   String?
-  actorLabel    String
-  reason        String?
+  id             String                 @id @default(cuid())
+  decisionId     String
+  version        Int
+  action         DecisionRevisionAction
+  actorUserId    String?
+  actorLabel     String
+  reason         String?
   // Set when a manager finalized without the review rule being met (FR-9).
   overrideReason String?
-  question      String
-  outcome       String?
-  rationale     String?
-  alternatives  String?
-  followUp      String?
-  status        DecisionStatus
-  createdAt     DateTime               @default(now())
-  decision      Decision               @relation(fields: [decisionId], references: [id], onDelete: Cascade)
-  actor         User?                  @relation("DecisionRevisionActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  // The decision's file names at this revision (file uploads PRD, FR-11).
+  fileNames      String[]               @default([])
+  question       String
+  outcome        String?
+  rationale      String?
+  alternatives   String?
+  followUp       String?
+  status         DecisionStatus
+  createdAt      DateTime               @default(now())
+  decision       Decision               @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  actor          User?                  @relation("DecisionRevisionActor", fields: [actorUserId], references: [id], onDelete: SetNull)
 
   @@unique([decisionId, version])
 }
@@ -375,16 +381,16 @@ model DigestWorkspaceOptOut {
 // what happened. SENDING claims the row before sending, so overlapping runs
 // never both send; HELD means built but not sent because of the allow list.
 model DigestDelivery {
-  id          String               @id @default(cuid())
-  userId      String
-  digestDate  DateTime             @db.Date
-  status      DigestDeliveryStatus
-  providerId  String?
-  attempts    Int                  @default(0)
-  error       String?
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String               @id @default(cuid())
+  userId     String
+  digestDate DateTime             @db.Date
+  status     DigestDeliveryStatus
+  providerId String?
+  attempts   Int                  @default(0)
+  error      String?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  user       User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, digestDate])
   @@index([digestDate, status])
@@ -509,4 +515,52 @@ model ActivityEvent {
   @@index([workspaceId, createdAt(sort: Desc), id(sort: Desc)])
   @@index([subjectType, subjectId])
   @@index([actorUserId])
+}
+
+enum AttachmentStatus {
+  PENDING
+  ATTACHED
+}
+
+// A file uploaded to storage (file uploads PRD). PENDING from the moment an
+// upload URL is issued until a post claims it; then ATTACHED to exactly one
+// discussion, reply or decision (CHECK constraints in the migration). Deleting
+// a row, directly or by cascade, records its key in DeletedFile (a trigger),
+// and the daily clean-up deletes the object from storage.
+model Attachment {
+  id           String           @id @default(cuid())
+  workspaceId  String
+  uploaderId   String?
+  // Random and name-free: files/<workspaceId>/<random> (NFR-1).
+  key          String           @unique
+  fileName     String
+  contentType  String
+  size         Int
+  status       AttachmentStatus @default(PENDING)
+  discussionId String?
+  commentId    String?
+  decisionId   String?
+  position     Int              @default(0)
+  createdAt    DateTime         @default(now())
+  attachedAt   DateTime?
+  workspace    Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  uploader     User?            @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  discussion   Discussion?      @relation(fields: [workspaceId, discussionId], references: [workspaceId, id], onDelete: Cascade)
+  comment      Comment?         @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  decision     Decision?        @relation(fields: [workspaceId, decisionId], references: [workspaceId, id], onDelete: Cascade)
+
+  @@index([workspaceId, status])
+  @@index([status, createdAt])
+  @@index([discussionId, position])
+  @@index([commentId, position])
+  @@index([decisionId, position])
+}
+
+// Storage objects whose Attachment row is gone, waiting for the clean-up job
+// to delete them (file uploads PRD, FR-12). Written only by a trigger.
+model DeletedFile {
+  key       String   @id
+  deletedAt DateTime @default(now())
+
+  @@index([deletedAt])
 }

@@ -10,6 +10,8 @@ import { commentActionError } from "@/components/comment/commentErrors";
 import { useCommentActions } from "@/hooks/useComment";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
+import { AttachmentComposer } from "@/components/files/AttachmentComposer";
+import { uploadBlocker, useUploader } from "@/hooks/useAttachments";
 
 export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, active = true, onCancel, onCreated }: {
   discussionId: string;
@@ -21,7 +23,7 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
 }) {
   const form = useForm<CreateCommentInput>({
     resolver: zodResolver(createCommentInputSchema),
-    defaultValues: { discussionId, parentCommentId, body: "" },
+    defaultValues: { discussionId, parentCommentId, body: "", attachmentIds: [] },
     shouldFocusError: true,
   });
   const { create } = useCommentActions(discussionId, workspaceId);
@@ -29,7 +31,14 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
   // One key per draft: a retry of the same content replays instead of duplicating.
   const submissionRef = useRef<{ fingerprint: string; key: string } | null>(null);
   const [posted, setPosted] = useState(false);
+  const uploader = useUploader(workspaceId);
+  const [blocked, setBlocked] = useState<string | null>(null);
   const busy = form.formState.isSubmitting || create.isPending;
+  // The schema accepts a reply that is only files, so it sees them too.
+  const attachmentKey = uploader.attachmentIds.join(",");
+  useEffect(() => {
+    form.setValue("attachmentIds", attachmentKey ? attachmentKey.split(",") : [], { shouldValidate: form.formState.isSubmitted });
+  }, [attachmentKey, form]);
   const fieldId = `comment-body-${parentCommentId ?? "root"}`;
   const fieldErrorId = `${fieldId}-error`;
   const { setFocus } = form;
@@ -43,16 +52,24 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
       event.preventDefault();
       return;
     }
+    const blocker = uploadBlocker(uploader);
+    setBlocked(blocker);
+    if (blocker) {
+      event.preventDefault();
+      return;
+    }
     submittingRef.current = true;
     void form.handleSubmit(async (values) => {
       setPosted(false);
       try {
-        if (submissionRef.current?.fingerprint !== values.body) {
-          submissionRef.current = { fingerprint: values.body, key: crypto.randomUUID() };
+        const fingerprint = JSON.stringify([values.body, values.attachmentIds]);
+        if (submissionRef.current?.fingerprint !== fingerprint) {
+          submissionRef.current = { fingerprint, key: crypto.randomUUID() };
         }
         await create.mutateAsync({ ...values, idempotencyKey: submissionRef.current.key });
         submissionRef.current = null;
-        form.reset({ discussionId, parentCommentId, body: "" });
+        form.reset({ discussionId, parentCommentId, body: "", attachmentIds: [] });
+        uploader.reset();
         setPosted(true);
         onCreated?.();
       } catch {
@@ -70,6 +87,7 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
         <label htmlFor={fieldId} className="mb-2 block text-sm font-semibold text-text-primary">
           {parentCommentId ? "Your reply" : "Your perspective"}
         </label>
+        <AttachmentComposer uploader={uploader} disabled={busy}>
         <MarkdownField>
         <MentionTextarea
           workspaceId={workspaceId}
@@ -86,9 +104,11 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
           className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
         />
         </MarkdownField>
+        </AttachmentComposer>
         {form.formState.errors.body ? (
-          <p id={fieldErrorId} role="alert" className="mt-1 text-sm text-danger">Write a {parentCommentId ? "reply" : "comment"} of up to 5,000 characters.</p>
+          <p id={fieldErrorId} role="alert" className="mt-1 text-sm text-danger">Write a {parentCommentId ? "reply" : "comment"} of up to 5,000 characters, or attach a file.</p>
         ) : null}
+        {blocked && uploadBlocker(uploader) ? <p role="alert" className="mt-1 text-sm text-danger">{uploadBlocker(uploader)}</p> : null}
       </div>
       {serverError ? <p role="alert" className="border-l-2 border-danger bg-surface px-3 py-2 text-sm text-danger">{serverError}</p> : null}
       {posted && !parentCommentId ? <p role="status" className="text-sm font-medium text-success">Comment posted.</p> : null}

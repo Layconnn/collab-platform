@@ -843,7 +843,7 @@ test("workspace + discussion + comment integration flow", async () => {
     assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["id", "name", "username"]);
 
     // 3. User B creates discussion in workspace.
-    state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v2:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v3:start:20`, JSON.stringify({}));
     const discussion = await callerB.discussion.create({
       workspaceId: workspace.id,
       title: "Integration Discussion",
@@ -851,18 +851,18 @@ test("workspace + discussion + comment integration flow", async () => {
     });
     assert.equal(discussion.workspaceId, workspace.id);
     assert.equal(discussion.author.username, "user_b");
-    assert.equal(state.redisKeyValues.has(`workspace:${workspace.id}:discussions:v2:start:20`), false);
+    assert.equal(state.redisKeyValues.has(`workspace:${workspace.id}:discussions:v3:start:20`), false);
     assert.ok(state.notificationJobs.some((job) => job.name === "deliver" && job.payload.type === "DISCUSSION_CREATED" && job.payload.recipientUserId === userA));
 
     // 4. User A creates root comment.
-    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v2:root:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v3:root:start:20`, JSON.stringify({}));
     const rootComment = await callerA.comment.create({
       discussionId: discussion.id,
       body: "Root comment",
     });
     assert.equal(rootComment.author.id, userA);
     assert.equal(rootComment.author.username, "user_a");
-    assert.equal(state.redisKeyValues.has(`discussion:${discussion.id}:comments:v2:root:start:20`), false);
+    assert.equal(state.redisKeyValues.has(`discussion:${discussion.id}:comments:v3:root:start:20`), false);
     assert.ok(state.notificationJobs.some((job) => job.payload.type === "COMMENT_CREATED" && job.payload.recipientUserId === userB));
     assert.ok(state.notificationJobs.every((job) => /^[0-9a-f]{64}$/.test(job.options.jobId)));
 
@@ -886,16 +886,16 @@ test("workspace + discussion + comment integration flow", async () => {
     ));
 
     // 6. User A edits their comment.
-    state.redisKeyValues.set(`comment:v2:${rootComment.id}`, JSON.stringify({ id: rootComment.id }));
-    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v2:${rootComment.id}:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`comment:v3:${rootComment.id}`, JSON.stringify({ id: rootComment.id }));
+    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v3:${rootComment.id}:start:20`, JSON.stringify({}));
     const updatedRoot = await callerA.comment.update({
       commentId: rootComment.id,
       body: "Root comment edited",
     });
     assert.equal(updatedRoot.body, "Root comment edited");
-    assert.equal(state.redisKeyValues.has(`comment:v2:${rootComment.id}`), false);
+    assert.equal(state.redisKeyValues.has(`comment:v3:${rootComment.id}`), false);
     assert.equal(
-      state.redisKeyValues.has(`discussion:${discussion.id}:comments:v2:${rootComment.id}:start:20`),
+      state.redisKeyValues.has(`discussion:${discussion.id}:comments:v3:${rootComment.id}:start:20`),
       false,
     );
 
@@ -914,12 +914,12 @@ test("workspace + discussion + comment integration flow", async () => {
     );
 
     // 8. User A deletes User B's comment.
-    state.redisKeyValues.set(`comment:v2:${reply.id}`, JSON.stringify({ id: reply.id }));
-    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v2:${rootComment.id}:start:20`, JSON.stringify({}));
+    state.redisKeyValues.set(`comment:v3:${reply.id}`, JSON.stringify({ id: reply.id }));
+    state.redisKeyValues.set(`discussion:${discussion.id}:comments:v3:${rootComment.id}:start:20`, JSON.stringify({}));
     const deleteReplyResult = await callerA.comment.remove({ commentId: reply.id });
     assert.equal(deleteReplyResult.success, true);
     assert.equal(state.comments.has(reply.id), false);
-    assert.equal(state.redisKeyValues.has(`comment:v2:${reply.id}`), false);
+    assert.equal(state.redisKeyValues.has(`comment:v3:${reply.id}`), false);
 
     // 9. User B removed from workspace cannot see discussion/comments.
     await callerA.workspace.removeMember({

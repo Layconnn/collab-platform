@@ -139,6 +139,8 @@ jobs:
         run: pnpm -C apps/web run test:saved-api
       - name: Daily digest (real database)
         run: pnpm -C apps/web run test:digest-api
+      - name: File uploads (real database)
+        run: pnpm -C apps/web run test:files-api
 
   frontend-tests:
     name: Frontend tests
@@ -226,6 +228,7 @@ jobs:
         run: pnpm -C apps/web run test:e2e
         env:
           NODE_ENV: production
+          FILES_LOCAL_DIR: ${{ runner.temp }}/commons-files
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v7

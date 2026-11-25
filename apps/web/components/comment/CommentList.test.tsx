@@ -17,6 +17,12 @@ const mocks = vi.hoisted(() => ({
 }));
 
 const pinMocks = vi.hoisted(() => ({ canPin: false, items: [] as Array<{ commentId: string; excerpt: string; author: string; pinnedBy: string | null }>, mutate: vi.fn() }));
+// File uploads are covered in components/files; here they are switched off.
+vi.mock("@/hooks/useAttachments", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/hooks/useAttachments")>()),
+  useAttachmentConfig: () => ({ data: { enabled: false } }),
+  useUploader: () => ({ items: [], notice: null, add: () => {}, remove: () => {}, retry: () => {}, reset: () => {}, attachmentIds: [], uploading: false, failed: false }),
+}));
 vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
 vi.mock("@/hooks/usePins", () => ({
   usePinnedReplies: () => ({ data: { canPin: pinMocks.canPin, max: 3, items: pinMocks.items } }),
@@ -318,11 +324,11 @@ describe("CommentList", () => {
     const field = screen.getByRole("combobox", { name: "Edit comment" });
     await user.clear(field);
     await user.click(screen.getByRole("button", { name: "Save comment" }));
-    expect(await screen.findByText(/Write a comment of up to/)).toBeTruthy();
+    expect(await screen.findByText("Write a reply or attach a file.")).toBeTruthy();
     expect(mocks.update).not.toHaveBeenCalled();
     await user.type(field, "Keep the setup path in one place.");
     await user.click(screen.getByRole("button", { name: "Save comment" }));
-    await waitFor(() => expect(mocks.update).toHaveBeenCalledWith({ commentId: root.id, body: "Keep the setup path in one place." }));
+    await waitFor(() => expect(mocks.update).toHaveBeenCalledWith({ commentId: root.id, body: "Keep the setup path in one place.", attachmentIds: [] }));
     expect(await screen.findByRole("alert")).toHaveProperty("textContent", "Your changes could not be saved. Please try again.");
     expect(screen.queryByText("Internal server details")).toBeNull();
     expect(field).toHaveProperty("value", "Keep the setup path in one place.");

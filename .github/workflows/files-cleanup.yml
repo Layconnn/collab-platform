@@ -1,0 +1,46 @@
+name: File clean-up
+
+# Deletes removed attachments and expired uploads from storage once a day
+# (file uploads PRD, FR-12). Each call to /api/files/cleanup works for up to
+# about 45 seconds and answers done: false until nothing is left; deleting is
+# idempotent, so re-running this workflow is safe.
+
+on:
+  schedule:
+    - cron: "30 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    name: Delete removed files
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Call /api/files/cleanup until done
+        env:
+          RUN_URL: https://collab-platform-web.vercel.app/api/files/cleanup
+          DIGEST_RUN_SECRET: ${{ secrets.DIGEST_RUN_SECRET }}
+        run: |
+          if [ -z "$DIGEST_RUN_SECRET" ]; then
+            echo "::notice::DIGEST_RUN_SECRET is not set; scheduled jobs are not switched on yet."
+            exit 0
+          fi
+          for call in $(seq 1 20); do
+            code=$(curl -sS -o body.json -w '%{http_code}' --retry 2 --retry-delay 10 --max-time 90 \
+              -X POST -H "Authorization: Bearer $DIGEST_RUN_SECRET" "$RUN_URL" || echo "000")
+            echo "Call $call: HTTP $code $(cat body.json 2>/dev/null)"
+            if [ "$code" = "503" ]; then
+              echo "::notice::File storage is not configured yet; nothing to clean up."
+              exit 0
+            fi
+            if [ "$code" != "200" ]; then
+              echo "::error::The file clean-up failed (HTTP $code). See docs/how-to-do-devops.md."
+              exit 1
+            fi
+            if [ "$(jq -r '.done' body.json)" = "true" ]; then exit 0; fi
+          done
+          echo "::error::The file clean-up did not finish in 20 calls."
+          exit 1

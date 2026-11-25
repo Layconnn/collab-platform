@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { attachmentIdsSchema } from "./files";
+
 const workspaceIdSchema = z.string().cuid();
 const discussionIdSchema = z.string().cuid();
 
@@ -7,6 +9,7 @@ export const createDiscussionInputSchema = z.object({
   workspaceId: workspaceIdSchema,
   title: z.string().trim().min(3).max(120),
   body: z.string().trim().min(1).max(5000),
+  attachmentIds: attachmentIdsSchema.optional(),
   idempotencyKey: z.string().trim().min(8).max(128).optional(),
 });
 
@@ -14,6 +17,8 @@ export const updateDiscussionInputSchema = z.object({
   discussionId: discussionIdSchema,
   title: z.string().trim().min(3).max(120).optional(),
   body: z.string().trim().min(1).max(5000).optional(),
+  // The discussion's full list of files in order, when it changes.
+  attachmentIds: attachmentIdsSchema.optional(),
 });
 
 export const getDiscussionByIdInputSchema = z.object({

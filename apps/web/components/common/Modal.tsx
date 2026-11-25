@@ -8,12 +8,14 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), texta
 // A modal dialog: focus moves to the first field (or `initialFocus`), Tab stays
 // inside, Escape and the backdrop close it unless `busy`, and focus returns to
 // whatever opened it. A bottom sheet on phones.
-export function Modal({ title, description, onClose, busy = false, initialFocus, children }: {
+export function Modal({ title, description, onClose, busy = false, initialFocus, size = "default", children }: {
   title: string;
   description?: ReactNode;
   onClose: () => void;
   busy?: boolean;
   initialFocus?: string;
+  // "wide" for content such as an image viewer.
+  size?: "default" | "wide";
   children: ReactNode;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -49,7 +51,7 @@ export function Modal({ title, description, onClose, busy = false, initialFocus,
       }
     }}
   >
-    <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-md border border-border bg-surface p-5 shadow-xl sm:rounded-md sm:p-7">
+    <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} className={`max-h-[92dvh] w-full ${size === "wide" ? "max-w-4xl" : "max-w-lg"} overflow-y-auto rounded-t-md border border-border bg-surface p-5 shadow-xl sm:rounded-md sm:p-7`}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h2 id={titleId} className="text-xl font-semibold text-text-primary">{title}</h2>
