@@ -28,6 +28,7 @@
     "test:pin-api": "node --test server/api/pin.integration.test.mjs",
     "test:saved-api": "node --test server/api/saved.integration.test.mjs",
     "test:digest-api": "node --test server/api/digest.integration.test.mjs",
+    "test:files-api": "node --test server/api/files.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },
@@ -47,6 +48,7 @@
     "@trpc/server": "^11.28.3",
     "@vercel/queue": "^0.11.0",
     "argon2": "^0.41.1",
+    "aws4fetch": "^1.0.20",
     "bullmq": "^5.81.5",
     "dotenv": "^18.0.10",
     "framer-motion": "^12.43.0",

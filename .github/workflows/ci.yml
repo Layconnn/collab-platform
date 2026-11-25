@@ -139,6 +139,8 @@ jobs:
         run: pnpm -C apps/web run test:saved-api
       - name: Daily digest (real database)
         run: pnpm -C apps/web run test:digest-api
+      - name: File uploads (real database)
+        run: pnpm -C apps/web run test:files-api
 
   frontend-tests:
     name: Frontend tests

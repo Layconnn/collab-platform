@@ -18,6 +18,11 @@ const envSchema = z.object({
   DIGEST_ALLOWLIST: z.string().optional(),
   // Shared with the scheduler (GitHub Actions) that starts each daily run.
   DIGEST_RUN_SECRET: z.string().min(32).optional(),
+  // File uploads (file uploads PRD). Without all four, attaching is switched off.
+  R2_ACCOUNT_ID: z.string().min(1).optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  R2_BUCKET: z.string().min(1).optional(),
 });
 
 export const env = envSchema.parse(process.env);

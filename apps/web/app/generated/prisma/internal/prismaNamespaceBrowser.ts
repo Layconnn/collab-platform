@@ -67,7 +67,9 @@ export const ModelName = {
   SavedItem: 'SavedItem',
   Reaction: 'Reaction',
   DecisionSupersession: 'DecisionSupersession',
-  ActivityEvent: 'ActivityEvent'
+  ActivityEvent: 'ActivityEvent',
+  Attachment: 'Attachment',
+  DeletedFile: 'DeletedFile'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -342,6 +344,34 @@ export const ActivityEventScalarFieldEnum = {
 } as const
 
 export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
+
+
+export const AttachmentScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  uploaderId: 'uploaderId',
+  key: 'key',
+  fileName: 'fileName',
+  contentType: 'contentType',
+  size: 'size',
+  status: 'status',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  decisionId: 'decisionId',
+  position: 'position',
+  createdAt: 'createdAt',
+  attachedAt: 'attachedAt'
+} as const
+
+export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
+
+
+export const DeletedFileScalarFieldEnum = {
+  key: 'key',
+  deletedAt: 'deletedAt'
+} as const
+
+export type DeletedFileScalarFieldEnum = (typeof DeletedFileScalarFieldEnum)[keyof typeof DeletedFileScalarFieldEnum]
 
 
 export const SortOrder = {

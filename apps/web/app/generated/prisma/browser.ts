@@ -102,3 +102,13 @@ export type DecisionSupersession = Prisma.DecisionSupersessionModel
  * 
  */
 export type ActivityEvent = Prisma.ActivityEventModel
+/**
+ * Model Attachment
+ * 
+ */
+export type Attachment = Prisma.AttachmentModel
+/**
+ * Model DeletedFile
+ * 
+ */
+export type DeletedFile = Prisma.DeletedFileModel
