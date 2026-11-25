@@ -17,6 +17,7 @@ import {
   recordDiscussionPermissionDenied,
 } from "../observability/security-events";
 import { activityActorLabel, recordActivity } from "./activity.service";
+import { attachmentService, attachmentsSelect, newUploadIds, type PublicAttachment } from "./files/attachment.service";
 import { followOnParticipation } from "./follow.service";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
@@ -36,7 +37,7 @@ type RequestContext = {
 };
 
 function discussionByIdKey(discussionId: string): string {
-  return `discussion:v2:${discussionId}`;
+  return `discussion:v3:${discussionId}`;
 }
 
 function workspaceDiscussionListKey(
@@ -85,6 +86,7 @@ export const discussionService = {
         title: string;
         body: string;
         author: { id: string; name: string | null; username?: string };
+        attachments?: PublicAttachment[];
         createdAt: Date;
         updatedAt: Date;
       }>(idempotencyResultKey);
@@ -126,8 +128,9 @@ export const discussionService = {
     );
 
     try {
+      const attachmentIds = await attachmentService.verifyUploads(userId, input.workspaceId, input.attachmentIds ?? []);
       const discussion = await prisma.$transaction(async (tx) => {
-        const created = await tx.discussion.create({
+        const draft = await tx.discussion.create({
           data: {
             workspaceId: input.workspaceId,
             authorId: userId,
@@ -139,6 +142,7 @@ export const discussionService = {
             workspaceId: true,
             title: true,
             body: true,
+            attachments: attachmentsSelect,
             author: {
               select: {
                 id: true,
@@ -150,6 +154,10 @@ export const discussionService = {
             updatedAt: true,
           },
         });
+        await attachmentService.attach(tx, { userId, workspaceId: input.workspaceId, attachmentIds, target: { discussionId: draft.id } });
+        const created = attachmentIds.length
+          ? { ...draft, attachments: await tx.attachment.findMany({ where: { discussionId: draft.id }, ...attachmentsSelect }) }
+          : draft;
         await followOnParticipation(tx, { workspaceId: input.workspaceId, discussionId: created.id, userId });
         await recordActivity(tx, {
           workspaceId: created.workspaceId,
@@ -158,7 +166,7 @@ export const discussionService = {
           kind: "DISCUSSION_CREATED",
           subjectType: "DISCUSSION",
           subjectId: created.id,
-          summary: { title: created.title },
+          summary: { title: created.title, ...(attachmentIds.length ? { files: attachmentIds.length } : {}) },
         });
         return created;
       });
@@ -335,6 +343,7 @@ export const discussionService = {
         name: string | null;
         username: string;
       };
+      attachments: PublicAttachment[];
       createdAt: Date;
       updatedAt: Date;
     }>(cacheKey);
@@ -356,6 +365,7 @@ export const discussionService = {
         workspaceId: true,
         title: true,
         body: true,
+        attachments: attachmentsSelect,
         author: {
           select: {
             id: true,
@@ -431,7 +441,14 @@ export const discussionService = {
     }
 
     try {
+      const target = { discussionId: discussion.id };
+      if (input.attachmentIds) {
+        await attachmentService.verifyUploads(userId, discussion.workspaceId, await newUploadIds(target, input.attachmentIds));
+      }
       const updated = await prisma.$transaction(async (tx) => {
+        const files = input.attachmentIds
+          ? await attachmentService.sync(tx, { userId, workspaceId: discussion.workspaceId, target, desired: input.attachmentIds })
+          : null;
         const changed = await tx.discussion.update({
           where: { id: input.discussionId },
           data: {
@@ -443,6 +460,7 @@ export const discussionService = {
             workspaceId: true,
             title: true,
             body: true,
+            attachments: attachmentsSelect,
             author: {
               select: {
                 id: true,
@@ -460,7 +478,7 @@ export const discussionService = {
           kind: "DISCUSSION_UPDATED",
           subjectType: "DISCUSSION",
           subjectId: changed.id,
-          summary: { title: changed.title },
+          summary: { title: changed.title, ...(files && (files.added || files.removed) ? { filesAdded: files.added, filesRemoved: files.removed } : {}) },
         });
         return changed;
       });

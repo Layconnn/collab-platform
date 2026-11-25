@@ -69,6 +69,19 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect(page.getByRole("heading", { level: 1, name: discussionTitle })).toBeVisible();
   });
 
+  await test.step("reply with a screenshot", async () => {
+    // A 1x1 PNG, uploaded through the local-folder storage (FILES_LOCAL_DIR).
+    const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
+    await page.locator('input[type="file"]').first().setInputFiles({ name: "screen.png", mimeType: "image/png", buffer: png });
+    const attached = page.getByRole("list", { name: "Attached files" });
+    await expect(attached.getByText(/^Image · \d+ B$/)).toBeVisible();
+    await page.getByRole("button", { name: "Post comment" }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Comment posted." })).toBeVisible();
+    const image = page.getByRole("article", { name: /^Comment by / }).getByRole("img", { name: "screen.png" });
+    await expect(image).toBeVisible();
+    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(1);
+  });
+
   await test.step("propose a decision", async () => {
     await page.getByRole("button", { name: "Propose decision" }).click();
     await page.getByLabel("Decision question").fill(question);

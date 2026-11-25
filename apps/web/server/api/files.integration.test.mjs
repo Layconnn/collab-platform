@@ -20,10 +20,14 @@ const jiti = createJiti(import.meta.url, { nativeModules: ["@prisma/client"] });
 const { attachmentRouter } = jiti("./routers/attachment.router.ts");
 const { attachmentService, contentDisposition, PENDING_TTL_MS } = jiti("../services/files/attachment.service.ts");
 const { createMemoryStorage, setStorageForTests } = jiti("../services/files/storage.ts");
+const { appRouter } = jiti("./root.ts");
+const { notificationQueue } = jiti("../queue/notification.queue.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis } = jiti("../cache/redis.ts");
 redis.incr = async () => 1;
 redis.expire = async () => 1;
+const enqueued = [];
+notificationQueue.add = async (name, payload, options) => { enqueued.push(payload); return { id: options.jobId }; };
 
 const PNG = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 1, 2, 3]);
 let storage;
@@ -34,6 +38,10 @@ beforeEach(() => {
 
 const suffix = () => randomUUID().replaceAll("-", "");
 const createdUserIds = [];
+const app = (user) => appRouter.createCaller({
+  user: { id: user.id }, requestId: `files-test-${suffix()}`, headers: new Headers(),
+  requestMethod: "POST", ip: null, responseHeaders: new Headers(),
+});
 const caller = (user) => attachmentRouter.createCaller({
   user: { id: user.id }, requestId: `files-test-${suffix()}`, headers: new Headers(),
   requestMethod: "POST", ip: null, responseHeaders: new Headers(),
@@ -83,6 +91,7 @@ after(async () => {
   await prisma.workspace.deleteMany({ where: { ownerId: { in: createdUserIds } } });
   for (const id of createdUserIds.reverse()) await prisma.user.deleteMany({ where: { id } });
   await prisma.$disconnect();
+  await notificationQueue.close();
   redis.disconnect();
 });
 
@@ -171,6 +180,7 @@ test("downloads: members who can read the post, through a short-lived URL", asyn
   const imageUrl = await attachmentService.downloadUrl(sam.id, image.attachmentId);
   assert.match(imageUrl, new RegExp(`^memory://download/${image.key}\\?type=image%2Fpng&disposition=inline`), "images open in the browser");
   assert.match(imageUrl, /expires=300$/, "for 5 minutes");
+  assert.match(await attachmentService.downloadUrl(sam.id, image.attachmentId, { download: true }), /disposition=attachment/, "an image can be downloaded too");
   const pdfUrl = new URL(await attachmentService.downloadUrl(sam.id, pdf.attachmentId).then((url) => url.replace("memory://", "http://x/")));
   assert.equal(pdfUrl.searchParams.get("disposition"), contentDisposition("attachment", "Résumé \"final\".pdf"));
   assert.equal(contentDisposition("attachment", "Résumé \"final\".pdf"), "attachment; filename=\"R_sum_ _final_.pdf\"; filename*=UTF-8''R%C3%A9sum%C3%A9%20%22final%22.pdf");
@@ -225,4 +235,51 @@ test("clean-up: expired uploads and files of deleted posts and workspaces leave 
   assert.equal(storage.objects.has(stays.key), true, "files still in use stay");
   assert.equal(storage.objects.has(fresh.key), true, "recent pending uploads stay");
   assert.equal(await prisma.attachment.count({ where: { id: fresh.attachmentId } }), 1);
+});
+
+test("discussions and replies: attach on create, change on edit, file-only replies", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(maya, [sam]);
+  const shot = await upload(maya, ws, "shot.png");
+  const spec = await upload(maya, ws, "spec.pdf", new TextEncoder().encode("%PDF-1.7"));
+
+  const d = await app(maya).discussion.create({ workspaceId: ws.id, title: "Which logo?", body: "Two options.", attachmentIds: [spec.attachmentId, shot.attachmentId] });
+  assert.deepEqual(d.attachments.map((file) => file.fileName), ["spec.pdf", "shot.png"]);
+  const read = await app(sam).discussion.getById({ discussionId: d.id });
+  assert.deepEqual(read.attachments.map((file) => [file.fileName, file.contentType, file.size]), [["spec.pdf", "application/pdf", 8], ["shot.png", "image/png", PNG.byteLength]]);
+  const created = await prisma.activityEvent.findFirstOrThrow({ where: { subjectId: d.id, kind: "DISCUSSION_CREATED" } });
+  assert.equal(created.summary.files, 2, "the event log records files");
+
+  // Someone else's upload cannot be attached, and nothing is created.
+  const samsShot = await upload(sam, ws, "sams.png");
+  await rejects(app(maya).discussion.create({ workspaceId: ws.id, title: "Stolen", body: "x", attachmentIds: [samsShot.attachmentId] }), "BAD_REQUEST");
+  assert.equal(await prisma.discussion.count({ where: { workspaceId: ws.id, title: "Stolen" } }), 1 - 1);
+
+  // Edit: drop the PDF, add a new image, keep the order given.
+  const extra = await upload(maya, ws, "extra.png");
+  const edited = await app(maya).discussion.update({ discussionId: d.id, attachmentIds: [extra.attachmentId, shot.attachmentId] });
+  assert.deepEqual(edited.attachments.map((file) => file.fileName), ["extra.png", "shot.png"]);
+  assert.equal(await prisma.deletedFile.count({ where: { key: spec.key } }), 1, "the removed file is queued for deletion");
+  const updatedEvent = await prisma.activityEvent.findFirstOrThrow({ where: { subjectId: d.id, kind: "DISCUSSION_UPDATED" } });
+  assert.deepEqual([updatedEvent.summary.filesAdded, updatedEvent.summary.filesRemoved], [1, 1]);
+  await rejects(app(sam).discussion.update({ discussionId: d.id, attachmentIds: [] }), "FORBIDDEN");
+
+  // A reply with only a file; its notification names the file.
+  const replyFile = await upload(sam, ws, "answer.png");
+  enqueued.length = 0;
+  const reply = await app(sam).comment.create({ discussionId: d.id, body: "", attachmentIds: [replyFile.attachmentId] });
+  assert.equal(reply.body, "");
+  assert.deepEqual(reply.attachments.map((file) => file.fileName), ["answer.png"]);
+  assert.equal(enqueued.some((job) => JSON.stringify(job).includes("answer.png")), true);
+  const listed = await app(maya).comment.listByDiscussion({ discussionId: d.id, take: 20 });
+  assert.deepEqual(listed.items[0].attachments.map((file) => file.fileName), ["answer.png"]);
+  await assert.rejects(app(sam).comment.create({ discussionId: d.id, body: "  " }), "a reply needs text or a file");
+  await rejects(app(sam).comment.update({ commentId: reply.id, body: "", attachmentIds: [] }), "BAD_REQUEST", /reply or attach/);
+  const kept = await app(sam).comment.update({ commentId: reply.id, body: "Here it is", attachmentIds: [] });
+  assert.deepEqual(kept.attachments, []);
+  await rejects(app(sam).comment.update({ commentId: reply.id, body: "" }), "BAD_REQUEST", /reply or attach/);
+
+  // Deleting the discussion queues every file still on it.
+  await app(maya).discussion.remove({ discussionId: d.id });
+  assert.equal(await prisma.deletedFile.count({ where: { key: { in: [extra.key, shot.key, replyFile.key] } } }), 3);
 });

@@ -40,6 +40,22 @@ export function contentDisposition(type: "inline" | "attachment", fileName: stri
 
 export type AttachmentTarget = { discussionId: string } | { commentId: string } | { decisionId: string };
 
+// What a post shows of its files (FR-7). Selected with the post itself.
+export const attachmentsSelect = {
+  select: { id: true, fileName: true, contentType: true, size: true },
+  orderBy: { position: "asc" },
+} as const satisfies Prisma.Discussion$attachmentsArgs;
+
+export type PublicAttachment = { id: string; fileName: string; contentType: string; size: number };
+
+// Which of `desired` are new uploads, before a post's transaction, so they can
+// be verified with storage first (verifyUploads).
+export async function newUploadIds(target: AttachmentTarget, desired: string[]) {
+  const existing = await prisma.attachment.findMany({ where: { ...target }, select: { id: true } });
+  const have = new Set(existing.map((row) => row.id));
+  return [...new Set(desired)].filter((id) => !have.has(id));
+}
+
 export const attachmentService = {
   config() {
     return { enabled: configuredStorage() !== null };
@@ -117,10 +133,32 @@ export const attachmentService = {
     }
   },
 
+  // FR-11: makes a post's files exactly `desired`, in that order. Files no
+  // longer listed are removed (their storage objects queued for deletion), new
+  // uploads are claimed (verify them first), and the rest are reordered.
+  async sync(tx: Tx, input: { userId: string; workspaceId: string; target: AttachmentTarget; desired: string[]; now?: Date }) {
+    const desired = [...new Set(input.desired)];
+    if (desired.length > FILE_LIMITS.maxFilesPerPost) throw new AppError("BAD_REQUEST", `A post can have up to ${FILE_LIMITS.maxFilesPerPost} files.`);
+    const existing = await tx.attachment.findMany({ where: { ...input.target }, select: { id: true } });
+    const have = new Set(existing.map((row) => row.id));
+    const removed = existing.filter((row) => !desired.includes(row.id)).map((row) => row.id);
+    if (removed.length) await tx.attachment.deleteMany({ where: { id: { in: removed }, ...input.target } });
+    const added: string[] = [];
+    for (const [position, id] of desired.entries()) {
+      if (have.has(id)) {
+        await tx.attachment.updateMany({ where: { id, ...input.target }, data: { position } });
+      } else {
+        await this.attach(tx, { userId: input.userId, workspaceId: input.workspaceId, attachmentIds: [id], target: input.target, startPosition: position, now: input.now });
+        added.push(id);
+      }
+    }
+    return { added: added.length, removed: removed.length, count: desired.length };
+  },
+
   // FR-8: a short-lived download URL, only for current members who can read
   // the post. Anything else is "not found", so ids reveal nothing (NFR-1).
-  async downloadUrl(userId: string, attachmentId: string, storage: FileStorage | null = configuredStorage()) {
-    const store = requireStorage(storage);
+  async downloadUrl(userId: string, attachmentId: string, options: { download?: boolean; storage?: FileStorage | null } = {}) {
+    const store = requireStorage(options.storage === undefined ? configuredStorage() : options.storage);
     const notFound = new AppError("NOT_FOUND", "File not found.");
     const attachment = await prisma.attachment.findUnique({
       where: { id: attachmentId },
@@ -136,8 +174,9 @@ export const attachmentService = {
     const role = await getMembershipRole(attachment.workspaceId, userId);
     const action = attachment.decisionId ? WORKSPACE_ACTIONS.READ : WORKSPACE_ACTIONS.READ_DISCUSSION;
     if (!role || !canPerformWorkspaceAction(role, action)) throw notFound;
-    // Only images are shown in the browser; everything else downloads (NFR-2).
-    const disposition = contentDisposition(isImageType(attachment.contentType) ? "inline" : "attachment", attachment.fileName);
+    // Only images are shown in the browser, unless asked to download; everything
+    // else always downloads (NFR-2).
+    const disposition = contentDisposition(isImageType(attachment.contentType) && !options.download ? "inline" : "attachment", attachment.fileName);
     return store.signDownload(attachment.key, { contentType: attachment.contentType, contentDisposition: disposition }, DOWNLOAD_URL_SECONDS);
   },
 

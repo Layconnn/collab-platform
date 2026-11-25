@@ -15,6 +15,8 @@ import { useDiscussionActions } from "@/hooks/useDiscussion";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
 import { discussionActionError } from "@/components/discussion/discussionErrors";
+import { AttachmentComposer } from "@/components/files/AttachmentComposer";
+import { uploadBlocker, useUploader } from "@/hooks/useAttachments";
 
 export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { workspaceId: string; onCancel: () => void; open?: boolean }) {
   const form = useForm<CreateDiscussionInput>({
@@ -29,6 +31,8 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
   // One key per draft: a retry of the same content replays instead of duplicating.
   const submissionRef = useRef<{ fingerprint: string; key: string } | null>(null);
   const [posted, setPosted] = useState<{ id: string; title: string } | null>(null);
+  const uploader = useUploader(workspaceId);
+  const [blocked, setBlocked] = useState<string | null>(null);
   const busy = form.formState.isSubmitting || createDiscussion.isPending;
 
   const { setFocus } = form;
@@ -39,17 +43,25 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
       event.preventDefault();
       return;
     }
+    const blocker = uploadBlocker(uploader);
+    setBlocked(blocker);
+    if (blocker) {
+      event.preventDefault();
+      return;
+    }
     submittingRef.current = true;
     void form.handleSubmit(async (values) => {
       setPosted(null);
       try {
-        const fingerprint = JSON.stringify([values.title, values.body]);
+        const attachmentIds = uploader.attachmentIds;
+        const fingerprint = JSON.stringify([values.title, values.body, attachmentIds]);
         if (submissionRef.current?.fingerprint !== fingerprint) {
           submissionRef.current = { fingerprint, key: crypto.randomUUID() };
         }
-        const discussion = await createDiscussion.mutateAsync({ ...values, idempotencyKey: submissionRef.current.key });
+        const discussion = await createDiscussion.mutateAsync({ ...values, attachmentIds, idempotencyKey: submissionRef.current.key });
         submissionRef.current = null;
         form.reset({ workspaceId, title: "", body: "" });
+        uploader.reset();
         setPosted({ id: discussion.id, title: discussion.title });
       } catch {
         // The mutation error is shown below without discarding the draft.
@@ -81,6 +93,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
       </div>
       <div>
         <label htmlFor="discussion-body" className="block text-sm font-semibold text-text-primary">Context</label>
+        <AttachmentComposer uploader={uploader} disabled={busy}>
         <MarkdownField>
         <MentionTextarea
           workspaceId={workspaceId}
@@ -97,12 +110,14 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           maxLength={5000}
         />
         </MarkdownField>
+        </AttachmentComposer>
         <div className="mt-1 flex flex-wrap items-start justify-between gap-2 text-xs text-text-muted">
           <p id="discussion-body-help">Keep the important details together. Markdown and @mentions work.</p>
           <span>{form.watch("body").length}/5000</span>
         </div>
         {form.formState.errors.body ? <p id="discussion-body-error" role="alert" className="mt-1.5 text-sm text-danger">Please add some context within the allowed length.</p> : null}
       </div>
+      {blocked && uploadBlocker(uploader) ? <p role="alert" className="text-sm text-danger">{uploadBlocker(uploader)}</p> : null}
       {createDiscussion.error ? <p role="alert" className="border-l-2 border-danger bg-surface px-3 py-2.5 text-sm text-danger">{discussionActionError(createDiscussion.error, "Your discussion could not be published. Your draft is still here; please try again.")}</p> : null}
       {posted ? (
         <p role="status" className="border-l-2 border-success bg-surface px-3 py-2.5 text-sm text-text-secondary">

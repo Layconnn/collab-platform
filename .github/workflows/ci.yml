@@ -228,6 +228,7 @@ jobs:
         run: pnpm -C apps/web run test:e2e
         env:
           NODE_ENV: production
+          FILES_LOCAL_DIR: ${{ runner.temp }}/commons-files
       - name: Upload the Playwright report
         if: failure()
         uses: actions/upload-artifact@v7
