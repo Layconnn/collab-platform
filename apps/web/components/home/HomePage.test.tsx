@@ -81,7 +81,17 @@ describe("HomePage", () => {
     expect(mocks.dismiss).toHaveBeenCalledWith({ notificationIds: ["c000000000000000000000009"] });
     fireEvent.click(screen.getByRole("button", { name: "Mark all done" }));
     expect(mocks.dismissAll).toHaveBeenCalledOnce();
-    fireEvent.click(screen.getByRole("link", { name: "Pricing for small teams" }));
+    // Opening the link marks it done. The navigation itself is cancelled: a
+    // real one starts a router transition (and jsdom's unimplemented page
+    // load) that can still be running when the test environment is torn
+    // down, which made this file fail now and then (#115).
+    const cancelNavigation = (event: MouseEvent) => event.preventDefault();
+    document.addEventListener("click", cancelNavigation, true);
+    try {
+      fireEvent.click(screen.getByRole("link", { name: "Pricing for small teams" }));
+    } finally {
+      document.removeEventListener("click", cancelNavigation, true);
+    }
     expect(mocks.dismiss).toHaveBeenCalledTimes(2);
   });
 
