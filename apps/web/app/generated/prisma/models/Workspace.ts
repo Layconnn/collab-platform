@@ -203,6 +203,7 @@ export type WorkspaceWhereInput = {
   notifications?: Prisma.NotificationListRelationFilter
   activityEvents?: Prisma.ActivityEventListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
+  invites?: Prisma.WorkspaceInviteListRelationFilter
 }
 
 export type WorkspaceOrderByWithRelationInput = {
@@ -225,6 +226,7 @@ export type WorkspaceOrderByWithRelationInput = {
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   activityEvents?: Prisma.ActivityEventOrderByRelationAggregateInput
   attachments?: Prisma.AttachmentOrderByRelationAggregateInput
+  invites?: Prisma.WorkspaceInviteOrderByRelationAggregateInput
 }
 
 export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
@@ -250,6 +252,7 @@ export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
   notifications?: Prisma.NotificationListRelationFilter
   activityEvents?: Prisma.ActivityEventListRelationFilter
   attachments?: Prisma.AttachmentListRelationFilter
+  invites?: Prisma.WorkspaceInviteListRelationFilter
 }, "id" | "slug">
 
 export type WorkspaceOrderByWithAggregationInput = {
@@ -295,6 +298,7 @@ export type WorkspaceCreateInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateInput = {
@@ -316,6 +320,7 @@ export type WorkspaceUncheckedCreateInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUpdateInput = {
@@ -337,6 +342,7 @@ export type WorkspaceUpdateInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateInput = {
@@ -358,6 +364,7 @@ export type WorkspaceUncheckedUpdateInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyInput = {
@@ -638,6 +645,20 @@ export type WorkspaceUpdateOneRequiredWithoutAttachmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.WorkspaceUpdateWithoutAttachmentsInput>, Prisma.WorkspaceUncheckedUpdateWithoutAttachmentsInput>
 }
 
+export type WorkspaceCreateNestedOneWithoutInvitesInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitesInput, Prisma.WorkspaceUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutInvitesInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneRequiredWithoutInvitesNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitesInput, Prisma.WorkspaceUncheckedCreateWithoutInvitesInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutInvitesInput
+  upsert?: Prisma.WorkspaceUpsertWithoutInvitesInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutInvitesInput, Prisma.WorkspaceUpdateWithoutInvitesInput>, Prisma.WorkspaceUncheckedUpdateWithoutInvitesInput>
+}
+
 export type WorkspaceCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -656,6 +677,7 @@ export type WorkspaceCreateWithoutOwnerInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutOwnerInput = {
@@ -676,6 +698,7 @@ export type WorkspaceUncheckedCreateWithoutOwnerInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutOwnerInput = {
@@ -734,6 +757,7 @@ export type WorkspaceCreateWithoutDiscussionsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutDiscussionsInput = {
@@ -754,6 +778,7 @@ export type WorkspaceUncheckedCreateWithoutDiscussionsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutDiscussionsInput = {
@@ -790,6 +815,7 @@ export type WorkspaceUpdateWithoutDiscussionsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutDiscussionsInput = {
@@ -810,6 +836,7 @@ export type WorkspaceUncheckedUpdateWithoutDiscussionsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutCommentsInput = {
@@ -830,6 +857,7 @@ export type WorkspaceCreateWithoutCommentsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutCommentsInput = {
@@ -850,6 +878,7 @@ export type WorkspaceUncheckedCreateWithoutCommentsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutCommentsInput = {
@@ -886,6 +915,7 @@ export type WorkspaceUpdateWithoutCommentsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutCommentsInput = {
@@ -906,6 +936,7 @@ export type WorkspaceUncheckedUpdateWithoutCommentsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutNotificationsInput = {
@@ -926,6 +957,7 @@ export type WorkspaceCreateWithoutNotificationsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutNotificationsInput = {
@@ -946,6 +978,7 @@ export type WorkspaceUncheckedCreateWithoutNotificationsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutNotificationsInput = {
@@ -982,6 +1015,7 @@ export type WorkspaceUpdateWithoutNotificationsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutNotificationsInput = {
@@ -1002,6 +1036,7 @@ export type WorkspaceUncheckedUpdateWithoutNotificationsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutMembersInput = {
@@ -1022,6 +1057,7 @@ export type WorkspaceCreateWithoutMembersInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutMembersInput = {
@@ -1042,6 +1078,7 @@ export type WorkspaceUncheckedCreateWithoutMembersInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutMembersInput = {
@@ -1078,6 +1115,7 @@ export type WorkspaceUpdateWithoutMembersInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutMembersInput = {
@@ -1098,6 +1136,7 @@ export type WorkspaceUncheckedUpdateWithoutMembersInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutDecisionsInput = {
@@ -1118,6 +1157,7 @@ export type WorkspaceCreateWithoutDecisionsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutDecisionsInput = {
@@ -1138,6 +1178,7 @@ export type WorkspaceUncheckedCreateWithoutDecisionsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutDecisionsInput = {
@@ -1174,6 +1215,7 @@ export type WorkspaceUpdateWithoutDecisionsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutDecisionsInput = {
@@ -1194,6 +1236,7 @@ export type WorkspaceUncheckedUpdateWithoutDecisionsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutDecisionReviewsInput = {
@@ -1214,6 +1257,7 @@ export type WorkspaceCreateWithoutDecisionReviewsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutDecisionReviewsInput = {
@@ -1234,6 +1278,7 @@ export type WorkspaceUncheckedCreateWithoutDecisionReviewsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutDecisionReviewsInput = {
@@ -1270,6 +1315,7 @@ export type WorkspaceUpdateWithoutDecisionReviewsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutDecisionReviewsInput = {
@@ -1290,6 +1336,7 @@ export type WorkspaceUncheckedUpdateWithoutDecisionReviewsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutDiscussionFollowsInput = {
@@ -1310,6 +1357,7 @@ export type WorkspaceCreateWithoutDiscussionFollowsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutDiscussionFollowsInput = {
@@ -1330,6 +1378,7 @@ export type WorkspaceUncheckedCreateWithoutDiscussionFollowsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutDiscussionFollowsInput = {
@@ -1366,6 +1415,7 @@ export type WorkspaceUpdateWithoutDiscussionFollowsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutDiscussionFollowsInput = {
@@ -1386,6 +1436,7 @@ export type WorkspaceUncheckedUpdateWithoutDiscussionFollowsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutDigestOptOutsInput = {
@@ -1406,6 +1457,7 @@ export type WorkspaceCreateWithoutDigestOptOutsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutDigestOptOutsInput = {
@@ -1426,6 +1478,7 @@ export type WorkspaceUncheckedCreateWithoutDigestOptOutsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutDigestOptOutsInput = {
@@ -1462,6 +1515,7 @@ export type WorkspaceUpdateWithoutDigestOptOutsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutDigestOptOutsInput = {
@@ -1482,6 +1536,7 @@ export type WorkspaceUncheckedUpdateWithoutDigestOptOutsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutSavedItemsInput = {
@@ -1502,6 +1557,7 @@ export type WorkspaceCreateWithoutSavedItemsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutSavedItemsInput = {
@@ -1522,6 +1578,7 @@ export type WorkspaceUncheckedCreateWithoutSavedItemsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutSavedItemsInput = {
@@ -1558,6 +1615,7 @@ export type WorkspaceUpdateWithoutSavedItemsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutSavedItemsInput = {
@@ -1578,6 +1636,7 @@ export type WorkspaceUncheckedUpdateWithoutSavedItemsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutReactionsInput = {
@@ -1598,6 +1657,7 @@ export type WorkspaceCreateWithoutReactionsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutReactionsInput = {
@@ -1618,6 +1678,7 @@ export type WorkspaceUncheckedCreateWithoutReactionsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutReactionsInput = {
@@ -1654,6 +1715,7 @@ export type WorkspaceUpdateWithoutReactionsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutReactionsInput = {
@@ -1674,6 +1736,7 @@ export type WorkspaceUncheckedUpdateWithoutReactionsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutActivityEventsInput = {
@@ -1694,6 +1757,7 @@ export type WorkspaceCreateWithoutActivityEventsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutWorkspaceInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutActivityEventsInput = {
@@ -1714,6 +1778,7 @@ export type WorkspaceUncheckedCreateWithoutActivityEventsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutWorkspaceInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutActivityEventsInput = {
@@ -1750,6 +1815,7 @@ export type WorkspaceUpdateWithoutActivityEventsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutWorkspaceNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutActivityEventsInput = {
@@ -1770,6 +1836,7 @@ export type WorkspaceUncheckedUpdateWithoutActivityEventsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutWorkspaceNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateWithoutAttachmentsInput = {
@@ -1790,6 +1857,7 @@ export type WorkspaceCreateWithoutAttachmentsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutWorkspaceInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceUncheckedCreateWithoutAttachmentsInput = {
@@ -1810,6 +1878,7 @@ export type WorkspaceUncheckedCreateWithoutAttachmentsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutWorkspaceInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
   activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
 }
 
 export type WorkspaceCreateOrConnectWithoutAttachmentsInput = {
@@ -1846,6 +1915,7 @@ export type WorkspaceUpdateWithoutAttachmentsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutWorkspaceNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutAttachmentsInput = {
@@ -1866,6 +1936,107 @@ export type WorkspaceUncheckedUpdateWithoutAttachmentsInput = {
   digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutWorkspaceNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutInvitesInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedSpacesInput
+  members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutWorkspaceInput
+  comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
+  decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutWorkspaceInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutWorkspaceInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutWorkspaceInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutInvitesInput = {
+  id?: string
+  name: string
+  slug: string
+  ownerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutWorkspaceInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
+  decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutWorkspaceInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutWorkspaceInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutWorkspaceInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutInvitesInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitesInput, Prisma.WorkspaceUncheckedCreateWithoutInvitesInput>
+}
+
+export type WorkspaceUpsertWithoutInvitesInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutInvitesInput, Prisma.WorkspaceUncheckedUpdateWithoutInvitesInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutInvitesInput, Prisma.WorkspaceUncheckedCreateWithoutInvitesInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutInvitesInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutInvitesInput, Prisma.WorkspaceUncheckedUpdateWithoutInvitesInput>
+}
+
+export type WorkspaceUpdateWithoutInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedSpacesNestedInput
+  members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutWorkspaceNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
+  decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutWorkspaceNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutWorkspaceNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutWorkspaceNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutInvitesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutWorkspaceNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutWorkspaceNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutWorkspaceNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceCreateManyOwnerInput = {
@@ -1894,6 +2065,7 @@ export type WorkspaceUpdateWithoutOwnerInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateWithoutOwnerInput = {
@@ -1914,6 +2086,7 @@ export type WorkspaceUncheckedUpdateWithoutOwnerInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
   activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
   attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
 }
 
 export type WorkspaceUncheckedUpdateManyWithoutOwnerInput = {
@@ -1942,6 +2115,7 @@ export type WorkspaceCountOutputType = {
   notifications: number
   activityEvents: number
   attachments: number
+  invites: number
 }
 
 export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1957,6 +2131,7 @@ export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   notifications?: boolean | WorkspaceCountOutputTypeCountNotificationsArgs
   activityEvents?: boolean | WorkspaceCountOutputTypeCountActivityEventsArgs
   attachments?: boolean | WorkspaceCountOutputTypeCountAttachmentsArgs
+  invites?: boolean | WorkspaceCountOutputTypeCountInvitesArgs
 }
 
 /**
@@ -2053,6 +2228,13 @@ export type WorkspaceCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime
   where?: Prisma.AttachmentWhereInput
 }
 
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountInvitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkspaceInviteWhereInput
+}
+
 
 export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2074,6 +2256,7 @@ export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   notifications?: boolean | Prisma.Workspace$notificationsArgs<ExtArgs>
   activityEvents?: boolean | Prisma.Workspace$activityEventsArgs<ExtArgs>
   attachments?: boolean | Prisma.Workspace$attachmentsArgs<ExtArgs>
+  invites?: boolean | Prisma.Workspace$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["workspace"]>
 
@@ -2121,6 +2304,7 @@ export type WorkspaceInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   notifications?: boolean | Prisma.Workspace$notificationsArgs<ExtArgs>
   activityEvents?: boolean | Prisma.Workspace$activityEventsArgs<ExtArgs>
   attachments?: boolean | Prisma.Workspace$attachmentsArgs<ExtArgs>
+  invites?: boolean | Prisma.Workspace$invitesArgs<ExtArgs>
   _count?: boolean | Prisma.WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type WorkspaceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2146,6 +2330,7 @@ export type $WorkspacePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
     attachments: Prisma.$AttachmentPayload<ExtArgs>[]
+    invites: Prisma.$WorkspaceInvitePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2561,6 +2746,7 @@ export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends runtim
   notifications<T extends Prisma.Workspace$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   activityEvents<T extends Prisma.Workspace$activityEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attachments<T extends Prisma.Workspace$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  invites<T extends Prisma.Workspace$invitesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$invitesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkspaceInvitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3282,6 +3468,30 @@ export type Workspace$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.AttachmentScalarFieldEnum | Prisma.AttachmentScalarFieldEnum[]
+}
+
+/**
+ * Workspace.invites
+ */
+export type Workspace$invitesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceInvite
+   */
+  select?: Prisma.WorkspaceInviteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceInvite
+   */
+  omit?: Prisma.WorkspaceInviteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceInviteInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceInviteWhereInput
+  orderBy?: Prisma.WorkspaceInviteOrderByWithRelationInput | Prisma.WorkspaceInviteOrderByWithRelationInput[]
+  cursor?: Prisma.WorkspaceInviteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkspaceInviteScalarFieldEnum | Prisma.WorkspaceInviteScalarFieldEnum[]
 }
 
 /**

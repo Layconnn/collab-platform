@@ -25,6 +25,8 @@ enum NotificationType {
   MENTION
   REVIEW_REQUESTED
   REVIEW_RESPONDED
+  // Someone joined a workspace with an invite link you created (invite links PRD, FR-10).
+  INVITE_ACCEPTED
 }
 
 enum DecisionStatus {
@@ -96,6 +98,8 @@ model User {
   notificationsSent        Notification[]          @relation("NotificationActor")
   activityEvents           ActivityEvent[]
   attachmentsUploaded      Attachment[]
+  invitesCreated           WorkspaceInvite[]
+  inviteUses               WorkspaceInviteUse[]
 }
 
 model Workspace {
@@ -120,6 +124,7 @@ model Workspace {
   notifications     Notification[]
   activityEvents    ActivityEvent[]
   attachments       Attachment[]
+  invites           WorkspaceInvite[]
   // Recommended (optional): @@index([createdAt]) for global recent-workspaces feeds.
 
   @@index([ownerId, createdAt])
@@ -563,4 +568,40 @@ model DeletedFile {
   deletedAt DateTime @default(now())
 
   @@index([deletedAt])
+}
+
+// A link that lets people join a workspace (invite links PRD). Only the
+// SHA-256 hash of its token is stored; the token is shown once, when the link
+// is created (FR-2). CHECK constraints in the migration keep the role to
+// MEMBER or ADMIN and uses within maxUses.
+model WorkspaceInvite {
+  id          String               @id @default(cuid())
+  workspaceId String
+  createdById String?
+  tokenHash   String               @unique
+  role        WorkspaceRole        @default(MEMBER)
+  name        String?
+  maxUses     Int?
+  uses        Int                  @default(0)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime             @default(now())
+  workspace   Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User?                @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  joins       WorkspaceInviteUse[]
+
+  @@index([workspaceId, createdAt(sort: Desc)])
+}
+
+// Who joined with which invite link.
+model WorkspaceInviteUse {
+  id        String          @id @default(cuid())
+  inviteId  String
+  userId    String
+  createdAt DateTime        @default(now())
+  invite    WorkspaceInvite @relation(fields: [inviteId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([inviteId, userId])
+  @@index([userId])
 }

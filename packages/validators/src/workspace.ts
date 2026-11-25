@@ -96,3 +96,23 @@ export type AddWorkspaceMemberByUsernameInput = z.infer<typeof addWorkspaceMembe
 export type UpdateWorkspaceMemberRoleInput = z.infer<typeof updateWorkspaceMemberRoleInputSchema>;
 export type RemoveWorkspaceMemberInput = z.infer<typeof removeWorkspaceMemberInputSchema>;
 export type TransferWorkspaceOwnershipInput = z.infer<typeof transferWorkspaceOwnershipInputSchema>;
+
+// Invite links (invite links PRD).
+export const INVITE_EXPIRY_DAYS = [1, 7, 30] as const;
+export const MAX_ACTIVE_INVITES = 20;
+// 32 random bytes in base64url.
+export const inviteTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/, "Invalid invite link.");
+
+export const createInviteInputSchema = z.object({
+  workspaceId: workspaceIdSchema,
+  role: z.enum(["MEMBER", "ADMIN"]).default("MEMBER"),
+  expiresInDays: z.union([z.literal(1), z.literal(7), z.literal(30)]).default(7),
+  maxUses: z.number().int().min(1).max(100).optional(),
+  name: z.string().trim().max(60).optional().transform((value) => value || undefined),
+});
+
+export const listInvitesInputSchema = z.object({ workspaceId: workspaceIdSchema });
+export const revokeInviteInputSchema = z.object({ workspaceId: workspaceIdSchema, inviteId: z.string().cuid() });
+export const inviteByTokenInputSchema = z.object({ token: inviteTokenSchema });
+
+export type CreateInviteInput = z.infer<typeof createInviteInputSchema>;
