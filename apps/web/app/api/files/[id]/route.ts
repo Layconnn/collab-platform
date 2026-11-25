@@ -25,7 +25,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
   try {
     await downloadRateLimit(user.id, resolveRequestId(request.headers));
-    const url = await attachmentService.downloadUrl(user.id, id);
+    const url = await attachmentService.downloadUrl(user.id, id, { download: new URL(request.url).searchParams.get("download") === "1" });
     return new Response(null, { status: 302, headers: { location: url, "cache-control": "no-store", "referrer-policy": "no-referrer" } });
   } catch (error) {
     if (error instanceof AppError && error.code === "NOT_FOUND") return plain(404, "This file does not exist, or you no longer have access to it.");

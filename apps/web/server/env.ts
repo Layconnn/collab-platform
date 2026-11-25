@@ -23,6 +23,8 @@ const envSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().min(1).optional(),
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET: z.string().min(1).optional(),
+  // Local runs and end-to-end tests only: keep files in this folder instead.
+  FILES_LOCAL_DIR: z.string().min(1).optional(),
 });
 
 export const env = envSchema.parse(process.env);

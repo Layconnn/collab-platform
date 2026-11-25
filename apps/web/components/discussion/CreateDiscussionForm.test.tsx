@@ -8,6 +8,12 @@ const mocks = vi.hoisted(() => ({
   error: null as Error | null,
 }));
 
+// File uploads are covered in components/files; here they are switched off.
+vi.mock("@/hooks/useAttachments", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/hooks/useAttachments")>()),
+  useAttachmentConfig: () => ({ data: { enabled: false } }),
+  useUploader: () => ({ items: [], notice: null, add: () => {}, remove: () => {}, retry: () => {}, reset: () => {}, attachmentIds: [], uploading: false, failed: false }),
+}));
 vi.mock("@/hooks/useDiscussion", () => ({
   useDiscussionActions: () => ({ create: {
     mutateAsync: mocks.mutateAsync,

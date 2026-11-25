@@ -13,6 +13,9 @@ import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
 import { Markdown } from "@/components/common/Markdown";
+import { AttachmentComposer } from "@/components/files/AttachmentComposer";
+import { Attachments } from "@/components/files/Attachments";
+import { uploadBlocker, useUploader } from "@/hooks/useAttachments";
 import { ReactionBar } from "@/components/common/ReactionBar";
 import { usePinnedReplies, useSetPin } from "@/hooks/usePins";
 import { SaveButton } from "@/components/common/SaveButton";
@@ -72,6 +75,8 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
     shouldFocusError: true,
   });
   const editBody = useWatch({ control: form.control, name: "body" });
+  const uploader = useUploader(workspaceId);
+  const [editProblem, setEditProblem] = useState<string | null>(null);
   const { setFocus } = form;
   const author = resolveUserIdentity(comment.author);
   const authorName = author.label;
@@ -117,14 +122,23 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
   };
   const cancelEdit = () => {
     form.reset({ commentId: comment.id, body: comment.body });
+    uploader.reset();
+    setEditProblem(null);
     update.reset();
     setEditing(false);
     requestAnimationFrame(() => menuTriggerRef.current?.focus());
   };
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const problem = uploadBlocker(uploader)
+      ?? (!form.getValues("body").trim() && !uploader.attachmentIds.length ? "Write a reply or attach a file." : null);
+    setEditProblem(problem);
+    if (problem) {
+      event.preventDefault();
+      return;
+    }
     void form.handleSubmit(async (values) => {
       try {
-        await update.mutateAsync(values);
+        await update.mutateAsync({ ...values, attachmentIds: uploader.attachmentIds });
         setEditing(false);
         requestAnimationFrame(() => menuTriggerRef.current?.focus());
       } catch (error) {
@@ -153,6 +167,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
             {editing && canManage ? (
               <form onSubmit={onSubmit} className="mt-3 space-y-2.5" noValidate>
                 <label htmlFor={`edit-comment-${comment.id}`} className="block text-sm font-semibold text-text-primary">Edit comment</label>
+                <AttachmentComposer uploader={uploader} disabled={update.isPending}>
                 <MarkdownField>
                 <MentionTextarea
                   workspaceId={workspaceId}
@@ -168,7 +183,9 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                   className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                 />
                 </MarkdownField>
+                </AttachmentComposer>
                 {form.formState.errors.body ? <p id={`edit-comment-error-${comment.id}`} role="alert" className="text-sm text-danger">Write a comment of up to 5,000 characters.</p> : null}
+                {editProblem ? <p role="alert" className="text-sm text-danger">{editProblem}</p> : null}
                 {editError ? <p role="alert" className="text-sm text-danger">{editError}</p> : null}
                 <div className="flex flex-wrap items-center gap-2">
                   <button type="submit" disabled={update.isPending || form.formState.isSubmitting} className="inline-flex min-h-10 items-center rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{update.isPending ? "Saving..." : "Save comment"}</button>
@@ -177,7 +194,8 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               </form>
             ) : (
               <>
-                <Markdown text={comment.body} className="mt-1.5 text-[0.94rem] leading-6 text-text-primary" />
+                {comment.body ? <Markdown text={comment.body} className="mt-1.5 text-[0.94rem] leading-6 text-text-primary" /> : null}
+                <Attachments attachments={comment.attachments} />
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   <ReactionBar workspaceId={workspaceId} discussionId={discussionId} commentId={comment.id} reactions={reactions.data?.comments[comment.id] ?? []} disabled={!reactions.data} />
                   <SaveButton workspaceId={workspaceId} target={{ commentId: comment.id }} label="reply" compact />
@@ -215,7 +233,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               <Portal>
                 <Menu.Positioner>
                   <Menu.Content minW="11rem" p="1" bg="surface" borderWidth="1px" borderColor="border" borderRadius="sm" shadow="md" zIndex="popover">
-                    <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ commentId: comment.id, body: comment.body }); setEditing(true); requestAnimationFrame(() => setFocus("body")); }} color="textPrimary" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
+                    <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ commentId: comment.id, body: comment.body }); uploader.reset(comment.attachments); setEditProblem(null); setEditing(true); requestAnimationFrame(() => setFocus("body")); }} color="textPrimary" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
                       <Pencil size={15} aria-hidden="true" /> Edit comment
                     </Menu.Item>
                     <Menu.Item value="delete" onSelect={() => { if (window.confirm("Delete this comment and its replies?")) remove.mutate({ commentId: comment.id }); }} color="danger" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">

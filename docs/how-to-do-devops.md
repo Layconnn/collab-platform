@@ -79,6 +79,8 @@ One-time setup in Cloudflare:
 
 Clean-up: `.github/workflows/files-cleanup.yml` runs at 06:30 UTC with the same `DIGEST_RUN_SECRET` and calls `POST /api/files/cleanup` until `done: true`. Deleting an attachment row (removed from its post, or its post or workspace deleted) queues its key in `DeletedFile` through a database trigger; the job deletes those objects and any upload not attached within 24 hours. A key that fails to delete stays queued for the next run.
 
+Locally and in the end-to-end job, `FILES_LOCAL_DIR=<folder>` keeps files in a folder instead, served by `app/api/files/local` with signed, expiring URLs like R2's; it is ignored on Vercel.
+
 Limits (`packages/validators/src/files.ts`): 10 MB per file, 10 files per post, 1 GB per workspace. R2's free plan covers 10 GB stored, 1 million writes and 10 million reads a month, with free downloads.
 
 ## Production database migrations

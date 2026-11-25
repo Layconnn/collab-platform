@@ -9,6 +9,7 @@ export default defineConfig({
       { find: "@repo/validators/decision", replacement: fileURLToPath(new URL("../../packages/validators/src/decision.ts", import.meta.url)) },
       { find: "@repo/validators/comment", replacement: fileURLToPath(new URL("../../packages/validators/src/comment.ts", import.meta.url)) },
       { find: "@repo/validators/workspace", replacement: fileURLToPath(new URL("../../packages/validators/src/workspace.ts", import.meta.url)) },
+      { find: "@repo/validators/files", replacement: fileURLToPath(new URL("../../packages/validators/src/files.ts", import.meta.url)) },
       { find: "@repo/validators", replacement: fileURLToPath(new URL("../../packages/validators/src/index.ts", import.meta.url)) },
       { find: "@", replacement: fileURLToPath(new URL(".", import.meta.url)) },
     ],

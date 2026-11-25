@@ -1,3 +1,7 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
+import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import path from "node:path";
+
 import { AwsClient } from "aws4fetch";
 
 import { env } from "../../env";
@@ -91,12 +95,73 @@ export function createMemoryStorage() {
   return storage;
 }
 
+// For local runs and end-to-end tests without R2: files on disk, served by
+// app/api/files/local with URLs signed like R2's. Refused on Vercel.
+const LOCAL_KEY = /^files\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+$/;
+
+export function localSignature(secret: string, parts: string[]) {
+  return createHmac("sha256", `commons:local-files:${secret}`).update(parts.join("\n")).digest("base64url");
+}
+
+export function verifyLocalSignature(secret: string, parts: string[], given: string) {
+  const expected = Buffer.from(localSignature(secret, parts));
+  const actual = Buffer.from(given);
+  return expected.length === actual.length && timingSafeEqual(expected, actual);
+}
+
+export function createLocalStorage(options: { dir: string; secret: string }) {
+  const file = (key: string) => {
+    if (!LOCAL_KEY.test(key)) throw new StorageError("Invalid key.");
+    return path.join(options.dir, ...key.split("/"));
+  };
+  const expiry = (seconds: number) => String(Math.floor(Date.now() / 1000) + seconds);
+  const storage: FileStorage & { dir: string; secret: string; path: typeof file } = {
+    dir: options.dir,
+    secret: options.secret,
+    path: file,
+    async signUpload(key, upload, expiresInSeconds) {
+      const e = expiry(expiresInSeconds);
+      const query = new URLSearchParams({ e, s: String(upload.size), ct: upload.contentType, t: localSignature(options.secret, ["PUT", key, e, String(upload.size), upload.contentType]) });
+      return { url: `/api/files/local/${key}?${query}`, headers: { "content-type": upload.contentType } };
+    },
+    async signDownload(key, response, expiresInSeconds) {
+      const e = expiry(expiresInSeconds);
+      const query = new URLSearchParams({ e, ct: response.contentType, cd: response.contentDisposition, t: localSignature(options.secret, ["GET", key, e, response.contentType, response.contentDisposition]) });
+      return `/api/files/local/${key}?${query}`;
+    },
+    async head(key) {
+      try {
+        const info = await stat(file(key));
+        return { size: info.size, contentType: null };
+      } catch {
+        return null;
+      }
+    },
+    async readStart(key, bytes) {
+      return new Uint8Array(await readFile(file(key))).slice(0, bytes);
+    },
+    async delete(key) {
+      await rm(file(key), { force: true });
+    },
+  };
+  return storage;
+}
+
+export async function writeLocalObject(storage: ReturnType<typeof createLocalStorage>, key: string, body: Uint8Array) {
+  const target = storage.path(key);
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, body);
+}
+
 let override: FileStorage | null | undefined;
 
-// The storage in use: R2 when all four settings exist, otherwise none, and
-// attaching is switched off (NFR-6). Tests swap in memory storage.
+// The storage in use: R2 when all four settings exist, a local folder when
+// FILES_LOCAL_DIR is set (never on Vercel), otherwise none, and attaching is
+// switched off (NFR-6). Tests swap in memory storage.
 export function configuredStorage(): FileStorage | null {
   if (override !== undefined) return override;
+  const local = configuredLocalStorage();
+  if (local) return local;
   const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET } = env;
   if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET) return null;
   return createR2Storage({ accountId: R2_ACCOUNT_ID, accessKeyId: R2_ACCESS_KEY_ID, secretAccessKey: R2_SECRET_ACCESS_KEY, bucket: R2_BUCKET });
@@ -104,4 +169,9 @@ export function configuredStorage(): FileStorage | null {
 
 export function setStorageForTests(storage: FileStorage | null | undefined) {
   override = storage;
+}
+
+export function configuredLocalStorage() {
+  if (!env.FILES_LOCAL_DIR || process.env.VERCEL) return null;
+  return createLocalStorage({ dir: env.FILES_LOCAL_DIR, secret: env.JWT_SECRET });
 }
