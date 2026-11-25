@@ -23,7 +23,8 @@ export const NotificationType = {
   COMMENT_CREATED: 'COMMENT_CREATED',
   MENTION: 'MENTION',
   REVIEW_REQUESTED: 'REVIEW_REQUESTED',
-  REVIEW_RESPONDED: 'REVIEW_RESPONDED'
+  REVIEW_RESPONDED: 'REVIEW_RESPONDED',
+  INVITE_ACCEPTED: 'INVITE_ACCEPTED'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]

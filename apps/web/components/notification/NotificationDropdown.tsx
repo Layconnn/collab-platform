@@ -31,6 +31,7 @@ const titles: Record<NotificationItem["type"], string> = {
   MENTION: "Mention",
   REVIEW_REQUESTED: "Review requested",
   REVIEW_RESPONDED: "Review response",
+  INVITE_ACCEPTED: "Joined with your link",
 };
 
 function NotificationSkeleton() {
@@ -73,8 +74,10 @@ function NotificationRow({
     ? `/workspace/${item.workspaceId}/discussions/${item.discussionId}`
     : typeof decisionId === "string"
       ? `/workspace/${item.workspaceId}/decisions/${decisionId}`
-      : null;
-  const target = item.discussionId ? "discussion" : "decision";
+      : item.type === "INVITE_ACCEPTED"
+        ? `/workspace/${item.workspaceId}/members`
+        : null;
+  const target = item.discussionId ? "discussion" : item.type === "INVITE_ACCEPTED" ? "members" : "decision";
   const date = new Date(item.createdAt);
   const formattedDate = Number.isNaN(date.valueOf())
     ? null

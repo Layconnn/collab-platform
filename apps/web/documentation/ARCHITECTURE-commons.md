@@ -65,7 +65,7 @@ These names are the subdomains used in pull request titles (`Commons: <Subdomain
 | Subdomain | Responsibility | Main code |
 | --- | --- | --- |
 | Identity and Access | Registration, login, sessions, access-token refresh and revocation, CSRF, auth rate limits | `server/services/auth.service.ts`, `server/middleware/auth.ts`, `server/middleware/csrf.ts`, `components/auth/*` |
-| Workspaces and Membership | Workspaces, roles (OWNER, ADMIN, MEMBER), the permission matrix, member onboarding by username, ownership transfer | `server/services/workspace.service.ts`, `server/services/workspace.permissions.ts`, `server/services/workspace.access.ts`, `components/workspace/*` |
+| Workspaces and Membership | Workspaces, roles (OWNER, ADMIN, MEMBER), the permission matrix, member onboarding by username and by invite link (hashed, expiring, revocable tokens; `/join/<token>`), ownership transfer | `server/services/workspace.service.ts`, `server/services/invite.service.ts`, `server/services/workspace.permissions.ts`, `server/services/workspace.access.ts`, `components/workspace/*` |
 | Discussions | Workspace discussions: create, read, edit, delete, list | `server/services/discussion.service.ts`, `components/discussion/*` |
 | Threaded Comments | Nested replies up to depth 8 with lazy per-parent loading | `server/services/comment.service.ts`, `components/comment/*` |
 | Mentions | `@username` parsing, member-scoped suggestions, notifications for newly added mentions | `server/utils/mentions.ts`, `components/common/MentionTextarea.tsx` |

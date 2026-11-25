@@ -146,6 +146,17 @@ export type NotificationEvent =
       occurredAt: string;
     }
   | {
+      // Invite links PRD, FR-10: the link's creator, when someone joins with it.
+      kind: "invite_accepted";
+      requestId: string;
+      actorUserId: string;
+      workspaceId: string;
+      inviteId: string;
+      recipientUserId: string;
+      message: string;
+      occurredAt: string;
+    }
+  | {
       kind: "mentions_added";
       requestId: string;
       actorUserId: string;
@@ -210,6 +221,26 @@ export async function planNotificationDeliveries(event: NotificationEvent): Prom
       message: event.message,
       metadata: { decisionId: event.decisionId, question: event.question },
     }));
+  }
+  if (event.kind === "invite_accepted") {
+    // Only if the creator is still a member, and never for joining your own link.
+    if (event.recipientUserId === event.actorUserId) return [];
+    const member = await prisma.workspaceMember.findUnique({
+      where: { workspaceId_userId: { workspaceId: event.workspaceId, userId: event.recipientUserId } },
+      select: { userId: true },
+    });
+    if (!member) return [];
+    return [{
+      dedupeKey: ["notification", "INVITE_ACCEPTED", event.recipientUserId, event.workspaceId, "invite", event.inviteId, event.actorUserId].join(":"),
+      recipientUserId: event.recipientUserId,
+      actorUserId: event.actorUserId,
+      workspaceId: event.workspaceId,
+      discussionId: null,
+      commentId: null,
+      type: "INVITE_ACCEPTED",
+      message: event.message,
+      metadata: { inviteId: event.inviteId },
+    }];
   }
   if (event.kind === "mentions_added") {
     const [previous, updated] = await Promise.all([
@@ -324,6 +355,13 @@ export const notificationService = {
     if (!params.recipientUserIds.length) return;
     await publishEvent(
       { kind: "decision_review", ...params, requestId: params.requestId ?? randomUUID(), occurredAt: new Date().toISOString() },
+      { workspaceId: params.workspaceId, discussionId: null, commentId: null },
+    );
+  },
+
+  async enqueueInviteAccepted(params: Omit<Extract<NotificationEvent, { kind: "invite_accepted" }>, "kind" | "occurredAt">): Promise<void> {
+    await publishEvent(
+      { kind: "invite_accepted", ...params, occurredAt: new Date().toISOString() },
       { workspaceId: params.workspaceId, discussionId: null, commentId: null },
     );
   },

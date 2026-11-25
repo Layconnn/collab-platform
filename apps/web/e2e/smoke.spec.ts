@@ -135,3 +135,48 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect(page).toHaveURL(/\/login\?next=/);
   });
 });
+
+test("a teammate without an account joins with an invite link", async ({ page, browser }) => {
+  const id = unique();
+  const workspaceName = `Invite ${id}`;
+  let link = "";
+
+  await test.step("the owner creates a link", async () => {
+    await page.goto("/register");
+    await page.getByLabel("Email").fill(`owner_${id}@example.test`);
+    await page.getByLabel("Username").fill(`owner_${id}`);
+    await page.getByLabel("Password", { exact: true }).fill(`owner-password-${id}`);
+    await page.getByRole("button", { name: "Create account" }).click();
+    await page.getByRole("main").getByRole("button", { name: "Create a workspace" }).click();
+    const dialog = page.getByRole("dialog", { name: "Create a workspace" });
+    await dialog.getByLabel("Workspace name").fill(workspaceName);
+    await dialog.getByLabel("Workspace address").fill(`invite-${id}`);
+    await dialog.getByRole("button", { name: "Create workspace" }).click();
+    await expect(page).toHaveURL(/\/workspace\/[a-z0-9]+$/);
+    await page.goto(`${new URL(page.url()).pathname}/members`);
+    await page.getByRole("button", { name: "Invite people" }).click();
+    await page.getByRole("dialog", { name: "Invite people" }).getByRole("button", { name: "Create link" }).click();
+    link = await page.getByRole("dialog", { name: "Your invite link" }).getByLabel("Link").inputValue();
+    expect(link).toMatch(/\/join\/[A-Za-z0-9_-]{43}$/);
+  });
+
+  await test.step("a new person registers from the link and joins", async () => {
+    const guest = await browser.newPage();
+    await guest.goto(link);
+    await expect(guest.getByRole("heading", { name: `owner_${id} invited you to join ${workspaceName}` })).toBeVisible();
+    await guest.getByRole("link", { name: "Create account" }).click();
+    await guest.getByLabel("Email").fill(`guest_${id}@example.test`);
+    await guest.getByLabel("Username").fill(`guest_${id}`);
+    await guest.getByLabel("Password", { exact: true }).fill(`guest-password-${id}`);
+    await guest.getByRole("button", { name: "Create account" }).click();
+    await expect(guest).toHaveURL(/\/join\//);
+    await guest.getByRole("button", { name: `Join ${workspaceName}` }).click();
+    await expect(guest).toHaveURL(/\/workspace\/[a-z0-9]+$/);
+    await guest.close();
+  });
+
+  await test.step("the owner sees the use", async () => {
+    await page.reload();
+    await expect(page.getByRole("list", { name: "Invite links" }).getByText(/^1 joined/)).toBeVisible();
+  });
+});

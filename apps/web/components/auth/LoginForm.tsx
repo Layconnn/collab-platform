@@ -11,15 +11,8 @@ import { loginInputSchema, type LoginInput } from "@repo/validators/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthField } from "@/components/auth/AuthField";
 import { authErrorMessage } from "@/components/auth/authError";
+import { safeNextPath } from "@/lib/safe-next";
 
-// Only same-site paths are followed, so the login page cannot be used as an open redirect.
-function safeNextPath(): string {
-  const next = new URLSearchParams(window.location.search).get("next");
-  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) {
-    return "/workspace";
-  }
-  return next;
-}
 
 export function LoginForm() {
   const router = useRouter();
@@ -44,7 +37,7 @@ export function LoginForm() {
       try {
         await login.mutateAsync(values);
         setRedirecting(true);
-        router.replace(safeNextPath());
+        router.replace(safeNextPath(window.location.search));
       } catch (error) {
         form.setError("root", { type: "server", message: authErrorMessage(error, "login") });
         submittingRef.current = false;

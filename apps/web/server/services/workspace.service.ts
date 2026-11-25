@@ -118,6 +118,12 @@ async function invalidateUserWorkspaceLists(userId: string): Promise<void> {
   await redisCache.delByPattern(`user:${userId}:workspaces:*`);
 }
 
+// After someone joins outside this service (an invite link).
+export async function invalidateMembershipCaches(workspaceId: string, userId: string): Promise<void> {
+  await invalidateWorkspaceCache(workspaceId);
+  await invalidateUserWorkspaceLists(userId);
+}
+
 export const workspaceService = {
   async create(userId: string, input: CreateWorkspaceInput, context: RequestContext) {
     try {

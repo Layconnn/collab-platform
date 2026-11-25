@@ -108,7 +108,9 @@ export function describeActivity(item: ActivityEntry, workspaceId: string): { le
       gone,
     };
     case "DECISION_DELETED": return { lead: "deleted the decision", subject: plain(question) };
-    case "MEMBER_ADDED": return { lead: "added", subject: plain(member), tail: `as ${roleLabel(item.summary?.role)}` };
+    case "MEMBER_ADDED": return item.summary?.via === "invite"
+      ? { lead: "joined with an invite link", subject: "", tail: `as ${roleLabel(item.summary?.role)}` }
+      : { lead: "added", subject: plain(member), tail: `as ${roleLabel(item.summary?.role)}` };
     case "MEMBER_ROLE_CHANGED": return { lead: "changed the role of", subject: plain(member), tail: `from ${roleLabel(item.summary?.previousRole)} to ${roleLabel(item.summary?.role)}` };
     case "MEMBER_REMOVED": return { lead: "removed", subject: plain(member) };
     case "OWNERSHIP_TRANSFERRED": return { lead: "transferred ownership to", subject: plain(member) };

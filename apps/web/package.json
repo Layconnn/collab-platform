@@ -29,6 +29,7 @@
     "test:saved-api": "node --test server/api/saved.integration.test.mjs",
     "test:digest-api": "node --test server/api/digest.integration.test.mjs",
     "test:files-api": "node --test server/api/files.integration.test.mjs",
+    "test:invite-api": "node --test server/api/invite.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },

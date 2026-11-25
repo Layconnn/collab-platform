@@ -10,6 +10,7 @@ import { registerInputSchema, type RegisterInput } from "@repo/validators/auth";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthField } from "@/components/auth/AuthField";
 import { authErrorMessage } from "@/components/auth/authError";
+import { safeNextPath } from "@/lib/safe-next";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export function RegisterForm() {
       try {
         await register.mutateAsync(values);
         setRedirecting(true);
-        router.replace("/workspace");
+        router.replace(safeNextPath(window.location.search));
       } catch (error) {
         form.setError("root", { type: "server", message: authErrorMessage(error, "register") });
         submittingRef.current = false;

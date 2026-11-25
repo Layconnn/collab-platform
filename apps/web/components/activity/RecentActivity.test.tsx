@@ -136,3 +136,13 @@ describe("review activity", () => {
   });
 });
 
+
+describe("membership activity", () => {
+  const added = (summary: Record<string, unknown>) => event({ kind: "MEMBER_ADDED", subjectType: "MEMBER", subjectId: "c000000000000000000000004", discussion: null, summary }) as never;
+
+  it("says when someone joined with an invite link rather than being added", () => {
+    const joined = describeActivity(added({ member: "Lee", role: "MEMBER", via: "invite" }), "c000000000000000000000001");
+    expect([joined.lead, joined.tail]).toEqual(["joined with an invite link", "as member"]);
+    expect(describeActivity(added({ member: "Lee", role: "ADMIN" }), "c000000000000000000000001").lead).toBe("added");
+  });
+});
