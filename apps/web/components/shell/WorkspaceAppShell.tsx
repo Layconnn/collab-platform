@@ -10,6 +10,7 @@ import { AppIcon } from "@/components/common/AppIcon";
 import { WorkspaceSwitcher } from "@/components/shell/WorkspaceSwitcher";
 import { CommandPalette, ShortcutsSheet, useCommandShortcuts } from "@/components/command/CommandPalette";
 import { CreateWorkspaceDialog } from "@/components/workspace/CreateWorkspaceDialog";
+import { TopBarSlotProvider, useTopBarSlot } from "@/components/shell/TopBarActions";
 import { isMacPlatform } from "@/components/command/commandItems";
 import { NotificationDropdown } from "@/components/notification/NotificationDropdown";
 import { WorkspaceNavigation } from "@/components/workspace/WorkspaceNavigation";
@@ -66,23 +67,11 @@ function SidebarContent({
   onToggle?: () => void;
   showBrandHeader?: boolean;
 }) {
+  const setCommandPaletteOpen = useUiStore((state) => state.setCommandPaletteOpen);
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      {showBrandHeader ? (
-        <div className={`flex h-14 shrink-0 items-center border-b border-border-subtle px-3 ${collapsed ? "justify-center" : "justify-between"}`}>
-          <Link href="/workspace" onClick={onNavigate} className="flex min-w-0 items-center gap-2.5 rounded focus-visible:ring-2 focus-visible:ring-focus-ring" aria-label="Commons home">
-            <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent">C</span>
-            {!collapsed ? <span className="truncate text-sm font-semibold text-text-primary">Commons</span> : null}
-          </Link>
-          {!collapsed && onToggle ? (
-            <IconButton type="button" aria-label="Collapse sidebar" title="Collapse sidebar" size="sm" variant="ghost" onClick={onToggle}>
-              <AppIcon name="panel" />
-            </IconButton>
-          ) : null}
-        </div>
-      ) : null}
-
-      <div className="shrink-0 p-3">
+    <div className="flex h-full min-h-0 flex-col gap-4 px-3 pb-4 pt-3.5">
+      {showBrandHeader ? <span className="sr-only">Commons</span> : null}
+      <div className="shrink-0">
         <WorkspaceSwitcher
           pathname={pathname}
           currentId={workspaceId}
@@ -99,15 +88,29 @@ function SidebarContent({
         />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
-        {!collapsed ? <p className="mb-2 px-2.5 text-[10px] font-semibold uppercase text-text-muted">Workspace</p> : null}
-        <WorkspaceNavigation workspaceId={workspaceId} collapsed={collapsed} onNavigate={onNavigate} />
+      <button
+        type="button"
+        onClick={() => { onNavigate?.(); setCommandPaletteOpen(true); }}
+        aria-keyshortcuts="Control+K Meta+K"
+        aria-label={collapsed ? "Search or jump to" : undefined}
+        title={collapsed ? "Search or jump to" : undefined}
+        className={`flex min-h-[34px] shrink-0 items-center gap-2 rounded-[9px] border border-sidebar-line bg-sidebar-field px-2.5 text-[0.8125rem] text-sidebar-muted transition-colors duration-150 ease-out hover:text-sidebar-text-strong focus-visible:outline-2 focus-visible:outline-sidebar-live ${collapsed ? "justify-center" : ""}`}
+      >
+        <AppIcon name="search" />
+        {!collapsed ? <>
+          <span className="flex-1 text-left">Search or jump to</span>
+          <kbd suppressHydrationWarning className="rounded-[5px] bg-sidebar-hover px-1.5 py-px font-mono text-[11px] text-sidebar-text">{isMacPlatform() ? "⌘K" : "Ctrl K"}</kbd>
+        </> : null}
+      </button>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <WorkspaceNavigation workspaceId={workspaceId} workspaceName={workspaceName} workspaces={workspaces} collapsed={collapsed} onNavigate={onNavigate} />
       </div>
 
-      <div className="shrink-0 border-t border-border-subtle p-3">
-        {collapsed && onToggle ? (
-          <IconButton type="button" aria-label="Expand sidebar" title="Expand sidebar" size="sm" variant="ghost" className="mb-2 w-full" onClick={onToggle}>
-            <AppIcon name="panel-open" />
+      <div className="flex shrink-0 flex-col gap-2">
+        {onToggle ? (
+          <IconButton type="button" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} title={collapsed ? "Expand sidebar" : "Collapse sidebar"} size="sm" variant="ghost" className={`!text-sidebar-muted hover:!bg-sidebar-hover hover:!text-sidebar-text-strong ${collapsed ? "w-full" : "self-end"}`} onClick={onToggle}>
+            <AppIcon name={collapsed ? "panel-open" : "panel"} />
           </IconButton>
         ) : null}
         <AccountMenu user={user} collapsed={collapsed} />
@@ -139,6 +142,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
   const mobileCloseRef = useRef<HTMLButtonElement>(null);
   const mobilePanelRef = useRef<HTMLElement>(null);
   const previousPathname = useRef(pathname);
+  const { slot, slotRef } = useTopBarSlot();
 
   useEffect(() => {
     if (!mobileNavOpen) return;
@@ -222,7 +226,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
     : workspaceName ?? (workspaceId ? "Loading workspace" : context);
 
   return (
-    <div className={`min-h-screen bg-canvas text-text-primary md:grid md:transition-[grid-template-columns] md:duration-150 motion-reduce:transition-none ${sidebarExpanded ? "md:grid-cols-[16rem_minmax(0,1fr)]" : "md:grid-cols-[4.5rem_minmax(0,1fr)]"}`}>
+    <div className={`min-h-screen bg-canvas text-text-primary md:grid md:transition-[grid-template-columns] md:duration-150 motion-reduce:transition-none ${sidebarExpanded ? "md:grid-cols-[16.5rem_minmax(0,1fr)]" : "md:grid-cols-[4.5rem_minmax(0,1fr)]"}`}>
       <a href="#main-content" className="sr-only z-[60] rounded bg-surface px-3 py-2 text-sm font-medium text-text-primary focus:not-sr-only focus:fixed focus:left-3 focus:top-3">
         Skip to content
       </a>
@@ -230,13 +234,13 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
       <aside
         aria-label="Application sidebar"
         inert={mobileNavOpen}
-        className="sticky top-0 z-30 hidden h-dvh min-w-0 self-start border-r border-border-subtle bg-surface md:block"
+        className="sticky top-0 z-30 hidden h-dvh min-w-0 self-start border-r border-sidebar-line bg-sidebar text-sidebar-text md:block"
       >
         {sidebarContent}
       </aside>
 
       <div inert={mobileNavOpen} className="min-h-screen min-w-0">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border-subtle bg-surface px-3 sm:px-5 lg:px-8">
+        <header className="glass-bar sticky top-0 z-20 flex min-h-14 flex-wrap items-center gap-3 border-b px-4 py-2.5 sm:px-7">
           <div className="flex min-w-0 items-center gap-2 md:hidden">
             <IconButton
               ref={mobileTriggerRef}
@@ -250,32 +254,30 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
             >
               <AppIcon name="menu" />
             </IconButton>
-            <Link href="/workspace" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent" aria-label="Commons home">C</Link>
             <span className="min-w-0 truncate text-sm font-medium text-text-primary">{contextName}</span>
           </div>
-          <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-xs text-text-muted md:flex">
+          <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-[0.8125rem] text-text-muted md:flex">
             <Link href="/workspace" className="shrink-0 hover:text-text-primary">Home</Link>
             {visibleWorkspaceId ? <><span aria-hidden="true">/</span><Link href={`/workspace/${visibleWorkspaceId}`} className="max-w-64 truncate hover:text-text-primary">{contextName}</Link></> : null}
-            {visibleWorkspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span><span aria-current="page" className="text-text-secondary">{context}</span></> : null}
+            {visibleWorkspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span><span aria-current="page" className="font-medium text-text-primary">{context}</span></> : null}
+            {!visibleWorkspaceId && context !== "Home" ? <><span aria-hidden="true">/</span><span aria-current="page" className="font-medium text-text-primary">{context}</span></> : null}
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-2">
+            <div ref={slotRef} className="flex flex-wrap items-center gap-2" />
             <button
               type="button"
               onClick={() => setCommandPaletteOpen(true)}
-              aria-keyshortcuts="Control+K Meta+K"
-              className="flex min-h-9 items-center gap-2 rounded-sm border border-border-subtle px-2.5 text-xs text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"
+              aria-label="Search or jump to"
+              className="grid size-9 place-items-center rounded-[9px] text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring md:hidden"
             >
               <AppIcon name="search" />
-              <span className="hidden sm:inline">Search or jump to…</span>
-              <span className="sr-only sm:hidden">Open command palette</span>
-              <kbd suppressHydrationWarning className="hidden rounded-[3px] border border-border-subtle px-1 font-mono text-[11px] sm:inline">{isMacPlatform() ? "⌘K" : "Ctrl K"}</kbd>
             </button>
-            <NotificationDropdown compact />
+            <span className="md:hidden"><NotificationDropdown compact /></span>
           </div>
         </header>
 
-        <main id="main-content" className="mx-auto w-full min-w-0 max-w-none wrap-anywhere px-4 py-6 sm:px-6 lg:px-8">
-          {children}
+        <main id="main-content" className="w-full min-w-0 max-w-none wrap-anywhere px-5 pb-12 pt-8 sm:px-7 lg:px-10">
+          <TopBarSlotProvider slot={slot}>{children}</TopBarSlotProvider>
         </main>
         <CommandPalette />
         <ShortcutsSheet />
@@ -292,14 +294,14 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
             aria-modal="true"
             aria-label="Workspace navigation"
             tabIndex={-1}
-            className="relative z-10 flex h-full w-[min(20rem,calc(100%-2.5rem))] flex-col border-r border-border bg-surface shadow-xl"
+            className="relative z-10 flex h-full w-[min(20rem,calc(100%-2.5rem))] flex-col bg-sidebar text-sidebar-text shadow-xl"
           >
-            <div className="flex h-14 shrink-0 items-center justify-between border-b border-border-subtle px-3">
-              <Link href="/workspace" onClick={() => setMobileNavOpen(false)} className="flex items-center gap-2.5 rounded focus-visible:ring-2 focus-visible:ring-focus-ring">
-                <span aria-hidden="true" className="grid size-8 place-items-center rounded-md bg-brand-accent text-sm font-bold text-on-brand-accent">C</span>
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-sidebar-line px-3">
+              <Link href="/workspace" onClick={() => setMobileNavOpen(false)} className="flex items-center gap-2.5 rounded text-sidebar-text-strong focus-visible:ring-2 focus-visible:ring-sidebar-live">
+                <span aria-hidden="true" className="grid size-8 place-items-center rounded-lg bg-editorial-cream text-sm font-bold text-brand-primary">C</span>
                 <span className="text-sm font-semibold">Commons</span>
               </Link>
-              <IconButton ref={mobileCloseRef} type="button" aria-label="Close navigation" size="sm" variant="ghost" onClick={() => setMobileNavOpen(false)}>
+              <IconButton ref={mobileCloseRef} type="button" aria-label="Close navigation" size="sm" variant="ghost" className="!text-sidebar-text hover:!bg-sidebar-hover" onClick={() => setMobileNavOpen(false)}>
                 <AppIcon name="close" />
               </IconButton>
             </div>
@@ -330,14 +332,14 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
 
 export function WorkspaceShellLoading() {
   return (
-    <div className="min-h-screen bg-canvas md:grid md:grid-cols-[16rem_minmax(0,1fr)]" role="status" aria-label="Checking your session">
-      <aside aria-hidden="true" className="sticky top-0 hidden h-dvh min-w-0 self-start border-r border-border-subtle bg-surface p-4 md:block">
-        <div className="h-8 w-32 animate-pulse rounded bg-surface-active" />
-        <div className="mt-8 h-11 animate-pulse rounded bg-surface-subtle" />
-        <div className="mt-8 space-y-3"><div className="h-9 animate-pulse rounded bg-surface-subtle" /><div className="h-9 animate-pulse rounded bg-surface-subtle" /><div className="h-9 animate-pulse rounded bg-surface-subtle" /></div>
+    <div className="min-h-screen bg-canvas md:grid md:grid-cols-[16.5rem_minmax(0,1fr)]" role="status" aria-label="Checking your session">
+      <aside aria-hidden="true" className="sticky top-0 hidden h-dvh min-w-0 self-start bg-sidebar p-4 md:block">
+        <div className="h-12 animate-pulse rounded-[10px] bg-sidebar-hover" />
+        <div className="mt-4 h-[34px] animate-pulse rounded-[9px] bg-sidebar-field" />
+        <div className="mt-6 space-y-2"><div className="h-[34px] animate-pulse rounded-lg bg-sidebar-hover" /><div className="h-[34px] animate-pulse rounded-lg bg-sidebar-hover" /><div className="h-[34px] animate-pulse rounded-lg bg-sidebar-hover" /></div>
       </aside>
       <div className="min-w-0">
-        <header aria-hidden="true" className="h-14 border-b border-border-subtle bg-surface px-4">
+        <header aria-hidden="true" className="h-14 border-b border-border-subtle bg-canvas px-4">
           <div className="ml-auto h-8 w-24 animate-pulse rounded bg-surface-subtle" />
         </header>
         <main className="px-4 py-6" aria-live="polite">
