@@ -88,6 +88,23 @@ describe("Commons brand tokens", () => {
       expect(
         contrast(token("--control-border", mode), token("--surface", mode)),
       ).toBeGreaterThanOrEqual(3);
+      // Canopy (dashboard redesign PRD, NFR-1): text on every surface it sits on.
+      for (const surface of ["--surface", "--canvas", "--surface-active"]) {
+        expect(contrast(token("--text-muted", mode), token(surface, mode))).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(token("--text-secondary", mode), token(surface, mode))).toBeGreaterThanOrEqual(4.5);
+      }
+      for (const [text, background] of [
+        ["--on-attention", "--attention"],
+        ["--attention-text", "--attention-soft"],
+        ["--on-status-proposal", "--status-proposal"],
+        ["--on-status-decided", "--status-decided"],
+        ["--on-status-replaced", "--status-replaced"],
+        ["--sidebar-text", "--sidebar"],
+        ["--sidebar-text-strong", "--sidebar"],
+        ["--sidebar-muted", "--sidebar"],
+      ]) {
+        expect(contrast(token(text, mode), token(background, mode)), `${text} on ${background} (${mode})`).toBeGreaterThanOrEqual(4.5);
+      }
     }
 
     expect(
