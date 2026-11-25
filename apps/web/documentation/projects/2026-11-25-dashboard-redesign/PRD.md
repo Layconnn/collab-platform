@@ -136,15 +136,15 @@ The author confirmed every default on 2026-11-25.
 | # | Pull request | Requirements |
 | --- | --- | --- |
 | 1 (#164) | `Platform: Design System: PRD for the dashboard redesign` — this document | — |
-| 2 | `Platform: Design System: Canopy tokens, motion, glass and primitives` — tokens light and dark, Instrument Serif, motion and glass utilities with reduced-motion and fallback, the shared primitives with tests, `docs/DESIGN_SYSTEM.md` updated | FR-1, FR-2, NFR-2, NFR-3 |
-| 3 | `Platform: Design System: the Canopy shell` — forest sidebar, glass top bar, full-width frame with context panel, phone drawer | FR-3, FR-5, FR-6, NFR-1 |
-| 4 | `Platform: Design System: overlays in Canopy` — command palette, notifications, account menu, dialogs, menus, toasts | FR-4, NFR-2 |
-| 5 | `Commons: Home: redesign Home as a briefing` — Home v2 | FR-4, FR-6, FR-7 |
-| 6 | `Commons: Discussions: redesign the discussions list and composer` | FR-4, FR-6 |
-| 7 | `Commons: Discussions: redesign the discussion page` — thread, floating composer, context panel | FR-4, FR-5, FR-6 |
-| 8 | `Commons: Decision Records: redesign decisions as a list beside the record` — Decisions v2: grouped list, the record, review and history, floating action bar | FR-4, FR-6, FR-7 |
-| 9 | `Commons: Decision Records: redesign the decision flows` — direct-link record, edit, finalize, supersede and delete, full history and replacement chain | FR-4, FR-6, FR-7 |
-| 10 | `Commons: Workspaces and Membership: redesign the workspace overview and members` | FR-4, FR-6 |
-| 11 | `Commons: Search: redesign search and saved` | FR-4, FR-6 |
-| 12 | `Platform: Design System: settings in the pattern of X` — the settings layout, category list with search, grouped rows and deeper pages; the digest, theme and password moved in | FR-6, FR-8 |
-| 13 | `Platform: Design System: states, accessibility and motion audit` — skeletons, empty and error states everywhere, an accessibility and reduced-motion pass, final screenshots | NFR-1, NFR-2, NFR-4 |
+| 2 (#166) | `Platform: Design System: Canopy tokens, motion, glass and primitives` — tokens light and dark, Instrument Serif, motion and glass utilities with reduced-motion and fallback, the shared primitives with tests, `docs/DESIGN_SYSTEM.md` updated | FR-1, FR-2, NFR-2, NFR-3 |
+| 3 (#167) | `Platform: Design System: the Canopy shell` — forest sidebar, glass top bar, full-width frame with context panel, phone drawer | FR-3, FR-5, FR-6, NFR-1 |
+| 4 (#168) | `Platform: Design System: overlays in Canopy` — command palette, notifications, account menu, dialogs, menus, toasts | FR-4, NFR-2 |
+| 5 (#169) | `Commons: Home: redesign Home as a briefing` — Home v2 | FR-4, FR-6, FR-7 |
+| 6 (#170) | `Commons: Discussions: redesign the discussions list and composer` | FR-4, FR-6 |
+| 7 (#171) | `Commons: Discussions: redesign the discussion page` — thread, floating composer, context panel | FR-4, FR-5, FR-6 |
+| 8 (#172) | `Commons: Decision Records: redesign decisions as a list beside the record` — Decisions v2: grouped list, the record, review and history, floating action bar | FR-4, FR-6, FR-7 |
+| 9 (#173) | `Commons: Decision Records: redesign the decision flows` — direct-link record, edit, finalize, supersede and delete, full history and replacement chain | FR-4, FR-6, FR-7 |
+| 10 (#174) | `Commons: Workspaces and Membership: redesign the workspace overview and members` | FR-4, FR-6 |
+| 11 (#175) | `Commons: Search: redesign search and saved` | FR-4, FR-6 |
+| 12 (#176) | `Platform: Design System: settings in the pattern of X` — the settings layout, category list with search, grouped rows and deeper pages; the digest, theme and password moved in | FR-6, FR-8 |
+| 13 (#177) | `Platform: Design System: states, accessibility and motion audit` — skeletons, empty and error states everywhere, an accessibility and reduced-motion pass, final screenshots | NFR-1, NFR-2, NFR-4 |
