@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { attachmentIdsSchema } from "./files";
+
 const id = z.string().cuid();
 const text = (max: number) => z.string().trim().min(1).max(max);
 const optionalText = (max: number) => text(max).optional();
@@ -12,6 +14,7 @@ export const createDecisionInputSchema = z.object({
   rationale: optionalText(5000),
   alternatives: optionalText(5000),
   followUp: optionalText(2000),
+  attachmentIds: attachmentIdsSchema.optional(),
   idempotencyKey: z.string().trim().min(8).max(128),
 });
 
@@ -36,7 +39,9 @@ export const editDecisionInputSchema = decisionByIdInputSchema.extend({
   rationale: text(5000).nullable().optional(),
   alternatives: text(5000).nullable().optional(),
   followUp: text(2000).nullable().optional(),
-}).refine((value) => [value.question, value.outcome, value.rationale, value.alternatives, value.followUp].some((field) => field !== undefined), {
+  // The proposal's full list of files in order, when it changes.
+  attachmentIds: attachmentIdsSchema.optional(),
+}).refine((value) => [value.question, value.outcome, value.rationale, value.alternatives, value.followUp, value.attachmentIds].some((field) => field !== undefined), {
   message: "Provide at least one field to edit.",
 });
 

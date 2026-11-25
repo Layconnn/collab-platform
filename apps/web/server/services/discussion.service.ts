@@ -45,7 +45,7 @@ function workspaceDiscussionListKey(
   cursor: string | undefined,
   take: number,
 ): string {
-  return `workspace:${workspaceId}:discussions:v2:${cursor ?? "start"}:${take}`;
+  return `workspace:${workspaceId}:discussions:v3:${cursor ?? "start"}:${take}`;
 }
 
 async function invalidateDiscussionCaches(
@@ -255,6 +255,7 @@ export const discussionService = {
           name: string | null;
           username: string;
         };
+        files: number;
         createdAt: Date;
         updatedAt: Date;
       }>
@@ -300,12 +301,13 @@ export const discussionService = {
             username: true,
           },
         },
+        _count: { select: { attachments: true } },
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    const paginated = toPaginatedResult(rows, input.take);
+    const paginated = toPaginatedResult(rows.map(({ _count, ...row }) => ({ ...row, files: _count.attachments })), input.take);
     await redisCache.setJSON(cacheKey, paginated, DISCUSSION_LIST_TTL_SECONDS);
     await recordDiscussionOperation({
       requestId: context.requestId,

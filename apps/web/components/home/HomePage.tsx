@@ -11,6 +11,7 @@ import { WorkspaceCards } from "@/components/home/WorkspaceCards";
 import { useAuth } from "@/hooks/useAuth";
 import { useDismissNeeds, useNeedsYou, useRecentDecisions, useWorkspacePulse } from "@/hooks/useHome";
 import { useUiStore } from "@/stores/ui.store";
+import { FileCount } from "@/components/files/FileCount";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const URGENT_MS = 2 * DAY_MS;
@@ -35,6 +36,7 @@ type RecentDecision = {
   actor: string;
   at: Date | string;
   replacement: { id: string; question: string } | null;
+  files?: number;
 };
 
 export function greeting(hour: number) {
@@ -154,6 +156,7 @@ function DecidedThisWeek() {
             ? <>Replaced{decision.replacement ? <> by <Link href={`/workspace/${decision.workspace.id}/decisions/${decision.replacement.id}`} className="text-brand-link hover:underline">{decision.replacement.question}</Link></> : null} · {decision.actor}</>
             : <>Finalized by {decision.actor}</>}
           {" · "}{decision.workspace.name} · <time dateTime={new Date(decision.at).toISOString()}>{timeAgo(decision.at)}</time>
+          {decision.files ? <> · <FileCount count={decision.files} /></> : null}
         </p>
       </li>)}
     </ol> : null}

@@ -139,7 +139,7 @@ export const attachmentService = {
   async sync(tx: Tx, input: { userId: string; workspaceId: string; target: AttachmentTarget; desired: string[]; now?: Date }) {
     const desired = [...new Set(input.desired)];
     if (desired.length > FILE_LIMITS.maxFilesPerPost) throw new AppError("BAD_REQUEST", `A post can have up to ${FILE_LIMITS.maxFilesPerPost} files.`);
-    const existing = await tx.attachment.findMany({ where: { ...input.target }, select: { id: true } });
+    const existing = await tx.attachment.findMany({ where: { ...input.target }, orderBy: { position: "asc" }, select: { id: true } });
     const have = new Set(existing.map((row) => row.id));
     const removed = existing.filter((row) => !desired.includes(row.id)).map((row) => row.id);
     if (removed.length) await tx.attachment.deleteMany({ where: { id: { in: removed }, ...input.target } });
@@ -152,7 +152,9 @@ export const attachmentService = {
         added.push(id);
       }
     }
-    return { added: added.length, removed: removed.length, count: desired.length };
+    const kept = existing.filter((row) => desired.includes(row.id)).map((row) => row.id);
+    const reordered = kept.join() !== desired.filter((id) => have.has(id)).join();
+    return { added: added.length, removed: removed.length, reordered, count: desired.length };
   },
 
   // FR-8: a short-lived download URL, only for current members who can read

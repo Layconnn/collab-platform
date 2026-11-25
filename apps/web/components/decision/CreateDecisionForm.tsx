@@ -10,6 +10,8 @@ import { createDecisionInputSchema } from "@repo/validators/decision";
 import { useDecisionActions } from "@/hooks/useDecision";
 import { blankDecisionDraft, decisionDraftSchema, DecisionFields, optionalCreate, type DecisionDraft } from "./decisionFields";
 import { decisionError } from "./decisionUI";
+import { AttachmentComposer } from "@/components/files/AttachmentComposer";
+import { uploadBlocker, useUploader } from "@/hooks/useAttachments";
 
 export function CreateDecisionForm({ workspaceId, discussionId, discussionTitle, onCancel }: {
   workspaceId: string; discussionId: string; discussionTitle: string; onCancel: () => void;
@@ -20,16 +22,22 @@ export function CreateDecisionForm({ workspaceId, discussionId, discussionTitle,
   const submission = useRef<{ fingerprint: string; key: string } | null>(null);
   const inFlight = useRef(false);
   const [createdId, setCreatedId] = useState<string | null>(null);
+  const uploader = useUploader(workspaceId);
+  const [blocked, setBlocked] = useState<string | null>(null);
   const busy = create.isPending || form.formState.isSubmitting || Boolean(createdId);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (inFlight.current || createdId) { event.preventDefault(); return; }
+    const blocker = uploadBlocker(uploader);
+    setBlocked(blocker);
+    if (blocker) { event.preventDefault(); return; }
     inFlight.current = true;
     void form.handleSubmit(async (draft) => {
       const content = {
         workspaceId, sourceDiscussionId: discussionId, question: draft.question.trim(),
         outcome: optionalCreate(draft.outcome), rationale: optionalCreate(draft.rationale),
         alternatives: optionalCreate(draft.alternatives), followUp: optionalCreate(draft.followUp),
+        attachmentIds: uploader.attachmentIds,
       };
       const fingerprint = JSON.stringify(content);
       if (submission.current?.fingerprint !== fingerprint) submission.current = { fingerprint, key: crypto.randomUUID() };
@@ -47,7 +55,10 @@ export function CreateDecisionForm({ workspaceId, discussionId, discussionTitle,
 
   return <form onSubmit={onSubmit} noValidate className="max-w-[44rem] space-y-4">
     <p className="text-sm leading-6 text-text-secondary">Linked to <strong className="wrap-anywhere text-text-primary">{discussionTitle}</strong>. Add an outcome and rationale now or before a workspace manager finalizes it.</p>
-    <DecisionFields prefix="propose-decision" register={form.register} errors={form.formState.errors} disabled={busy} />
+    <AttachmentComposer uploader={uploader} disabled={busy}>
+      <DecisionFields prefix="propose-decision" register={form.register} errors={form.formState.errors} disabled={busy} />
+    </AttachmentComposer>
+    {blocked && uploadBlocker(uploader) ? <p role="alert" className="text-sm text-danger">{uploadBlocker(uploader)}</p> : null}
     {create.error ? <div role="alert" className="border-l-2 border-danger bg-surface px-4 py-3 text-sm text-danger">{decisionError(create.error, "Could not save the proposal. Your draft is still here; please try again.")}{["FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(create.error.data?.code ?? "") ? <Link href={`/workspace/${workspaceId}/decisions`} className="mt-2 block font-semibold underline">Open decisions</Link> : null}</div> : null}
     {createdId ? <p role="status" className="text-sm text-text-secondary">Proposal saved. <Link href={`/workspace/${workspaceId}/decisions/${createdId}`} className="font-semibold text-brand-link underline">Open decision</Link></p> : null}
     <div className="flex flex-col-reverse gap-2 border-t border-border-subtle pt-4 sm:flex-row sm:justify-end">

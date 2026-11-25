@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
   decision: {
     id: "c000000000000000000000002", workspaceId: "c000000000000000000000001", sourceDiscussionId: "c000000000000000000000003" as string | null,
     sourceDiscussionTitle: "Initial discussion", createdById: "user-1", createdByLabel: "Maya", question: "Which stack?", outcome: "Use TypeScript",
-    rationale: "Shared types", alternatives: "Plain JavaScript", followUp: "Document the choice", status: "PROPOSED" as "PROPOSED" | "DECIDED" | "SUPERSEDED", version: 1,
+    rationale: "Shared types", alternatives: "Plain JavaScript", followUp: "Document the choice", attachments: [] as Array<{ id: string; fileName: string; contentType: string; size: number }>, status: "PROPOSED" as "PROPOSED" | "DECIDED" | "SUPERSEDED", version: 1,
     decidedAt: null as Date | null, updatedAt: new Date("2026-10-20T10:00:00Z"), createdAt: new Date("2026-10-20T09:00:00Z"),
     previousDecision: null as null | { id: string; question: string },
     replacementDecision: null as null | { id: string; question: string },
@@ -33,6 +33,12 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(), edit: vi.fn(), finalize: vi.fn(), supersede: vi.fn(), remove: vi.fn(), push: vi.fn(), listNextPage: vi.fn(), revisionNextPage: vi.fn(), refetch: vi.fn(),
 }));
 
+// File uploads are covered in components/files; here they are switched off.
+vi.mock("@/hooks/useAttachments", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/hooks/useAttachments")>()),
+  useAttachmentConfig: () => ({ data: { enabled: false } }),
+  useUploader: () => ({ items: [], notice: null, add: () => {}, remove: () => {}, retry: () => {}, reset: () => {}, attachmentIds: [], uploading: false, failed: false }),
+}));
 vi.mock("@/components/common/SaveButton", () => ({ SaveButton: () => null }));
 vi.mock("next/navigation", () => ({ useParams: () => ({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId }), useRouter: () => ({ push: mocks.push }) }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: mocks.userId } }) }));

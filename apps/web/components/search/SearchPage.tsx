@@ -11,6 +11,7 @@ import { DecisionStatus } from "@/components/decision/decisionUI";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearch, type SearchFilters } from "@/hooks/useSearch";
 import { useWorkspaceSwitcherList } from "@/hooks/useWorkspace";
+import { FileCount } from "@/components/files/FileCount";
 
 // Server snippets wrap matched words in these control characters.
 const HIGHLIGHT_START = "\u0002";
@@ -42,6 +43,7 @@ export type SearchResultItem = {
   status: "PROPOSED" | "DECIDED" | "SUPERSEDED" | null;
   author: string;
   discussionId: string | null;
+  files?: number;
   updatedAt: Date | string;
 };
 
@@ -220,7 +222,7 @@ export function SearchPage() {
               <Link href={resultHref(item)} className="underline-offset-2 hover:text-brand-link hover:underline focus-visible:outline-2 focus-visible:outline-focus-ring">{item.type === "COMMENT" ? `Reply in ${item.title}` : item.title}</Link>
             </h2>
             {item.snippet ? <p className="mt-1.5 wrap-anywhere text-sm leading-6 text-text-secondary"><Snippet text={item.snippet} /></p> : null}
-            <p className="mt-1.5 text-xs text-text-muted">{item.author} · updated <time dateTime={new Date(item.updatedAt).toISOString()}>{timeAgo(item.updatedAt)}</time></p>
+            <p className="mt-1.5 text-xs text-text-muted">{item.author} · updated <time dateTime={new Date(item.updatedAt).toISOString()}>{timeAgo(item.updatedAt)}</time>{item.files ? <> · <FileCount count={item.files} /></> : null}</p>
           </li>)}
         </ol>
         {search.hasNextPage ? <button type="button" disabled={search.isFetchingNextPage} onClick={() => void search.fetchNextPage()} className="mt-4 min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{search.isFetchingNextPage ? "Loading..." : "More results"}</button> : null}

@@ -283,3 +283,48 @@ test("discussions and replies: attach on create, change on edit, file-only repli
   await app(maya).discussion.remove({ discussionId: d.id });
   assert.equal(await prisma.deletedFile.count({ where: { key: { in: [extra.key, shot.key, replyFile.key] } } }), 3);
 });
+
+test("decisions: files on create and edit, revision snapshots, finalized records locked, counts elsewhere", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(maya, [sam]);
+  const d = await discussion(ws, maya);
+  const sheet = await upload(sam, ws, "pricing.xlsx", new TextEncoder().encode("PK"));
+  const brief = await upload(sam, ws, "brief.pdf", new TextEncoder().encode("%PDF-1.7"));
+
+  const created = await app(sam).decision.create({
+    workspaceId: ws.id, sourceDiscussionId: d.id, question: "Ship pricing B", outcome: "B", rationale: "Simpler.",
+    attachmentIds: [sheet.attachmentId, brief.attachmentId], idempotencyKey: `key-${suffix()}`,
+  });
+  assert.deepEqual(created.attachments.map((file) => file.fileName), ["pricing.xlsx", "brief.pdf"]);
+  const read = await app(maya).decision.getById({ workspaceId: ws.id, decisionId: created.id });
+  assert.deepEqual(read.attachments.map((file) => file.fileName), ["pricing.xlsx", "brief.pdf"]);
+  assert.equal((await app(maya).decision.listByWorkspace({ workspaceId: ws.id, take: 20 })).items[0].attachments.length, 2);
+
+  // A reviewer's approval is asked again when only the files change.
+  await app(sam).decisionReview.request({ workspaceId: ws.id, decisionId: created.id, reviewerIds: [maya.id] });
+  const version = async () => (await prisma.decision.findUniqueOrThrow({ where: { id: created.id } })).version;
+  await app(maya).decisionReview.respond({ workspaceId: ws.id, decisionId: created.id, expectedVersion: await version(), response: "APPROVED" });
+  const edited = await app(sam).decision.edit({ workspaceId: ws.id, decisionId: created.id, expectedVersion: await version(), attachmentIds: [brief.attachmentId] });
+  assert.deepEqual(edited.attachments.map((file) => file.fileName), ["brief.pdf"]);
+  const review = await prisma.decisionReview.findFirstOrThrow({ where: { decisionId: created.id, reviewerId: maya.id } });
+  assert.equal(review.state, "PENDING", "changing the files asks reviewers again");
+  const revisions = (await app(maya).decision.revisions({ workspaceId: ws.id, decisionId: created.id, take: 20 })).items;
+  assert.deepEqual(revisions.map((revision) => [revision.action, revision.fileNames]), [["CREATE", ["pricing.xlsx", "brief.pdf"]], ["EDIT", ["brief.pdf"]]]);
+  assert.equal(await prisma.deletedFile.count({ where: { key: sheet.key } }), 1);
+
+  const finalized = await app(maya).decision.finalize({ workspaceId: ws.id, decisionId: created.id, expectedVersion: edited.version, overrideReason: "Ship before the review closes." });
+  assert.deepEqual((await prisma.decisionRevision.findFirstOrThrow({ where: { decisionId: created.id, action: "FINALIZE" } })).fileNames, ["brief.pdf"]);
+  const late = await upload(sam, ws, "late.pdf", new TextEncoder().encode("%PDF-1.7"));
+  await rejects(app(sam).decision.edit({ workspaceId: ws.id, decisionId: created.id, expectedVersion: finalized.version, attachmentIds: [brief.attachmentId, late.attachmentId] }), "CONFLICT");
+  assert.equal((await prisma.attachment.findUniqueOrThrow({ where: { id: late.attachmentId } })).status, "PENDING", "nothing is claimed by a refused edit");
+
+  // Counts, never content: Home, search and the discussion list.
+  const recent = await app(maya).home.recentDecisions();
+  assert.equal(recent.decisions.find((item) => item.decisionId === created.id).files, 1);
+  const found = await app(maya).search.query({ query: "pricing", take: 10 });
+  assert.equal(found.items.find((item) => item.id === created.id)?.files, 1);
+  const shot = await upload(maya, ws, "shot.png");
+  await app(maya).discussion.update({ discussionId: d.id, attachmentIds: [shot.attachmentId] });
+  const rows = await app(maya).discussion.listByWorkspace({ workspaceId: ws.id, take: 20 });
+  assert.equal(rows.items.find((row) => row.id === d.id).files, 1);
+});
