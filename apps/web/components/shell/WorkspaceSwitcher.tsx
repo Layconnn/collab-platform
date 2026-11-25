@@ -59,18 +59,18 @@ export function WorkspaceSwitcher({
         ref={summaryRef}
         aria-label={`Switch workspace. Current: ${label}`}
         title={collapsed ? label : undefined}
-        className={`flex min-h-11 w-full cursor-pointer list-none items-center gap-2 rounded-md text-left outline-none transition-colors hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center px-1" : "px-2"}`}
+        className={`flex min-h-12 w-full cursor-pointer list-none items-center gap-2.5 rounded-[10px] bg-sidebar-hover text-left text-sidebar-text-strong outline-none transition-colors duration-150 ease-out hover:bg-sidebar-active focus-visible:ring-2 focus-visible:ring-sidebar-live ${collapsed ? "justify-center px-1" : "px-2"}`}
       >
-        <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-md bg-brand-100 text-xs font-semibold text-brand-800">
+        <span aria-hidden="true" className="grid size-[30px] shrink-0 place-items-center rounded-lg bg-editorial-cream text-xs font-semibold text-brand-primary">
           {currentWorkspace?.name || selected?.name ? workspaceInitials(label) : <AppIcon name="workspaces" />}
         </span>
         {!collapsed ? (
           <>
             <span className="min-w-0 flex-1">
-              <span className="block text-[10px] font-medium leading-4 text-text-muted">WORKSPACE</span>
-              <span className="block truncate text-sm font-semibold leading-5 text-text-primary">{label}</span>
+              <span className="block truncate text-sm font-semibold leading-5 text-sidebar-text-strong">{label}</span>
+              <span className="block font-mono text-[10px] uppercase leading-4 tracking-[0.08em] text-sidebar-muted">Workspace</span>
             </span>
-            <AppIcon name="chevron" className="size-4 shrink-0 text-text-muted transition-transform group-open:rotate-180" />
+            <AppIcon name="chevron" className="size-4 shrink-0 text-sidebar-muted transition-transform group-open:rotate-180" />
           </>
         ) : null}
       </summary>

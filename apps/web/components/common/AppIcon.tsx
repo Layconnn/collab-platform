@@ -6,7 +6,6 @@ import {
   LogOut,
   Menu,
   MessageSquare,
-  BookOpen,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
@@ -15,6 +14,9 @@ import {
   X,
   type LucideIcon,
   Bookmark,
+  Inbox,
+  LayoutGrid,
+  Scale,
 } from "lucide-react";
 
 export type AppIconName =
@@ -32,13 +34,15 @@ export type AppIconName =
   | "chevron"
   | "logout"
   | "search"
-  | "saved";
+  | "saved"
+  | "inbox"
+  | "overview";
 
 const icons: Record<AppIconName, LucideIcon> = {
   home: House,
   workspaces: Building2,
   discussions: MessageSquare,
-  decisions: BookOpen,
+  decisions: Scale,
   members: Users,
   plus: Plus,
   bell: Bell,
@@ -50,6 +54,8 @@ const icons: Record<AppIconName, LucideIcon> = {
   logout: LogOut,
   search: Search,
   saved: Bookmark,
+  inbox: Inbox,
+  overview: LayoutGrid,
 };
 
 export function AppIcon({ name, className = "size-4" }: { name: AppIconName; className?: string }) {

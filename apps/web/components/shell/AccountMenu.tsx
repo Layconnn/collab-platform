@@ -25,16 +25,16 @@ export function AccountMenu({
         ref={summaryRef}
         aria-label={`Account menu for ${label}`}
         title={collapsed ? label : undefined}
-        className={`flex min-h-11 w-full cursor-pointer list-none items-center gap-3 rounded-md px-2 text-left hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-focus-ring ${collapsed ? "justify-center" : ""}`}
+        className={`flex min-h-12 w-full cursor-pointer list-none items-center gap-2.5 rounded-[10px] bg-sidebar-field px-2 text-left transition-colors duration-150 ease-out hover:bg-sidebar-hover focus-visible:ring-2 focus-visible:ring-sidebar-live ${collapsed ? "justify-center" : ""}`}
       >
-        <UserAvatar name={identity.avatarName} className="size-8" />
+        <UserAvatar name={identity.avatarName} className="size-8 !bg-sidebar-live !text-brand-primary" />
         {!collapsed ? (
           <>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium text-text-primary">{label}</span>
-              <span className="block truncate text-xs text-text-muted">{user.email}</span>
+              <span className="block truncate text-[0.8125rem] font-medium text-sidebar-text-strong">{label}</span>
+              <span className="block truncate text-xs text-sidebar-muted">{user.username}</span>
             </span>
-            <AppIcon name="chevron" className="size-4 shrink-0 text-text-muted transition-transform group-open:rotate-180" />
+            <AppIcon name="chevron" className="size-4 shrink-0 text-sidebar-muted transition-transform group-open:rotate-180" />
           </>
         ) : null}
       </summary>
