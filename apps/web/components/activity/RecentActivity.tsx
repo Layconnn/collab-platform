@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import type { ActivityFilter } from "@repo/validators/activity";
 import { EmptyState, ErrorState } from "@/components/common/StateNotice";
 import { useWorkspaceActivity } from "@/hooks/useActivity";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
 type Summary = Record<string, string | number | boolean | null> | null;
 export type ActivityEntry = {
@@ -128,24 +129,9 @@ export function RecentActivity({ workspaceId }: { workspaceId: string }) {
 
   return (
     <section aria-labelledby="recent-activity-heading" className="min-w-0">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase text-brand-link">Workspace record</p>
-          <h2 id="recent-activity-heading" className="mt-1 text-xl font-semibold text-text-primary">Recent activity</h2>
-        </div>
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter activity">
-          {FILTERS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={filter === value}
-              onClick={() => setFilter(value)}
-              className={`min-h-10 rounded-sm border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-focus-ring ${filter === value ? "border-brand-accent bg-surface-subtle text-brand-link" : "border-border-subtle text-text-secondary hover:bg-surface-hover"}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="recent-activity-heading" className="type-canopy-label m-0">Recent activity</h2>
+        <SegmentedControl label="Filter activity" options={FILTERS} value={filter} onChange={setFilter} />
       </div>
 
       {activity.isLoading && !activity.data ? (
