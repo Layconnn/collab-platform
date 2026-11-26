@@ -336,7 +336,6 @@ export function WorkspaceHome({ workspaceId }: { workspaceId: string }) {
                   key={item.id}
                   discussion={item}
                   workspaceId={workspaceId}
-                  compact
                 />
               ))}
             </ol>

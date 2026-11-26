@@ -143,6 +143,8 @@ jobs:
         run: pnpm -C apps/web run test:files-api
       - name: Invite links (real database)
         run: pnpm -C apps/web run test:invite-api
+      - name: Discussions list (real database)
+        run: pnpm -C apps/web run test:discussion-list-api
 
   frontend-tests:
     name: Frontend tests

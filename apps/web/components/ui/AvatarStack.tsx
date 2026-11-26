@@ -9,9 +9,9 @@ export function AvatarStack({ names, max = 4, size = "size-[22px]" }: { names: A
   return (
     <span role="img" aria-label={label || `${names.length} people`} className="inline-flex items-center">
       {shown.map((name, index) => (
-        <UserAvatar key={`${name}-${index}`} name={name} className={`${size} text-[9px] ring-2 ring-surface ${index ? "-ml-1.5" : ""}`} />
+        <UserAvatar key={`${name}-${index}`} name={name} className={`${size} text-[9px] ring-2 ring-surface ${index ? "-ml-1" : ""}`} />
       ))}
-      {rest > 0 ? <span aria-hidden="true" className={`-ml-1.5 grid ${size} place-items-center rounded-full bg-surface-active text-[9px] font-semibold text-text-secondary ring-2 ring-surface`}>+{rest}</span> : null}
+      {rest > 0 ? <span aria-hidden="true" className={`-ml-1 grid ${size} place-items-center rounded-full bg-surface-active text-[9px] font-semibold text-text-secondary ring-2 ring-surface`}>+{rest}</span> : null}
     </span>
   );
 }

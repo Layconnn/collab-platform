@@ -12,7 +12,14 @@ vi.mock("@/hooks/useDiscussion", () => ({ useDiscussionList: () => mocks.discuss
 vi.mock("@/components/discussion/DiscussionList", () => ({ DiscussionList: () => <div>Discussion feed</div> }));
 vi.mock("@/components/discussion/CreateDiscussionForm", () => ({ CreateDiscussionForm: () => <label>Composer form <input /></label> }));
 
-import DiscussionListPage from "@/app/(workspace)/workspace/[workspaceId]/discussions/page";
+import Page from "@/app/(workspace)/workspace/[workspaceId]/discussions/page";
+import { TopBarSlotProvider } from "@/components/shell/TopBarActions";
+
+// The page puts "New discussion" in the shell's top bar; give it one.
+function DiscussionListPage() {
+  const slot = document.getElementById("top-bar") ?? Object.assign(document.body.appendChild(document.createElement("div")), { id: "top-bar" });
+  return <TopBarSlotProvider slot={slot}><Page /></TopBarSlotProvider>;
+}
 
 describe("Discussions page", () => {
   beforeEach(() => {
@@ -56,5 +63,19 @@ describe("Discussions page", () => {
 
     expect(screen.queryByRole("button", { name: "New discussion" })).toBeNull();
     expect(screen.queryByText("Open Atlas")).toBeNull();
+  });
+
+  it("sums up the list under the title", () => {
+    const row = (id: string, status: string | null) => ({ id, decision: status ? { id: `d${id}`, status } : null });
+    mocks.discussions.data = { pages: [{ items: [row("1", "DECIDED"), row("2", "PROPOSED"), row("3", null)] as never[] }] };
+    mocks.discussions.hasNextPage = true;
+    render(<DiscussionListPage />);
+    expect(screen.getByRole("heading", { level: 1, name: "Discussions" })).toBeTruthy();
+    expect(screen.getByText("Open Atlas · Discussions")).toBeTruthy();
+    expect(screen.getByText("3 discussions+")).toBeTruthy();
+    expect(screen.getByText("1 open proposal")).toBeTruthy();
+    expect(screen.getByText("1 decided")).toBeTruthy();
+    mocks.discussions.data = { pages: [{ items: [] }] };
+    mocks.discussions.hasNextPage = false;
   });
 });
