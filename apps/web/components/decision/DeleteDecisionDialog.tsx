@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 
 import { decisionError } from "./decisionUI";
 import { useDecisionActions } from "@/hooks/useDecision";
+import { dialogPanelClasses, dialogTitleClasses, scrimClasses } from "@/components/ui/overlay";
 
 export function DeleteDecisionDialog({ workspaceId, decision, onClose }: {
   workspaceId: string;
@@ -31,7 +32,7 @@ export function DeleteDecisionDialog({ workspaceId, decision, onClose }: {
     ? "This decision changed or is now part of a replacement history. Close this dialog and review it before trying again."
     : decisionError(remove.error, "Could not delete the decision. Please try again.");
 
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 sm:p-4" onKeyDown={(event) => {
+  return <div className={`${scrimClasses} z-50 flex items-center justify-center p-3 sm:p-4`} onKeyDown={(event) => {
     if (event.key === "Escape" && !remove.isPending) onClose();
     if (event.key !== "Tab" || !dialogRef.current) return;
     const controls = Array.from(dialogRef.current.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
@@ -40,8 +41,8 @@ export function DeleteDecisionDialog({ workspaceId, decision, onClose }: {
       event.preventDefault(); (event.shiftKey ? last : first).focus();
     }
   }}>
-    <div ref={dialogRef} tabIndex={-1} role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description" className="w-full max-w-lg rounded-sm border border-border bg-surface p-5 shadow-xl outline-none sm:p-7">
-      <h2 id="delete-title" className="text-xl font-semibold text-text-primary">{decision.status === "PROPOSED" ? "Delete this proposal?" : "Delete this decision?"}</h2>
+    <div ref={dialogRef} tabIndex={-1} role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-description" className={`${dialogPanelClasses} w-full max-w-lg !rounded-2xl p-5 sm:p-7`}>
+      <h2 id="delete-title" className={dialogTitleClasses}>{decision.status === "PROPOSED" ? "Delete this proposal?" : "Delete this decision?"}</h2>
       <p id="delete-description" className="mt-3 wrap-anywhere text-sm leading-6 text-text-secondary"><strong className="text-text-primary">{decision.question}</strong> will be removed for everyone in this workspace. This cannot be undone from Commons.</p>
       {message ? <p role="alert" className="mt-4 text-sm text-danger">{message}</p> : null}
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { DecisionDate, decisionError } from "./decisionUI";
 import { useDecisionActions, useReplacementCandidates } from "@/hooks/useDecision";
+import { dialogPanelClasses, dialogTitleClasses, overlayLabelClasses, scrimClasses } from "@/components/ui/overlay";
 
 type Candidate = { id: string; question: string; outcome: string | null; sourceDiscussionTitle: string; version: number; decidedAt: Date | null };
 
@@ -41,7 +42,7 @@ export function SupersedeDecisionDialog({ workspaceId, oldDecision, onClose }: {
     finally { submitting.current = false; }
   };
 
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 sm:p-4" onKeyDown={(event) => {
+  return <div className={`${scrimClasses} z-50 flex items-center justify-center p-3 sm:p-4`} onKeyDown={(event) => {
     if (event.key === "Escape" && !supersede.isPending) onClose();
     if (event.key !== "Tab" || !dialogRef.current) return;
     const controls = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), textarea:not(:disabled)'));
@@ -50,9 +51,9 @@ export function SupersedeDecisionDialog({ workspaceId, oldDecision, onClose }: {
       event.preventDefault(); (event.shiftKey ? last : first).focus();
     }
   }}>
-    <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="supersede-title" aria-describedby="supersede-description" className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-sm border border-border bg-surface p-4 shadow-xl outline-none sm:p-6">
-      <p className="text-xs font-semibold uppercase text-brand-link">Decision history</p>
-      <h2 id="supersede-title" className="mt-1 text-xl font-semibold text-text-primary">{confirming ? "Confirm replacement" : "Supersede decision"}</h2>
+    <div ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="supersede-title" aria-describedby="supersede-description" className={`${dialogPanelClasses} max-h-[90vh] w-full max-w-2xl overflow-y-auto !rounded-2xl p-4 sm:p-6`}>
+      <p className={overlayLabelClasses}>Decision history</p>
+      <h2 id="supersede-title" className={`${dialogTitleClasses} mt-1.5`}>{confirming ? "Confirm replacement" : "Supersede decision"}</h2>
       <p id="supersede-description" className="mt-2 wrap-anywhere text-sm leading-6 text-text-secondary">Replacing <strong className="text-text-primary">{oldDecision.question}</strong></p>
       {accessLost ? <p role="alert" className="mt-5 text-sm text-danger">Decision access changed. Close this dialog and return to the workspace.</p> : confirming ? <div className="mt-5 space-y-3 text-sm leading-6 text-text-secondary">
         <p>The original decision will be marked Superseded. <strong className="wrap-anywhere text-text-primary">{selected?.question}</strong> becomes the current decision.</p>

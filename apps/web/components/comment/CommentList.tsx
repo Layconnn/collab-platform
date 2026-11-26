@@ -25,6 +25,7 @@ import { ErrorState } from "@/components/common/StateNotice";
 import { useCommentActions, useCommentList } from "@/hooks/useComment";
 import type { AppRouter } from "@/server/api/root";
 import { resolveUserIdentity } from "@/lib/user-identity";
+import { floatPanelClasses, menuItemClasses } from "@/components/ui/overlay";
 
 type CommentItem = inferRouterOutputs<AppRouter>["comment"]["listByDiscussion"]["items"][number];
 type Viewer = { id: string | undefined; canAct: boolean; canManageOthers: boolean };
@@ -231,12 +232,12 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                 </button>
               </Menu.Trigger>
               <Portal>
-                <Menu.Positioner>
-                  <Menu.Content minW="11rem" p="1" bg="surface" borderWidth="1px" borderColor="border" borderRadius="sm" shadow="md" zIndex="popover">
-                    <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ commentId: comment.id, body: comment.body }); uploader.reset(comment.attachments); setEditProblem(null); setEditing(true); requestAnimationFrame(() => setFocus("body")); }} color="textPrimary" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
+                <Menu.Positioner className="z-50">
+                  <Menu.Content unstyled className={`${floatPanelClasses} min-w-44 p-1`}>
+                    <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ commentId: comment.id, body: comment.body }); uploader.reset(comment.attachments); setEditProblem(null); setEditing(true); requestAnimationFrame(() => setFocus("body")); }} unstyled className={`${menuItemClasses} cursor-pointer`}>
                       <Pencil size={15} aria-hidden="true" /> Edit comment
                     </Menu.Item>
-                    <Menu.Item value="delete" onSelect={() => { if (window.confirm("Delete this comment and its replies?")) remove.mutate({ commentId: comment.id }); }} color="danger" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
+                    <Menu.Item value="delete" onSelect={() => { if (window.confirm("Delete this comment and its replies?")) remove.mutate({ commentId: comment.id }); }} unstyled className={`${menuItemClasses} cursor-pointer !text-danger`}>
                       <Trash2 size={15} aria-hidden="true" /> Delete comment
                     </Menu.Item>
                   </Menu.Content>

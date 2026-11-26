@@ -70,8 +70,9 @@ contrast in both themes.
 | Live and callouts | `bg-live`, `bg-callout`, `border-callout-line` |
 | Elevation | `shadow-card`, `shadow-lift`, `shadow-float` |
 | Type | `font-serif` (Instrument Serif, page titles only), `type-canopy-title`, `type-canopy-label` (mono section labels) |
-| Glass | `glass-bar` (top bar), `glass-float` (floating composers and action bars, palette, menus, toasts); both fall back to solid without `backdrop-filter` or under reduced transparency |
+| Glass | `glass-bar` (top bar), `glass-float` (floating composers and action bars, menus and popovers over page content); both fall back to solid without `backdrop-filter` or under reduced transparency. Menus over the forest sidebar and the command palette stay solid: glass loses contrast over the sidebar and turns grey over a scrim |
 | Motion | `canopy-rise`, `canopy-stagger` (children rise in 40 ms steps), `canopy-lift`, `canopy-zoom`, `canopy-row`, `canopy-live`, `canopy-grow`; all off under reduced motion |
+| Overlays | `canopy-scrim` (the layer behind dialogs and the palette, `--scrim`), `canopy-fade`, `canopy-pop` (anything that opens), `canopy-panel` (overlay frames: no focus ring on the frame, its rows show focus) |
 
 Building blocks in `apps/web/components/ui/`: `Button` and `ButtonLink`
 (primary, secondary, ghost, danger), `PageIntro` (the standard page header),
@@ -79,6 +80,14 @@ Building blocks in `apps/web/components/ui/`: `Button` and `ButtonLink`
 `ContextPanel`, `SegmentedControl`, `AvatarStack`, `TableFrame` and
 `tableClasses`. Use them before writing new styles; add to them when a page
 needs something they lack.
+
+Everything that floats uses the classes in `components/ui/overlay.ts`:
+`floatPanelClasses` (glass menus and popovers), `solidPanelClasses` (sidebar
+menus, the palette), `menuItemClasses` (one row), `scrimClasses`,
+`dialogPanelClasses`, `dialogTitleClasses` (serif, like page titles) and
+`overlayLabelClasses` (the mono label above a dialog title). Dialogs build on
+`components/common/Modal.tsx`, which handles focus, Escape, the scrim and the
+phone bottom sheet.
 
 Marketing and authentication pages (the landing page, sign-in, registration,
 the join and unsubscribe cards) are outside these rules.

@@ -20,6 +20,7 @@ import {
   useUnreadNotifications,
 } from "@/hooks/useNotifications";
 import { resolveUserIdentity } from "@/lib/user-identity";
+import { floatPanelClasses } from "@/components/ui/overlay";
 
 type NotificationItem = NonNullable<
   ReturnType<typeof useNotificationsFeed>["data"]
@@ -277,11 +278,11 @@ export function NotificationDropdown({
         <Popover.Positioner className="z-40">
           <Popover.Content
             unstyled
-            className="flex max-h-[min(34rem,calc(100dvh-4.5rem))] w-[min(26rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-md border border-border bg-surface text-text-primary shadow-lg shadow-black/10 outline-none data-[state=open]:animate-[thread-reveal_160ms_ease-out] motion-reduce:animate-none"
+            className={`${floatPanelClasses} flex max-h-[min(34rem,calc(100dvh-4.5rem))] w-[min(26rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden`}
           >
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border-subtle px-4 py-3">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-glass-line px-4 py-3">
               <div>
-                <Popover.Title className="text-sm font-semibold text-text-primary">
+                <Popover.Title className="font-serif text-[1.375rem] leading-tight text-text-primary">
                   Notifications
                 </Popover.Title>
                 <p className="mt-0.5 text-xs text-text-muted">

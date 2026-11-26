@@ -20,13 +20,13 @@ const props = {
 describe("WorkspaceSwitcher", () => {
   afterEach(cleanup);
 
-  it("keeps the expanded menu in the sidebar flow", () => {
+  it("floats the expanded menu below the switcher, as wide as the sidebar", () => {
     const { container } = render(<WorkspaceSwitcher {...props} />);
 
     expect(screen.getByText("Switch workspace")).toBeTruthy();
     const menu = container.querySelector("details > div");
-    expect(menu?.className).toContain("w-full");
-    expect(menu?.className).not.toContain("absolute");
+    expect(menu?.className).toContain("absolute left-0 right-0 top-full");
+    expect(menu?.className).toContain("max-h-[min(22rem,60dvh)]");
   });
 
   it("anchors the collapsed flyout and bounds it to the viewport", () => {

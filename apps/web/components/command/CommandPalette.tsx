@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSearch } from "@/hooks/useSearch";
 import { useWorkspaceDetail, useWorkspaceSwitcherList } from "@/hooks/useWorkspace";
 import { useUiStore } from "@/stores/ui.store";
+import { dialogPanelClasses, dialogTitleClasses, scrimClasses, solidPanelClasses } from "@/components/ui/overlay";
 import {
   buildCommands, isMacPlatform, matchCommands, readRecent, recentItems, rememberRecent,
   searchResultItems, seeAllResultsItem, type CommandItem, type SearchHit,
@@ -129,8 +130,8 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
     else if (event.key === "Tab") { event.preventDefault(); }
   };
 
-  return <div className="fixed inset-0 z-[60] flex items-start justify-center bg-black/50 px-3 pt-[12vh] sm:px-4" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
-    <div role="dialog" aria-modal="true" aria-label="Command palette" className="w-full max-w-xl overflow-hidden rounded-md border border-border bg-surface shadow-xl">
+  return <div className={`${scrimClasses} z-[60] flex items-start justify-center px-3 pt-[12vh] sm:px-4`} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <div role="dialog" aria-modal="true" aria-label="Command palette" className={`${solidPanelClasses} w-full max-w-[38rem] overflow-hidden`}>
       <input
         ref={inputRef}
         role="combobox"
@@ -145,29 +146,29 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         placeholder="Type a command, a workspace or a page…"
         autoComplete="off"
         spellCheck={false}
-        className="h-14 w-full border-b border-border-subtle bg-surface px-5 text-base text-text-primary placeholder:text-text-muted focus:outline-none"
+        className="h-14 w-full border-b border-border-subtle bg-transparent px-5 text-[0.9375rem] text-text-primary placeholder:text-text-muted focus:outline-none"
       />
       <ul id={listId} role="listbox" aria-label="Commands" className="max-h-[50vh] overflow-y-auto p-2">
         {items.map((item, index) => {
           const heading = index === 0 || items[index - 1]?.group !== item.group ? item.group : null;
           return <li key={item.id} role="presentation">
-            {heading ? <div aria-hidden="true" className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-text-muted">{heading}</div> : null}
+            {heading ? <div aria-hidden="true" className="px-3 pb-1.5 pt-3 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">{heading}</div> : null}
             <div
               id={optionId(index)}
               role="option"
               aria-selected={index === active}
               onMouseMove={() => setActive(index)}
               onClick={() => void run(item)}
-              className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-sm px-3 text-sm ${index === active ? "bg-surface-active text-text-primary" : "text-text-secondary"}`}
+              className={`flex min-h-10 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 text-[0.8125rem] transition-colors duration-100 ease-out ${index === active ? "bg-surface-active text-text-primary shadow-[inset_2px_0_0_var(--live)]" : "text-text-secondary"}`}
             >
               <span className="min-w-0 truncate font-medium">{item.label}</span>
-              {item.hint ? <span className="shrink-0 truncate text-xs text-text-muted">{item.hint}</span> : null}
+              {item.hint ? <span className="shrink-0 truncate font-mono text-[11px] text-text-muted">{item.hint}</span> : null}
             </div>
           </li>;
         })}
         {!items.length ? <li role="presentation" className="px-3 py-6 text-center text-sm text-text-muted">No matching commands.</li> : null}
       </ul>
-      <div className="flex items-center justify-between gap-3 border-t border-border-subtle px-4 py-2 text-xs text-text-muted">
+      <div className="flex items-center justify-between gap-3 border-t border-border-subtle px-4 py-2 font-mono text-[11px] text-text-muted">
         <span>↑ ↓ to move · Enter to open · Esc to close</span>
         <span role="status" aria-live="polite">{searching ? "Searching…" : search.error && searchable ? "Search unavailable" : ""}</span>
       </div>
@@ -195,16 +196,16 @@ export function ShortcutsSheet() {
     ["Enter", "Open the selected result"],
     ["Esc", "Close the palette or this sheet"],
   ];
-  return <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" onKeyDown={(event) => { if (event.key === "Escape") setOpen(false); }} onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
-    <div role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" className="w-full max-w-md rounded-md border border-border bg-surface p-5 shadow-xl sm:p-6">
+  return <div className={`${scrimClasses} z-[60] flex items-center justify-center p-4`} onKeyDown={(event) => { if (event.key === "Escape") setOpen(false); }} onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
+    <div role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" className={`${dialogPanelClasses} w-full max-w-md !rounded-2xl p-5 sm:p-6`}>
       <div className="flex items-center justify-between gap-3">
-        <h2 id="shortcuts-title" className="text-lg font-semibold text-text-primary">Keyboard shortcuts</h2>
-        <button ref={closeRef} type="button" onClick={() => setOpen(false)} className="min-h-10 rounded-sm px-3 text-sm font-semibold text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Close</button>
+        <h2 id="shortcuts-title" className={dialogTitleClasses}>Keyboard shortcuts</h2>
+        <button ref={closeRef} type="button" onClick={() => setOpen(false)} className="min-h-9 rounded-lg px-3 text-[0.8125rem] font-medium text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring">Close</button>
       </div>
       <dl className="mt-4 divide-y divide-border-subtle">
         {rows.map(([keys, label]) => <div key={keys} className="flex items-center justify-between gap-4 py-2.5 text-sm">
           <dt className="text-text-secondary">{label}</dt>
-          <dd><kbd className="rounded-sm border border-border bg-surface-subtle px-2 py-0.5 font-mono text-xs text-text-primary">{keys}</kbd></dd>
+          <dd><kbd className="rounded-md border border-border bg-surface-subtle px-2 py-0.5 font-mono text-[11px] text-text-primary">{keys}</kbd></dd>
         </div>)}
       </dl>
     </div>

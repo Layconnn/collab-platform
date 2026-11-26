@@ -17,6 +17,7 @@ import {
   Inbox,
   LayoutGrid,
   Scale,
+  Settings,
 } from "lucide-react";
 
 export type AppIconName =
@@ -36,6 +37,7 @@ export type AppIconName =
   | "search"
   | "saved"
   | "inbox"
+  | "settings"
   | "overview";
 
 const icons: Record<AppIconName, LucideIcon> = {
@@ -55,6 +57,7 @@ const icons: Record<AppIconName, LucideIcon> = {
   search: Search,
   saved: Bookmark,
   inbox: Inbox,
+  settings: Settings,
   overview: LayoutGrid,
 };
 
