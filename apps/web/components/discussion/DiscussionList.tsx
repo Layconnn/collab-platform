@@ -14,6 +14,7 @@ import { discussionActionError } from "@/components/discussion/discussionErrors"
 import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionActions, useDiscussionList } from "@/hooks/useDiscussion";
 import { useWorkspaceDetail } from "@/hooks/useWorkspace";
+import { floatPanelClasses, menuItemClasses } from "@/components/ui/overlay";
 
 function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: DiscussionSummary; workspaceId: string; canManage: boolean }) {
   const { update, remove } = useDiscussionActions(workspaceId);
@@ -86,12 +87,12 @@ function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: D
             </button>
           </Menu.Trigger>
           <Portal>
-            <Menu.Positioner>
-              <Menu.Content minW="11rem" p="1" bg="surface" borderWidth="1px" borderColor="border" borderRadius="sm" shadow="md" zIndex="popover">
-                <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ discussionId: discussion.id, title: discussion.title }); setEditing(true); requestAnimationFrame(() => form.setFocus("title")); }} color="textPrimary" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
+            <Menu.Positioner className="z-50">
+              <Menu.Content unstyled className={`${floatPanelClasses} min-w-44 p-1`}>
+                <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ discussionId: discussion.id, title: discussion.title }); setEditing(true); requestAnimationFrame(() => form.setFocus("title")); }} unstyled className={`${menuItemClasses} cursor-pointer`}>
                   <Pencil size={15} aria-hidden="true" /> Edit title
                 </Menu.Item>
-                <Menu.Item value="delete" onSelect={() => { if (window.confirm("Delete this discussion and its comments?")) remove.mutate({ discussionId: discussion.id }); }} color="danger" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
+                <Menu.Item value="delete" onSelect={() => { if (window.confirm("Delete this discussion and its comments?")) remove.mutate({ discussionId: discussion.id }); }} unstyled className={`${menuItemClasses} cursor-pointer !text-danger`}>
                   <Trash2 size={15} aria-hidden="true" /> Delete discussion
                 </Menu.Item>
               </Menu.Content>

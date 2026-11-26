@@ -8,6 +8,7 @@ import { AppIcon } from "@/components/common/AppIcon";
 import { useUiStore } from "@/stores/ui.store";
 import { workspaceInitials } from "@/lib/workspace-identity";
 import { useDismissibleDetails } from "@/components/shell/useDismissibleDetails";
+import { menuItemClasses, solidPanelClasses } from "@/components/ui/overlay";
 
 type WorkspaceSummary = inferRouterOutputs<AppRouter>["workspace"]["listForUser"]["items"][number];
 
@@ -74,8 +75,8 @@ export function WorkspaceSwitcher({
           </>
         ) : null}
       </summary>
-      <div className={`z-30 overflow-y-auto rounded-md border border-border bg-surface ${collapsed ? "absolute left-full top-0 ml-2 max-h-[calc(100dvh-5rem)] w-[min(18rem,calc(100vw-5.5rem))] shadow-lg" : "mt-2 max-h-[min(20rem,50dvh)] w-full shadow-sm"}`}>
-        <p className="px-3 pb-2 pt-3 text-xs font-medium text-text-muted">Switch workspace</p>
+      <div className={`${solidPanelClasses} z-30 overflow-y-auto ${collapsed ? "absolute left-full top-0 ml-2 max-h-[calc(100dvh-5rem)] w-[min(18rem,calc(100vw-5.5rem))]" : "absolute left-0 right-0 top-full mt-2 max-h-[min(22rem,60dvh)]"}`}>
+        <p className="px-3 pb-1.5 pt-3 font-mono text-[11px] uppercase tracking-[0.08em] text-text-muted">Switch workspace</p>
         <div className="p-1">
           {isLoading ? (
             <div aria-label="Loading workspaces" className="space-y-2 p-3" role="status">
@@ -95,11 +96,11 @@ export function WorkspaceSwitcher({
                   href={targetForWorkspace(pathname, workspace.workspaceId)}
                   aria-current={workspace.workspaceId === currentId ? "page" : undefined}
                   onClick={closeMenu}
-                  className="flex min-h-10 items-center gap-3 rounded px-2 text-sm text-text-secondary hover:bg-surface-subtle hover:text-text-primary focus-visible:bg-surface-subtle"
+                  className="flex min-h-9 items-center gap-2.5 rounded-lg px-2 text-[0.8125rem] text-text-secondary transition-colors duration-150 ease-out hover:bg-surface-hover hover:text-text-primary focus-visible:bg-surface-hover aria-[current=page]:font-medium aria-[current=page]:text-text-primary"
                 >
-                  <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded bg-surface-subtle text-[10px] font-semibold text-brand-link">{workspaceInitials(workspace.name)}</span>
+                  <span aria-hidden="true" className="grid size-6 shrink-0 place-items-center rounded-md bg-surface-active text-[10px] font-semibold text-text-primary">{workspaceInitials(workspace.name)}</span>
                   <span className="min-w-0 flex-1 truncate">{workspace.name}</span>
-                  {workspace.workspaceId === currentId ? <span aria-hidden="true" className="size-1.5 rounded-full bg-brand-accent" /> : null}
+                  {workspace.workspaceId === currentId ? <span aria-hidden="true" className="size-1.5 rounded-full bg-live" /> : null}
                 </Link>
               ))}
             </nav>
@@ -107,17 +108,17 @@ export function WorkspaceSwitcher({
             <p className="px-3 py-2 text-sm text-text-secondary">No workspaces yet.</p>
           )}
           {!isLoading && hasMore ? (
-            <button type="button" onClick={onLoadMore} disabled={isFetchingMore} className="flex min-h-10 w-full items-center justify-center rounded px-2 text-xs font-medium text-brand-link hover:bg-surface-subtle disabled:opacity-60">
+            <button type="button" onClick={onLoadMore} disabled={isFetchingMore} className="flex min-h-9 w-full items-center justify-center rounded-lg px-2 text-xs font-medium text-brand-link hover:bg-surface-hover disabled:opacity-60">
               {isFetchingMore ? "Loading more..." : "Load more workspaces"}
             </button>
           ) : null}
         </div>
         <div className="border-t border-border-subtle p-1">
-          <button type="button" onClick={() => { closeMenu(); setCreateWorkspaceOpen(true); }} className="flex min-h-10 w-full items-center gap-2 rounded px-2 text-left text-sm font-medium text-text-secondary hover:bg-surface-subtle hover:text-text-primary">
+          <button type="button" onClick={() => { closeMenu(); setCreateWorkspaceOpen(true); }} className={menuItemClasses}>
             <AppIcon name="plus" />
             Create a workspace
           </button>
-          <Link href="/workspace" onClick={closeMenu} className="flex min-h-10 items-center gap-2 rounded px-2 text-sm font-medium text-text-secondary hover:bg-surface-subtle hover:text-text-primary">
+          <Link href="/workspace" onClick={closeMenu} className={menuItemClasses}>
             <AppIcon name="workspaces" />
             All workspaces
             {hasMore ? <span className="ml-auto text-xs text-text-muted">More</span> : null}

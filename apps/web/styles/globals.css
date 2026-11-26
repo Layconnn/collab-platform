@@ -88,6 +88,7 @@
   --glass-line: rgba(21, 32, 26, 0.08);
   --glass-highlight: rgba(255, 255, 255, 0.6);
   --glass-solid: #f3f3ef;
+  --scrim: rgba(12, 20, 16, 0.38);
   --shadow-card: 0 1px 0 rgba(21, 32, 26, 0.03);
   --shadow-lift: 0 1px 0 rgba(20, 32, 26, 0.04), 0 8px 24px -12px rgba(20, 32, 26, 0.18);
   --shadow-float: 0 20px 40px -20px rgba(20, 32, 26, 0.35);
@@ -172,6 +173,7 @@
   --glass-line: rgba(255, 255, 255, 0.09);
   --glass-highlight: rgba(255, 255, 255, 0.06);
   --glass-solid: #121a16;
+  --scrim: rgba(0, 0, 0, 0.58);
   --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.2);
   --shadow-lift: 0 10px 28px -14px rgba(0, 0, 0, 0.7);
   --shadow-float: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
@@ -199,6 +201,12 @@ body {
 :focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+/* Overlay containers take focus only to hand it to their rows (menus) or to
+   announce themselves (dialogs); the rows show the focus, not the frame. */
+.canopy-panel:focus-visible {
+  outline: none;
 }
 
 @layer components {
@@ -432,7 +440,43 @@ body {
   }
 }
 
+/* Overlays: a soft scrim behind dialogs and the palette, and a short pop for
+   anything that opens (menus, popovers, dialogs). */
+.canopy-scrim {
+  background: var(--scrim);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .canopy-scrim {
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .canopy-fade {
+    animation: canopy-fade 160ms ease-out both;
+  }
+  .canopy-pop {
+    animation: canopy-pop 180ms var(--ease-out-soft) both;
+  }
+}
+
+@keyframes canopy-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes canopy-pop {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
 @media (prefers-reduced-transparency: reduce) {
+  .canopy-scrim {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
   .glass-bar,
   .glass-float {
     background: var(--glass-solid);

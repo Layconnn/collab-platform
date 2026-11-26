@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 
 import { CreateWorkspaceForm } from "@/components/workspace/CreateWorkspaceForm";
 import { useUiStore } from "@/stores/ui.store";
+import { dialogPanelClasses, dialogTitleClasses, overlayLabelClasses, scrimClasses } from "@/components/ui/overlay";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -49,7 +50,7 @@ function DialogPanel({ onOpen, onClose }: { onOpen: () => void; onClose: () => v
   }, []);
 
   return <div
-    className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:p-4"
+    className={`${scrimClasses} z-50 flex items-end justify-center sm:items-center sm:p-4`}
     onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
     onKeyDown={(event) => {
       if (event.key === "Escape") { event.preventDefault(); onClose(); return; }
@@ -62,13 +63,14 @@ function DialogPanel({ onOpen, onClose }: { onOpen: () => void; onClose: () => v
       }
     }}
   >
-    <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="create-workspace-title" aria-describedby="create-workspace-description" className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-md border border-border bg-surface p-5 shadow-xl sm:rounded-md sm:p-7">
+    <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby="create-workspace-title" aria-describedby="create-workspace-description" className={`${dialogPanelClasses} max-h-[92dvh] w-full max-w-lg overflow-y-auto p-5 sm:p-7`}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 id="create-workspace-title" className="text-xl font-semibold text-text-primary">Create a workspace</h2>
+          <p className={overlayLabelClasses}>New workspace</p>
+          <h2 id="create-workspace-title" className={`${dialogTitleClasses} mt-1.5`}>Create a workspace</h2>
           <p id="create-workspace-description" className="mt-2 text-sm leading-6 text-text-secondary">A shared place for your team&apos;s discussions and decisions. You can add people by their username once it exists.</p>
         </div>
-        <button type="button" onClick={onClose} aria-label="Close" className="grid size-10 shrink-0 place-items-center rounded-sm text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring"><X size={18} aria-hidden="true" /></button>
+        <button type="button" onClick={onClose} aria-label="Close" className="grid size-9 shrink-0 place-items-center rounded-lg text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"><X size={18} aria-hidden="true" /></button>
       </div>
       <div className="mt-6"><CreateWorkspaceForm /></div>
     </div>
