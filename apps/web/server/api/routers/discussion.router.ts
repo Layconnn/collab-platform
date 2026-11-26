@@ -1,6 +1,7 @@
 import {
   createDiscussionInputSchema,
   deleteDiscussionInputSchema,
+  discussionContextInputSchema,
   getDiscussionByIdInputSchema,
   listDiscussionsInputSchema,
   updateDiscussionInputSchema,
@@ -94,6 +95,12 @@ export const discussionRouter = createTRPCRouter({
   listByWorkspace: listDiscussionProcedure.input(listDiscussionsInputSchema).query(({ ctx, input }) =>
     execute(() =>
       discussionService.listByWorkspace(ctx.user.id, input, { requestId: ctx.requestId }),
+    ),
+  ),
+
+  context: getDiscussionProcedure.input(discussionContextInputSchema).query(({ ctx, input }) =>
+    execute(() =>
+      discussionService.context(ctx.user.id, input, { requestId: ctx.requestId }),
     ),
   ),
 

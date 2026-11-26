@@ -39,6 +39,8 @@ export function useDecisionActions(workspaceId: string) {
   const refresh = async (decisionId: string) => {
     await Promise.all([
       utils.decision.listByWorkspace.invalidate({ workspaceId }),
+      // The discussion page's side panel lists decisions from the discussion.
+      utils.discussion.context.invalidate(),
       utils.decision.getById.invalidate({ workspaceId, decisionId }),
       utils.decision.revisions.invalidate({ workspaceId, decisionId }),
       // Edits reset reviews and finalizing closes them.

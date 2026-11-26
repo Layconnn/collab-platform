@@ -25,8 +25,9 @@ export function useCommentActions(discussionId: string, workspaceId: string) {
     }
   };
   // Replying follows the discussion on the server, so its follow state changes too.
+  const refreshPanel = () => utils.discussion.context.invalidate({ workspaceId, discussionId });
   const create = trpc.comment.create.useMutation({
-    onSuccess: () => Promise.all([refresh(), utils.follow.get.invalidate({ workspaceId, discussionId })]),
+    onSuccess: () => Promise.all([refresh(), refreshPanel(), utils.follow.get.invalidate({ workspaceId, discussionId })]),
     onError: refreshAfterRejection,
   });
   const update = trpc.comment.update.useMutation({
@@ -35,6 +36,6 @@ export function useCommentActions(discussionId: string, workspaceId: string) {
     },
     onError: refreshAfterRejection,
   });
-  const remove = trpc.comment.remove.useMutation({ onSuccess: refresh, onError: refreshAfterRejection });
+  const remove = trpc.comment.remove.useMutation({ onSuccess: () => Promise.all([refresh(), refreshPanel()]), onError: refreshAfterRejection });
   return { create, update, remove };
 }
