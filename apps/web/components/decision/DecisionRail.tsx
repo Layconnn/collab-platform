@@ -99,7 +99,7 @@ export function DecisionRail({ workspaceId, workspaceName, selectedId }: { works
       const groupItems = shown.filter((item) => groupOf(item) === group.key);
       if (!groupItems.length) return null;
       return <section key={group.key} aria-labelledby={`rail-${group.key}`} className="mt-5">
-        <h3 id={`rail-${group.key}`} className={`mb-1.5 px-1 font-mono text-[10px] uppercase tracking-[0.1em] ${group.attention ? "text-attention-text" : "text-text-muted"}`}>{group.label} · {groupItems.length}</h3>
+        <h2 id={`rail-${group.key}`} className={`mb-1.5 px-1 font-mono text-[10px] uppercase tracking-[0.1em] ${group.attention ? "text-attention-text" : "text-text-muted"}`}>{group.label} · {groupItems.length}</h2>
         <ul className="flex flex-col gap-0.5">
           {groupItems.map((item) => <Item key={item.id} item={item} workspaceId={workspaceId} current={item.id === selectedId} />)}
         </ul>

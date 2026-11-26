@@ -19,7 +19,8 @@ export function SettingsFrame({ children }: { children: ReactNode }) {
 
   return <div className="flex min-w-0 flex-col gap-8 lg:flex-row lg:items-start lg:gap-0">
     <nav aria-label="Settings" className={`canopy-rise min-w-0 lg:sticky lg:top-24 lg:w-[22rem] lg:shrink-0 lg:border-r lg:border-border-subtle lg:pr-5 ${atIndex ? "" : "max-lg:hidden"}`}>
-      <h1 className="type-canopy-title text-[2.5rem]">Settings</h1>
+      {/* The list is the page on /settings; elsewhere each page names itself. */}
+      {atIndex ? <h1 className="type-canopy-title text-[2.5rem]">Settings</h1> : <p className="type-canopy-title text-[2.5rem]">Settings</p>}
       <label className="canopy-field-frame mt-4 flex min-h-10 items-center gap-2 rounded-[10px] border border-border-subtle bg-surface px-3 text-text-muted">
         <Search size={15} aria-hidden="true" />
         <span className="sr-only">Search settings</span>
@@ -62,7 +63,7 @@ export function SettingsHeader({ title, intro, back }: { title: string; intro?: 
   return <header className="canopy-rise border-b border-border-subtle pb-6">
     {back ? <Link href={back.href} className="mb-3 inline-flex min-h-9 items-center gap-2 text-sm font-medium text-brand-link hover:underline focus-visible:outline-2 focus-visible:outline-focus-ring"><ArrowLeft size={16} aria-hidden="true" /> {back.label}</Link>
       : <Link href="/settings" className="mb-3 inline-flex min-h-9 items-center gap-2 text-sm font-medium text-brand-link hover:underline focus-visible:outline-2 focus-visible:outline-focus-ring lg:hidden"><ArrowLeft size={16} aria-hidden="true" /> Settings</Link>}
-    <h2 className="type-canopy-title text-[2.125rem] sm:text-[2.5rem]">{title}</h2>
+    <h1 className="type-canopy-title text-[2.125rem] sm:text-[2.5rem]">{title}</h1>
     {intro ? <p className="mt-2 max-w-[62ch] text-[0.875rem] leading-6 text-text-secondary">{intro}</p> : null}
   </header>;
 }
@@ -71,7 +72,7 @@ export function SettingsHeader({ title, intro, back }: { title: string; intro?: 
 export function SettingsGroup({ label, children }: { label: string; children: ReactNode }) {
   const id = `group-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return <section aria-labelledby={id} className="mt-7">
-    <h3 id={id} className="type-canopy-label m-0 mb-2.5">{label}</h3>
+    <h2 id={id} className="type-canopy-label m-0 mb-2.5">{label}</h2>
     <div className="overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-card">{children}</div>
   </section>;
 }

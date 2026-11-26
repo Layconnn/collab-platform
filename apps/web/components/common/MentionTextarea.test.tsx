@@ -74,7 +74,7 @@ describe("MentionTextarea", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(<Editor onSubmit={onSubmit} />);
-    const editor = screen.getByRole("combobox", { name: "Message" }) as HTMLTextAreaElement;
+    const editor = screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
     await user.type(editor, "Hello @");
     expect(await screen.findByRole("listbox", { name: "Workspace members" })).toBeTruthy();
     expect(screen.getAllByRole("option")).toHaveLength(2);
@@ -103,7 +103,7 @@ describe("MentionTextarea", () => {
   it("selects by touch-style pointer input and restores the caret in a scrolled textarea", async () => {
     const user = userEvent.setup();
     render(<Editor />);
-    const editor = screen.getByRole("combobox", { name: "Message" }) as HTMLTextAreaElement;
+    const editor = screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
     await user.type(editor, "Earlier context\nAsk @ma");
     editor.scrollTop = 32;
     const option = await screen.findByRole("option", { name: /Maya Chen.*@maya/ });
@@ -117,7 +117,7 @@ describe("MentionTextarea", () => {
   it("supports arrow navigation, Escape, and username filtering", async () => {
     const user = userEvent.setup();
     render(<Editor />);
-    const editor = screen.getByRole("combobox", { name: "Message" });
+    const editor = screen.getByRole("textbox", { name: "Message" });
     await user.type(editor, "@");
     await screen.findByRole("listbox");
     await user.keyboard("{ArrowDown}");
@@ -131,7 +131,7 @@ describe("MentionTextarea", () => {
   it("shows no matches and refuses a removed member on selection", async () => {
     const user = userEvent.setup();
     render(<Editor />);
-    const editor = screen.getByRole("combobox", { name: "Message" }) as HTMLTextAreaElement;
+    const editor = screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
     await user.type(editor, "@zzz");
     expect(await screen.findByText("No matching members.")).toBeTruthy();
     await user.clear(editor);
@@ -146,7 +146,7 @@ describe("MentionTextarea", () => {
   it("keeps the draft when member lookup fails and lets Tab leave the editor", async () => {
     const user = userEvent.setup();
     render(<Editor />);
-    const editor = screen.getByRole("combobox", { name: "Message" }) as HTMLTextAreaElement;
+    const editor = screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
     await user.type(editor, "@ma");
     await screen.findByRole("option", { name: /Maya Chen.*@maya/ });
     mocks.refetch.mockRejectedValueOnce(new Error("offline"));
@@ -160,7 +160,7 @@ describe("MentionTextarea", () => {
   it("keeps the suggestion panel within the mobile visual viewport", async () => {
     const user = userEvent.setup();
     render(<Editor />);
-    const editor = screen.getByRole("combobox", { name: "Message" }) as HTMLTextAreaElement;
+    const editor = screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
     editor.getBoundingClientRect = () => ({ top: 220, bottom: 360, left: 300, right: 590, width: 290, height: 140, x: 300, y: 220, toJSON: () => ({}) });
     const priorViewport = window.visualViewport;
     Object.defineProperty(window, "visualViewport", { configurable: true, value: { offsetTop: 20, offsetLeft: 0, height: 310, width: 390, addEventListener: vi.fn(), removeEventListener: vi.fn() } });
@@ -178,7 +178,7 @@ describe("MentionTextarea", () => {
   it("hides suggestions when the editor scrolls outside the visible viewport", async () => {
     const user = userEvent.setup();
     render(<Editor />);
-    const editor = screen.getByRole("combobox", { name: "Message" }) as HTMLTextAreaElement;
+    const editor = screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement;
     let top = 120;
     editor.getBoundingClientRect = () => ({ top, bottom: top + 100, left: 16, right: 300, width: 284, height: 100, x: 16, y: top, toJSON: () => ({}) });
     await user.type(editor, "@ma");
@@ -187,7 +187,8 @@ describe("MentionTextarea", () => {
     top = window.innerHeight + 20;
     fireEvent.scroll(window);
     await waitFor(() => expect(screen.queryByRole("listbox")).toBeNull());
-    expect(editor.getAttribute("aria-expanded")).toBe("false");
+    // A textarea is a textbox, so it has no aria-expanded; the controls go away.
+    expect(editor.hasAttribute("aria-expanded")).toBe(false);
     expect(editor.hasAttribute("aria-controls")).toBe(false);
     expect(editor.hasAttribute("aria-activedescendant")).toBe(false);
 

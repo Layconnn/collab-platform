@@ -190,11 +190,11 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
           <div className="mt-2 text-[1.25rem] leading-snug text-text-primary">{record.outcome ? <Markdown text={record.outcome} /> : <span className="text-base text-text-muted">Not recorded yet.</span>}</div>
         </div>
         <div className={`mt-7 grid gap-7 ${record.alternatives ? "md:grid-cols-2" : ""}`}>
-          <section aria-labelledby="rationale-heading"><SectionLabel as="h3" id="rationale-heading">Rationale</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary">{record.rationale ? <Markdown text={record.rationale} /> : <span className="text-text-muted">Not recorded yet.</span>}</div></section>
-          {record.alternatives ? <section aria-labelledby="alternatives-heading"><SectionLabel as="h3" id="alternatives-heading">Alternatives considered</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary"><Markdown text={record.alternatives} /></div></section> : null}
+          <section aria-labelledby="rationale-heading"><SectionLabel as="h2" id="rationale-heading">Rationale</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary">{record.rationale ? <Markdown text={record.rationale} /> : <span className="text-text-muted">Not recorded yet.</span>}</div></section>
+          {record.alternatives ? <section aria-labelledby="alternatives-heading"><SectionLabel as="h2" id="alternatives-heading">Alternatives considered</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary"><Markdown text={record.alternatives} /></div></section> : null}
         </div>
-        {record.followUp ? <section aria-labelledby="follow-up-heading" className="mt-7"><SectionLabel as="h3" id="follow-up-heading">Follow-up notes</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary"><Markdown text={record.followUp} /></div></section> : null}
-        {files ? <section aria-labelledby="files-heading" className="mt-7"><SectionLabel as="h3" id="files-heading">Files · {files}</SectionLabel><Attachments attachments={record.attachments} /></section> : null}
+        {record.followUp ? <section aria-labelledby="follow-up-heading" className="mt-7"><SectionLabel as="h2" id="follow-up-heading">Follow-up notes</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary"><Markdown text={record.followUp} /></div></section> : null}
+        {files ? <section aria-labelledby="files-heading" className="mt-7"><SectionLabel as="h2" id="files-heading">Files · {files}</SectionLabel><Attachments attachments={record.attachments} /></section> : null}
       </>}
     </article>
     {superseding && canSupersede ? <SupersedeDecisionDialog workspaceId={workspaceId} oldDecision={{ id: record.id, question: record.question, version: record.version }} onClose={() => { setSuperseding(false); requestAnimationFrame(() => supersedeButton.current?.focus()); }} /> : null}

@@ -168,10 +168,14 @@ export function MentionTextarea({ as = "textarea", workspaceId, registration, va
     name: registration.name,
     ref: (node: Editor | null) => { editorRef.current = node; registration.ref(node); },
     disabled,
-    role: "combobox",
+    // A single-line field is a combobox; a textarea may not take that role
+    // (ARIA in HTML), so it stays a textbox that points at its suggestions.
+    ...(as === "input" ? {
+      role: "combobox",
+      "aria-haspopup": "listbox" as const,
+      "aria-expanded": open && Boolean(panelPlacement),
+    } : {}),
     "aria-autocomplete": "list" as const,
-    "aria-haspopup": "listbox" as const,
-    "aria-expanded": open && Boolean(panelPlacement),
     "aria-controls": open && panelPlacement ? `${id}-list` : undefined,
     "aria-activedescendant": open && panelPlacement && options.length ? `${id}-option-${selectedIndex}` : undefined,
     onChange: (event: ChangeEvent<Editor>) => { void registration.onChange(event); updateToken(event.currentTarget, true); },
