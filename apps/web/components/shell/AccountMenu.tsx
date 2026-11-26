@@ -48,7 +48,7 @@ export function AccountMenu({
           </div>
         </div>
         <ThemeModePicker className="border-b border-border-subtle px-2 py-3" />
-        <Link href="/settings/email" className={`${menuItemClasses} mt-1.5`}><AppIcon name="settings" />Email settings</Link>
+        <Link href="/settings" className={`${menuItemClasses} mt-1.5`}><AppIcon name="settings" />Settings</Link>
         <div className="border-t border-border-subtle pt-1.5 mt-1.5">
           <SignOutButton />
         </div>

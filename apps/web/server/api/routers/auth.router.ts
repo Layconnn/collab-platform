@@ -25,6 +25,14 @@ const registerRateLimit = createRateLimitGuardByKey({
   windowSeconds: 600,
 });
 
+// Each attempt checks the current password, so a stolen session can't use
+// it to guess: five tries per user per ten minutes (#176).
+const changePasswordRateLimit = createRateLimitGuardByKey({
+  routeKey: "auth.changePassword",
+  limit: 5,
+  windowSeconds: 600,
+});
+
 const loginProcedure = publicProcedure.use(async ({ ctx, next }) => {
   const ip = ctx.ip ?? "unknown";
   await loginRateLimit(ip, ctx.requestId);
@@ -81,7 +89,12 @@ export const authRouter = createTRPCRouter({
     }),
   ),
 
+  // Rate limited: each attempt checks the current password (#176).
   changePassword: protectedProcedure
+    .use(async ({ ctx, next }) => {
+      await changePasswordRateLimit(ctx.user.id, ctx.requestId);
+      return next();
+    })
     .input(changePasswordInputSchema)
     .mutation(({ ctx, input }) =>
       execute(() =>

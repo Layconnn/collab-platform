@@ -71,7 +71,7 @@ function row(title: string, href: string, detail: string) {
 export function renderDigest(digest: Digest, links: DigestLinks): { subject: string; html: string; text: string } {
   const now = digest.generatedAt;
   const home = `${links.baseUrl}/workspace`;
-  const settings = `${links.baseUrl}/settings/email`;
+  const settings = `${links.baseUrl}/settings/notifications/digest`;
   const more = digest.needs.total - digest.needs.items.length;
 
   const needsHtml = digest.needs.items.map((item) => row(item.title, needUrl(item, links.baseUrl), `${needLine(item, now)} · ${item.workspace.name}`)).join("")

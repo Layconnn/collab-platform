@@ -21,7 +21,7 @@ export function UnsubscribePage({ token }: { token: string }) {
       {describe.error ? <>
         <h1 className="mt-4 text-xl font-semibold text-text-primary">This link has expired</h1>
         <p className="mt-2 text-sm leading-6 text-text-secondary">Unsubscribe links work for 60 days. You can change your email settings after signing in.</p>
-        <Link href="/settings/email" className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand-link hover:text-brand-link-hover">Email settings</Link>
+        <Link href="/settings/notifications/digest" className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand-link hover:text-brand-link-hover">Email settings</Link>
       </> : null}
       {describe.data && !apply.isSuccess ? <>
         <h1 className="mt-4 text-xl font-semibold text-text-primary">Stop {target}?</h1>
