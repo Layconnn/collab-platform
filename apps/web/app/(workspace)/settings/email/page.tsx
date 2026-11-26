@@ -1,9 +1,7 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { EmailSettings } from "@/components/settings/EmailSettings";
-
-export const metadata: Metadata = { title: "Email settings · Commons" };
-
+// Digest emails already sent link here; the digest now lives under
+// Notifications (dashboard redesign, #176).
 export default function Page() {
-  return <EmailSettings />;
+  redirect("/settings/notifications/digest");
 }

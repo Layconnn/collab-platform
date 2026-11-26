@@ -142,7 +142,7 @@ export function AddMemberForm({
           placeholder="username"
           aria-invalid={Boolean(usernameError)}
           aria-describedby={`add-member-username-help${usernameError ? " add-member-username-error" : ""}`}
-          className="mt-2 h-11 w-full min-w-0 rounded-sm border border-control-border bg-surface px-3 text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+          className="mt-2 h-11 w-full min-w-0 rounded-[9px] border border-control-border bg-surface px-3 text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
           {...form.register("username", {
             onChange: () => {
               setCandidate(null);
@@ -170,7 +170,7 @@ export function AddMemberForm({
         <select
           id="add-member-role"
           disabled={busy}
-          className="mt-2 h-11 w-full rounded-sm border border-control-border bg-surface px-3 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+          className="mt-2 h-11 w-full rounded-[9px] border border-control-border bg-surface px-3 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
           {...form.register("role")}
         >
           <option value="MEMBER">Member</option>
@@ -210,7 +210,7 @@ export function AddMemberForm({
       <button
         type="submit"
         disabled={busy}
-        className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 motion-reduce:transition-none"
+        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-[9px] bg-brand-action px-4 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 motion-reduce:transition-none"
       >
         {busy ? (
           <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />

@@ -24,6 +24,12 @@ function currentWorkspaceId(pathname: string) {
   return pathname.match(/^\/workspace\/([^/]+)/)?.[1];
 }
 
+// How far below a workspace section the page is: 0 on /workspace/<id>/decisions,
+// 1 on a decision.
+function sectionDepth(pathname: string) {
+  return Math.max(0, pathname.split("/").filter(Boolean).length - 3);
+}
+
 function pageContext(pathname: string) {
   if (pathname === "/workspace") return "Home";
   if (pathname.startsWith("/search")) return "Search";
@@ -31,6 +37,7 @@ function pageContext(pathname: string) {
   if (pathname.startsWith("/settings")) return "Settings";
   if (pathname.includes("/members")) return "Members";
   if (pathname.includes("/discussions")) return "Discussions";
+  if (pathname.includes("/decisions")) return "Decisions";
   return "Overview";
 }
 
@@ -259,21 +266,26 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
           <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-[0.8125rem] text-text-muted md:flex">
             <Link href="/workspace" className="shrink-0 hover:text-text-primary">Home</Link>
             {visibleWorkspaceId ? <><span aria-hidden="true">/</span><Link href={`/workspace/${visibleWorkspaceId}`} className="max-w-64 truncate hover:text-text-primary">{contextName}</Link></> : null}
-            {visibleWorkspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span><span aria-current="page" className="font-medium text-text-primary">{context}</span></> : null}
+            {visibleWorkspaceId && context !== "Overview" ? <><span aria-hidden="true">/</span>{sectionDepth(pathname) > 0
+              // On a discussion or a decision, the section leads back to its list.
+              ? <Link href={`/workspace/${visibleWorkspaceId}/${context.toLowerCase()}`} className="shrink-0 hover:text-text-primary">{context}</Link>
+              : <span aria-current="page" className="font-medium text-text-primary">{context}</span>}</> : null}
             {!visibleWorkspaceId && context !== "Home" ? <><span aria-hidden="true">/</span><span aria-current="page" className="font-medium text-text-primary">{context}</span></> : null}
           </nav>
-          <div className="ml-auto flex shrink-0 items-center gap-2">
-            <div ref={slotRef} className="flex flex-wrap items-center gap-2" />
+          {/* Search and the inbox stay on the first line on phones; a page's
+              own actions take a line of their own below them. */}
+          <div className="ml-auto flex shrink-0 items-center gap-2 md:hidden">
             <button
               type="button"
               onClick={() => setCommandPaletteOpen(true)}
               aria-label="Search or jump to"
-              className="grid size-9 place-items-center rounded-[9px] text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring md:hidden"
+              className="grid size-9 place-items-center rounded-[9px] text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"
             >
               <AppIcon name="search" />
             </button>
-            <span className="md:hidden"><NotificationDropdown compact /></span>
+            <NotificationDropdown compact />
           </div>
+          <div ref={slotRef} className="flex min-w-0 flex-wrap items-center gap-2 empty:hidden max-sm:order-last max-sm:w-full sm:ml-auto md:justify-end" />
         </header>
 
         <main id="main-content" className="w-full min-w-0 max-w-none wrap-anywhere px-5 pb-12 pt-8 sm:px-7 lg:px-10">

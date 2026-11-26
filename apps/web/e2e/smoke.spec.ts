@@ -17,7 +17,7 @@ test("the landing page invites people to sign up", async ({ page }) => {
 });
 
 test("signed-out visitors are sent to sign in from every signed-in page", async ({ page }) => {
-  for (const path of ["/workspace", "/search", "/saved", "/settings/email"]) {
+  for (const path of ["/workspace", "/search", "/saved", "/settings", "/settings/email"]) {
     await page.goto(path);
     await expect(page).toHaveURL((url) => url.pathname === "/login" && url.searchParams.get("next") === path);
   }
@@ -95,8 +95,11 @@ test("a new user registers, records a decision from a discussion and signs out",
   });
 
   await test.step("find it in the decision list", async () => {
-    await page.getByRole("link", { name: "Back to decisions" }).click();
-    await expect(page.getByRole("heading", { level: 3, name: question })).toBeVisible();
+    // The grouped list sits beside the record (Decisions v2).
+    const rail = page.getByRole("navigation", { name: "Decision list" });
+    await expect(rail.getByRole("link", { name: question })).toHaveAttribute("aria-current", "page");
+    await page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Decisions" }).click();
+    await expect(rail.getByRole("region", { name: /^Proposals/ }).getByRole("link", { name: question })).toBeVisible();
   });
 
   await test.step("jump with the command palette", async () => {

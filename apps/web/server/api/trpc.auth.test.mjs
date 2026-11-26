@@ -116,3 +116,25 @@ test("a cookie-authenticated mutation with a mismatched CSRF token is FORBIDDEN,
   const matched = await call(new Headers({ cookie, "x-csrf-token": "expected" }), "POST");
   assert.equal(await matched.caller.touch(), userId);
 });
+
+test("changing the password is limited to five attempts per user in ten minutes", async () => {
+  const counts = new Map();
+  redis.incr = async (key) => { counts.set(key, (counts.get(key) ?? 0) + 1); return counts.get(key); };
+  redis.expire = async () => 1;
+  redis.ttl = async () => 600;
+  const { authRouter } = jiti("./routers/auth.router.ts");
+  const { authService } = jiti("../services/auth.service.ts");
+  const attempts = [];
+  authService.changePassword = async (id) => { attempts.push(id); return { success: true }; };
+
+  await persistSession("session-token-5", userId, "sid-5", 60);
+  const ctx = await createTRPCContext({
+    headers: new Headers({ authorization: `Bearer ${signAccessToken(userId, "sid-5")}` }),
+    request: new Request("http://localhost/api/trpc", { method: "POST" }),
+  });
+  const caller = authRouter.createCaller(ctx);
+  const input = { currentPassword: "old-password-1", newPassword: "new-password-2" };
+  for (let i = 0; i < 5; i += 1) assert.deepEqual(await caller.changePassword(input), { success: true });
+  await assert.rejects(() => caller.changePassword(input), isCode("TOO_MANY_REQUESTS"));
+  assert.equal(attempts.length, 5);
+});

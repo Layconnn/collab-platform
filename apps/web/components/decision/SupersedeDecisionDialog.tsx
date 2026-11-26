@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { DecisionDate, decisionError } from "./decisionUI";
 import { useDecisionActions, useReplacementCandidates } from "@/hooks/useDecision";
 import { dialogPanelClasses, dialogTitleClasses, overlayLabelClasses, scrimClasses } from "@/components/ui/overlay";
+import { Button } from "@/components/ui/Button";
 
 type Candidate = { id: string; question: string; outcome: string | null; sourceDiscussionTitle: string; version: number; decidedAt: Date | null };
 
@@ -58,26 +59,26 @@ export function SupersedeDecisionDialog({ workspaceId, oldDecision, onClose }: {
       {accessLost ? <p role="alert" className="mt-5 text-sm text-danger">Decision access changed. Close this dialog and return to the workspace.</p> : confirming ? <div className="mt-5 space-y-3 text-sm leading-6 text-text-secondary">
         <p>The original decision will be marked Superseded. <strong className="wrap-anywhere text-text-primary">{selected?.question}</strong> becomes the current decision.</p>
         <p>The original record and reasoning remain accessible. This creates permanent historical metadata.</p>
-        <div className="border-l-2 border-brand-accent pl-3"><p className="font-semibold text-text-primary">Reason</p><p className="whitespace-pre-wrap wrap-anywhere">{reason}</p></div>
+        <div className="rounded-[10px] border border-callout-line bg-callout px-3.5 py-2.5"><p className="font-medium text-text-primary">Reason</p><p className="whitespace-pre-wrap wrap-anywhere">{reason}</p></div>
       </div> : <div className="mt-5 space-y-5">
         <fieldset disabled={supersede.isPending}>
-          <legend className="text-sm font-semibold text-text-primary">Choose a finalized replacement</legend>
+          <legend className="text-sm font-medium text-text-primary">Choose a finalized replacement</legend>
           <p className="mt-1 text-xs leading-5 text-text-muted">Only standalone finalized decisions in this workspace are eligible. Check the outcome and source before selecting.</p>
           {candidates.isLoading && !candidates.data ? <p role="status" className="mt-3 text-sm text-text-secondary">Loading decisions...</p> : null}
           {candidates.error ? <div role="alert" className="mt-3 text-sm text-danger">Could not load eligible decisions. <button type="button" onClick={() => void candidates.refetch()} className="font-semibold underline">Retry</button></div> : null}
           {!candidates.isLoading && !candidates.error && !items.length ? <p className="mt-3 text-sm text-text-secondary">No eligible finalized decisions are available yet.</p> : null}
-          {items.length ? <div className="mt-3 max-h-64 overflow-y-auto border-y border-border-subtle">{items.map((item) => <label key={item.id} className="flex min-w-0 cursor-pointer gap-3 border-b border-border-subtle px-2 py-3 last:border-b-0 hover:bg-surface-hover">
+          {items.length ? <div className="mt-3 flex max-h-64 flex-col gap-2 overflow-y-auto">{items.map((item) => <label key={item.id} className={`flex min-w-0 cursor-pointer gap-3 rounded-xl border px-3 py-3 focus-within:outline-2 focus-within:outline-focus-ring ${selectedId === item.id ? "border-brand-link bg-callout" : "border-border-subtle hover:bg-surface-hover"}`}>
             <input type="radio" name="replacement" value={item.id} checked={selectedId === item.id} onChange={() => { setSelectedId(item.id); supersede.reset(); }} className="mt-1 accent-brand-accent" />
             <span className="min-w-0"><span className="block wrap-anywhere text-sm font-semibold text-text-primary">{item.question}</span><span className="mt-1 block line-clamp-2 wrap-anywhere text-sm text-text-secondary">{item.outcome}</span><span className="mt-1 block wrap-anywhere text-xs text-text-muted">From {item.sourceDiscussionTitle}{item.decidedAt ? <> · Finalized <DecisionDate value={item.decidedAt} /></> : null}</span></span>
           </label>)}</div> : null}
-          {candidates.hasNextPage ? <button type="button" disabled={candidates.isFetchingNextPage} onClick={() => void candidates.fetchNextPage()} className="mt-2 min-h-10 rounded-sm border border-border px-3 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{candidates.isFetchingNextPage ? "Loading..." : "Load more decisions"}</button> : null}
+          {candidates.hasNextPage ? <button type="button" disabled={candidates.isFetchingNextPage} onClick={() => void candidates.fetchNextPage()} className="mt-2 inline-flex min-h-9 items-center rounded-[9px] border border-border px-3 text-[0.8125rem] font-medium text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{candidates.isFetchingNextPage ? "Loading..." : "Load more decisions"}</button> : null}
         </fieldset>
-        <div><label htmlFor="supersession-reason" className="block text-sm font-semibold text-text-primary">Why is this decision being replaced?</label><textarea id="supersession-reason" required minLength={10} maxLength={2000} rows={3} value={reason} onChange={(event) => setReason(event.target.value)} aria-describedby="supersession-reason-help" className="mt-2 min-h-24 w-full resize-y rounded-sm border border-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring" /><p id="supersession-reason-help" className="mt-1 text-xs text-text-muted">Use at least 10 characters. This reason becomes part of the permanent decision history.</p></div>
+        <div><label htmlFor="supersession-reason" className="block text-sm font-medium text-text-primary">Why is this decision being replaced?</label><textarea id="supersession-reason" required minLength={10} maxLength={2000} rows={3} value={reason} onChange={(event) => setReason(event.target.value)} aria-describedby="supersession-reason-help" className="mt-2 min-h-24 w-full resize-y rounded-[10px] border border-control-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring" /><p id="supersession-reason-help" className="mt-1 text-xs text-text-muted">Use at least 10 characters. This reason becomes part of the permanent decision history.</p></div>
       </div>}
       {supersede.error ? <p role="alert" className="mt-4 text-sm text-danger">{decisionError(supersede.error, "Could not replace the decision. Your reason is still here.")}{supersede.error.data?.code === "CONFLICT" ? " Another manager may have changed a decision. Close and review both records before trying again." : null}</p> : null}
       <div className="mt-6 flex flex-col-reverse gap-2 border-t border-border-subtle pt-4 sm:flex-row sm:justify-end">
-        <button type="button" disabled={supersede.isPending} onClick={confirming ? () => setConfirming(false) : onClose} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">{confirming ? "Back" : "Cancel"}</button>
-        <button type="button" disabled={supersede.isPending || accessLost || (!confirming && (!selected || reason.trim().length < 10))} onClick={confirming ? () => void submit() : () => setConfirming(true)} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{confirming ? supersede.isPending ? "Replacing..." : "Confirm replacement" : "Review replacement"}</button>
+        <Button variant="ghost" disabled={supersede.isPending} onClick={confirming ? () => setConfirming(false) : onClose}>{confirming ? "Back" : "Cancel"}</Button>
+        <Button variant="primary" disabled={supersede.isPending || accessLost || (!confirming && (!selected || reason.trim().length < 10))} onClick={confirming ? () => void submit() : () => setConfirming(true)}>{confirming ? supersede.isPending ? "Replacing..." : "Confirm replacement" : "Review replacement"}</Button>
       </div>
     </div>
   </div>;

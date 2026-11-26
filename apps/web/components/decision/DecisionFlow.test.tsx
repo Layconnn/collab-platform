@@ -58,9 +58,16 @@ vi.mock("@/hooks/useDecision", () => ({
   useDecisionActions: () => ({ create: { mutateAsync: mocks.create, isPending: false, error: null }, edit: { mutateAsync: mocks.edit, isPending: false, error: mocks.editError, reset: vi.fn() }, finalize: { mutateAsync: mocks.finalize, isPending: false, error: mocks.finalizeError, reset: vi.fn() }, supersede: { mutateAsync: mocks.supersede, isPending: mocks.supersedePending, error: mocks.supersedeError, reset: vi.fn() }, remove: { mutateAsync: mocks.remove, isPending: false, error: mocks.removeError, reset: vi.fn() } }),
 }));
 
-import DecisionsPage from "@/app/(workspace)/workspace/[workspaceId]/decisions/page";
+import DecisionsLayout from "@/app/(workspace)/workspace/[workspaceId]/decisions/layout";
 import DecisionDetailPage from "@/app/(workspace)/workspace/[workspaceId]/decisions/[decisionId]/page";
 import { CreateDecisionForm } from "./CreateDecisionForm";
+import { TopBarSlotProvider } from "@/components/shell/TopBarActions";
+
+// The record's actions sit in the shell's top bar; give the page one.
+function detail() {
+  const slot = document.getElementById("top-bar") ?? Object.assign(document.body.appendChild(document.createElement("div")), { id: "top-bar" });
+  return <TopBarSlotProvider slot={slot}><DecisionDetailPage /></TopBarSlotProvider>;
+}
 
 describe("decision frontend flow", () => {
   beforeEach(() => {
@@ -76,21 +83,30 @@ describe("decision frontend flow", () => {
   });
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
-  it("lists decisions, filters by status, and paginates", () => {
+  it("lists decisions beside the record, groups them, filters by question, and paginates", () => {
     mocks.listNext = true;
-    render(<DecisionsPage />);
-    expect(screen.getByRole("link", { name: /Which stack?/ })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Finalized" }));
-    expect(screen.getByRole("button", { name: "Finalized" }).getAttribute("aria-pressed")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "Load more decisions" }));
+    render(<DecisionsLayout><p>Record</p></DecisionsLayout>);
+    const rail = screen.getByRole("navigation", { name: "Decision list" });
+    const link = within(rail).getByRole("link", { name: /Which stack?/ });
+    expect(link.getAttribute("aria-current")).toBe("page");
+    expect(within(rail).getByRole("heading", { name: "Proposals · 1" })).toBeTruthy();
+    expect(rail.textContent).toContain("1 record+ · 1 proposal");
+    expect(screen.getByText("Record")).toBeTruthy();
+    fireEvent.change(within(rail).getByLabelText("Filter decisions"), { target: { value: "budget" } });
+    expect(within(rail).queryByRole("link", { name: /Which stack?/ })).toBeNull();
+    expect(within(rail).getByRole("status").textContent).toContain("No loaded decision matches");
+    fireEvent.change(within(rail).getByLabelText("Filter decisions"), { target: { value: "STACK" } });
+    expect(within(rail).getByRole("link", { name: /Which stack?/ })).toBeTruthy();
+    fireEvent.click(within(rail).getByRole("button", { name: "Load more decisions" }));
     expect(mocks.listNextPage).toHaveBeenCalledTimes(1);
   });
 
-  it("hides cached index content after access denial", () => {
-    mocks.listError = { data: { code: "UNAUTHORIZED" } };
-    render(<DecisionsPage />);
+  it("hides cached list content after access denial", () => {
+    mocks.workspaceError = { data: { code: "FORBIDDEN" } };
+    render(<DecisionsLayout><p>Record</p></DecisionsLayout>);
     expect(screen.getByText("Decision access restricted")).toBeTruthy();
     expect(screen.queryByText("Which stack?")).toBeNull();
+    expect(screen.queryByText("Record")).toBeNull();
   });
 
   it("preserves the same idempotency key when retrying an unchanged draft", async () => {
@@ -129,24 +145,24 @@ describe("decision frontend flow", () => {
   });
 
   it("allows the author to edit but only managers to finalize", () => {
-    render(<DecisionDetailPage />);
+    render(detail());
     expect(screen.getByRole("button", { name: "Edit proposal" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Finalize decision" })).toBeNull();
   });
 
   it("does not offer edits to another member or finalized records", () => {
     mocks.userId = "user-2";
-    const view = render(<DecisionDetailPage />);
+    const view = render(detail());
     expect(screen.queryByRole("button", { name: "Edit proposal" })).toBeNull();
     mocks.role = "ADMIN"; mocks.decision.status = "DECIDED";
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.queryByRole("button", { name: "Edit proposal" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Finalize decision" })).toBeNull();
   });
 
   it("offers a safe refresh on a stale edit without discarding the draft", () => {
     mocks.editError = { data: { code: "CONFLICT" } };
-    render(<DecisionDetailPage />);
+    render(detail());
     fireEvent.click(screen.getByRole("button", { name: "Edit proposal" }));
     fireEvent.change(screen.getByLabelText("Decision question"), { target: { value: "Updated question?" } });
     expect(screen.getByDisplayValue("Updated question?")).toBeTruthy();
@@ -157,7 +173,7 @@ describe("decision frontend flow", () => {
 
   it("shows deleted-source disclosure and manager finalization confirmation", async () => {
     mocks.role = "ADMIN"; mocks.decision.sourceDiscussionId = null;
-    render(<DecisionDetailPage />);
+    render(detail());
     expect(screen.getByText(/original discussion unavailable/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Finalize decision" }));
     expect(screen.getByRole("dialog", { name: "Finalize this decision?" })).toBeTruthy();
@@ -168,7 +184,7 @@ describe("decision frontend flow", () => {
 
   it("keeps keyboard focus in the confirmation and restores it on Escape", () => {
     mocks.role = "OWNER";
-    render(<DecisionDetailPage />);
+    render(detail());
     const trigger = screen.getByRole("button", { name: "Finalize decision" });
     fireEvent.click(trigger);
     const dialog = screen.getByRole("dialog", { name: "Finalize this decision?" });
@@ -182,7 +198,7 @@ describe("decision frontend flow", () => {
 
   it("keeps the revision timeline readable and paginated", () => {
     mocks.revisionNext = true;
-    render(<DecisionDetailPage />);
+    render(detail());
     expect(screen.getByText("Proposal created")).toBeTruthy();
     fireEvent.click(screen.getByText("Recorded content"));
     expect(screen.getAllByText("Shared types").length).toBeGreaterThan(0);
@@ -192,20 +208,20 @@ describe("decision frontend flow", () => {
 
   it("offers supersession only to managers of finalized decisions", () => {
     mocks.decision.status = "DECIDED";
-    const view = render(<DecisionDetailPage />);
+    const view = render(detail());
     expect(screen.queryByRole("button", { name: "Supersede decision" })).toBeNull();
     mocks.role = "ADMIN";
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.getByRole("button", { name: "Supersede decision" })).toBeTruthy();
     mocks.decision.status = "PROPOSED";
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.queryByRole("button", { name: "Supersede decision" })).toBeNull();
   });
 
   it("reviews a replacement before submitting both expected versions", async () => {
     mocks.role = "OWNER"; mocks.decision.status = "DECIDED";
     mocks.supersede.mockResolvedValue({ oldDecisionId: mocks.decisionId, replacementDecisionId: "c000000000000000000000004" });
-    render(<DecisionDetailPage />);
+    render(detail());
     fireEvent.click(screen.getByRole("button", { name: "Supersede decision" }));
     const dialog = screen.getByRole("dialog", { name: "Supersede decision" });
     expect(document.activeElement).toBe(dialog);
@@ -223,7 +239,7 @@ describe("decision frontend flow", () => {
   it("keeps the replacement reason after an API conflict", async () => {
     mocks.role = "ADMIN"; mocks.decision.status = "DECIDED";
     mocks.supersede.mockRejectedValue(new Error("conflict"));
-    render(<DecisionDetailPage />);
+    render(detail());
     fireEvent.click(screen.getByRole("button", { name: "Supersede decision" }));
     fireEvent.click(screen.getByRole("radio", { name: /Use a different stack/ }));
     fireEvent.change(screen.getByLabelText("Why is this decision being replaced?"), { target: { value: "Requirements changed" } });
@@ -238,7 +254,7 @@ describe("decision frontend flow", () => {
 
   it("traps focus in the replacement dialog and restores it on Escape", () => {
     mocks.role = "OWNER"; mocks.decision.status = "DECIDED";
-    render(<DecisionDetailPage />);
+    render(detail());
     const trigger = screen.getByRole("button", { name: "Supersede decision" });
     fireEvent.click(trigger);
     const dialog = screen.getByRole("dialog", { name: "Supersede decision" });
@@ -252,13 +268,13 @@ describe("decision frontend flow", () => {
 
   it("disables repeat confirmation while supersession is pending", () => {
     mocks.role = "ADMIN"; mocks.decision.status = "DECIDED";
-    const view = render(<DecisionDetailPage />);
+    const view = render(detail());
     fireEvent.click(screen.getByRole("button", { name: "Supersede decision" }));
     fireEvent.click(screen.getByRole("radio", { name: /Use a different stack/ }));
     fireEvent.change(screen.getByLabelText("Why is this decision being replaced?"), { target: { value: "Requirements changed" } });
     fireEvent.click(screen.getByRole("button", { name: "Review replacement" }));
     mocks.supersedePending = true;
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.getByRole("button", { name: "Replacing..." }).hasAttribute("disabled")).toBe(true);
   });
 
@@ -272,7 +288,7 @@ describe("decision frontend flow", () => {
       { id: nextId, question: "Use Rust?", status: "DECIDED", replacement: null },
     ];
     mocks.effectiveDecisionId = nextId;
-    render(<DecisionDetailPage />);
+    render(detail());
     expect(screen.getByRole("heading", { name: "Replacement history" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Revision history" })).toBeTruthy();
     expect(screen.getAllByText(/Authorized by Owner/).length).toBeGreaterThan(0);
@@ -280,26 +296,26 @@ describe("decision frontend flow", () => {
   });
 
   it("offers deletion to the proposal author and to managers, never for linked records", () => {
-    const view = render(<DecisionDetailPage />);
+    const view = render(detail());
     expect(screen.getByRole("button", { name: "Delete proposal" })).toBeTruthy();
     mocks.userId = "user-2";
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.queryByRole("button", { name: "Delete proposal" })).toBeNull();
     mocks.userId = "user-1"; mocks.decision.status = "DECIDED";
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.queryByRole("button", { name: "Delete decision" })).toBeNull();
     mocks.role = "ADMIN";
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.getByRole("button", { name: "Delete decision" })).toBeTruthy();
     mocks.decision.previousDecision = { id: "c000000000000000000000005", question: "Earlier choice" };
-    view.rerender(<DecisionDetailPage />);
+    view.rerender(detail());
     expect(screen.queryByRole("button", { name: "Delete decision" })).toBeNull();
   });
 
   it("confirms deletion with the expected version and returns to the list", async () => {
     mocks.decision.version = 3;
     mocks.remove.mockResolvedValue({ id: mocks.decisionId, workspaceId: mocks.workspaceId });
-    render(<DecisionDetailPage />);
+    render(detail());
     fireEvent.click(screen.getByRole("button", { name: "Delete proposal" }));
     const dialog = screen.getByRole("alertdialog", { name: "Delete this proposal?" });
     fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
@@ -309,7 +325,7 @@ describe("decision frontend flow", () => {
 
   it("explains a deletion conflict and closes on Escape", () => {
     mocks.removeError = { data: { code: "CONFLICT" } };
-    render(<DecisionDetailPage />);
+    render(detail());
     const trigger = screen.getByRole("button", { name: "Delete proposal" });
     fireEvent.click(trigger);
     const dialog = screen.getByRole("alertdialog", { name: "Delete this proposal?" });
@@ -322,7 +338,7 @@ describe("decision frontend flow", () => {
   it("asks a manager for a reason before finalizing a proposal whose review rule is not met", async () => {
     mocks.role = "ADMIN";
     mocks.reviews = { summary: { rule: "ALL", needed: 2, active: 2, approved: 1, objected: 0, pending: 1, met: false }, reviews: [{ state: "APPROVED", reviewerLabel: "Sam" }, { state: "PENDING", reviewerLabel: "Lee" }] };
-    render(<DecisionDetailPage />);
+    render(detail());
     expect(screen.getByText("Review section")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Finalize decision" }));
     const dialog = screen.getByRole("dialog");
@@ -335,12 +351,14 @@ describe("decision frontend flow", () => {
     await waitFor(() => expect(mocks.finalize).toHaveBeenCalledWith({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId, expectedVersion: 1, overrideReason: "Launch date fixed by the board." }));
   });
 
-  it("shows review progress in the list and filters to proposals waiting for my review", () => {
+  it("puts proposals waiting for my review first, with their progress", () => {
     (mocks.decision as Record<string, unknown>).review = { rule: "ALL", needed: 2, active: 2, approved: 0, objected: 0, pending: 2, met: false, waitingForMe: true };
-    render(<DecisionsPage />);
-    expect(screen.getByText("Your review is requested · 0 of 2 approved")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Waiting for my review" }));
-    expect(mocks.listArgs).toEqual([mocks.workspaceId, undefined, true]);
+    render(<DecisionsLayout><p>Record</p></DecisionsLayout>);
+    const rail = screen.getByRole("navigation", { name: "Decision list" });
+    const waiting = within(rail).getByRole("region", { name: "Waiting on you · 1" });
+    expect(within(waiting).getByRole("link").textContent).toContain("Maya · 0 of 2 approved");
+    expect(rail.textContent).toContain("1 waiting on you");
+    expect(mocks.listArgs).toEqual([mocks.workspaceId]);
     delete (mocks.decision as Record<string, unknown>).review;
   });
 });
