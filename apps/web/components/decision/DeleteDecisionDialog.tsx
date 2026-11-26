@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { decisionError } from "./decisionUI";
 import { useDecisionActions } from "@/hooks/useDecision";
 import { dialogPanelClasses, dialogTitleClasses, scrimClasses } from "@/components/ui/overlay";
+import { Button } from "@/components/ui/Button";
 
 export function DeleteDecisionDialog({ workspaceId, decision, onClose }: {
   workspaceId: string;
@@ -46,8 +47,8 @@ export function DeleteDecisionDialog({ workspaceId, decision, onClose }: {
       <p id="delete-description" className="mt-3 wrap-anywhere text-sm leading-6 text-text-secondary"><strong className="text-text-primary">{decision.question}</strong> will be removed for everyone in this workspace. This cannot be undone from Commons.</p>
       {message ? <p role="alert" className="mt-4 text-sm text-danger">{message}</p> : null}
       <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <button type="button" disabled={remove.isPending} onClick={onClose} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Cancel</button>
-        <button type="button" disabled={remove.isPending} onClick={() => void submit()} className="min-h-11 rounded-sm bg-danger-action px-4 text-sm font-semibold text-on-danger-action hover:opacity-90 focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{remove.isPending ? "Deleting..." : "Delete"}</button>
+        <Button variant="ghost" disabled={remove.isPending} onClick={onClose}>Cancel</Button>
+        <Button variant="danger" disabled={remove.isPending} onClick={() => void submit()}>{remove.isPending ? "Deleting..." : "Delete"}</Button>
       </div>
     </div>
   </div>;

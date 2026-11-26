@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 
 import { Markdown } from "@/components/common/Markdown";
+import { StatusPill } from "@/components/ui/Canopy";
 
 export function DecisionStatus({ status }: { status: "PROPOSED" | "DECIDED" | "SUPERSEDED" }) {
-  const label = status === "DECIDED" ? "Finalized" : status === "PROPOSED" ? "Proposal" : "Superseded";
-  return <span className={`inline-flex min-h-7 items-center rounded-sm border px-2.5 text-xs font-semibold ${status === "DECIDED" ? "border-success text-success" : status === "PROPOSED" ? "border-info text-info" : "border-border text-text-muted"}`}>{label}</span>;
+  // The same words as the decisions list and the record header (Decisions v2).
+  const label = status === "DECIDED" ? "Decided" : status === "PROPOSED" ? "Proposal" : "Replaced";
+  return <StatusPill tone={status === "DECIDED" ? "decided" : status === "PROPOSED" ? "proposal" : "replaced"}>{label}</StatusPill>;
 }
 
 export function DecisionDate({ value }: { value: Date | string }) {
