@@ -139,7 +139,8 @@ The author confirmed every default on 2026-11-25.
 | 2 (#166) | `Platform: Design System: Canopy tokens, motion, glass and primitives` — tokens light and dark, Instrument Serif, motion and glass utilities with reduced-motion and fallback, the shared primitives with tests, `docs/DESIGN_SYSTEM.md` updated | FR-1, FR-2, NFR-2, NFR-3 |
 | 3 (#167) | `Platform: Design System: the Canopy shell` — forest sidebar, glass top bar, full-width frame with context panel, phone drawer | FR-3, FR-5, FR-6, NFR-1 |
 | 4 (#168) | `Platform: Design System: overlays in Canopy` — command palette, notifications, account menu, dialogs, menus, toasts | FR-4, NFR-2 |
-| 5 (#169) | `Commons: Home: redesign Home as a briefing` — Home v2 | FR-4, FR-6, FR-7 |
+| 5 (#169) | `Commons: Home: redesign Home as a briefing` — Home v2: greeting and summary line, rich "Needs you" cards (the words of a mention, a proposal's outcome, reasoning and reviews), pick up where you left off, the week and each workspace in the rail | FR-4, FR-6, FR-7 |
+| 5b (#181) | `Commons: Home: approve, object and reply from Home` — the canvas's inline actions on Home's cards, using the existing review and comment endpoints | FR-4, FR-6 |
 | 6 (#170) | `Commons: Discussions: redesign the discussions list and composer` | FR-4, FR-6 |
 | 7 (#171) | `Commons: Discussions: redesign the discussion page` — thread, floating composer, context panel | FR-4, FR-5, FR-6 |
 | 8 (#172) | `Commons: Decision Records: redesign decisions as a list beside the record` — Decisions v2: grouped list, the record, review and history, floating action bar | FR-4, FR-6, FR-7 |
