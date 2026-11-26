@@ -38,6 +38,11 @@ function discussion(id: number) {
     author: { id: "user-2", name: "Maya Chen", username: "maya" },
     createdAt,
     updatedAt: createdAt,
+    files: 0,
+    replies: 0,
+    lastReplyAt: null,
+    participants: [],
+    decision: null,
   };
 }
 

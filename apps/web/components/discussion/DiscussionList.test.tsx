@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, within, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ChakraProvider } from "@chakra-ui/react";
 import { uiSystem } from "@/lib/ui-system";
@@ -36,6 +36,11 @@ const discussion = {
   author: { id: "user-2", name: "Maya Chen", username: "maya" },
   createdAt: new Date("2026-10-01T10:00:00.000Z"),
   updatedAt: new Date("2026-10-02T10:00:00.000Z"),
+  files: 0,
+  replies: 4,
+  lastReplyAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+  participants: [{ id: "user-3", name: "Sam Adeyemi", username: "sam" }],
+  decision: { id: "c000000000000000000000009", status: "DECIDED" },
 };
 
 function query(overrides: Record<string, unknown> = {}) {
@@ -82,7 +87,12 @@ describe("DiscussionList", () => {
     render(<DiscussionList workspaceId={workspaceId} query={result} onCreate={vi.fn()} />);
 
     expect(screen.getByRole("link", { name: /Keep onboarding decisions together/ })).toBeTruthy();
-    expect(screen.getByText(/Updated/)).toBeTruthy();
+    const row = screen.getByRole("listitem");
+    expect(row.textContent).toContain("Maya Chen·opened Oct 1, 2026");
+    expect(within(row).getByText("Decided").className).toContain("bg-status-decided");
+    expect(within(row).getByText("4 replies")).toBeTruthy();
+    expect(within(row).getByRole("img", { name: "Sam Adeyemi" })).toBeTruthy();
+    expect(row.textContent).toContain("Last reply 2 hours ago");
     expect(screen.getByText("Could not load more discussions")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(result.fetchNextPage).toHaveBeenCalledTimes(1);

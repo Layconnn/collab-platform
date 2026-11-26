@@ -17,6 +17,7 @@ import { MarkdownField } from "@/components/common/MarkdownField";
 import { discussionActionError } from "@/components/discussion/discussionErrors";
 import { AttachmentComposer } from "@/components/files/AttachmentComposer";
 import { uploadBlocker, useUploader } from "@/hooks/useAttachments";
+import { Button } from "@/components/ui/Button";
 
 export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { workspaceId: string; onCancel: () => void; open?: boolean }) {
   const form = useForm<CreateDiscussionInput>({
@@ -72,7 +73,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
   };
 
   return (
-    <form onSubmit={onSubmit} className="max-w-2xl space-y-4" noValidate>
+    <form onSubmit={onSubmit} className="max-w-3xl space-y-4" noValidate>
       <div>
         <label htmlFor="discussion-title" className="block text-sm font-semibold text-text-primary">Title</label>
         <MentionTextarea
@@ -82,7 +83,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           value={title}
           onInsert={(value) => form.setValue("title", value, { shouldDirty: true, shouldValidate: true })}
           id="discussion-title"
-          className="mt-2 min-h-11 w-full rounded-sm border border-control-border bg-surface px-3.5 text-base text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
+          className="mt-2 min-h-11 w-full rounded-[10px] border border-control-border bg-surface px-3.5 text-base text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
           placeholder="What needs a conversation?"
           aria-invalid={Boolean(form.formState.errors.title)}
           aria-describedby={form.formState.errors.title ? "discussion-title-error" : undefined}
@@ -101,7 +102,7 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
           value={form.watch("body")}
           onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })}
           id="discussion-body"
-          className="mt-2 min-h-32 w-full resize-y rounded-sm border border-control-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
+          className="mt-2 min-h-32 w-full resize-y rounded-[10px] border border-control-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring disabled:opacity-60"
           placeholder="Share the background, question, or update so others can contribute."
           rows={5}
           aria-invalid={Boolean(form.formState.errors.body)}
@@ -118,19 +119,18 @@ export function CreateDiscussionForm({ workspaceId, onCancel, open = true }: { w
         {form.formState.errors.body ? <p id="discussion-body-error" role="alert" className="mt-1.5 text-sm text-danger">Please add some context within the allowed length.</p> : null}
       </div>
       {blocked && uploadBlocker(uploader) ? <p role="alert" className="text-sm text-danger">{uploadBlocker(uploader)}</p> : null}
-      {createDiscussion.error ? <p role="alert" className="border-l-2 border-danger bg-surface px-3 py-2.5 text-sm text-danger">{discussionActionError(createDiscussion.error, "Your discussion could not be published. Your draft is still here; please try again.")}</p> : null}
+      {createDiscussion.error ? <p role="alert" className="rounded-[10px] border-l-2 border-danger bg-surface-subtle px-3 py-2.5 text-sm text-danger">{discussionActionError(createDiscussion.error, "Your discussion could not be published. Your draft is still here; please try again.")}</p> : null}
       {posted ? (
-        <p role="status" className="border-l-2 border-success bg-surface px-3 py-2.5 text-sm text-text-secondary">
+        <p role="status" className="rounded-[10px] border-l-2 border-success bg-callout px-3 py-2.5 text-sm text-text-secondary">
           Discussion published. <Link href={`/workspace/${workspaceId}/discussions/${posted.id}`} className="font-semibold text-brand-link hover:text-brand-link-hover">Open {posted.title}</Link>
         </p>
       ) : null}
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
         {busy ? <span role="status" className="sr-only">Publishing discussion...</span> : null}
-        <button type="button" onClick={onCancel} disabled={busy} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover hover:text-text-primary disabled:opacity-60">Cancel</button>
-        <button type="submit" disabled={busy} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm bg-brand-action px-5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none">
-          {busy ? <LoaderCircle size={17} className="animate-spin" aria-hidden="true" /> : <ArrowRight size={17} aria-hidden="true" />}
+        <Button variant="ghost" onClick={onCancel} disabled={busy}>Cancel</Button>
+        <Button type="submit" variant="primary" disabled={busy} icon={busy ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <ArrowRight size={16} aria-hidden="true" />}>
           {busy ? "Publishing..." : "Publish discussion"}
-        </button>
+        </Button>
       </div>
     </form>
   );
