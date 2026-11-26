@@ -76,7 +76,7 @@ export function DecisionRail({ workspaceId, workspaceName, selectedId }: { works
       </p> : null}
     </div>
 
-    <label className="mt-4 flex min-h-9 items-center gap-2 rounded-[9px] border border-border-subtle bg-surface px-2.5 text-text-muted focus-within:outline-2 focus-within:outline-focus-ring">
+    <label className="mt-4 flex min-h-9 items-center gap-2 rounded-[9px] border border-border-subtle bg-surface px-2.5 text-text-muted canopy-field-frame">
       <Search size={14} aria-hidden="true" />
       <span className="sr-only">Filter decisions</span>
       <input value={filter} onChange={(event) => setFilter(event.target.value)} placeholder="Filter decisions" className="canopy-inset min-w-0 flex-1 bg-transparent text-[0.8125rem] text-text-primary outline-none placeholder:text-text-muted" />

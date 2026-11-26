@@ -147,7 +147,7 @@ export function SearchPage() {
       <h1 className="type-canopy-title mt-2 text-[2.35rem] sm:text-[2.875rem]">Search</h1>
       <form role="search" onSubmit={onSubmit} className="mt-5">
         <label htmlFor={inputId} className="sr-only">Search decisions, discussions and replies</label>
-        <div className="flex min-h-12 items-center gap-2.5 rounded-xl border border-control-border bg-surface px-4 shadow-card focus-within:outline-2 focus-within:outline-focus-ring">
+        <div className="flex min-h-12 items-center gap-2.5 rounded-xl border border-control-border bg-surface px-4 shadow-card canopy-field-frame">
           <Search size={17} aria-hidden="true" className="shrink-0 text-text-muted" />
           <input
             ref={inputRef}

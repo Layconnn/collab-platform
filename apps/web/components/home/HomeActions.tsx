@@ -110,7 +110,7 @@ export function QuickReply({ discussionId, parentCommentId, actor, onReplied }: 
     : null;
 
   return <form onSubmit={submit} className="mt-3.5">
-    <div className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-subtle py-1.5 pl-3 pr-1.5 focus-within:outline-2 focus-within:outline-focus-ring">
+    <div className="flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-subtle py-1.5 pl-3 pr-1.5 canopy-field-frame">
       <label htmlFor={inputId} className="sr-only">Reply to {actor ?? "this"}</label>
       <input
         id={inputId}
