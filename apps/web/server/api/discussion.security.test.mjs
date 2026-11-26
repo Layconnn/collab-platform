@@ -269,7 +269,31 @@ prisma.discussion.findUnique = async ({ where, select }) => {
   return projectDiscussionWithSelect(row, select);
 };
 
+// Edit history (#200): the edit locks the row, reads the version it replaces
+// and keeps it as a revision.
+state.revisions = [];
+const originalQueryRaw = prisma.$queryRaw;
+const originalDiscussionFindUniqueOrThrow = prisma.discussion.findUniqueOrThrow;
+const originalRevisionCreate = prisma.discussionRevision.create;
+prisma.$queryRaw = async () => [];
+prisma.discussion.findUniqueOrThrow = async ({ where }) => {
+  const row = state.discussions.get(where.id);
+  if (!row) {
+    const error = new Error("Not found");
+    error.code = "P2025";
+    throw error;
+  }
+  return { title: row.title, body: row.body, editCount: row.editCount ?? 0, attachments: [] };
+};
+prisma.discussionRevision.create = async ({ data }) => {
+  state.revisions.push(data);
+  return data;
+};
+
 prisma.discussion.update = async ({ where, data, select }) => {
+  if (data.editCount?.increment) {
+    data = { ...data, editCount: (state.discussions.get(where.id)?.editCount ?? 0) + data.editCount.increment };
+  }
   const row = state.discussions.get(where.id);
   if (!row) {
     const error = new Error("Not found");
@@ -298,6 +322,9 @@ prisma.discussion.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.$queryRaw = originalQueryRaw;
+  prisma.discussion.findUniqueOrThrow = originalDiscussionFindUniqueOrThrow;
+  prisma.discussionRevision.create = originalRevisionCreate;
   prisma.$transaction = originalPrismaTransactionForActivity;
   prisma.activityEvent.create = originalActivityEventCreate;
   prisma.user.findUnique = originalUserFindUniqueForActivity;

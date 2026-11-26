@@ -417,7 +417,9 @@ export const ModelName = {
   Attachment: 'Attachment',
   DeletedFile: 'DeletedFile',
   WorkspaceInvite: 'WorkspaceInvite',
-  WorkspaceInviteUse: 'WorkspaceInviteUse'
+  WorkspaceInviteUse: 'WorkspaceInviteUse',
+  DiscussionRevision: 'DiscussionRevision',
+  CommentRevision: 'CommentRevision'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -433,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent" | "attachment" | "deletedFile" | "workspaceInvite" | "workspaceInviteUse"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent" | "attachment" | "deletedFile" | "workspaceInvite" | "workspaceInviteUse" | "discussionRevision" | "commentRevision"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1991,6 +1993,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DiscussionRevision: {
+      payload: Prisma.$DiscussionRevisionPayload<ExtArgs>
+      fields: Prisma.DiscussionRevisionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DiscussionRevisionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DiscussionRevisionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>
+        }
+        findFirst: {
+          args: Prisma.DiscussionRevisionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DiscussionRevisionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>
+        }
+        findMany: {
+          args: Prisma.DiscussionRevisionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>[]
+        }
+        create: {
+          args: Prisma.DiscussionRevisionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>
+        }
+        createMany: {
+          args: Prisma.DiscussionRevisionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DiscussionRevisionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>[]
+        }
+        delete: {
+          args: Prisma.DiscussionRevisionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>
+        }
+        update: {
+          args: Prisma.DiscussionRevisionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>
+        }
+        deleteMany: {
+          args: Prisma.DiscussionRevisionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DiscussionRevisionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DiscussionRevisionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>[]
+        }
+        upsert: {
+          args: Prisma.DiscussionRevisionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DiscussionRevisionPayload>
+        }
+        aggregate: {
+          args: Prisma.DiscussionRevisionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDiscussionRevision>
+        }
+        groupBy: {
+          args: Prisma.DiscussionRevisionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DiscussionRevisionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DiscussionRevisionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DiscussionRevisionCountAggregateOutputType> | number
+        }
+      }
+    }
+    CommentRevision: {
+      payload: Prisma.$CommentRevisionPayload<ExtArgs>
+      fields: Prisma.CommentRevisionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CommentRevisionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CommentRevisionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>
+        }
+        findFirst: {
+          args: Prisma.CommentRevisionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CommentRevisionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>
+        }
+        findMany: {
+          args: Prisma.CommentRevisionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>[]
+        }
+        create: {
+          args: Prisma.CommentRevisionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>
+        }
+        createMany: {
+          args: Prisma.CommentRevisionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CommentRevisionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>[]
+        }
+        delete: {
+          args: Prisma.CommentRevisionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>
+        }
+        update: {
+          args: Prisma.CommentRevisionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>
+        }
+        deleteMany: {
+          args: Prisma.CommentRevisionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CommentRevisionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CommentRevisionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>[]
+        }
+        upsert: {
+          args: Prisma.CommentRevisionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommentRevisionPayload>
+        }
+        aggregate: {
+          args: Prisma.CommentRevisionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCommentRevision>
+        }
+        groupBy: {
+          args: Prisma.CommentRevisionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommentRevisionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CommentRevisionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommentRevisionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2062,7 +2212,8 @@ export const DiscussionScalarFieldEnum = {
   title: 'title',
   body: 'body',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  editCount: 'editCount'
 } as const
 
 export type DiscussionScalarFieldEnum = (typeof DiscussionScalarFieldEnum)[keyof typeof DiscussionScalarFieldEnum]
@@ -2079,7 +2230,8 @@ export const CommentScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   pinnedAt: 'pinnedAt',
-  pinnedById: 'pinnedById'
+  pinnedById: 'pinnedById',
+  editCount: 'editCount'
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
@@ -2342,6 +2494,38 @@ export const WorkspaceInviteUseScalarFieldEnum = {
 } as const
 
 export type WorkspaceInviteUseScalarFieldEnum = (typeof WorkspaceInviteUseScalarFieldEnum)[keyof typeof WorkspaceInviteUseScalarFieldEnum]
+
+
+export const DiscussionRevisionScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  version: 'version',
+  title: 'title',
+  body: 'body',
+  fileNames: 'fileNames',
+  editedById: 'editedById',
+  editorLabel: 'editorLabel',
+  createdAt: 'createdAt'
+} as const
+
+export type DiscussionRevisionScalarFieldEnum = (typeof DiscussionRevisionScalarFieldEnum)[keyof typeof DiscussionRevisionScalarFieldEnum]
+
+
+export const CommentRevisionScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  version: 'version',
+  body: 'body',
+  fileNames: 'fileNames',
+  editedById: 'editedById',
+  editorLabel: 'editorLabel',
+  createdAt: 'createdAt'
+} as const
+
+export type CommentRevisionScalarFieldEnum = (typeof CommentRevisionScalarFieldEnum)[keyof typeof CommentRevisionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2793,6 +2977,8 @@ export type GlobalOmitConfig = {
   deletedFile?: Prisma.DeletedFileOmit
   workspaceInvite?: Prisma.WorkspaceInviteOmit
   workspaceInviteUse?: Prisma.WorkspaceInviteUseOmit
+  discussionRevision?: Prisma.DiscussionRevisionOmit
+  commentRevision?: Prisma.CommentRevisionOmit
 }
 
 /* Types for Logging */

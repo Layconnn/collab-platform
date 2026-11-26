@@ -136,7 +136,25 @@ const getCommentProcedure = protectedProcedure.use(async ({ ctx, next }) => {
   return next();
 });
 
+// Edit history reads (edit history PRD, NFR-1).
+const historyCommentRateLimit = createRateLimitGuard({
+  routeKey: "comment.history",
+  limit: 60,
+  windowSeconds: 60,
+});
+
+const historyCommentProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  await historyCommentRateLimit(ctx.user.id, ctx.requestId);
+  return next();
+});
+
 export const commentRouter = createTRPCRouter({
+  history: historyCommentProcedure.input(getCommentByIdInputSchema).query(({ ctx, input }) =>
+    execute(() =>
+      commentService.history(ctx.user.id, input, { requestId: ctx.requestId }),
+    ),
+  ),
+
   create: createCommentProcedure.input(createCommentInputSchema).mutation(({ ctx, input }) =>
     execute(() =>
       commentService.create(ctx.user.id, input, { requestId: ctx.requestId }),
