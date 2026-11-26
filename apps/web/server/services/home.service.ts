@@ -29,7 +29,20 @@ export type NeedItem = {
   outcome: string | null;
   rationale: string | null;
   reviews: { approved: number; requested: number } | null;
+  // For acting from Home (#181): the proposal version a review answers, and
+  // the comment a reply goes under (null for a reply to the discussion).
+  decisionVersion: number | null;
+  replyToCommentId: string | null;
 };
+
+// Replies nest at most this deep (comment service); a reply to a comment at
+// the limit goes beside it, under the same parent.
+const MAX_COMMENT_DEPTH = 8;
+
+function replyTarget(comment: { id: string; depth: number; parentCommentId: string | null } | null) {
+  if (!comment) return null;
+  return comment.depth < MAX_COMMENT_DEPTH ? comment.id : comment.parentCommentId;
+}
 
 const EXCERPT_LENGTH = 240;
 
@@ -51,7 +64,7 @@ export function plainExcerpt(text: string | null | undefined, length = EXCERPT_L
   return plain.length > length ? `${plain.slice(0, length - 1).trimEnd()}…` : plain;
 }
 
-const noDetail = { excerpt: null, outcome: null, rationale: null, reviews: null };
+const noDetail = { excerpt: null, outcome: null, rationale: null, reviews: null, decisionVersion: null, replyToCommentId: null };
 
 type ProviderContext = { userId: string; now: Date };
 type Provider = (context: ProviderContext) => Promise<NeedItem[]>;
@@ -79,7 +92,7 @@ function unreadNotifications(userId: string, type: "MENTION" | "COMMENT_CREATED"
       id: true, createdAt: true, discussionId: true,
       workspace: { select: { id: true, name: true } },
       discussion: { select: { title: true, body: true } },
-      comment: { select: { body: true } },
+      comment: { select: { id: true, body: true, depth: true, parentCommentId: true } },
       actor: { select: { name: true, username: true } },
     },
   });
@@ -89,7 +102,7 @@ const mentions: Provider = async ({ userId }) =>
   (await unreadNotifications(userId, "MENTION")).map((n) => ({
     id: `mention:${n.id}`, kind: "MENTION", workspace: n.workspace, title: n.discussion?.title ?? "A discussion",
     actor: label(n.actor), discussionId: n.discussionId, decisionId: null, at: n.createdAt, notificationId: n.id,
-    ...noDetail, excerpt: plainExcerpt(n.comment?.body ?? n.discussion?.body),
+    ...noDetail, excerpt: plainExcerpt(n.comment?.body ?? n.discussion?.body), replyToCommentId: replyTarget(n.comment),
   }));
 
 // Replies in discussions the user started (reply notifications go to every member).
@@ -97,19 +110,22 @@ const replies: Provider = async ({ userId }) =>
   (await unreadNotifications(userId, "COMMENT_CREATED", userId)).map((n) => ({
     id: `reply:${n.id}`, kind: "REPLY", workspace: n.workspace, title: n.discussion?.title ?? "A discussion",
     actor: label(n.actor), discussionId: n.discussionId, decisionId: null, at: n.createdAt, notificationId: n.id,
-    ...noDetail, excerpt: plainExcerpt(n.comment?.body),
+    ...noDetail, excerpt: plainExcerpt(n.comment?.body), replyToCommentId: replyTarget(n.comment),
   }));
 
 // A proposal's outcome, reasoning and how many of the requested reviewers
 // approved (withdrawn requests do not count).
 const proposalDetail = {
+  version: true,
   outcome: true,
   rationale: true,
   reviews: { where: { state: { not: "WITHDRAWN" as const } }, select: { state: true } },
 };
 
-function detailOf(decision: { outcome: string | null; rationale: string | null; reviews: Array<{ state: string }> }) {
+function detailOf(decision: { version: number; outcome: string | null; rationale: string | null; reviews: Array<{ state: string }> }) {
   return {
+    decisionVersion: decision.version,
+    replyToCommentId: null,
     excerpt: null,
     outcome: plainExcerpt(decision.outcome),
     rationale: plainExcerpt(decision.rationale),

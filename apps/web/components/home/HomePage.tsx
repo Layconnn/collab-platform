@@ -9,6 +9,7 @@ import { readRecent, type RecentEntry } from "@/components/command/commandItems"
 import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { FileCount } from "@/components/files/FileCount";
+import { QuickReply, ReviewActions } from "@/components/home/HomeActions";
 import { WorkspaceActivity } from "@/components/home/WorkspaceActivity";
 import { TopBarActions } from "@/components/shell/TopBarActions";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -35,6 +36,8 @@ type NeedItem = {
   outcome?: string | null;
   rationale?: string | null;
   reviews?: { approved: number; requested: number } | null;
+  decisionVersion?: number | null;
+  replyToCommentId?: string | null;
 };
 
 type RecentDecision = {
@@ -124,7 +127,9 @@ function ProposalCard({ item, now, onOpen }: { item: NeedItem; now: number; onOp
     </div> : null}
     <div className="mt-4 flex flex-wrap items-center gap-2.5">
       <span className="text-[0.8125rem] text-text-muted">{reviewProgress(item.reviews)}</span>
-      <ButtonLink href={needHref(item)} onClick={onOpen} variant="primary" size="md" className="ml-auto">{review ? "Review" : "Open decision"}</ButtonLink>
+      {review && item.decisionId && item.decisionVersion
+        ? <ReviewActions workspaceId={item.workspace.id} decisionId={item.decisionId} version={item.decisionVersion} href={needHref(item)} title={item.title} />
+        : <ButtonLink href={needHref(item)} onClick={onOpen} variant="primary" size="md" className="ml-auto">{review ? "Review" : "Open decision"}</ButtonLink>}
     </div>
   </article>;
 }
@@ -139,7 +144,8 @@ function ConversationCard({ item, onOpen, onDone, doneDisabled }: { item: NeedIt
       {" · "}{item.workspace.name}
     </Lead>
     {item.excerpt ? <blockquote className="mt-3 wrap-anywhere border-l-2 border-callout-line pl-3.5 text-[0.9375rem] leading-relaxed text-text-primary">{item.excerpt}</blockquote> : null}
-    <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+    {item.discussionId ? <QuickReply discussionId={item.discussionId} parentCommentId={item.replyToCommentId ?? null} actor={item.actor} onReplied={onDone} /> : null}
+    <div className={`flex flex-wrap items-center justify-end gap-2 ${item.discussionId ? "mt-1" : "mt-4"}`}>
       {item.notificationId ? <Button variant="ghost" aria-label={`Mark done: ${item.title}`} disabled={doneDisabled} onClick={onDone} icon={<Check size={15} aria-hidden="true" />}>Done</Button> : null}
       <ButtonLink href={needHref(item)} onClick={onOpen} variant="secondary">Open discussion</ButtonLink>
     </div>

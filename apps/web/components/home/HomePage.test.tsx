@@ -22,6 +22,10 @@ vi.mock("@/hooks/useHome", () => ({
   useDismissNeeds: () => ({ dismiss: { mutate: mocks.dismiss, isPending: false }, dismissAll: { mutate: mocks.dismissAll, isPending: false } }),
 }));
 vi.mock("@/components/home/WorkspaceActivity", () => ({ WorkspaceActivity: () => <p>Workspace list</p> }));
+vi.mock("@/components/home/HomeActions", () => ({
+  ReviewActions: ({ title, version }: { title: string; version: number }) => <p>Review actions for {title} at version {version}</p>,
+  QuickReply: ({ parentCommentId, onReplied }: { parentCommentId: string | null; onReplied: () => void }) => <p data-reply-to={parentCommentId ?? "discussion"} onClick={onReplied}>Quick reply</p>,
+}));
 
 import { HomePage as Home, greeting, needReason, reviewProgress } from "./HomePage";
 import { TopBarSlotProvider } from "@/components/shell/TopBarActions";
@@ -220,6 +224,22 @@ describe("Home helpers", () => {
     expect(within(row).getByRole("link", { name: "Offer a free plan" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/c000000000000000000000005`);
     expect(within(row).getByRole("link", { name: "Review" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/c000000000000000000000005`);
     expect(within(row).queryByRole("button")).toBeNull();
+  });
+
+  it("answers a review from its card when the version is known, and replies in the thread", () => {
+    cleanup();
+    mocks.needs = { total: 2, items: [
+      need({ id: "rv", kind: "REVIEW_REQUESTED", title: "Offer a free plan", discussionId: null, decisionId: "c000000000000000000000005", notificationId: null, decisionVersion: 4 }),
+      need({ id: "m", replyToCommentId: "c000000000000000000000007" }),
+    ] };
+    render(<HomePage />);
+    const [reviewRow, mentionRow] = within(screen.getByRole("list", { name: "Needs you" })).getAllByRole("listitem");
+    expect(within(reviewRow!).getByText("Review actions for Offer a free plan at version 4")).toBeTruthy();
+    expect(within(reviewRow!).queryByRole("link", { name: "Review" })).toBeNull();
+    const reply = within(mentionRow!).getByText("Quick reply");
+    expect(reply.getAttribute("data-reply-to")).toBe("c000000000000000000000007");
+    fireEvent.click(reply);
+    expect(mocks.dismiss).toHaveBeenCalledWith({ notificationIds: ["c000000000000000000000009"] });
   });
 
   it("puts review progress in words", () => {

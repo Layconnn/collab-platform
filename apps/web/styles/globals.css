@@ -209,6 +209,12 @@ body {
   outline: none;
 }
 
+/* A field inside a frame that shows focus for it (focus-within), such as
+   Home's quick reply: one ring, on the frame. */
+.canopy-inset:focus-visible {
+  outline: none;
+}
+
 @layer components {
   .type-page-title {
     font-size: 1.875rem;

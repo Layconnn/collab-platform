@@ -130,6 +130,25 @@ test("cards carry the words of a mention or reply and a proposal's outcome, reas
   assert.deepEqual(byKind.REVIEW_REQUESTED.reviews, { approved: 1, requested: 2 });
   assert.equal(byKind.REVIEW_REQUESTED.excerpt, null);
   assert.equal(byKind.MENTION.reviews, null);
+  // What acting from Home needs: the version a review answers, and where a reply goes.
+  assert.equal(byKind.REVIEW_REQUESTED.decisionVersion, asked.version);
+  assert.equal(byKind.REPLY.replyToCommentId, reply.id);
+  assert.equal(byKind.MENTION.replyToCommentId, null);
+  assert.equal(byKind.MENTION.decisionVersion, null);
+});
+
+test("a reply to a comment at the nesting limit goes beside it", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(maya, [[sam, "MEMBER"]]);
+  const mine = await discussion(ws, maya, "Deep thread");
+  const parent = await prisma.comment.create({ data: { discussionId: mine.id, workspaceId: ws.id, authorId: maya.id, body: "Parent", depth: 7 } });
+  const deepest = await prisma.comment.create({ data: { discussionId: mine.id, workspaceId: ws.id, authorId: sam.id, body: "At the limit", depth: 8, parentCommentId: parent.id } });
+  await prisma.notification.create({ data: {
+    recipientUserId: maya.id, actorUserId: sam.id, workspaceId: ws.id, discussionId: mine.id, commentId: deepest.id,
+    type: "COMMENT_CREATED", message: "reply", dedupeKey: suffix(),
+  } });
+  const { items } = await caller(maya.id).needsYou({});
+  assert.equal(items.find((item) => item.kind === "REPLY").replyToCommentId, parent.id);
 });
 
 test("excerpts drop Markdown and stay short", () => {
