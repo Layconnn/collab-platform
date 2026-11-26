@@ -95,8 +95,11 @@ test("a new user registers, records a decision from a discussion and signs out",
   });
 
   await test.step("find it in the decision list", async () => {
+    // The grouped list sits beside the record (Decisions v2).
+    const rail = page.getByRole("navigation", { name: "Decision list" });
+    await expect(rail.getByRole("link", { name: question })).toHaveAttribute("aria-current", "page");
     await page.getByRole("link", { name: "Back to decisions" }).click();
-    await expect(page.getByRole("heading", { level: 3, name: question })).toBeVisible();
+    await expect(rail.getByRole("region", { name: /^Proposals/ }).getByRole("link", { name: question })).toBeVisible();
   });
 
   await test.step("jump with the command palette", async () => {
