@@ -100,31 +100,35 @@ model User {
   attachmentsUploaded      Attachment[]
   invitesCreated           WorkspaceInvite[]
   inviteUses               WorkspaceInviteUse[]
+  discussionRevisions      DiscussionRevision[]    @relation("DiscussionRevisionEditor")
+  commentRevisions         CommentRevision[]       @relation("CommentRevisionEditor")
 }
 
 model Workspace {
-  id                String                  @id @default(cuid())
-  name              String
-  slug              String                  @unique
-  ownerId           String
-  createdAt         DateTime                @default(now())
-  updatedAt         DateTime                @updatedAt
+  id                  String                  @id @default(cuid())
+  name                String
+  slug                String                  @unique
+  ownerId             String
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
   // Restrict: deleting a user must not silently delete the workspaces they own.
   // Transfer ownership or delete the workspace first.
-  owner             User                    @relation(fields: [ownerId], references: [id], onDelete: Restrict)
-  members           WorkspaceMember[]
-  discussions       Discussion[]
-  comments          Comment[]
-  decisions         Decision[]
-  decisionReviews   DecisionReview[]
-  reactions         Reaction[]
-  discussionFollows DiscussionFollow[]
-  savedItems        SavedItem[]
-  digestOptOuts     DigestWorkspaceOptOut[]
-  notifications     Notification[]
-  activityEvents    ActivityEvent[]
-  attachments       Attachment[]
-  invites           WorkspaceInvite[]
+  owner               User                    @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  members             WorkspaceMember[]
+  discussions         Discussion[]
+  comments            Comment[]
+  discussionRevisions DiscussionRevision[]
+  commentRevisions    CommentRevision[]
+  decisions           Decision[]
+  decisionReviews     DecisionReview[]
+  reactions           Reaction[]
+  discussionFollows   DiscussionFollow[]
+  savedItems          SavedItem[]
+  digestOptOuts       DigestWorkspaceOptOut[]
+  notifications       Notification[]
+  activityEvents      ActivityEvent[]
+  attachments         Attachment[]
+  invites             WorkspaceInvite[]
   // Recommended (optional): @@index([createdAt]) for global recent-workspaces feeds.
 
   @@index([ownerId, createdAt])
@@ -150,6 +154,10 @@ model Discussion {
   follows     DiscussionFollow[]
   savedItems  SavedItem[]
   attachments Attachment[]
+  // Edit history (edit history PRD): how many times the title or context was
+  // edited, and the versions those edits replaced.
+  editCount   Int                  @default(0)
+  revisions   DiscussionRevision[]
   // Recommended (optional): @@index([workspaceId, updatedAt]) for active-discussion sort views.
 
   @@unique([workspaceId, id])
@@ -184,7 +192,10 @@ model Comment {
   // (Markdown, reactions, follow and pin PRD, FR-13 to FR-15).
   pinnedAt    DateTime?
   pinnedById  String?
-  pinnedBy    User?        @relation("CommentPinner", fields: [pinnedById], references: [id], onDelete: SetNull)
+  pinnedBy    User?             @relation("CommentPinner", fields: [pinnedById], references: [id], onDelete: SetNull)
+  // Edit history (edit history PRD): edits made and the versions they replaced.
+  editCount   Int               @default(0)
+  revisions   CommentRevision[]
   // Recommended (optional): @@index([discussionId, createdAt]) for chronological thread views.
 
   @@index([searchVector], type: Gin)
@@ -604,4 +615,46 @@ model WorkspaceInviteUse {
 
   @@unique([inviteId, userId])
   @@index([userId])
+}
+
+// The version of a discussion that an edit replaced (edit history PRD, FR-1).
+// CHECK version >= 1 and editCount >= 0 are in migration 20261126_edit_history.
+// The current version is the discussion itself; `version` 1 is the original.
+model DiscussionRevision {
+  id           String     @id @default(cuid())
+  workspaceId  String
+  discussionId String
+  version      Int
+  title        String
+  body         String
+  fileNames    String[]   @default([])
+  editedById   String?
+  editorLabel  String
+  createdAt    DateTime   @default(now())
+  workspace    Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  editedBy     User?      @relation("DiscussionRevisionEditor", fields: [editedById], references: [id], onDelete: SetNull)
+
+  @@unique([discussionId, version])
+}
+
+// The version of a reply that an edit replaced (edit history PRD, FR-2).
+// CHECK version >= 1 and editCount >= 0 are in migration 20261126_edit_history.
+model CommentRevision {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  discussionId String
+  commentId    String
+  version      Int
+  body         String
+  fileNames    String[]  @default([])
+  editedById   String?
+  editorLabel  String
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  comment      Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  editedBy     User?     @relation("CommentRevisionEditor", fields: [editedById], references: [id], onDelete: SetNull)
+
+  @@unique([commentId, version])
+  @@index([workspaceId, discussionId])
 }

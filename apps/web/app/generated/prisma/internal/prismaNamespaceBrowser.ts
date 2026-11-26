@@ -71,7 +71,9 @@ export const ModelName = {
   Attachment: 'Attachment',
   DeletedFile: 'DeletedFile',
   WorkspaceInvite: 'WorkspaceInvite',
-  WorkspaceInviteUse: 'WorkspaceInviteUse'
+  WorkspaceInviteUse: 'WorkspaceInviteUse',
+  DiscussionRevision: 'DiscussionRevision',
+  CommentRevision: 'CommentRevision'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -122,7 +124,8 @@ export const DiscussionScalarFieldEnum = {
   title: 'title',
   body: 'body',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  editCount: 'editCount'
 } as const
 
 export type DiscussionScalarFieldEnum = (typeof DiscussionScalarFieldEnum)[keyof typeof DiscussionScalarFieldEnum]
@@ -139,7 +142,8 @@ export const CommentScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   pinnedAt: 'pinnedAt',
-  pinnedById: 'pinnedById'
+  pinnedById: 'pinnedById',
+  editCount: 'editCount'
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
@@ -402,6 +406,38 @@ export const WorkspaceInviteUseScalarFieldEnum = {
 } as const
 
 export type WorkspaceInviteUseScalarFieldEnum = (typeof WorkspaceInviteUseScalarFieldEnum)[keyof typeof WorkspaceInviteUseScalarFieldEnum]
+
+
+export const DiscussionRevisionScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  version: 'version',
+  title: 'title',
+  body: 'body',
+  fileNames: 'fileNames',
+  editedById: 'editedById',
+  editorLabel: 'editorLabel',
+  createdAt: 'createdAt'
+} as const
+
+export type DiscussionRevisionScalarFieldEnum = (typeof DiscussionRevisionScalarFieldEnum)[keyof typeof DiscussionRevisionScalarFieldEnum]
+
+
+export const CommentRevisionScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  discussionId: 'discussionId',
+  commentId: 'commentId',
+  version: 'version',
+  body: 'body',
+  fileNames: 'fileNames',
+  editedById: 'editedById',
+  editorLabel: 'editorLabel',
+  createdAt: 'createdAt'
+} as const
+
+export type CommentRevisionScalarFieldEnum = (typeof CommentRevisionScalarFieldEnum)[keyof typeof CommentRevisionScalarFieldEnum]
 
 
 export const SortOrder = {

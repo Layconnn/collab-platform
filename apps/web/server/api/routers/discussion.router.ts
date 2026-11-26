@@ -85,7 +85,25 @@ const listDiscussionProcedure = protectedProcedure.use(async ({ ctx, next }) => 
   return next();
 });
 
+// Edit history reads (edit history PRD, NFR-1).
+const historyDiscussionRateLimit = createRateLimitGuard({
+  routeKey: "discussion.history",
+  limit: 60,
+  windowSeconds: 60,
+});
+
+const historyDiscussionProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  await historyDiscussionRateLimit(ctx.user.id, ctx.requestId);
+  return next();
+});
+
 export const discussionRouter = createTRPCRouter({
+  history: historyDiscussionProcedure.input(getDiscussionByIdInputSchema).query(({ ctx, input }) =>
+    execute(() =>
+      discussionService.history(ctx.user.id, input, { requestId: ctx.requestId }),
+    ),
+  ),
+
   create: createDiscussionProcedure.input(createDiscussionInputSchema).mutation(({ ctx, input }) =>
     execute(() =>
       discussionService.create(ctx.user.id, input, { requestId: ctx.requestId }),

@@ -440,12 +440,38 @@ prisma.discussion.findMany = async ({ where, take, skip, cursor, select }) => {
   );
 };
 
+// Edit history (#200): the edit locks the row, reads the version it replaces
+// and keeps it as a revision.
+state.revisions = [];
+const originalQueryRaw = prisma.$queryRaw;
+const originalDiscussionFindUniqueOrThrow = prisma.discussion.findUniqueOrThrow;
+const originalCommentFindUniqueOrThrow = prisma.comment.findUniqueOrThrow;
+const originalDiscussionRevisionCreate = prisma.discussionRevision.create;
+const originalCommentRevisionCreate = prisma.commentRevision.create;
+prisma.$queryRaw = async () => [];
+const lockedVersion = (rows, fields) => async ({ where }) => {
+  const rec = rows.get(where.id);
+  if (!rec) {
+    const err = new Error("Not found");
+    err.code = "P2025";
+    throw err;
+  }
+  return { ...Object.fromEntries(fields.map((field) => [field, rec[field]])), editCount: rec.editCount ?? 0, attachments: [] };
+};
+prisma.discussion.findUniqueOrThrow = lockedVersion(state.discussions, ["title", "body"]);
+prisma.comment.findUniqueOrThrow = lockedVersion(state.comments, ["body"]);
+prisma.discussionRevision.create = async ({ data }) => { state.revisions.push(data); return data; };
+prisma.commentRevision.create = async ({ data }) => { state.revisions.push(data); return data; };
+
 prisma.discussion.update = async ({ where, data, select }) => {
   const rec = state.discussions.get(where.id);
   if (!rec) {
     const err = new Error("Not found");
     err.code = "P2025";
     throw err;
+  }
+  if (data.editCount?.increment) {
+    data = { ...data, editCount: (rec.editCount ?? 0) + data.editCount.increment };
   }
   const next = { ...rec, ...data, updatedAt: new Date() };
   state.discussions.set(where.id, next);
@@ -539,6 +565,9 @@ prisma.comment.update = async ({ where, data, select }) => {
     err.code = "P2025";
     throw err;
   }
+  if (data.editCount?.increment) {
+    data = { ...data, editCount: (rec.editCount ?? 0) + data.editCount.increment };
+  }
   const next = { ...rec, ...data, updatedAt: new Date() };
   state.comments.set(where.id, next);
   return projectSelect(next, select, {
@@ -561,6 +590,11 @@ prisma.comment.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.$queryRaw = originalQueryRaw;
+  prisma.discussion.findUniqueOrThrow = originalDiscussionFindUniqueOrThrow;
+  prisma.comment.findUniqueOrThrow = originalCommentFindUniqueOrThrow;
+  prisma.discussionRevision.create = originalDiscussionRevisionCreate;
+  prisma.commentRevision.create = originalCommentRevisionCreate;
   prisma.activityEvent.create = originalActivityEventCreate;
   redis.incr = originalRedisIncr;
   redis.expire = originalRedisExpire;

@@ -22,6 +22,13 @@ import { attachmentService, attachmentsSelect, newUploadIds, type PublicAttachme
 import { followOnParticipation } from "./follow.service";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
+import {
+  buildHistory,
+  discussionEditChanges,
+  HISTORY_MAX_VERSIONS,
+  keepDiscussionRevision,
+  lockDiscussionVersion,
+} from "./revision.service";
 import { requireWorkspaceAction as requireMemberAction } from "./workspace.access";
 import {
   WORKSPACE_ACTIONS,
@@ -132,6 +139,38 @@ const requireWorkspaceAction = (
 ) => requireMemberAction(workspaceId, userId, action, requestId, recordDiscussionPermissionDenied);
 
 export const discussionService = {
+  // Every version of the title and context, newest first (edit history PRD,
+  // FR-4, FR-5). Read fresh; members of the workspace only.
+  async history(userId: string, input: GetDiscussionByIdInput, context: RequestContext) {
+    const discussion = await prisma.discussion.findUnique({
+      where: { id: input.discussionId },
+      select: {
+        workspaceId: true,
+        title: true,
+        body: true,
+        editCount: true,
+        createdAt: true,
+        author: { select: { name: true, username: true } },
+        attachments: { select: { fileName: true }, orderBy: { position: "asc" } },
+      },
+    });
+    if (!discussion) {
+      throw new AppError("NOT_FOUND", "Discussion not found.");
+    }
+    await requireWorkspaceAction(discussion.workspaceId, userId, WORKSPACE_ACTIONS.READ_DISCUSSION, context.requestId);
+    const revisions = await prisma.discussionRevision.findMany({
+      where: { discussionId: input.discussionId },
+      orderBy: { version: "desc" },
+      take: HISTORY_MAX_VERSIONS,
+      select: { version: true, title: true, body: true, fileNames: true, editorLabel: true, createdAt: true },
+    });
+    return buildHistory({
+      current: { title: discussion.title, body: discussion.body, fileNames: discussion.attachments.map((file) => file.fileName), editCount: discussion.editCount },
+      author: { label: activityActorLabel(discussion.author), at: discussion.createdAt },
+      revisions,
+    });
+  },
+
   // What the discussion page's side panel shows (dashboard redesign, #171):
   // who took part and how much, and the decisions that came from it. Read
   // fresh, never cached, so a new reply or decision shows at once.
@@ -268,6 +307,7 @@ export const discussionService = {
             },
             createdAt: true,
             updatedAt: true,
+            editCount: true,
           },
         });
         await attachmentService.attach(tx, { userId, workspaceId: input.workspaceId, attachmentIds, target: { discussionId: draft.id } });
@@ -480,6 +520,7 @@ export const discussionService = {
         },
         createdAt: true,
         updatedAt: true,
+        editCount: true,
       },
     });
 
@@ -551,14 +592,22 @@ export const discussionService = {
         await attachmentService.verifyUploads(userId, discussion.workspaceId, await newUploadIds(target, input.attachmentIds));
       }
       const updated = await prisma.$transaction(async (tx) => {
+        const before = await lockDiscussionVersion(tx, discussion.id);
         const files = input.attachmentIds
           ? await attachmentService.sync(tx, { userId, workspaceId: discussion.workspaceId, target, desired: input.attachmentIds })
           : null;
+        const edited = await discussionEditChanges(tx, before, {
+          discussionId: discussion.id, title: input.title ?? before.title, body: input.body ?? before.body, filesSynced: Boolean(files),
+        });
+        if (edited) {
+          await keepDiscussionRevision(tx, { workspaceId: discussion.workspaceId, discussionId: discussion.id, editorId: userId, before });
+        }
         const changed = await tx.discussion.update({
           where: { id: input.discussionId },
           data: {
             title: input.title,
             body: input.body,
+            ...(edited ? { editCount: { increment: 1 } } : {}),
           },
           select: {
             id: true,
@@ -575,6 +624,7 @@ export const discussionService = {
             },
             createdAt: true,
             updatedAt: true,
+            editCount: true,
           },
         });
         await recordActivity(tx, {

@@ -146,3 +146,13 @@ export type WorkspaceInvite = Prisma.WorkspaceInviteModel
  * 
  */
 export type WorkspaceInviteUse = Prisma.WorkspaceInviteUseModel
+/**
+ * Model DiscussionRevision
+ * 
+ */
+export type DiscussionRevision = Prisma.DiscussionRevisionModel
+/**
+ * Model CommentRevision
+ * 
+ */
+export type CommentRevision = Prisma.CommentRevisionModel
