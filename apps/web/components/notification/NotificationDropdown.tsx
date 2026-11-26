@@ -20,6 +20,7 @@ import {
   useUnreadNotifications,
 } from "@/hooks/useNotifications";
 import { resolveUserIdentity } from "@/lib/user-identity";
+import { floatPanelClasses } from "@/components/ui/overlay";
 
 type NotificationItem = NonNullable<
   ReturnType<typeof useNotificationsFeed>["data"]
@@ -178,8 +179,13 @@ function NotificationRow({
 
 export function NotificationDropdown({
   compact = false,
+  variant = "topbar",
+  collapsed = false,
 }: {
   compact?: boolean;
+  // "sidebar": the forest sidebar's Inbox row (dashboard redesign PRD).
+  variant?: "topbar" | "sidebar";
+  collapsed?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [markingId, setMarkingId] = useState<string | null>(null);
@@ -236,10 +242,21 @@ export function NotificationDropdown({
         setOpen(details.open);
         if (details.open) setActionError(null);
       }}
-      positioning={{ placement: "bottom-end", strategy: "fixed", gutter: 8 }}
+      positioning={{ placement: variant === "sidebar" ? "right-start" : "bottom-end", strategy: "fixed", gutter: 8 }}
     >
       <Popover.Trigger asChild>
-        <button
+        {variant === "sidebar" ? (
+          <button
+            type="button"
+            aria-label={accessibleLabel}
+            title={collapsed ? accessibleLabel : undefined}
+            className={`flex min-h-[34px] w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[0.8125rem] text-sidebar-text transition-colors duration-150 ease-out hover:bg-sidebar-hover hover:text-sidebar-text-strong focus-visible:outline-2 focus-visible:outline-sidebar-live ${collapsed ? "justify-center" : ""} ${open ? "bg-sidebar-hover text-sidebar-text-strong" : ""}`}
+          >
+            <AppIcon name="inbox" />
+            {!collapsed ? <span className="flex-1 truncate">Inbox</span> : null}
+            {showUnread ? <span aria-hidden="true" className={collapsed ? "absolute ml-5 -mt-5 size-2 rounded-full bg-attention" : "rounded-full bg-attention px-[7px] py-px text-[11px] font-semibold text-on-attention"}>{collapsed ? null : badgeLabel}</span> : null}
+          </button>
+        ) : <button
           type="button"
           aria-label={accessibleLabel}
           title={accessibleLabel}
@@ -255,17 +272,17 @@ export function NotificationDropdown({
               {badgeLabel}
             </span>
           ) : null}
-        </button>
+        </button>}
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner className="z-40">
           <Popover.Content
             unstyled
-            className="flex max-h-[min(34rem,calc(100dvh-4.5rem))] w-[min(26rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-md border border-border bg-surface text-text-primary shadow-lg shadow-black/10 outline-none data-[state=open]:animate-[thread-reveal_160ms_ease-out] motion-reduce:animate-none"
+            className={`${floatPanelClasses} flex max-h-[min(34rem,calc(100dvh-4.5rem))] w-[min(26rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden`}
           >
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border-subtle px-4 py-3">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-glass-line px-4 py-3">
               <div>
-                <Popover.Title className="text-sm font-semibold text-text-primary">
+                <Popover.Title className="font-serif text-[1.375rem] leading-tight text-text-primary">
                   Notifications
                 </Popover.Title>
                 <p className="mt-0.5 text-xs text-text-muted">

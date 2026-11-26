@@ -14,6 +14,8 @@ import { discussionActionError } from "@/components/discussion/discussionErrors"
 import { useAuth } from "@/hooks/useAuth";
 import { useDiscussionActions, useDiscussionList } from "@/hooks/useDiscussion";
 import { useWorkspaceDetail } from "@/hooks/useWorkspace";
+import { floatPanelClasses, menuItemClasses } from "@/components/ui/overlay";
+import { Button } from "@/components/ui/Button";
 
 function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: DiscussionSummary; workspaceId: string; canManage: boolean }) {
   const { update, remove } = useDiscussionActions(workspaceId);
@@ -51,22 +53,22 @@ function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: D
 
   if (editing && canManage) {
     return (
-      <li className="border-b border-border-subtle bg-surface-subtle px-3 py-5 sm:px-5">
+      <li className="border-t border-border-subtle bg-surface-subtle px-4 py-5 first:border-t-0 sm:px-5">
         <form onSubmit={onSubmit} className="space-y-3" noValidate>
           <label htmlFor={`edit-discussion-${discussion.id}`} className="block text-sm font-semibold text-text-primary">Edit discussion title</label>
           <input
             id={`edit-discussion-${discussion.id}`}
             aria-invalid={Boolean(form.formState.errors.title)}
             aria-describedby={form.formState.errors.title ? `edit-discussion-error-${discussion.id}` : undefined}
-            className="min-h-11 w-full rounded-sm border border-control-border bg-surface px-3 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"
+            className="min-h-10 w-full rounded-[10px] border border-control-border bg-surface px-3 text-sm text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring"
             maxLength={120}
             {...form.register("title")}
           />
           {form.formState.errors.title ? <p id={`edit-discussion-error-${discussion.id}`} role="alert" className="text-sm text-danger">Please add a clear title within the allowed length.</p> : null}
           {update.error ? <p role="alert" className="text-sm text-danger">{discussionActionError(update.error, "Your changes could not be saved. Please try again.")}</p> : null}
           <div className="flex flex-wrap gap-2">
-            <button type="submit" disabled={update.isPending || form.formState.isSubmitting} className="inline-flex min-h-10 items-center rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover disabled:opacity-60">{update.isPending ? "Saving..." : "Save title"}</button>
-            <button type="button" disabled={update.isPending} onClick={cancelEdit} className="min-h-10 rounded-sm px-3 text-sm font-medium text-text-secondary hover:bg-surface-hover disabled:opacity-60">Cancel</button>
+            <Button type="submit" variant="primary" disabled={update.isPending || form.formState.isSubmitting}>{update.isPending ? "Saving..." : "Save title"}</Button>
+            <Button variant="ghost" disabled={update.isPending} onClick={cancelEdit}>Cancel</Button>
           </div>
         </form>
       </li>
@@ -81,17 +83,17 @@ function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: D
       actions={canManage ? (
         <Menu.Root positioning={{ placement: "bottom-end", strategy: "fixed" }}>
           <Menu.Trigger asChild>
-            <button ref={menuTriggerRef} type="button" aria-label={`Actions for ${discussion.title}`} title="Discussion actions" disabled={remove.isPending} className="grid size-11 place-items-center rounded-sm text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">
+            <button ref={menuTriggerRef} type="button" aria-label={`Actions for ${discussion.title}`} title="Discussion actions" disabled={remove.isPending} className="grid size-9 place-items-center rounded-lg text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">
               {remove.isPending ? <LoaderCircle size={17} className="animate-spin" aria-hidden="true" /> : <Ellipsis size={18} aria-hidden="true" />}
             </button>
           </Menu.Trigger>
           <Portal>
-            <Menu.Positioner>
-              <Menu.Content minW="11rem" p="1" bg="surface" borderWidth="1px" borderColor="border" borderRadius="sm" shadow="md" zIndex="popover">
-                <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ discussionId: discussion.id, title: discussion.title }); setEditing(true); requestAnimationFrame(() => form.setFocus("title")); }} color="textPrimary" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
+            <Menu.Positioner className="z-50">
+              <Menu.Content unstyled className={`${floatPanelClasses} min-w-44 p-1`}>
+                <Menu.Item value="edit" onSelect={() => { update.reset(); form.reset({ discussionId: discussion.id, title: discussion.title }); setEditing(true); requestAnimationFrame(() => form.setFocus("title")); }} unstyled className={`${menuItemClasses} cursor-pointer`}>
                   <Pencil size={15} aria-hidden="true" /> Edit title
                 </Menu.Item>
-                <Menu.Item value="delete" onSelect={() => { if (window.confirm("Delete this discussion and its comments?")) remove.mutate({ discussionId: discussion.id }); }} color="danger" _highlighted={{ bg: "surfaceHover" }} cursor="pointer" minH="10">
+                <Menu.Item value="delete" onSelect={() => { if (window.confirm("Delete this discussion and its comments?")) remove.mutate({ discussionId: discussion.id }); }} unstyled className={`${menuItemClasses} cursor-pointer !text-danger`}>
                   <Trash2 size={15} aria-hidden="true" /> Delete discussion
                 </Menu.Item>
               </Menu.Content>
@@ -105,10 +107,10 @@ function DiscussionEntry({ discussion, workspaceId, canManage }: { discussion: D
 
 function DiscussionSkeleton() {
   return (
-    <div role="status" aria-label="Loading discussions" className="border-t border-border-subtle">
+    <div role="status" aria-label="Loading discussions" className="overflow-hidden rounded-2xl border border-border-subtle bg-surface">
       <span className="sr-only">Loading discussions...</span>
       {[1, 2, 3, 4].map((item) => (
-        <div key={item} aria-hidden="true" className="flex min-h-24 items-start gap-4 border-b border-border-subtle px-3 py-5">
+        <div key={item} aria-hidden="true" className="flex items-center gap-3 border-t border-border-subtle px-5 py-4 first:border-t-0">
           <span className="size-9 shrink-0 animate-pulse rounded-full bg-surface-active" />
           <span className="min-w-0 flex-1 space-y-3">
             <span className="block h-4 w-[min(28rem,82%)] animate-pulse rounded-sm bg-surface-active" />
@@ -149,14 +151,14 @@ export function DiscussionList({ workspaceId, query, onCreate, accessDenied = fa
         </div>
       ) : null}
       {!items.length && !query.error ? (
-        <div className="border-y border-border-subtle bg-surface-subtle px-5 py-9 sm:px-8 sm:py-12">
-          <span aria-hidden="true" className="grid size-11 place-items-center rounded-sm bg-surface-active text-brand-link"><MessageSquareText size={21} /></span>
-          <h3 className="mt-5 text-lg font-semibold text-text-primary">Start with the question worth keeping.</h3>
+        <div className="canopy-rise rounded-2xl border border-dashed border-border px-6 py-10 sm:px-10 sm:py-14">
+          <span aria-hidden="true" className="grid size-11 place-items-center rounded-xl bg-callout text-brand-link"><MessageSquareText size={21} /></span>
+          <h3 className="mt-5 font-serif text-[1.75rem] leading-tight text-text-primary">Start with the question worth keeping.</h3>
           <p className="mt-2 max-w-[50ch] text-sm leading-6 text-text-secondary">Share an update or open a question. Replies will stay with the discussion so the next person can pick up the context.</p>
-          <button type="button" onClick={onCreate} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover"><Plus size={17} aria-hidden="true" /> Start the first discussion</button>
+          <Button variant="primary" className="mt-5" onClick={onCreate} icon={<Plus size={16} aria-hidden="true" />}>Start the first discussion</Button>
         </div>
       ) : null}
-      {items.length ? <ol className="border-t border-border-subtle">{items.map((discussion) => (
+      {items.length ? <ol aria-label="Discussions" className="canopy-rise overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-card">{items.map((discussion) => (
         <DiscussionEntry
           key={discussion.id}
           discussion={discussion}
@@ -165,11 +167,10 @@ export function DiscussionList({ workspaceId, query, onCreate, accessDenied = fa
         />
       ))}</ol> : null}
       {query.hasNextPage && !query.isFetchNextPageError ? (
-        <div className="flex justify-center border-b border-border-subtle py-6">
-          <button type="button" disabled={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()} className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-border bg-surface px-5 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-hover disabled:opacity-60 motion-reduce:transition-none">
-            {query.isFetchingNextPage ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : null}
+        <div className="flex justify-center py-5">
+          <Button variant="secondary" disabled={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()} icon={query.isFetchingNextPage ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : null}>
             {query.isFetchingNextPage ? "Loading discussions..." : "Load more discussions"}
-          </button>
+          </Button>
         </div>
       ) : null}
     </div>

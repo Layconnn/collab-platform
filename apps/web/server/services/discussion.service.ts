@@ -4,6 +4,7 @@ import type {
   GetDiscussionByIdInput,
   ListDiscussionsInput,
   UpdateDiscussionInput,
+  DiscussionContextInput,
 } from "@repo/validators/discussion";
 import { Prisma } from "../../app/generated/prisma/client";
 
@@ -58,6 +59,71 @@ async function invalidateDiscussionCaches(
   await redisCache.delByPattern(`workspace:${workspaceId}:discussions:*`);
 }
 
+type ListedDiscussion = {
+  id: string;
+  workspaceId: string;
+  title: string;
+  author: { id: string; name: string | null; username: string };
+  files: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type Participant = { id: string; name: string | null; username: string };
+
+// What each row of the discussions list shows beyond the cached page
+// (dashboard redesign, #170): replies, when the last one came, who else took
+// part and whether the discussion led to a decision. Read fresh on every
+// request, so replies and decisions never wait for the list cache.
+const PARTICIPANTS_SHOWN = 3;
+
+async function withActivity(workspaceId: string, items: ListedDiscussion[]) {
+  if (!items.length) return [];
+  const ids = items.map((item) => item.id);
+  const [byAuthor, decisions] = await Promise.all([
+    prisma.comment.groupBy({
+      by: ["discussionId", "authorId"],
+      where: { workspaceId, discussionId: { in: ids } },
+      _count: { _all: true },
+      _max: { createdAt: true },
+    }),
+    prisma.decision.findMany({
+      where: { workspaceId, sourceWorkspaceId: workspaceId, sourceDiscussionId: { in: ids }, deletedAt: null },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, status: true, sourceDiscussionId: true },
+    }),
+  ]);
+  const people = await prisma.user.findMany({
+    where: { id: { in: [...new Set(byAuthor.map((row) => row.authorId))] } },
+    select: { id: true, name: true, username: true },
+  });
+  const person = new Map<string, Participant>(people.map((user) => [user.id, user]));
+
+  return items.map((item) => {
+    const rows = byAuthor
+      .filter((row) => row.discussionId === item.id)
+      .sort((a, b) => (b._max.createdAt?.getTime() ?? 0) - (a._max.createdAt?.getTime() ?? 0));
+    const lastReplyAt = rows[0]?._max.createdAt ?? null;
+    const participants = rows
+      .filter((row) => row.authorId !== item.author.id)
+      .map((row) => person.get(row.authorId))
+      .filter((user): user is Participant => Boolean(user))
+      .slice(0, PARTICIPANTS_SHOWN);
+    // The newest decision from the discussion says where it stands.
+    const decision = decisions.find((row) => row.sourceDiscussionId === item.id);
+    return {
+      ...item,
+      replies: rows.reduce((total, row) => total + row._count._all, 0),
+      lastReplyAt,
+      participants,
+      decision: decision ? { id: decision.id, status: decision.status } : null,
+    };
+  });
+}
+
+// The side panel lists the author and then the most recent repliers.
+const CONTEXT_PEOPLE = 8;
+
 const requireWorkspaceAction = (
   workspaceId: string,
   userId: string,
@@ -66,6 +132,56 @@ const requireWorkspaceAction = (
 ) => requireMemberAction(workspaceId, userId, action, requestId, recordDiscussionPermissionDenied);
 
 export const discussionService = {
+  // What the discussion page's side panel shows (dashboard redesign, #171):
+  // who took part and how much, and the decisions that came from it. Read
+  // fresh, never cached, so a new reply or decision shows at once.
+  async context(userId: string, input: DiscussionContextInput, context: RequestContext) {
+    await requireWorkspaceAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ_DISCUSSION, context.requestId);
+    const discussion = await prisma.discussion.findFirst({
+      where: { id: input.discussionId, workspaceId: input.workspaceId },
+      select: { authorId: true },
+    });
+    if (!discussion) throw new AppError("NOT_FOUND", "Discussion not found.");
+
+    const [byAuthor, decisions] = await Promise.all([
+      prisma.comment.groupBy({
+        by: ["authorId"],
+        where: { workspaceId: input.workspaceId, discussionId: input.discussionId },
+        _count: { _all: true },
+        _max: { createdAt: true },
+      }),
+      prisma.decision.findMany({
+        where: { workspaceId: input.workspaceId, sourceWorkspaceId: input.workspaceId, sourceDiscussionId: input.discussionId, deletedAt: null },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        select: { id: true, question: true, status: true, createdAt: true },
+      }),
+    ]);
+    const repliers = [...byAuthor]
+      .filter((row) => row.authorId !== discussion.authorId)
+      .sort((a, b) => (b._max.createdAt?.getTime() ?? 0) - (a._max.createdAt?.getTime() ?? 0));
+    const shown = repliers.slice(0, CONTEXT_PEOPLE - 1);
+    const users = await prisma.user.findMany({
+      where: { id: { in: [discussion.authorId, ...shown.map((row) => row.authorId)] } },
+      select: { id: true, name: true, username: true },
+    });
+    const byId = new Map(users.map((user) => [user.id, user]));
+    const authorReplies = byAuthor.find((row) => row.authorId === discussion.authorId)?._count._all ?? 0;
+    const people = [
+      ...(byId.has(discussion.authorId) ? [{ ...byId.get(discussion.authorId)!, author: true, replies: authorReplies }] : []),
+      ...shown.flatMap((row) => {
+        const user = byId.get(row.authorId);
+        return user ? [{ ...user, author: false, replies: row._count._all }] : [];
+      }),
+    ];
+    return {
+      replies: byAuthor.reduce((total, row) => total + row._count._all, 0),
+      people,
+      morePeople: repliers.length - shown.length,
+      decisions,
+    };
+  },
+
   async create(
     userId: string,
     input: CreateDiscussionInput,
@@ -245,21 +361,7 @@ export const discussionService = {
       input.cursor,
       input.take,
     );
-    const cached = await redisCache.getJSON<
-      PaginatedResult<{
-        id: string;
-        workspaceId: string;
-        title: string;
-        author: {
-          id: string;
-          name: string | null;
-          username: string;
-        };
-        files: number;
-        createdAt: Date;
-        updatedAt: Date;
-      }>
-    >(cacheKey);
+    const cached = await redisCache.getJSON<PaginatedResult<ListedDiscussion>>(cacheKey);
     if (cached) {
       await recordDiscussionOperation({
         requestId: context.requestId,
@@ -277,7 +379,8 @@ export const discussionService = {
         action: "list",
         timestamp: new Date().toISOString(),
       });
-      return cached;
+      // Dates come back from the cache as strings.
+      return { ...cached, items: await withActivity(input.workspaceId, cached.items.map((item) => ({ ...item, createdAt: new Date(item.createdAt), updatedAt: new Date(item.updatedAt) }))) };
     }
 
     const rows = await prisma.discussion.findMany({
@@ -326,7 +429,7 @@ export const discussionService = {
       timestamp: new Date().toISOString(),
     });
 
-    return paginated;
+    return { ...paginated, items: await withActivity(input.workspaceId, paginated.items) };
   },
 
   async getById(

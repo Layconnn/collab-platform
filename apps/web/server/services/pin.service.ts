@@ -18,7 +18,10 @@ export function excerpt(body: string) {
     .replace(/```[\s\S]*?```/g, " [code] ")
     .replace(/`([^`]*)`/g, "$1")
     .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/^[#>\-*+\d.\s]+|[*_~]/gm, "")
+    .replace(/^[#>\-*+\d.\s]+/gm, "")
+    .replace(/\*\*|__|~~|\*/g, "")
+    // A single underscore is emphasis only around a phrase; usernames keep theirs.
+    .replace(/(^|[\s(])_(?=\S)([^_]*?\S)_(?=$|[\s).,!?:;])/g, "$1$2")
     .replace(/\s+/g, " ")
     .trim();
   return plain.length > EXCERPT ? `${plain.slice(0, EXCERPT - 1)}…` : plain;

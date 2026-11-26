@@ -22,7 +22,49 @@ export type NeedItem = {
   at: Date;
   // Notification-based items can be marked done; proposals leave when decided.
   notificationId: string | null;
+  // What the card shows without opening the item (dashboard redesign, Home
+  // v2): the words of a mention or reply, or a proposal's outcome, reasoning
+  // and review progress. Plain text, shortened.
+  excerpt: string | null;
+  outcome: string | null;
+  rationale: string | null;
+  reviews: { approved: number; requested: number } | null;
+  // For acting from Home (#181): the proposal version a review answers, and
+  // the comment a reply goes under (null for a reply to the discussion).
+  decisionVersion: number | null;
+  replyToCommentId: string | null;
 };
+
+// Replies nest at most this deep (comment service); a reply to a comment at
+// the limit goes beside it, under the same parent.
+const MAX_COMMENT_DEPTH = 8;
+
+function replyTarget(comment: { id: string; depth: number; parentCommentId: string | null } | null) {
+  if (!comment) return null;
+  return comment.depth < MAX_COMMENT_DEPTH ? comment.id : comment.parentCommentId;
+}
+
+const EXCERPT_LENGTH = 240;
+
+// Markdown reads badly as a one-paragraph preview: drop the syntax, keep the words.
+export function plainExcerpt(text: string | null | undefined, length = EXCERPT_LENGTH): string | null {
+  if (!text) return null;
+  const plain = text
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/^\s{0,3}(#{1,6}|>|[-*+]|\d+\.)\s+/gm, "")
+    .replace(/\*\*|__|~~|[*`]/g, "")
+    // A single underscore is emphasis only around a phrase; inside a word or
+    // a username (@maya_okafor) it stays.
+    .replace(/(^|[\s(])_(?=\S)([^_]*?\S)_(?=$|[\s).,!?:;])/g, "$1$2")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!plain) return null;
+  return plain.length > length ? `${plain.slice(0, length - 1).trimEnd()}…` : plain;
+}
+
+const noDetail = { excerpt: null, outcome: null, rationale: null, reviews: null, decisionVersion: null, replyToCommentId: null };
 
 type ProviderContext = { userId: string; now: Date };
 type Provider = (context: ProviderContext) => Promise<NeedItem[]>;
@@ -49,7 +91,8 @@ function unreadNotifications(userId: string, type: "MENTION" | "COMMENT_CREATED"
     select: {
       id: true, createdAt: true, discussionId: true,
       workspace: { select: { id: true, name: true } },
-      discussion: { select: { title: true } },
+      discussion: { select: { title: true, body: true } },
+      comment: { select: { id: true, body: true, depth: true, parentCommentId: true } },
       actor: { select: { name: true, username: true } },
     },
   });
@@ -59,6 +102,7 @@ const mentions: Provider = async ({ userId }) =>
   (await unreadNotifications(userId, "MENTION")).map((n) => ({
     id: `mention:${n.id}`, kind: "MENTION", workspace: n.workspace, title: n.discussion?.title ?? "A discussion",
     actor: label(n.actor), discussionId: n.discussionId, decisionId: null, at: n.createdAt, notificationId: n.id,
+    ...noDetail, excerpt: plainExcerpt(n.comment?.body ?? n.discussion?.body), replyToCommentId: replyTarget(n.comment),
   }));
 
 // Replies in discussions the user started (reply notifications go to every member).
@@ -66,7 +110,30 @@ const replies: Provider = async ({ userId }) =>
   (await unreadNotifications(userId, "COMMENT_CREATED", userId)).map((n) => ({
     id: `reply:${n.id}`, kind: "REPLY", workspace: n.workspace, title: n.discussion?.title ?? "A discussion",
     actor: label(n.actor), discussionId: n.discussionId, decisionId: null, at: n.createdAt, notificationId: n.id,
+    ...noDetail, excerpt: plainExcerpt(n.comment?.body), replyToCommentId: replyTarget(n.comment),
   }));
+
+// A proposal's outcome, reasoning and how many of the requested reviewers
+// approved (withdrawn requests do not count).
+const proposalDetail = {
+  version: true,
+  outcome: true,
+  rationale: true,
+  reviews: { where: { state: { not: "WITHDRAWN" as const } }, select: { state: true } },
+};
+
+function detailOf(decision: { version: number; outcome: string | null; rationale: string | null; reviews: Array<{ state: string }> }) {
+  return {
+    decisionVersion: decision.version,
+    replyToCommentId: null,
+    excerpt: null,
+    outcome: plainExcerpt(decision.outcome),
+    rationale: plainExcerpt(decision.rationale),
+    reviews: decision.reviews.length
+      ? { approved: decision.reviews.filter((review) => review.state === "APPROVED").length, requested: decision.reviews.length }
+      : null,
+  };
+}
 
 // Reviews the user was asked for and has not answered, on open proposals
 // (decision reviews, FR-14). They leave when answered, withdrawn or closed.
@@ -82,12 +149,13 @@ const reviewRequests: Provider = async ({ userId }) =>
     take: PROVIDER_LIMIT,
     select: {
       id: true, updatedAt: true, requestedByLabel: true,
-      decision: { select: { id: true, question: true } },
+      decision: { select: { id: true, question: true, ...proposalDetail } },
       workspace: { select: { id: true, name: true } },
     },
   })).map((r) => ({
     id: `review:${r.id}`, kind: "REVIEW_REQUESTED", workspace: r.workspace, title: r.decision.question,
     actor: r.requestedByLabel, discussionId: null, decisionId: r.decision.id, at: r.updatedAt, notificationId: null,
+    ...detailOf(r.decision),
   }));
 
 // Proposals someone else made, in workspaces where the user can finalize them.
@@ -102,10 +170,11 @@ const proposalsWaiting: Provider = async ({ userId }) =>
     },
     orderBy: { createdAt: "asc" },
     take: PROVIDER_LIMIT,
-    select: { id: true, question: true, createdAt: true, createdByLabel: true, workspace: { select: { id: true, name: true } } },
+    select: { id: true, question: true, createdAt: true, createdByLabel: true, ...proposalDetail, workspace: { select: { id: true, name: true } } },
   })).map((d) => ({
     id: `waiting:${d.id}`, kind: "PROPOSAL_WAITING", workspace: d.workspace, title: d.question,
     actor: d.createdByLabel, discussionId: null, decisionId: d.id, at: d.createdAt, notificationId: null,
+    ...detailOf(d),
   }));
 
 const ownProposals: Provider = async ({ userId }) =>
@@ -113,10 +182,11 @@ const ownProposals: Provider = async ({ userId }) =>
     where: { status: "PROPOSED", deletedAt: null, createdById: userId, workspace: { members: { some: { userId } } } },
     orderBy: { createdAt: "asc" },
     take: PROVIDER_LIMIT,
-    select: { id: true, question: true, createdAt: true, createdByLabel: true, workspace: { select: { id: true, name: true } } },
+    select: { id: true, question: true, createdAt: true, createdByLabel: true, ...proposalDetail, workspace: { select: { id: true, name: true } } },
   })).map((d) => ({
     id: `own:${d.id}`, kind: "OWN_PROPOSAL", workspace: d.workspace, title: d.question,
     actor: d.createdByLabel, discussionId: null, decisionId: d.id, at: d.createdAt, notificationId: null,
+    ...detailOf(d),
   }));
 
 const PROVIDERS: Provider[] = [reviewRequests, mentions, replies, proposalsWaiting, ownProposals];
@@ -293,6 +363,8 @@ export type RecentDecision = {
   replacement: { id: string; question: string } | null;
   // How many files it has; never their content (file uploads PRD, FR-10).
   files: number;
+  // The outcome in a line, for Home's "This week" (plain text, shortened).
+  outcome: string | null;
 };
 
 // The window is seven days for Home; the daily digest asks for one.
@@ -317,7 +389,7 @@ export async function recentDecisions(userId: string, now = new Date(), windowMs
     .filter((id): id is string => typeof id === "string");
   const decisions = await prisma.decision.findMany({
     where: { id: { in: [...latest.keys(), ...replacementIds] }, deletedAt: null },
-    select: { id: true, question: true, _count: { select: { attachments: true } } },
+    select: { id: true, question: true, outcome: true, _count: { select: { attachments: true } } },
   });
   const live = new Map(decisions.map((decision) => [decision.id, decision]));
 
@@ -336,6 +408,7 @@ export async function recentDecisions(userId: string, now = new Date(), windowMs
       at: event.createdAt,
       replacement: event.kind === "DECISION_SUPERSEDED" && replacement ? { id: replacement.id, question: replacement.question } : null,
       files: decision._count.attachments,
+      outcome: plainExcerpt(decision.outcome, 140),
     });
     if (result.length === RECENT_DECISIONS_LIMIT) break;
   }

@@ -24,6 +24,7 @@ import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { resolveUserIdentity } from "@/lib/user-identity";
 import { workspaceInitials } from "@/lib/workspace-identity";
+import { floatPanelClasses, menuItemClasses } from "@/components/ui/overlay";
 
 type Member =
   inferRouterOutputs<AppRouter>["workspace"]["listMembers"]["items"][number];
@@ -441,27 +442,15 @@ export function WorkspaceMembersPanel({
                               </button>
                             </Menu.Trigger>
                             <Portal>
-                              <Menu.Positioner>
-                                <Menu.Content
-                                  minW="12rem"
-                                  p="1"
-                                  bg="surface"
-                                  borderWidth="1px"
-                                  borderColor="border"
-                                  borderRadius="sm"
-                                  shadow="md"
-                                  zIndex="popover"
-                                >
+                              <Menu.Positioner className="z-50">
+                                <Menu.Content unstyled className={`${floatPanelClasses} min-w-48 p-1`}>
                                   {mayTransfer ? (
                                     <Menu.Item
                                       value="transfer"
                                       onSelect={() =>
                                         setConfirm({ kind: "transfer", member })
                                       }
-                                      color="textPrimary"
-                                      _highlighted={{ bg: "surfaceHover" }}
-                                      cursor="pointer"
-                                      minH="10"
+                                      unstyled className={`${menuItemClasses} cursor-pointer`}
                                     >
                                       <Crown size={15} aria-hidden="true" />{" "}
                                       Transfer ownership
@@ -473,10 +462,7 @@ export function WorkspaceMembersPanel({
                                       onSelect={() =>
                                         setConfirm({ kind: "remove", member })
                                       }
-                                      color="danger"
-                                      _highlighted={{ bg: "surfaceHover" }}
-                                      cursor="pointer"
-                                      minH="10"
+                                      unstyled className={`${menuItemClasses} cursor-pointer !text-danger`}
                                     >
                                       <Trash2 size={15} aria-hidden="true" />{" "}
                                       Remove member

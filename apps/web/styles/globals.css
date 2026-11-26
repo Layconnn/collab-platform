@@ -1,17 +1,17 @@
 :root {
   color-scheme: light;
   --brand-primary: #192d20;
-  --canvas: #f5f8f6;
+  --canvas: #f3f3ef;
   --surface: #ffffff;
-  --surface-subtle: #edf4ef;
-  --surface-hover: #e7f0ea;
-  --surface-active: #dcebe1;
-  --text-primary: #17231f;
-  --text-secondary: #34443c;
-  --text-muted: #63716a;
-  --border: #cbd8d0;
-  --control-border: #87958a;
-  --border-subtle: #dce6e0;
+  --surface-subtle: #f7f7f4;
+  --surface-hover: #f1f2ee;
+  --surface-active: #e9ebe6;
+  --text-primary: #15201a;
+  --text-secondary: #4b5650;
+  --text-muted: #5f6963;
+  --border: #d9dcd5;
+  --control-border: #868f89;
+  --border-subtle: #e6e8e2;
   --brand-50: #f0f5f0;
   --brand-100: #e2ece3;
   --brand-200: #bfd3c2;
@@ -58,21 +58,56 @@
   --auth-stage-text: var(--editorial-cream);
   --auth-stage-muted: var(--editorial-stage-muted);
   --auth-stage-avatar: #b7e4cc;
+
+  /* Canopy (dashboard redesign PRD): the forest sidebar, attention, decision
+     statuses, live dots, glass layers, elevation and motion. */
+  --sidebar: #13231a;
+  --sidebar-text: #c9d3cb;
+  --sidebar-text-strong: #f4efe3;
+  --sidebar-muted: #7e8f83;
+  --sidebar-hover: rgba(238, 229, 210, 0.07);
+  --sidebar-active: rgba(159, 211, 180, 0.14);
+  --sidebar-field: rgba(0, 0, 0, 0.18);
+  --sidebar-line: rgba(238, 229, 210, 0.12);
+  --sidebar-live: #9fd3b4;
+  --attention: #b8473c;
+  --on-attention: #ffffff;
+  --attention-soft: #fbedea;
+  --attention-text: #a33e34;
+  --status-proposal: #f4f0e6;
+  --on-status-proposal: #7a5a1e;
+  --status-decided: #e3efe7;
+  --on-status-decided: #1f5a3a;
+  --status-replaced: #eeeaf6;
+  --on-status-replaced: #4a3f7a;
+  --live: #2a6140;
+  --callout: #eef5f0;
+  --callout-line: #c7dccf;
+  --glass-bar: rgba(243, 243, 239, 0.72);
+  --glass-float: rgba(255, 255, 255, 0.74);
+  --glass-line: rgba(21, 32, 26, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+  --glass-solid: #f3f3ef;
+  --scrim: rgba(12, 20, 16, 0.38);
+  --shadow-card: 0 1px 0 rgba(21, 32, 26, 0.03);
+  --shadow-lift: 0 1px 0 rgba(20, 32, 26, 0.04), 0 8px 24px -12px rgba(20, 32, 26, 0.18);
+  --shadow-float: 0 20px 40px -20px rgba(20, 32, 26, 0.35);
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --canvas: #111815;
-  --surface: #18211c;
-  --surface-subtle: #202c25;
-  --surface-hover: #28372e;
-  --surface-active: #34483a;
-  --text-primary: #edf4ef;
-  --text-secondary: #c5d2c9;
-  --text-muted: #9aa99f;
-  --border: #405147;
-  --control-border: #647d6b;
-  --border-subtle: #2e3c33;
+  --canvas: #0c110e;
+  --surface: #121a16;
+  --surface-subtle: #161e1a;
+  --surface-hover: #1b2520;
+  --surface-active: #22302a;
+  --text-primary: #e7ede8;
+  --text-secondary: #c9d3cb;
+  --text-muted: #8e9a92;
+  --border: #2a3630;
+  --control-border: #64766b;
+  --border-subtle: #1e2823;
   --brand-50: #0d2a20;
   --brand-100: #113d2d;
   --brand-200: #15543b;
@@ -119,6 +154,29 @@
   --auth-stage-text: var(--editorial-cream);
   --auth-stage-muted: var(--editorial-stage-muted);
   --auth-stage-avatar: #b7e4cc;
+
+  --sidebar: #10201a;
+  --sidebar-field: rgba(0, 0, 0, 0.22);
+  --attention-soft: #2a1c19;
+  --attention-text: #f2b2a8;
+  --status-proposal: #2a2a1f;
+  --on-status-proposal: #e9c98f;
+  --status-decided: #1c2c24;
+  --on-status-decided: #9fd3b4;
+  --status-replaced: #24232f;
+  --on-status-replaced: #c9bef0;
+  --live: #9fd3b4;
+  --callout: #15221c;
+  --callout-line: #2c4a3a;
+  --glass-bar: rgba(12, 17, 14, 0.66);
+  --glass-float: rgba(22, 30, 26, 0.72);
+  --glass-line: rgba(255, 255, 255, 0.09);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-solid: #121a16;
+  --scrim: rgba(0, 0, 0, 0.58);
+  --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.2);
+  --shadow-lift: 0 10px 28px -14px rgba(0, 0, 0, 0.7);
+  --shadow-float: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
 }
 
 html {
@@ -143,6 +201,18 @@ body {
 :focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+/* Overlay containers take focus only to hand it to their rows (menus) or to
+   announce themselves (dialogs); the rows show the focus, not the frame. */
+.canopy-panel:focus-visible {
+  outline: none;
+}
+
+/* A field inside a frame that shows focus for it (focus-within), such as
+   Home's quick reply: one ring, on the frame. */
+.canopy-inset:focus-visible {
+  outline: none;
 }
 
 @layer components {
@@ -208,6 +278,24 @@ body {
     font-family: var(--font-geist-mono), monospace;
     font-size: 0.8125rem;
     line-height: 1.5;
+  }
+
+  .type-canopy-title {
+    font-family: var(--font-instrument-serif), Georgia, serif;
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.005em;
+    color: var(--text-primary);
+  }
+
+  .type-canopy-label {
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--text-muted);
   }
 
   .type-editorial-display {
@@ -277,6 +365,129 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Canopy motion and glass (dashboard redesign PRD). Motion runs only when the
+   member has not asked for less; transform and opacity only, 340 ms at most. */
+@media (prefers-reduced-motion: no-preference) {
+  .canopy-rise {
+    animation: canopy-rise 340ms var(--ease-out-soft) both;
+  }
+  .canopy-stagger > * {
+    animation: canopy-rise 340ms var(--ease-out-soft) both;
+  }
+  .canopy-stagger > :nth-child(2) { animation-delay: 40ms; }
+  .canopy-stagger > :nth-child(3) { animation-delay: 80ms; }
+  .canopy-stagger > :nth-child(4) { animation-delay: 120ms; }
+  .canopy-stagger > :nth-child(5) { animation-delay: 160ms; }
+  .canopy-stagger > :nth-child(n + 6) { animation-delay: 200ms; }
+  .canopy-lift {
+    transition: transform 180ms ease-out, box-shadow 180ms ease-out, border-color 180ms ease-out;
+  }
+  .canopy-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lift);
+  }
+  .canopy-zoom {
+    transition: transform 200ms ease-out;
+  }
+  .canopy-zoom:hover {
+    transform: scale(1.015);
+  }
+  .canopy-live {
+    animation: canopy-live 2.4s ease-in-out infinite;
+  }
+  .canopy-grow {
+    transform-origin: left;
+    animation: canopy-grow 600ms var(--ease-out-soft) 250ms both;
+  }
+}
+
+.canopy-row {
+  transition: background-color 160ms ease-out, box-shadow 160ms ease-out;
+}
+
+@keyframes canopy-rise {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes canopy-live {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes canopy-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Glass only on floating layers: the top bar, floating composers and action
+   bars, the command palette, menus and toasts. Solid where blur is missing or
+   the member prefers less transparency. */
+.glass-bar,
+.glass-float {
+  background: var(--glass-solid);
+  border-color: var(--glass-line);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-bar {
+    background: var(--glass-bar);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+  }
+  .glass-float {
+    background: var(--glass-float);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    backdrop-filter: blur(20px) saturate(1.4);
+    box-shadow: var(--shadow-float), inset 0 1px 0 var(--glass-highlight);
+  }
+}
+
+/* Overlays: a soft scrim behind dialogs and the palette, and a short pop for
+   anything that opens (menus, popovers, dialogs). */
+.canopy-scrim {
+  background: var(--scrim);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .canopy-scrim {
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .canopy-fade {
+    animation: canopy-fade 160ms ease-out both;
+  }
+  .canopy-pop {
+    animation: canopy-pop 180ms var(--ease-out-soft) both;
+  }
+}
+
+@keyframes canopy-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes canopy-pop {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .canopy-scrim {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-bar,
+  .glass-float {
+    background: var(--glass-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 }
 

@@ -21,7 +21,7 @@ process.env.JWT_SECRET ??= "test-jwt-secret-123456789";
 
 const jiti = createJiti(import.meta.url, { nativeModules: ["@prisma/client"] });
 const { homeRouter } = jiti("./routers/home.router.ts");
-const { rankNeeds } = jiti("../services/home.service.ts");
+const { plainExcerpt, rankNeeds } = jiti("../services/home.service.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis } = jiti("../cache/redis.ts");
 redis.incr = async () => 1;
@@ -102,6 +102,63 @@ test("lists mentions, replies to own discussions, waiting proposals and own prop
   assert.equal(items[4].decisionId, own.id);
   assert.ok(items[0].notificationId && items[2].notificationId);
   assert.equal(items[1].notificationId, null);
+});
+
+test("cards carry the words of a mention or reply and a proposal's outcome, reasoning and reviews", async () => {
+  const [maya, sam, lee] = await Promise.all([user("Maya"), user("Sam"), user("Lee")]);
+  const ws = await workspace(lee, [[maya, "ADMIN"], [sam, "MEMBER"]]);
+  const theirs = await discussion(ws, sam, "Logo");
+  const mine = await discussion(ws, maya, "Pricing");
+  const reply = await prisma.comment.create({ data: { discussionId: mine.id, workspaceId: ws.id, authorId: sam.id, body: "**Flat** pricing reads [simpler](https://example.test)." } });
+  await prisma.notification.create({ data: {
+    recipientUserId: maya.id, actorUserId: sam.id, workspaceId: ws.id, discussionId: mine.id, commentId: reply.id,
+    type: "COMMENT_CREATED", message: "reply", dedupeKey: suffix(),
+  } });
+  await notify(maya, sam, ws, theirs, "MENTION"); // a mention in the discussion itself: its body
+  const asked = await proposal(ws, sam, "Flat $49 a month", new Date(), { outcome: "Flat $49 a month for up to 10 seats.", rationale: "Per-seat pricing makes small teams hesitate." });
+  for (const [reviewer, state] of [[maya, "PENDING"], [lee, "APPROVED"]]) {
+    await prisma.decisionReview.create({ data: { workspaceId: ws.id, decisionId: asked.id, reviewerId: reviewer.id, reviewerLabel: reviewer.name, requestedByLabel: "Sam", state } });
+  }
+  await prisma.decisionReview.create({ data: { workspaceId: ws.id, decisionId: asked.id, reviewerLabel: "Gone", requestedByLabel: "Sam", state: "WITHDRAWN" } });
+
+  const { items } = await caller(maya.id).needsYou({});
+  const byKind = Object.fromEntries(items.map((item) => [item.kind, item]));
+  assert.equal(byKind.REPLY.excerpt, "Flat pricing reads simpler.");
+  assert.equal(byKind.MENTION.excerpt, "Body");
+  assert.equal(byKind.REVIEW_REQUESTED.outcome, "Flat $49 a month for up to 10 seats.");
+  assert.equal(byKind.REVIEW_REQUESTED.rationale, "Per-seat pricing makes small teams hesitate.");
+  assert.deepEqual(byKind.REVIEW_REQUESTED.reviews, { approved: 1, requested: 2 });
+  assert.equal(byKind.REVIEW_REQUESTED.excerpt, null);
+  assert.equal(byKind.MENTION.reviews, null);
+  // What acting from Home needs: the version a review answers, and where a reply goes.
+  assert.equal(byKind.REVIEW_REQUESTED.decisionVersion, asked.version);
+  assert.equal(byKind.REPLY.replyToCommentId, reply.id);
+  assert.equal(byKind.MENTION.replyToCommentId, null);
+  assert.equal(byKind.MENTION.decisionVersion, null);
+});
+
+test("a reply to a comment at the nesting limit goes beside it", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await workspace(maya, [[sam, "MEMBER"]]);
+  const mine = await discussion(ws, maya, "Deep thread");
+  const parent = await prisma.comment.create({ data: { discussionId: mine.id, workspaceId: ws.id, authorId: maya.id, body: "Parent", depth: 7 } });
+  const deepest = await prisma.comment.create({ data: { discussionId: mine.id, workspaceId: ws.id, authorId: sam.id, body: "At the limit", depth: 8, parentCommentId: parent.id } });
+  await prisma.notification.create({ data: {
+    recipientUserId: maya.id, actorUserId: sam.id, workspaceId: ws.id, discussionId: mine.id, commentId: deepest.id,
+    type: "COMMENT_CREATED", message: "reply", dedupeKey: suffix(),
+  } });
+  const { items } = await caller(maya.id).needsYou({});
+  assert.equal(items.find((item) => item.kind === "REPLY").replyToCommentId, parent.id);
+});
+
+test("excerpts drop Markdown and stay short", () => {
+  assert.equal(plainExcerpt("# Title\n\n> quoted *text* with `code`\n- item"), "Title quoted text with code item");
+  assert.equal(plainExcerpt("![chart](x.png) see [docs](https://x.test)"), "see docs");
+  assert.equal(plainExcerpt("@maya_okafor said _this_ and __that__ in snake_case"), "@maya_okafor said this and that in snake_case");
+  assert.equal(plainExcerpt("   "), null);
+  assert.equal(plainExcerpt(null), null);
+  const long = plainExcerpt("word ".repeat(100), 20);
+  assert.ok(long.length <= 20 && long.endsWith("…"));
 });
 
 test("only owners and admins see proposals waiting for a decision", async () => {
@@ -262,7 +319,7 @@ test("decided this week lists finalized and replaced decisions, newest first, on
   const ws = await workspace(sam, [[maya, "MEMBER"]]);
   const a = await proposal(ws, sam, "Use BullMQ", new Date(), { status: "SUPERSEDED" });
   const b = await proposal(ws, sam, "Use Vercel Queues", new Date(), { status: "DECIDED" });
-  const c = await proposal(ws, sam, "Adopt Playwright", new Date(), { status: "DECIDED" });
+  const c = await proposal(ws, sam, "Adopt Playwright", new Date(), { status: "DECIDED", outcome: "One **journey** per release." });
   const gone = await proposal(ws, sam, "Deleted later", new Date(), { status: "DECIDED", deletedAt: new Date() });
   const old = await proposal(ws, sam, "Last month", new Date(), { status: "DECIDED" });
   await decisionEvent(ws, sam, "DECISION_FINALIZED", a, 3 * DAY);
@@ -282,6 +339,8 @@ test("decided this week lists finalized and replaced decisions, newest first, on
   assert.deepEqual(decisions[1].replacement, { id: b.id, question: "Use Vercel Queues" });
   assert.equal(decisions[0].replacement, null);
   assert.deepEqual(decisions[0].workspace, { id: ws.id, name: ws.name });
+  assert.equal(decisions[0].outcome, "One journey per release.");
+  assert.equal(decisions[2].outcome, null);
 });
 
 test("decided this week never shows other workspaces and stops at ten", async () => {

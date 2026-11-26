@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   refreshWorkspace: vi.fn(async () => {}),
   refreshRoles: vi.fn(async () => {}),
   refreshFollow: vi.fn(async () => {}),
+  refreshPanel: vi.fn(async () => {}),
   createOnSuccess: null as null | (() => Promise<unknown>),
   createOnError: null as null | ((error: Rejection) => Promise<void>),
   updateOnError: null as null | ((error: Rejection) => Promise<void>),
@@ -22,7 +23,7 @@ vi.mock("@/lib/trpc/api-client", () => ({
         listByDiscussion: { invalidate: mocks.refreshComments },
         getById: { invalidate: mocks.refreshComment },
       },
-      discussion: { getById: { invalidate: mocks.refreshDiscussion } },
+      discussion: { getById: { invalidate: mocks.refreshDiscussion }, context: { invalidate: mocks.refreshPanel } },
       follow: { get: { invalidate: mocks.refreshFollow } },
       workspace: {
         getById: { invalidate: mocks.refreshWorkspace },
@@ -47,6 +48,7 @@ describe("useCommentActions scoped refresh", () => {
     mocks.refreshWorkspace.mockClear();
     mocks.refreshRoles.mockClear();
     mocks.refreshFollow.mockClear();
+    mocks.refreshPanel.mockClear();
   });
 
   it("refreshes only this discussion's comment queries after a write", async () => {
@@ -55,6 +57,8 @@ describe("useCommentActions scoped refresh", () => {
     expect(mocks.refreshComments).toHaveBeenCalledWith({ discussionId: "discussion-1" });
     // Replying follows the discussion, so its follow state is refreshed too.
     expect(mocks.refreshFollow).toHaveBeenCalledWith({ workspaceId: "workspace-1", discussionId: "discussion-1" });
+    // The side panel counts replies and people.
+    expect(mocks.refreshPanel).toHaveBeenCalledWith({ workspaceId: "workspace-1", discussionId: "discussion-1" });
     expect(mocks.refreshDiscussion).not.toHaveBeenCalled();
     expect(mocks.refreshRoles).not.toHaveBeenCalled();
   });

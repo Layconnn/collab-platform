@@ -12,14 +12,18 @@ import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
 import { AttachmentComposer } from "@/components/files/AttachmentComposer";
 import { uploadBlocker, useUploader } from "@/hooks/useAttachments";
+import { Button } from "@/components/ui/Button";
 
-export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, active = true, onCancel, onCreated }: {
+export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, active = true, onCancel, onCreated, floating = false }: {
   discussionId: string;
   workspaceId: string;
   parentCommentId?: string;
   active?: boolean;
   onCancel?: () => void;
   onCreated?: () => void;
+  // The discussion page's glass composer at the bottom of the thread (#171):
+  // a compact field without its own frame, the label for screen readers.
+  floating?: boolean;
 }) {
   const form = useForm<CreateCommentInput>({
     resolver: zodResolver(createCommentInputSchema),
@@ -82,9 +86,9 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
 
   const serverError = commentActionError(create.error, "Your comment could not be posted. Please try again.");
   return (
-    <form onSubmit={onSubmit} className="min-w-0 max-w-[44rem] space-y-3" noValidate>
+    <form onSubmit={onSubmit} className={`min-w-0 space-y-3 ${floating ? "" : "max-w-[44rem]"}`} noValidate>
       <div>
-        <label htmlFor={fieldId} className="mb-2 block text-sm font-semibold text-text-primary">
+        <label htmlFor={fieldId} className={floating ? "sr-only" : "mb-2 block text-sm font-semibold text-text-primary"}>
           {parentCommentId ? "Your reply" : "Your perspective"}
         </label>
         <AttachmentComposer uploader={uploader} disabled={busy}>
@@ -95,13 +99,15 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
           value={form.watch("body")}
           onInsert={(value) => form.setValue("body", value, { shouldDirty: true, shouldValidate: true })}
           id={fieldId}
-          placeholder={parentCommentId ? "Add to this part of the conversation..." : "Share a thoughtful response..."}
-          rows={parentCommentId ? 4 : 5}
+          placeholder={parentCommentId ? "Add to this part of the conversation..." : floating ? "Reply to the discussion, @ to mention, attach files" : "Share a thoughtful response..."}
+          rows={parentCommentId ? 4 : floating ? 2 : 5}
           maxLength={5000}
           disabled={busy}
           aria-invalid={Boolean(form.formState.errors.body)}
           aria-describedby={form.formState.errors.body ? fieldErrorId : undefined}
-          className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+          className={floating
+            ? "max-h-[40vh] min-h-14 w-full resize-y rounded-[10px] border border-transparent bg-transparent px-2.5 py-2 text-[0.9375rem] leading-6 text-text-primary placeholder:text-text-muted hover:border-border-subtle focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+            : "min-h-28 w-full resize-y rounded-[10px] border border-control-border bg-surface px-3.5 py-3 text-sm leading-6 text-text-primary placeholder:text-text-muted hover:border-text-muted focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"}
         />
         </MarkdownField>
         </AttachmentComposer>
@@ -110,19 +116,18 @@ export function CreateCommentForm({ discussionId, workspaceId, parentCommentId, 
         ) : null}
         {blocked && uploadBlocker(uploader) ? <p role="alert" className="mt-1 text-sm text-danger">{uploadBlocker(uploader)}</p> : null}
       </div>
-      {serverError ? <p role="alert" className="border-l-2 border-danger bg-surface px-3 py-2 text-sm text-danger">{serverError}</p> : null}
+      {serverError ? <p role="alert" className="rounded-[10px] border-l-2 border-danger bg-surface-subtle px-3 py-2 text-sm text-danger">{serverError}</p> : null}
       {posted && !parentCommentId ? <p role="status" className="text-sm font-medium text-success">Comment posted.</p> : null}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className={`flex flex-wrap items-center justify-between gap-3 ${floating ? "border-t border-glass-line pt-2.5" : ""}`}>
         {busy ? <span role="status" className="sr-only">{parentCommentId ? "Posting reply..." : "Posting comment..."}</span> : null}
-        <span className="text-xs text-text-muted">{form.watch("body").length}/5000</span>
+        <span className="text-xs text-text-muted">{floating ? "Markdown and @mentions work · " : ""}{form.watch("body").length}/5000</span>
         <div className="ml-auto flex min-w-0 w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
           {onCancel ? (
-            <button type="button" onClick={onCancel} disabled={busy} className="min-h-11 rounded-sm px-3 text-sm font-medium text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 max-[380px]:w-full">Cancel</button>
+            <Button variant="ghost" onClick={onCancel} disabled={busy} className="max-[380px]:w-full">Cancel</Button>
           ) : null}
-          <button type="submit" disabled={busy} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 motion-reduce:transition-none max-[380px]:w-full">
-            {busy ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <ArrowUp size={16} aria-hidden="true" />}
+          <Button type="submit" variant="primary" disabled={busy} className="max-[380px]:w-full" icon={busy ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <ArrowUp size={16} aria-hidden="true" />}>
             {busy ? "Posting..." : parentCommentId ? "Post reply" : "Post comment"}
-          </button>
+          </Button>
         </div>
       </div>
     </form>

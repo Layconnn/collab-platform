@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { dialogPanelClasses, dialogTitleClasses, scrimClasses } from "@/components/ui/overlay";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -38,7 +39,7 @@ export function Modal({ title, description, onClose, busy = false, initialFocus,
   }, []);
 
   return <div
-    className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:p-4"
+    className={`${scrimClasses} z-50 flex items-end justify-center sm:items-center sm:p-4`}
     onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) onClose(); }}
     onKeyDown={(event) => {
       if (event.key === "Escape" && !busy) { event.preventDefault(); onClose(); return; }
@@ -51,13 +52,13 @@ export function Modal({ title, description, onClose, busy = false, initialFocus,
       }
     }}
   >
-    <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} className={`max-h-[92dvh] w-full ${size === "wide" ? "max-w-4xl" : "max-w-lg"} overflow-y-auto rounded-t-md border border-border bg-surface p-5 shadow-xl sm:rounded-md sm:p-7`}>
+    <div ref={panelRef} role="dialog" aria-modal="true" aria-labelledby={titleId} className={`${dialogPanelClasses} max-h-[92dvh] w-full ${size === "wide" ? "max-w-4xl" : "max-w-lg"} overflow-y-auto p-5 sm:p-7`}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 id={titleId} className="text-xl font-semibold text-text-primary">{title}</h2>
+          <h2 id={titleId} className={dialogTitleClasses}>{title}</h2>
           {description ? <div className="mt-2 text-sm leading-6 text-text-secondary">{description}</div> : null}
         </div>
-        <button type="button" onClick={onClose} disabled={busy} aria-label="Close" className="grid size-10 shrink-0 place-items-center rounded-sm text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-50"><X size={18} aria-hidden="true" /></button>
+        <button type="button" onClick={onClose} disabled={busy} aria-label="Close" className="grid size-9 shrink-0 place-items-center rounded-lg text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-50"><X size={18} aria-hidden="true" /></button>
       </div>
       <div className="mt-5">{children}</div>
     </div>

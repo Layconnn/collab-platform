@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
     title: "How should first-time setup work?",
     body: "A long-running question.\n@maya can review the setup path.",
     author: { id: "user-1", name: null as string | null, username: "maya" },
+    attachments: [] as Array<{ id: string; fileName: string; contentType: string; size: number }>,
     createdAt: new Date("2026-10-01T10:00:00.000Z"),
     updatedAt: new Date("2026-10-01T10:00:00.000Z"),
   },
@@ -53,6 +54,7 @@ vi.mock("@/hooks/useWorkspace", () => ({
   useWorkspaceDetail: () => ({ data: { name: "Open Atlas", viewerRole: mocks.role }, error: null }),
 }));
 vi.mock("@/hooks/useDiscussion", () => ({
+  useDiscussionContext: () => ({ data: { replies: 3, people: [], morePeople: 0, decisions: [] }, error: null }),
   useDiscussionDetail: () => ({ data: mocks.loading || mocks.discussionError?.data.code === "INTERNAL_SERVER_ERROR" ? null : mocks.discussionData, isLoading: mocks.loading, isFetching: false, error: mocks.discussionError, refetch: mocks.refetchDiscussion }),
   useDiscussionActions: () => ({
     update: { mutateAsync: mocks.update, isPending: false, error: null, reset: vi.fn() },
@@ -70,9 +72,12 @@ vi.mock("@/components/comment/CreateCommentForm", () => ({ CreateCommentForm: ()
 vi.mock("@/components/decision/CreateDecisionForm", () => ({ CreateDecisionForm: () => <div>Decision proposal form</div> }));
 
 import DiscussionDetailPage from "@/app/(workspace)/workspace/[workspaceId]/discussions/[discussionId]/page";
+import { TopBarSlotProvider } from "@/components/shell/TopBarActions";
 
+// The page puts its actions in the shell's top bar; give it one.
 function view() {
-  return <ChakraProvider value={uiSystem}><DiscussionDetailPage /></ChakraProvider>;
+  const slot = document.getElementById("top-bar") ?? Object.assign(document.body.appendChild(document.createElement("div")), { id: "top-bar" });
+  return <ChakraProvider value={uiSystem}><TopBarSlotProvider slot={slot}><DiscussionDetailPage /></TopBarSlotProvider></ChakraProvider>;
 }
 
 describe("Discussion detail page", () => {
@@ -100,7 +105,11 @@ describe("Discussion detail page", () => {
     expect(screen.getByText("@maya")).toBeTruthy();
     expect(container.textContent).toContain("A long-running question.\n@maya can review the setup path.");
     expect(screen.getByText("Comment region")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Back to discussions" })).toBeTruthy();
+    // The shell's breadcrumb leads back; the header carries the facts.
+    expect(container.textContent).toContain("Discussion · opened");
+    expect(screen.getByText("3 replies")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Conversation · 3 replies" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Add your perspective" }).className).toContain("glass-float");
     expect(screen.queryByRole("navigation", { name: "Discussion location" })).toBeNull();
   });
 

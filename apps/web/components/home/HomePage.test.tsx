@@ -21,10 +21,21 @@ vi.mock("@/hooks/useHome", () => ({
   useWorkspacePulse: () => ({ data: { workspaces: mocks.workspaces }, error: null, isLoading: false }),
   useDismissNeeds: () => ({ dismiss: { mutate: mocks.dismiss, isPending: false }, dismissAll: { mutate: mocks.dismissAll, isPending: false } }),
 }));
-vi.mock("@/components/home/WorkspaceCards", () => ({ WorkspaceCards: () => <p>Workspace list</p> }));
+vi.mock("@/components/home/WorkspaceActivity", () => ({ WorkspaceActivity: () => <p>Workspace list</p> }));
+vi.mock("@/components/home/HomeActions", () => ({
+  ReviewActions: ({ title, version }: { title: string; version: number }) => <p>Review actions for {title} at version {version}</p>,
+  QuickReply: ({ parentCommentId, onReplied }: { parentCommentId: string | null; onReplied: () => void }) => <p data-reply-to={parentCommentId ?? "discussion"} onClick={onReplied}>Quick reply</p>,
+}));
 
-import { HomePage, greeting, needReason } from "./HomePage";
+import { HomePage as Home, greeting, needReason, reviewProgress } from "./HomePage";
+import { TopBarSlotProvider } from "@/components/shell/TopBarActions";
 import { useUiStore } from "@/stores/ui.store";
+
+// Home puts "New workspace" in the shell's top bar; give it one.
+function HomePage() {
+  const slot = document.getElementById("top-bar") ?? Object.assign(document.body.appendChild(document.createElement("div")), { id: "top-bar" });
+  return <TopBarSlotProvider slot={slot}><Home /></TopBarSlotProvider>;
+}
 
 const need = (overrides: Record<string, unknown>) => ({
   id: `n${Math.random()}`, kind: "MENTION", workspace: ws, title: "Pricing for small teams", actor: "Sam",
@@ -51,27 +62,50 @@ describe("HomePage", () => {
     render(<HomePage />);
     expect(screen.getByRole("heading", { name: "Needs you · 0" })).toBeTruthy();
     expect(screen.getByText("You're all caught up")).toBeTruthy();
+    expect(screen.getByText("Nothing needs you")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Mark all done" })).toBeNull();
   });
 
-  it("lists each kind with its reason, link and urgency", () => {
-    mocks.needs = { total: 4, items: [
-      need({}),
-      need({ id: "w", kind: "PROPOSAL_WAITING", title: "Move to Vercel Queues", decisionId: "c000000000000000000000003", discussionId: null, notificationId: null, at: new Date(Date.now() - 3 * DAY) }),
-      need({ id: "r", kind: "REPLY", title: "Which queue?" }),
+  it("sums up the briefing under the greeting", () => {
+    mocks.needs = { total: 3, items: [need({})] };
+    mocks.decisions = [{ decisionId: "d1", workspace: ws, question: "Adopt Playwright", action: "FINALIZED", actor: "Sam", at: new Date(), replacement: null }];
+    render(<HomePage />);
+    const header = screen.getByRole("banner");
+    expect(header.textContent).toContain("Your briefing · ");
+    expect(header.textContent).toContain("3 things need you");
+    expect(header.textContent).toContain("1 decision this week");
+    expect(header.textContent).toContain("1 workspace");
+  });
+
+  it("shows each kind as a card with who, why, the words and a way in", () => {
+    mocks.needs = { total: 5, items: [
+      need({ excerpt: "Can we check it on the favicon?" }),
+      need({ id: "w", kind: "PROPOSAL_WAITING", title: "Move to Vercel Queues", decisionId: "c000000000000000000000003", discussionId: null, notificationId: null, at: new Date(Date.now() - 3 * DAY), outcome: "Use Vercel Queues.", rationale: "No server to run.", reviews: { approved: 1, requested: 2 } }),
+      need({ id: "f", kind: "PROPOSAL_WAITING", title: "Fresh proposal", decisionId: "c000000000000000000000006", discussionId: null, notificationId: null, at: new Date(Date.now() - 60 * 60 * 1000) }),
+      need({ id: "r", kind: "REPLY", title: "Which queue?", excerpt: null }),
       need({ id: "o", kind: "OWN_PROPOSAL", title: "Adopt Playwright", actor: "Maya", decisionId: "c000000000000000000000004", discussionId: null, notificationId: null, at: new Date(Date.now() - DAY) }),
     ] };
     render(<HomePage />);
     const rows = within(screen.getByRole("list", { name: "Needs you" })).getAllByRole("listitem");
-    expect(rows.map((row) => row.querySelector("p")?.textContent?.split(" · ")[0])).toEqual([
-      "Sam mentioned you", "Proposed by Sam", "Sam replied to your discussion", "Your proposal",
-    ]);
-    expect(rows[1]!.textContent).toContain("waiting 3 days for a decision");
+    expect(rows[0]!.textContent).toContain("Sam mentioned you in Pricing for small teams · Platform");
+    expect(rows[0]!.querySelector("blockquote")!.textContent).toBe("Can we check it on the favicon?");
     expect(within(rows[0]!).getByRole("link", { name: "Pricing for small teams" }).getAttribute("href")).toBe(`/workspace/${ws.id}/discussions/c000000000000000000000002`);
-    expect(within(rows[1]!).getByRole("link", { name: "Move to Vercel Queues" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/c000000000000000000000003`);
-    expect(within(rows[1]!).getByText("Decision needed").className).toContain("bg-danger-action");
-    expect(within(rows[3]!).getByText("Your proposal").className).not.toContain("bg-danger-action");
-    expect(within(rows[1]!).queryByRole("button")).toBeNull();
+    expect(within(rows[0]!).getByRole("link", { name: "Open discussion" })).toBeTruthy();
+
+    expect(rows[1]!.textContent).toContain("Sam proposed a decision · Platform");
+    expect(within(rows[1]!).getByRole("heading", { level: 3, name: "Move to Vercel Queues" })).toBeTruthy();
+    expect(within(rows[1]!).getByText("Decision needed · 3 days").className).toContain("bg-attention-soft");
+    expect(within(rows[1]!).getByText("Use Vercel Queues.")).toBeTruthy();
+    expect(within(rows[1]!).getByText("No server to run.")).toBeTruthy();
+    expect(rows[1]!.textContent).toContain("1 of 2 approved");
+    expect(within(rows[1]!).getByRole("link", { name: "Open decision" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/c000000000000000000000003`);
+    expect(within(rows[2]!).getByText("Decision needed · less than a day").className).not.toContain("bg-attention-soft");
+    expect(rows[2]!.textContent).toContain("No reviewers yet");
+
+    expect(rows[3]!.textContent).toContain("Sam replied in Which queue?");
+    expect(rows[3]!.querySelector("blockquote")).toBeNull();
+    expect(rows[4]!.textContent).toContain("Your proposal · open for 1 day · no reviewers yet · Platform");
+    expect(within(rows[4]!).queryByRole("button")).toBeNull();
   });
 
   it("marks items done one at a time, all at once, or by opening them", () => {
@@ -104,13 +138,16 @@ describe("HomePage", () => {
 
   it("shows decisions made this week, including replacements", () => {
     mocks.decisions = [
-      { decisionId: "d1", workspace: ws, question: "Adopt Playwright", action: "FINALIZED", actor: "Sam", at: new Date(Date.now() - 3 * 60 * 60 * 1000), replacement: null },
+      { decisionId: "d1", workspace: ws, question: "Adopt Playwright", action: "FINALIZED", actor: "Sam", at: new Date(Date.now() - 3 * 60 * 60 * 1000), replacement: null, outcome: "One journey per release." },
       { decisionId: "d2", workspace: ws, question: "Use BullMQ", action: "SUPERSEDED", actor: "Maya", at: new Date(Date.now() - DAY), replacement: { id: "d3", question: "Use Vercel Queues" } },
     ];
     render(<HomePage />);
     const rows = within(screen.getByRole("list", { name: "Decided this week" })).getAllByRole("listitem");
-    expect(rows[0]!.textContent).toContain("Finalized by Sam · Platform · 3 hours ago");
-    expect(rows[1]!.textContent).toContain("Replaced by Use Vercel Queues · Maya");
+    expect(rows[0]!.textContent).toContain("Today · Decided · Platform");
+    expect(rows[0]!.textContent).toContain("“One journey per release.”");
+    expect(rows[0]!.textContent).toContain("Finalized by Sam");
+    expect(rows[1]!.textContent).toContain("Yesterday · Replaced · Platform");
+    expect(rows[1]!.textContent).toContain("Use BullMQ → Use Vercel Queues");
     expect(within(rows[1]!).getByRole("link", { name: "Use Vercel Queues" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/d3`);
   });
 
@@ -153,10 +190,16 @@ describe("HomePage", () => {
   });
 
   it("offers places opened recently from the palette", () => {
-    window.localStorage.setItem("commons.palette.recent", JSON.stringify([{ label: "Open decisions", href: `/workspace/${ws.id}/decisions`, hint: "Platform" }]));
+    window.localStorage.setItem("commons.palette.recent", JSON.stringify([
+      { label: "Which logo?", href: `/workspace/${ws.id}/discussions/c000000000000000000000002`, hint: "Platform" },
+      { label: "Open decisions", href: `/workspace/${ws.id}/decisions`, hint: "Platform" },
+    ]));
     render(<HomePage />);
-    const jump = screen.getByRole("region", { name: "Jump back in" });
-    expect(within(jump).getByRole("link", { name: /Open decisions/ }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions`);
+    const pickUp = screen.getByRole("region", { name: "Pick up where you left off" });
+    const links = within(pickUp).getAllByRole("link");
+    expect(links[0]!.textContent).toBe("Discussion · PlatformWhich logo?");
+    expect(links[1]!.getAttribute("href")).toBe(`/workspace/${ws.id}/decisions`);
+    expect(links[1]!.textContent).toBe("Page · PlatformOpen decisions");
   });
 });
 
@@ -176,9 +219,31 @@ describe("Home helpers", () => {
     mocks.needs = { total: 1, items: [need({ id: "rv", kind: "REVIEW_REQUESTED", title: "Offer a free plan", discussionId: null, decisionId: "c000000000000000000000005", notificationId: null, at: new Date(Date.now() - 2 * DAY) })] };
     render(<HomePage />);
     const row = within(screen.getByRole("list", { name: "Needs you" })).getByRole("listitem");
-    expect(within(row).getByText("Review requested")).toBeTruthy();
-    expect(row.textContent).toContain("Sam asked for your review · waiting 2 days");
+    expect(row.textContent).toContain("Sam asked you to review · Platform");
+    expect(within(row).getByText("Waiting on you · 2 days").className).toContain("bg-attention-soft");
     expect(within(row).getByRole("link", { name: "Offer a free plan" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/c000000000000000000000005`);
+    expect(within(row).getByRole("link", { name: "Review" }).getAttribute("href")).toBe(`/workspace/${ws.id}/decisions/c000000000000000000000005`);
     expect(within(row).queryByRole("button")).toBeNull();
+  });
+
+  it("answers a review from its card when the version is known, and replies in the thread", () => {
+    cleanup();
+    mocks.needs = { total: 2, items: [
+      need({ id: "rv", kind: "REVIEW_REQUESTED", title: "Offer a free plan", discussionId: null, decisionId: "c000000000000000000000005", notificationId: null, decisionVersion: 4 }),
+      need({ id: "m", replyToCommentId: "c000000000000000000000007" }),
+    ] };
+    render(<HomePage />);
+    const [reviewRow, mentionRow] = within(screen.getByRole("list", { name: "Needs you" })).getAllByRole("listitem");
+    expect(within(reviewRow!).getByText("Review actions for Offer a free plan at version 4")).toBeTruthy();
+    expect(within(reviewRow!).queryByRole("link", { name: "Review" })).toBeNull();
+    const reply = within(mentionRow!).getByText("Quick reply");
+    expect(reply.getAttribute("data-reply-to")).toBe("c000000000000000000000007");
+    fireEvent.click(reply);
+    expect(mocks.dismiss).toHaveBeenCalledWith({ notificationIds: ["c000000000000000000000009"] });
+  });
+
+  it("puts review progress in words", () => {
+    expect(reviewProgress({ approved: 1, requested: 2 })).toBe("1 of 2 approved");
+    expect(reviewProgress(null)).toBe("No reviewers yet");
   });
 });
