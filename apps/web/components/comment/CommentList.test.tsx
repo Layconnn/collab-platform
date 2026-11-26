@@ -262,7 +262,7 @@ describe("CommentList", () => {
     const trigger = screen.getByRole("button", { name: "Actions for comment by Maya Chen" });
     await user.click(trigger);
     await user.click(await screen.findByRole("menuitem", { name: "Edit comment" }));
-    const field = screen.getByRole("combobox", { name: "Edit comment" });
+    const field = screen.getByRole("textbox", { name: "Edit comment" });
     await user.clear(field);
     await user.type(field, "Changed draft");
     await user.click(screen.getByRole("button", { name: "Cancel" }));
@@ -299,7 +299,7 @@ describe("CommentList", () => {
     await waitFor(() => expect(screen.getByRole("menu").contains(document.activeElement)).toBe(true));
     editItem.focus();
     await user.keyboard("{Enter}");
-    expect(await screen.findByRole("combobox", { name: "Edit comment" })).toBeTruthy();
+    expect(await screen.findByRole("textbox", { name: "Edit comment" })).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     await waitFor(() => expect(screen.getByText(/Keep the setup context here/)).toBeTruthy());
     const restoredTrigger = screen.getByRole("button", { name: "Actions for comment by Maya Chen" });
@@ -321,7 +321,7 @@ describe("CommentList", () => {
     render(view([root], { id: "user-1", canAct: true, canManageOthers: false }));
     await user.click(screen.getByRole("button", { name: "Actions for comment by Maya Chen" }));
     await user.click(await screen.findByRole("menuitem", { name: "Edit comment" }));
-    const field = screen.getByRole("combobox", { name: "Edit comment" });
+    const field = screen.getByRole("textbox", { name: "Edit comment" });
     await user.clear(field);
     await user.click(screen.getByRole("button", { name: "Save comment" }));
     expect(await screen.findByText("Write a reply or attach a file.")).toBeTruthy();
