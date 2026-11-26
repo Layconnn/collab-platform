@@ -74,6 +74,7 @@ contrast in both themes.
 | Motion | `canopy-rise`, `canopy-stagger` (children rise in 40 ms steps), `canopy-lift`, `canopy-zoom`, `canopy-row`, `canopy-live`, `canopy-grow`; all off under reduced motion |
 | Overlays | `canopy-scrim` (the layer behind dialogs and the palette, `--scrim`), `canopy-fade`, `canopy-pop` (anything that opens), `canopy-panel` (overlay frames: no focus ring on the frame, its rows show focus) |
 | Form fields | Global in `styles/globals.css` (#193): inputs, textareas and selects never draw an outline (`!outline-none`); focus shows as a `--focus-ring` border and a soft ring, or on the frame for a field marked `canopy-inset`. Every select gets the same chevron (`--select-chevron`), inset by `0.85em` with `2.6em` kept on the right, so it scales with the field. Don't add per-field outline or arrow styles |
+| Accessibility | `apps/web/e2e/a11y.spec.ts` runs axe (WCAG 2.2 AA) on every signed-in page in light and dark with reduced motion, in CI with the smoke journey (#177). Every page has one `h1` (Settings and Decisions name the page itself when the list column is hidden); headings don't skip levels; muted sidebar text keeps 4.5:1 on hover and active rows (`BrandTokens.test.tsx`). A new page joins the list in that spec |
 
 Building blocks in `apps/web/components/ui/`: `Button` and `ButtonLink`
 (primary, secondary, ghost, danger), `PageIntro` (the standard page header),

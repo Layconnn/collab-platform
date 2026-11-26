@@ -45,7 +45,7 @@ describe("CreateDiscussionForm", () => {
 
     expect(await screen.findByText(/Please add a clear title/)).toBeTruthy();
     expect(screen.getByRole("combobox", { name: "Title" }).getAttribute("aria-invalid")).toBe("true");
-    expect(screen.getByRole("combobox", { name: "Context" }).getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByRole("textbox", { name: "Context" }).getAttribute("aria-invalid")).toBe("true");
     expect(mocks.mutateAsync).not.toHaveBeenCalled();
   });
 
@@ -55,7 +55,7 @@ describe("CreateDiscussionForm", () => {
     render(<CreateDiscussionForm workspaceId={workspaceId} onCancel={mocks.onCancel} />);
 
     await user.type(screen.getByRole("combobox", { name: "Title" }), "Improve onboarding");
-    await user.type(screen.getByRole("combobox", { name: "Context" }), "Where do new contributors lose the thread?");
+    await user.type(screen.getByRole("textbox", { name: "Context" }), "Where do new contributors lose the thread?");
     await user.click(screen.getByRole("button", { name: "Publish discussion" }));
 
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledTimes(1));
@@ -74,7 +74,7 @@ describe("CreateDiscussionForm", () => {
     render(<CreateDiscussionForm workspaceId={workspaceId} onCancel={mocks.onCancel} />);
 
     await user.type(screen.getByRole("combobox", { name: "Title" }), "Improve onboarding");
-    await user.type(screen.getByRole("combobox", { name: "Context" }), "Add a clear first step for contributors.");
+    await user.type(screen.getByRole("textbox", { name: "Context" }), "Add a clear first step for contributors.");
     await user.click(screen.getByRole("button", { name: "Publish discussion" }));
 
     expect(await screen.findByRole("alert")).toHaveProperty("textContent", expect.stringContaining("Your draft is still here"));
@@ -88,7 +88,7 @@ describe("CreateDiscussionForm", () => {
     render(<CreateDiscussionForm workspaceId={workspaceId} onCancel={mocks.onCancel} />);
 
     fireEvent.change(screen.getByRole("combobox", { name: "Title" }), { target: { value: "Improve onboarding" } });
-    fireEvent.change(screen.getByRole("combobox", { name: "Context" }), { target: { value: "Document the first step." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Context" }), { target: { value: "Document the first step." } });
     const form = screen.getByRole("button", { name: "Publish discussion" }).closest("form")!;
     fireEvent.submit(form);
     fireEvent.submit(form);

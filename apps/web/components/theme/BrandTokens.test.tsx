@@ -105,6 +105,12 @@ describe("Commons brand tokens", () => {
       ]) {
         expect(contrast(token(text, mode), token(background, mode)), `${text} on ${background} (${mode})`).toBeGreaterThanOrEqual(4.5);
       }
+      // Muted sidebar text also sits on the hover and active rows (the
+      // workspace switcher's label): those translucent layers over the sidebar,
+      // as the browser paints them (#177, found by axe).
+      for (const row of mode === "light" ? ["#223127", "#2a3a30"] : ["#202e27", "#27382f"]) {
+        expect(contrast(token("--sidebar-muted", mode), row), `--sidebar-muted on ${row} (${mode})`).toBeGreaterThanOrEqual(4.5);
+      }
     }
 
     expect(
