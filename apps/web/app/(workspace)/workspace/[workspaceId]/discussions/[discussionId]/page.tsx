@@ -12,6 +12,7 @@ import { updateDiscussionInputSchema, type UpdateDiscussionInput } from "@repo/v
 import { CommentList } from "@/components/comment/CommentList";
 import { CreateCommentForm } from "@/components/comment/CreateCommentForm";
 import { discussionActionError } from "@/components/discussion/discussionErrors";
+import { EditedButton } from "@/components/discussion/EditHistory";
 import { useCommentList } from "@/hooks/useComment";
 import { MentionTextarea } from "@/components/common/MentionTextarea";
 import { MarkdownField } from "@/components/common/MarkdownField";
@@ -162,7 +163,6 @@ export default function DiscussionDetailPage() {
   const author = resolveUserIdentity(discussion.data.author);
   const createdAt = new Date(discussion.data.createdAt);
   const updatedAt = new Date(discussion.data.updatedAt);
-  const wasUpdated = updatedAt.getTime() > createdAt.getTime() + 1000;
   const updateError = discussionActionError(update.error, "Your changes could not be saved. Please try again.");
   const removeError = discussionActionError(remove.error, "This discussion could not be deleted. Please try again.");
 
@@ -203,7 +203,7 @@ export default function DiscussionDetailPage() {
               <span className="font-medium text-text-primary">{author.label}</span>
               {replies !== undefined ? <><span aria-hidden="true">·</span><span>{replies} {replies === 1 ? "reply" : "replies"}</span></> : null}
               {files ? <><span aria-hidden="true">·</span><span>{files} {files === 1 ? "file" : "files"}</span></> : null}
-              {wasUpdated ? <><span aria-hidden="true">·</span><span>Edited <time dateTime={updatedAt.toISOString()}>{dateLabel(updatedAt)}</time></span></> : null}
+              {discussion.data.editCount ? <><span aria-hidden="true">·</span><EditedButton target={{ discussionId }} at={updatedAt} /></> : null}
             </div>
             {canAct ? <div className="mt-4 flex flex-wrap gap-2 sm:hidden">
               <SaveButton workspaceId={workspaceId} target={{ discussionId }} label="discussion" />

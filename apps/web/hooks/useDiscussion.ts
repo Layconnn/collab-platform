@@ -18,6 +18,11 @@ export function useDiscussionDetail(discussionId: string) {
   return trpc.discussion.getById.useQuery({ discussionId }, { enabled: Boolean(discussionId) });
 }
 
+// Every version of the title and context, loaded when the history is opened.
+export function useDiscussionHistory(discussionId: string, enabled: boolean) {
+  return trpc.discussion.history.useQuery({ discussionId }, { enabled: enabled && Boolean(discussionId) });
+}
+
 export function useDiscussionActions(workspaceId: string) {
   const utils = trpc.useUtils();
   const refreshList = () => utils.discussion.listByWorkspace.invalidate({ workspaceId, take: 20 });
@@ -38,6 +43,7 @@ export function useDiscussionActions(workspaceId: string) {
       await Promise.all([
         refreshList(),
         utils.discussion.getById.invalidate({ discussionId: discussion.id }),
+        utils.discussion.history.invalidate({ discussionId: discussion.id }),
       ]);
     },
     onError: refreshAfterRejection,

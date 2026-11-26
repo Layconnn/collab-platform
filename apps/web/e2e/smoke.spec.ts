@@ -83,6 +83,22 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(1);
   });
 
+  await test.step("edit the reply and read its history", async () => {
+    // Edit history PRD: an edit keeps the version it replaced.
+    const reply = page.getByRole("article", { name: /^Comment by / }).first();
+    await reply.getByRole("button", { name: /^Actions for comment by / }).click();
+    await page.getByRole("menuitem", { name: "Edit comment" }).click();
+    await reply.getByLabel("Edit comment").fill("The screenshot shows the queue backlog.");
+    await reply.getByRole("button", { name: "Save comment" }).click();
+    await reply.getByRole("button", { name: /Edited.*show edit history/ }).click();
+    const history = page.getByRole("dialog", { name: "Reply history" });
+    await expect(history.getByRole("heading", { name: "Current version" })).toBeVisible();
+    await expect(history.getByRole("heading", { name: "Original" })).toBeVisible();
+    await expect(history.locator("ins").filter({ hasText: "queue backlog" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(history).toBeHidden();
+  });
+
   await test.step("propose a decision", async () => {
     await page.getByRole("button", { name: "Propose decision" }).click();
     await page.getByLabel("Decision question").fill(question);

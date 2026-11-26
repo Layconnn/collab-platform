@@ -21,6 +21,7 @@ import { usePinnedReplies, useSetPin } from "@/hooks/usePins";
 import { SaveButton } from "@/components/common/SaveButton";
 import { useDiscussionReactions } from "@/hooks/useReactions";
 import { UserAvatar } from "@/components/common/UserAvatar";
+import { EditedButton } from "@/components/discussion/EditHistory";
 import { ErrorState } from "@/components/common/StateNotice";
 import { useCommentActions, useCommentList } from "@/hooks/useComment";
 import type { AppRouter } from "@/server/api/root";
@@ -102,8 +103,6 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
     requestAnimationFrame(() => (replyButtonRef.current ?? articleRef.current)?.focus());
   }, [knownEmptyBranch]);
   const createdAt = new Date(comment.createdAt);
-  const updatedAt = new Date(comment.updatedAt);
-  const edited = updatedAt.getTime() > createdAt.getTime() + 1000;
   const editError = commentActionError(update.error, "Your changes could not be saved. Please try again.");
   const deleteError = commentActionError(remove.error, "This comment could not be deleted. Please try again.");
 
@@ -163,7 +162,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
               <span className="max-w-full truncate text-[0.9375rem] font-semibold text-text-primary">{authorName}</span>
               {comment.depth > 0 ? <span className="text-text-muted">replied</span> : null}
               <time dateTime={createdAt.toISOString()} className="text-text-muted">{dateLabel(createdAt)}</time>
-              {edited ? <span className="text-text-muted">· Edited</span> : null}
+              {comment.editCount ? <><span aria-hidden="true" className="text-text-muted">·</span><EditedButton target={{ commentId: comment.id }} /></> : null}
               {pinned ? <StatusPill tone="attention" className="!py-px text-[11px]"><Pin size={11} aria-hidden="true" /> Pinned</StatusPill> : null}
             </div>
             {editing && canManage ? (

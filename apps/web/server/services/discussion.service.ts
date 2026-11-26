@@ -491,6 +491,8 @@ export const discussionService = {
       attachments: PublicAttachment[];
       createdAt: Date;
       updatedAt: Date;
+      // Absent in entries cached before edit history shipped.
+      editCount?: number;
     }>(cacheKey);
 
     if (cached) {
