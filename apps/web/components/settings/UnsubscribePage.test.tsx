@@ -37,6 +37,6 @@ describe("UnsubscribePage", () => {
     mocks.describe = { data: undefined, error: { message: "invalid" }, isLoading: false };
     render(<UnsubscribePage token="bad" />);
     expect(screen.getByRole("heading", { name: "This link has expired" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Email settings" }).getAttribute("href")).toBe("/settings/email");
+    expect(screen.getByRole("link", { name: "Email settings" }).getAttribute("href")).toBe("/settings/notifications/digest");
   });
 });

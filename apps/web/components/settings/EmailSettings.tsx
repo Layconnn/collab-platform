@@ -8,7 +8,9 @@ import { useDigestPreferenceActions, useDigestPreferences, useDigestPreview } fr
 
 // Settings → Email (daily digest PRD, FR-9 and FR-12): the digest on or off,
 // which workspaces it covers, and a preview of exactly what today's would say.
-export function EmailSettings() {
+// `embedded`: inside Settings → Notifications → Daily digest, whose header
+// already names and explains it (dashboard redesign, #176).
+export function EmailSettings({ embedded = false }: { embedded?: boolean }) {
   const [previewing, setPreviewing] = useState(false);
   const preview = useDigestPreview(previewing);
   const preferences = useDigestPreferences();
@@ -28,12 +30,14 @@ export function EmailSettings() {
     });
   };
 
-  return <div className="mx-auto w-full max-w-[52rem] min-w-0 pb-12">
-    <p className="text-xs font-semibold uppercase text-brand-link">Settings</p>
-    <h1 className="mt-1 text-[1.8rem] font-semibold leading-tight text-text-primary sm:text-[2.1rem]">Email</h1>
+  return <div className="w-full min-w-0 pb-12">
+    {embedded ? null : <>
+      <p className="text-xs font-semibold uppercase text-brand-link">Settings</p>
+      <h1 className="mt-1 text-[1.8rem] font-semibold leading-tight text-text-primary sm:text-[2.1rem]">Email</h1>
+    </>}
 
-    <section aria-labelledby="digest-heading" className="mt-8 border-t border-border-subtle pt-6">
-      <div className="flex items-start gap-3">
+    <section aria-labelledby="digest-heading" aria-label={embedded ? "Daily digest" : undefined} className={embedded ? "mt-7" : "mt-8 border-t border-border-subtle pt-6"}>
+      <div className={`flex items-start gap-3 ${embedded ? "sr-only" : ""}`}>
         <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-sm bg-surface-active text-brand-link"><Mail size={17} /></span>
         <div className="min-w-0">
           <h2 id="digest-heading" className="text-lg font-semibold text-text-primary">Daily digest</h2>
@@ -41,7 +45,7 @@ export function EmailSettings() {
         </div>
       </div>
       {preferences.data ? <div className="mt-5 space-y-4">
-        <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-sm border border-border-subtle px-3">
+        <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border border-border-subtle bg-surface px-5 shadow-card">
           <input type="checkbox" role="switch" checked={enabled} disabled={setEnabled.isPending} onChange={(event) => toggleEnabled(event.target.checked)} className="size-4 accent-[var(--color-brand-action)]" />
           <span className="text-sm font-semibold text-text-primary">Send me the daily digest</span>
         </label>

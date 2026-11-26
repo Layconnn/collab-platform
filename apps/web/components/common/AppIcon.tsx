@@ -18,6 +18,8 @@ import {
   LayoutGrid,
   Scale,
   Settings,
+  SunMoon,
+  UserRound,
 } from "lucide-react";
 
 export type AppIconName =
@@ -38,6 +40,8 @@ export type AppIconName =
   | "saved"
   | "inbox"
   | "settings"
+  | "account"
+  | "appearance"
   | "overview";
 
 const icons: Record<AppIconName, LucideIcon> = {
@@ -58,6 +62,8 @@ const icons: Record<AppIconName, LucideIcon> = {
   saved: Bookmark,
   inbox: Inbox,
   settings: Settings,
+  account: UserRound,
+  appearance: SunMoon,
   overview: LayoutGrid,
 };
 
