@@ -58,7 +58,7 @@ vi.mock("@/hooks/useDecision", () => ({
   useDecisionActions: () => ({ create: { mutateAsync: mocks.create, isPending: false, error: null }, edit: { mutateAsync: mocks.edit, isPending: false, error: mocks.editError, reset: vi.fn() }, finalize: { mutateAsync: mocks.finalize, isPending: false, error: mocks.finalizeError, reset: vi.fn() }, supersede: { mutateAsync: mocks.supersede, isPending: mocks.supersedePending, error: mocks.supersedeError, reset: vi.fn() }, remove: { mutateAsync: mocks.remove, isPending: false, error: mocks.removeError, reset: vi.fn() } }),
 }));
 
-import DecisionsPage from "@/app/(workspace)/workspace/[workspaceId]/decisions/page";
+import DecisionsLayout from "@/app/(workspace)/workspace/[workspaceId]/decisions/layout";
 import DecisionDetailPage from "@/app/(workspace)/workspace/[workspaceId]/decisions/[decisionId]/page";
 import { CreateDecisionForm } from "./CreateDecisionForm";
 
@@ -76,21 +76,30 @@ describe("decision frontend flow", () => {
   });
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
-  it("lists decisions, filters by status, and paginates", () => {
+  it("lists decisions beside the record, groups them, filters by question, and paginates", () => {
     mocks.listNext = true;
-    render(<DecisionsPage />);
-    expect(screen.getByRole("link", { name: /Which stack?/ })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Finalized" }));
-    expect(screen.getByRole("button", { name: "Finalized" }).getAttribute("aria-pressed")).toBe("true");
-    fireEvent.click(screen.getByRole("button", { name: "Load more decisions" }));
+    render(<DecisionsLayout><p>Record</p></DecisionsLayout>);
+    const rail = screen.getByRole("navigation", { name: "Decision list" });
+    const link = within(rail).getByRole("link", { name: /Which stack?/ });
+    expect(link.getAttribute("aria-current")).toBe("page");
+    expect(within(rail).getByRole("heading", { name: "Proposals · 1" })).toBeTruthy();
+    expect(rail.textContent).toContain("1 record+ · 1 proposal");
+    expect(screen.getByText("Record")).toBeTruthy();
+    fireEvent.change(within(rail).getByLabelText("Filter decisions"), { target: { value: "budget" } });
+    expect(within(rail).queryByRole("link", { name: /Which stack?/ })).toBeNull();
+    expect(within(rail).getByRole("status").textContent).toContain("No loaded decision matches");
+    fireEvent.change(within(rail).getByLabelText("Filter decisions"), { target: { value: "STACK" } });
+    expect(within(rail).getByRole("link", { name: /Which stack?/ })).toBeTruthy();
+    fireEvent.click(within(rail).getByRole("button", { name: "Load more decisions" }));
     expect(mocks.listNextPage).toHaveBeenCalledTimes(1);
   });
 
-  it("hides cached index content after access denial", () => {
-    mocks.listError = { data: { code: "UNAUTHORIZED" } };
-    render(<DecisionsPage />);
+  it("hides cached list content after access denial", () => {
+    mocks.workspaceError = { data: { code: "FORBIDDEN" } };
+    render(<DecisionsLayout><p>Record</p></DecisionsLayout>);
     expect(screen.getByText("Decision access restricted")).toBeTruthy();
     expect(screen.queryByText("Which stack?")).toBeNull();
+    expect(screen.queryByText("Record")).toBeNull();
   });
 
   it("preserves the same idempotency key when retrying an unchanged draft", async () => {
@@ -335,12 +344,14 @@ describe("decision frontend flow", () => {
     await waitFor(() => expect(mocks.finalize).toHaveBeenCalledWith({ workspaceId: mocks.workspaceId, decisionId: mocks.decisionId, expectedVersion: 1, overrideReason: "Launch date fixed by the board." }));
   });
 
-  it("shows review progress in the list and filters to proposals waiting for my review", () => {
+  it("puts proposals waiting for my review first, with their progress", () => {
     (mocks.decision as Record<string, unknown>).review = { rule: "ALL", needed: 2, active: 2, approved: 0, objected: 0, pending: 2, met: false, waitingForMe: true };
-    render(<DecisionsPage />);
-    expect(screen.getByText("Your review is requested · 0 of 2 approved")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Waiting for my review" }));
-    expect(mocks.listArgs).toEqual([mocks.workspaceId, undefined, true]);
+    render(<DecisionsLayout><p>Record</p></DecisionsLayout>);
+    const rail = screen.getByRole("navigation", { name: "Decision list" });
+    const waiting = within(rail).getByRole("region", { name: "Waiting on you · 1" });
+    expect(within(waiting).getByRole("link").textContent).toContain("Maya · 0 of 2 approved");
+    expect(rail.textContent).toContain("1 waiting on you");
+    expect(mocks.listArgs).toEqual([mocks.workspaceId]);
     delete (mocks.decision as Record<string, unknown>).review;
   });
 });
