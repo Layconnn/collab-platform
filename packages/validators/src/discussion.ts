@@ -35,7 +35,14 @@ export const listDiscussionsInputSchema = z.object({
   take: z.number().int().min(1).max(100).default(20),
 });
 
+// The discussion page's side panel (dashboard redesign, #171).
+export const discussionContextInputSchema = z.object({
+  workspaceId: workspaceIdSchema,
+  discussionId: discussionIdSchema,
+});
+
 export type CreateDiscussionInput = z.infer<typeof createDiscussionInputSchema>;
+export type DiscussionContextInput = z.infer<typeof discussionContextInputSchema>;
 export type UpdateDiscussionInput = z.infer<typeof updateDiscussionInputSchema>;
 export type GetDiscussionByIdInput = z.infer<typeof getDiscussionByIdInputSchema>;
 export type DeleteDiscussionInput = z.infer<typeof deleteDiscussionInputSchema>;

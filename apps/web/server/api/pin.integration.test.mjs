@@ -118,4 +118,5 @@ test("pins stay inside their workspace", async () => {
 test("excerpts read as plain text", () => {
   assert.equal(excerpt("**Use** [Vercel Queues](https://vercel.com) for `now`.\n\n```ts\nconst x = 1;\n```\n- cheap"), "Use Vercel Queues for now. [code] cheap");
   assert.equal(excerpt("x".repeat(200)).length, 160);
+  assert.equal(excerpt("@maya_okafor can you check _this_?"), "@maya_okafor can you check this?");
 });

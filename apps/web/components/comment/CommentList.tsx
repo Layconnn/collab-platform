@@ -26,6 +26,8 @@ import { useCommentActions, useCommentList } from "@/hooks/useComment";
 import type { AppRouter } from "@/server/api/root";
 import { resolveUserIdentity } from "@/lib/user-identity";
 import { floatPanelClasses, menuItemClasses } from "@/components/ui/overlay";
+import { Button } from "@/components/ui/Button";
+import { StatusPill } from "@/components/ui/Canopy";
 
 type CommentItem = inferRouterOutputs<AppRouter>["comment"]["listByDiscussion"]["items"][number];
 type Viewer = { id: string | undefined; canAct: boolean; canManageOthers: boolean };
@@ -153,17 +155,16 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
 
   return (
     <li className="min-w-0" id={`comment-${comment.id}`}>
-      <article ref={articleRef} tabIndex={-1} aria-label={`Comment by ${authorName}`} className={`min-w-0 focus-visible:outline-2 focus-visible:outline-focus-ring ${comment.depth ? "py-3.5" : "border-b border-border-subtle py-4"}`}>
+      <article ref={articleRef} tabIndex={-1} aria-label={`Comment by ${authorName}`} className={`canopy-row -mx-3 min-w-0 rounded-xl px-3 hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-focus-ring ${comment.depth ? "py-3" : "py-4"}`}>
         <div className="flex min-w-0 items-start gap-3">
-          <UserAvatar name={author.avatarName} className="size-8 sm:size-9" />
+          <UserAvatar name={author.avatarName} className={comment.depth ? "size-7 text-[10px]" : "size-[34px]"} />
           <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-5">
-              <span className="max-w-full truncate text-sm font-semibold text-text-primary">{authorName}</span>
+            <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5 text-xs leading-5">
+              <span className="max-w-full truncate text-[0.9375rem] font-semibold text-text-primary">{authorName}</span>
               {comment.depth > 0 ? <span className="text-text-muted">replied</span> : null}
-              <span aria-hidden="true" className="text-text-muted">/</span>
               <time dateTime={createdAt.toISOString()} className="text-text-muted">{dateLabel(createdAt)}</time>
-              {edited ? <span className="text-text-muted">Edited</span> : null}
-              {pinned ? <span className="inline-flex items-center gap-1 font-semibold text-brand-link"><Pin size={12} aria-hidden="true" /> Pinned</span> : null}
+              {edited ? <span className="text-text-muted">· Edited</span> : null}
+              {pinned ? <StatusPill tone="attention" className="!py-px text-[11px]"><Pin size={11} aria-hidden="true" /> Pinned</StatusPill> : null}
             </div>
             {editing && canManage ? (
               <form onSubmit={onSubmit} className="mt-3 space-y-2.5" noValidate>
@@ -181,7 +182,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                   disabled={update.isPending}
                   aria-invalid={Boolean(form.formState.errors.body)}
                   aria-describedby={form.formState.errors.body ? `edit-comment-error-${comment.id}` : undefined}
-                  className="min-h-28 w-full resize-y rounded-sm border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+                  className="min-h-28 w-full resize-y rounded-[10px] border border-control-border bg-surface px-3 py-2.5 text-sm leading-6 text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                 />
                 </MarkdownField>
                 </AttachmentComposer>
@@ -189,13 +190,13 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
                 {editProblem ? <p role="alert" className="text-sm text-danger">{editProblem}</p> : null}
                 {editError ? <p role="alert" className="text-sm text-danger">{editError}</p> : null}
                 <div className="flex flex-wrap items-center gap-2">
-                  <button type="submit" disabled={update.isPending || form.formState.isSubmitting} className="inline-flex min-h-10 items-center rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{update.isPending ? "Saving..." : "Save comment"}</button>
-                  <button type="button" onClick={cancelEdit} disabled={update.isPending} className="min-h-10 rounded-sm px-3 text-sm font-medium text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">Cancel</button>
+                  <Button type="submit" variant="primary" disabled={update.isPending || form.formState.isSubmitting}>{update.isPending ? "Saving..." : "Save comment"}</Button>
+                  <Button variant="ghost" onClick={cancelEdit} disabled={update.isPending}>Cancel</Button>
                 </div>
               </form>
             ) : (
               <>
-                {comment.body ? <Markdown text={comment.body} className="mt-1.5 text-[0.94rem] leading-6 text-text-primary" /> : null}
+                {comment.body ? <Markdown text={comment.body} className="mt-1.5 text-[0.9375rem] leading-relaxed text-text-secondary" /> : null}
                 <Attachments attachments={comment.attachments} />
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   <ReactionBar workspaceId={workspaceId} discussionId={discussionId} commentId={comment.id} reactions={reactions.data?.comments[comment.id] ?? []} disabled={!reactions.data} />
@@ -227,7 +228,7 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
           {canManage && !editing ? (
             <Menu.Root positioning={{ placement: "bottom-end", strategy: "fixed" }}>
               <Menu.Trigger asChild>
-                <button ref={menuTriggerRef} type="button" aria-label={`Actions for comment by ${authorName}`} title="Comment actions" disabled={remove.isPending} className="grid size-10 shrink-0 place-items-center rounded-sm text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">
+                <button ref={menuTriggerRef} type="button" aria-label={`Actions for comment by ${authorName}`} title="Comment actions" disabled={remove.isPending} className="grid size-9 shrink-0 place-items-center rounded-lg text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">
                   {remove.isPending ? <LoaderCircle size={17} className="animate-spin" aria-hidden="true" /> : <Ellipsis size={18} aria-hidden="true" />}
                 </button>
               </Menu.Trigger>
@@ -249,14 +250,14 @@ function CommentThread({ comment, discussionId, workspaceId, viewer, onAccessDen
       </article>
 
       {openedReplyForm && viewer.canAct ? (
-        <div id={`reply-form-${comment.id}`} hidden={!replying} className="thread-reveal ml-4 border-l-2 border-brand-accent bg-surface-subtle px-3 py-4 sm:ml-5 sm:px-5">
-          <p className="mb-3 text-xs font-semibold text-brand-link">Replying to {authorName}</p>
+        <div id={`reply-form-${comment.id}`} hidden={!replying} className="thread-reveal mb-2 ml-11 rounded-xl border border-border-subtle bg-surface-subtle px-3 py-4 sm:px-5">
+          <p className="type-canopy-label mb-3">Replying to {authorName}</p>
           <CreateCommentForm discussionId={discussionId} workspaceId={workspaceId} parentCommentId={comment.id} active={replying} onCancel={closeReply} onCreated={() => { setReplying(false); setPostedReply(true); setShowReplies(true); requestAnimationFrame(() => replyButtonRef.current?.focus()); }} />
         </div>
       ) : null}
 
       {showReplyBranch ? (
-        <div id={`replies-${comment.id}`} hidden={!showReplies} className={`thread-reveal ${comment.depth < 2 ? "ml-3 border-l border-border pl-3 sm:ml-4 sm:pl-5" : "ml-0 border-l border-border-subtle pl-1.5 sm:pl-2"}`}>
+        <div id={`replies-${comment.id}`} hidden={!showReplies} className={`thread-reveal ${comment.depth < 2 ? "ml-4 border-l-2 border-border-subtle pl-3 sm:ml-[17px] sm:pl-5" : "ml-0 border-l border-border-subtle pl-1.5 sm:pl-2"}`}>
           {replies.isLoading && !replies.data ? <p role="status" className="flex items-center gap-2 py-3 text-xs text-text-muted"><LoaderCircle size={14} className="animate-spin" aria-hidden="true" /> Checking this thread...</p> : null}
           {replyDenied ? <ErrorState title="Replies unavailable" description="You may no longer have access to this conversation." /> : null}
           {replies.error && !replyDenied && !replies.data ? (
@@ -291,18 +292,18 @@ export function CommentList({ discussionId, workspaceId, viewer, query, onAccess
     <div>
       {query.error && query.data ? <div className="mb-3"><ErrorState title="Could not refresh comments" description="Comments already loaded remain available." onRetry={() => void (query.isFetchNextPageError ? query.fetchNextPage() : query.refetch())} retrying={query.isFetching} /></div> : null}
       {!items.length && !query.error ? (
-        <div className="border-y border-border-subtle py-7">
+        <div className="rounded-2xl border border-dashed border-border px-5 py-7">
           <MessageCircle size={22} className="text-brand-link" aria-hidden="true" />
-          <p className="mt-3 text-sm font-semibold text-text-primary">The conversation starts here.</p>
+          <p className="mt-3 font-serif text-[1.375rem] text-text-primary">The conversation starts here.</p>
           <p className="mt-1 text-sm text-text-secondary">Add the first response below.</p>
         </div>
       ) : null}
-      {items.length ? <ul className="border-t border-border-subtle">{items.map((comment) => <CommentThread key={comment.id} comment={comment} discussionId={discussionId} workspaceId={workspaceId} viewer={viewer} onAccessDenied={onAccessDenied} />)}</ul> : null}
+      {items.length ? <ul aria-label="Replies" className="canopy-stagger flex flex-col">{items.map((comment) => <CommentThread key={comment.id} comment={comment} discussionId={discussionId} workspaceId={workspaceId} viewer={viewer} onAccessDenied={onAccessDenied} />)}</ul> : null}
       {query.hasNextPage && !query.isFetchNextPageError ? (
-        <div className="border-b border-border-subtle py-4">
-          <button type="button" onClick={() => void query.fetchNextPage()} disabled={query.isFetchingNextPage} className="min-h-11 rounded-sm border border-border bg-surface px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">
+        <div className="py-4">
+          <Button variant="secondary" onClick={() => void query.fetchNextPage()} disabled={query.isFetchingNextPage}>
             {query.isFetchingNextPage ? "Loading comments..." : query.isFetchNextPageError ? "Retry loading comments" : "Load more comments"}
-          </button>
+          </Button>
         </div>
       ) : null}
     </div>

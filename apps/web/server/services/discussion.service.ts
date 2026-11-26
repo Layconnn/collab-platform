@@ -4,6 +4,7 @@ import type {
   GetDiscussionByIdInput,
   ListDiscussionsInput,
   UpdateDiscussionInput,
+  DiscussionContextInput,
 } from "@repo/validators/discussion";
 import { Prisma } from "../../app/generated/prisma/client";
 
@@ -120,6 +121,9 @@ async function withActivity(workspaceId: string, items: ListedDiscussion[]) {
   });
 }
 
+// The side panel lists the author and then the most recent repliers.
+const CONTEXT_PEOPLE = 8;
+
 const requireWorkspaceAction = (
   workspaceId: string,
   userId: string,
@@ -128,6 +132,56 @@ const requireWorkspaceAction = (
 ) => requireMemberAction(workspaceId, userId, action, requestId, recordDiscussionPermissionDenied);
 
 export const discussionService = {
+  // What the discussion page's side panel shows (dashboard redesign, #171):
+  // who took part and how much, and the decisions that came from it. Read
+  // fresh, never cached, so a new reply or decision shows at once.
+  async context(userId: string, input: DiscussionContextInput, context: RequestContext) {
+    await requireWorkspaceAction(input.workspaceId, userId, WORKSPACE_ACTIONS.READ_DISCUSSION, context.requestId);
+    const discussion = await prisma.discussion.findFirst({
+      where: { id: input.discussionId, workspaceId: input.workspaceId },
+      select: { authorId: true },
+    });
+    if (!discussion) throw new AppError("NOT_FOUND", "Discussion not found.");
+
+    const [byAuthor, decisions] = await Promise.all([
+      prisma.comment.groupBy({
+        by: ["authorId"],
+        where: { workspaceId: input.workspaceId, discussionId: input.discussionId },
+        _count: { _all: true },
+        _max: { createdAt: true },
+      }),
+      prisma.decision.findMany({
+        where: { workspaceId: input.workspaceId, sourceWorkspaceId: input.workspaceId, sourceDiscussionId: input.discussionId, deletedAt: null },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        select: { id: true, question: true, status: true, createdAt: true },
+      }),
+    ]);
+    const repliers = [...byAuthor]
+      .filter((row) => row.authorId !== discussion.authorId)
+      .sort((a, b) => (b._max.createdAt?.getTime() ?? 0) - (a._max.createdAt?.getTime() ?? 0));
+    const shown = repliers.slice(0, CONTEXT_PEOPLE - 1);
+    const users = await prisma.user.findMany({
+      where: { id: { in: [discussion.authorId, ...shown.map((row) => row.authorId)] } },
+      select: { id: true, name: true, username: true },
+    });
+    const byId = new Map(users.map((user) => [user.id, user]));
+    const authorReplies = byAuthor.find((row) => row.authorId === discussion.authorId)?._count._all ?? 0;
+    const people = [
+      ...(byId.has(discussion.authorId) ? [{ ...byId.get(discussion.authorId)!, author: true, replies: authorReplies }] : []),
+      ...shown.flatMap((row) => {
+        const user = byId.get(row.authorId);
+        return user ? [{ ...user, author: false, replies: row._count._all }] : [];
+      }),
+    ];
+    return {
+      replies: byAuthor.reduce((total, row) => total + row._count._all, 0),
+      people,
+      morePeople: repliers.length - shown.length,
+      decisions,
+    };
+  },
+
   async create(
     userId: string,
     input: CreateDiscussionInput,

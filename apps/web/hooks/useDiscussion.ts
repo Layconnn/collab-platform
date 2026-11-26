@@ -9,6 +9,11 @@ export function useDiscussionList(workspaceId: string) {
   );
 }
 
+// The discussion page's side panel: people, replies and decisions (#171).
+export function useDiscussionContext(workspaceId: string, discussionId: string, enabled = true) {
+  return trpc.discussion.context.useQuery({ workspaceId, discussionId }, { enabled: enabled && Boolean(workspaceId && discussionId) });
+}
+
 export function useDiscussionDetail(discussionId: string) {
   return trpc.discussion.getById.useQuery({ discussionId }, { enabled: Boolean(discussionId) });
 }
