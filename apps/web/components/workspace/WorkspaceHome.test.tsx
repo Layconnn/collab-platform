@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
   discussions: null as unknown,
   members: null as unknown,
   memberEnabled: vi.fn(),
+  pulse: [] as unknown[],
+  decisions: [] as unknown[],
 }));
 
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: mocks.user }) }));
@@ -20,6 +22,8 @@ vi.mock("@/hooks/useDiscussion", () => ({
 vi.mock("@/hooks/useActivity", () => ({
   useWorkspaceActivity: () => ({ data: { pages: [{ items: [], nextCursor: null }] }, error: null, isLoading: false, isFetching: false, hasNextPage: false, isFetchingNextPage: false, refetch: vi.fn(), fetchNextPage: vi.fn() }),
 }));
+vi.mock("@/hooks/useHome", () => ({ useWorkspacePulse: () => ({ data: { workspaces: mocks.pulse } }) }));
+vi.mock("@/hooks/useDecision", () => ({ useDecisionList: () => ({ data: { pages: [{ items: mocks.decisions }] }, error: null, isLoading: false }) }));
 vi.mock("@/hooks/useWorkspaceMembers", () => ({
   useWorkspaceMembers: (_workspaceId: string, enabled: boolean) => {
     mocks.memberEnabled(enabled);
@@ -28,6 +32,7 @@ vi.mock("@/hooks/useWorkspaceMembers", () => ({
 }));
 
 import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
+import { TopBarSlotProvider } from "@/components/shell/TopBarActions";
 
 const createdAt = new Date("2026-03-11T12:00:00.000Z");
 
@@ -288,5 +293,42 @@ describe("WorkspaceHome", () => {
 
     expect(screen.getByText("Contributor access restricted")).toBeTruthy();
     expect(screen.queryByText("Maya Chen")).toBeNull();
+  });
+});
+
+describe("WorkspaceHome, redesigned", () => {
+  afterEach(() => { cleanup(); mocks.pulse = []; mocks.decisions = []; });
+
+  const slot = () => document.getElementById("top-bar") ?? Object.assign(document.body.appendChild(document.createElement("div")), { id: "top-bar" });
+  const ready = () => {
+    mocks.workspace = { data: { id: "c000000000000000000000001", name: "Open Atlas", slug: "open-atlas", viewerRole: "MEMBER", createdAt: new Date("2026-03-11T12:00:00.000Z") }, error: null, isLoading: false };
+    mocks.discussions = { data: { pages: [{ items: [] }] }, error: null, isLoading: false, hasNextPage: false };
+    mocks.members = { data: undefined, error: null, isLoading: false };
+  };
+
+  it("puts the workspace's actions in the top bar and says who you are in it", () => {
+    ready();
+    render(<TopBarSlotProvider slot={slot()}><WorkspaceHome workspaceId="c000000000000000000000001" /></TopBarSlotProvider>);
+    expect(screen.getByRole("link", { name: "Start a discussion" }).getAttribute("href")).toBe("/workspace/c000000000000000000000001/discussions#new-discussion");
+    expect(screen.getByText("Workspace · /open-atlas")).toBeTruthy();
+    expect(screen.getByText("You are a member")).toBeTruthy();
+  });
+
+  it("shows this week's figures with a text equivalent of the chart", () => {
+    ready();
+    mocks.pulse = [{ id: "c000000000000000000000001", name: "Open Atlas", role: "MEMBER", lastActivityAt: null, decisionsFinalized: 2, discussionsStarted: 3, replies: 11, activePeople: 4, openProposals: 1, daily: [0, 1, 4, 0, 2, 6, 3] }];
+    render(<WorkspaceHome workspaceId="c000000000000000000000001" />);
+    const week = screen.getByRole("region", { name: "This week" });
+    const figures = Object.fromEntries([...week.querySelectorAll("dl > div")].map((row) => [row.querySelector("dt")!.textContent, row.querySelector("dd")!.textContent]));
+    expect(figures).toEqual({ Decided: "2", "Open proposals": "1", Discussions: "3", Replies: "11", "People active": "4" });
+    expect(week.querySelector("figcaption")!.textContent).toContain("Last 24 hours: 3 events");
+  });
+
+  it("links the latest decisions with their status", () => {
+    ready();
+    mocks.decisions = [{ id: "d1", question: "Adopt Playwright", status: "DECIDED", createdByLabel: "Maya", updatedAt: new Date() }];
+    render(<WorkspaceHome workspaceId="c000000000000000000000001" />);
+    const section = screen.getByRole("region", { name: "Latest decisions" });
+    expect(section.querySelector("a[href='/workspace/c000000000000000000000001/decisions/d1']")!.textContent).toContain("DecidedAdopt Playwright");
   });
 });
