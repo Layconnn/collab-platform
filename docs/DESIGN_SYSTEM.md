@@ -73,6 +73,7 @@ contrast in both themes.
 | Glass | `glass-bar` (top bar), `glass-float` (floating composers and action bars, menus and popovers over page content); both fall back to solid without `backdrop-filter` or under reduced transparency. Menus over the forest sidebar and the command palette stay solid: glass loses contrast over the sidebar and turns grey over a scrim |
 | Motion | `canopy-rise`, `canopy-stagger` (children rise in 40 ms steps), `canopy-lift`, `canopy-zoom`, `canopy-row`, `canopy-live`, `canopy-grow`; all off under reduced motion |
 | Overlays | `canopy-scrim` (the layer behind dialogs and the palette, `--scrim`), `canopy-fade`, `canopy-pop` (anything that opens), `canopy-panel` (overlay frames: no focus ring on the frame, its rows show focus) |
+| Form fields | Global in `styles/globals.css` (#193): inputs, textareas and selects never draw an outline (`!outline-none`); focus shows as a `--focus-ring` border and a soft ring, or on the frame for a field marked `canopy-inset`. Every select gets the same chevron (`--select-chevron`), inset by `0.85em` with `2.6em` kept on the right, so it scales with the field. Don't add per-field outline or arrow styles |
 
 Building blocks in `apps/web/components/ui/`: `Button` and `ButtonLink`
 (primary, secondary, ghost, danger), `PageIntro` (the standard page header),

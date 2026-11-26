@@ -38,6 +38,8 @@
   --success: #167447;
   --info: #175c93;
   --focus-ring: #2a6140;
+  /* The select arrow, in the muted text colour (#193). */
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6963' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --selection: #cce9dc;
   --editorial-forest: var(--brand-primary);
   --editorial-cream: #eee5d2;
@@ -134,6 +136,7 @@
   --success: #79d49c;
   --info: #7ebdf0;
   --focus-ring: #83d1a7;
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e9a92' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --selection: #28553e;
   --editorial-forest: var(--brand-primary);
   --editorial-cream: #eee5d2;
@@ -207,6 +210,44 @@ body {
    announce themselves (dialogs); the rows show the focus, not the frame. */
 .canopy-panel:focus-visible {
   outline: none;
+}
+
+/* Form fields (#193): no field draws an outline. Focus stays visible to
+   keyboard users through the field's border and a soft ring instead; a
+   field inside a frame (.canopy-inset) lets the frame show it. */
+input,
+textarea,
+select {
+  outline: none !important;
+}
+
+:where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]), textarea, select):focus-visible:not(.canopy-inset) {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 22%, transparent);
+}
+
+/* A frame around a .canopy-inset field (search, quick reply, filters) shows
+   that field's focus the same way. */
+.canopy-field-frame:focus-within {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 22%, transparent);
+}
+
+:where(input[type="checkbox"], input[type="radio"]):focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 35%, transparent);
+}
+
+/* Selects: one chevron for every select, inset from the right edge by the
+   same em-based space as the field's text, with room kept on the right so
+   the chosen option never runs under it. It scales with the field's size. */
+select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--select-chevron);
+  background-repeat: no-repeat;
+  background-size: 1.05em 1.05em;
+  background-position: right 0.85em center;
+  padding-right: 2.6em;
 }
 
 /* A field inside a frame that shows focus for it (focus-within), such as
