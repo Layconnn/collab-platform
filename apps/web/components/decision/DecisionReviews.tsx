@@ -18,17 +18,24 @@ type HistoryEvent = { id: string; kind: string; actorLabel: string; summary: unk
 const MAX_REVIEWERS = 10;
 const STATE_TEXT: Record<ReviewState, string> = { PENDING: "Waiting", APPROVED: "Approved", OBJECTED: "Objected", WITHDRAWN: "Withdrawn" };
 const STATE_STYLE: Record<ReviewState, string> = {
-  PENDING: "border-border text-text-secondary",
-  APPROVED: "border-success text-success",
-  OBJECTED: "border-danger text-danger",
-  WITHDRAWN: "border-border-subtle text-text-muted",
+  PENDING: "text-attention-text",
+  APPROVED: "text-success",
+  OBJECTED: "text-danger",
+  WITHDRAWN: "text-text-muted",
+};
+// Reviewer cards: a waiting review is outlined in coral (dashboard redesign).
+const CARD_STYLE: Record<ReviewState, string> = {
+  PENDING: "border-dashed border-attention/45 bg-attention-soft/40",
+  APPROVED: "border-border-subtle bg-surface",
+  OBJECTED: "border-danger/40 bg-surface",
+  WITHDRAWN: "border-border-subtle bg-surface-subtle",
 };
 const STATE_ICON = { PENDING: CircleDashed, APPROVED: Check, OBJECTED: X, WITHDRAWN: MinusCircle } as const;
 
-const button = "min-h-10 rounded-sm px-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60";
-const primary = `${button} bg-brand-action px-4 text-on-brand-action hover:bg-brand-action-hover`;
-const quiet = `${button} border border-border text-text-primary hover:bg-surface-hover`;
-const control = "min-w-0 rounded-sm border border-control-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:border-focus-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/25";
+const button = "inline-flex min-h-9 items-center justify-center gap-2 rounded-[9px] px-3 text-[0.8125rem] font-medium transition-colors duration-150 ease-out focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-55";
+const primary = `${button} bg-brand-action px-3.5 text-on-brand-action hover:bg-brand-action-hover`;
+const quiet = `${button} border border-border bg-surface text-text-primary hover:bg-surface-hover`;
+const control = "min-w-0 rounded-[10px] border border-control-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:border-focus-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/25";
 const field = `w-full ${control}`;
 const numberField = `w-20 ${control}`;
 
@@ -66,7 +73,7 @@ export function reviewEventText(event: Pick<HistoryEvent, "kind" | "actorLabel" 
 
 function StateBadge({ state }: { state: ReviewState }) {
   const Icon = STATE_ICON[state];
-  return <span className={`inline-flex min-h-7 items-center gap-1.5 rounded-sm border px-2 text-xs font-semibold ${STATE_STYLE[state]}`}><Icon size={13} aria-hidden="true" />{STATE_TEXT[state]}</span>;
+  return <span className={`inline-flex items-center gap-1 text-xs font-medium ${STATE_STYLE[state]}`}><Icon size={13} aria-hidden="true" />{STATE_TEXT[state]}</span>;
 }
 
 function RequestDialog({ workspaceId, decisionId, authorId, asked, summary, onClose }: {
@@ -155,23 +162,28 @@ function RespondForm({ workspaceId, decisionId, version, current }: {
   };
 
   if (!editing) {
-    return <div className="mt-5 flex flex-wrap items-center gap-3 rounded-sm border border-border-subtle bg-surface-subtle px-4 py-3">
-      <p className="text-sm text-text-primary">You {current.state === "APPROVED" ? "approved" : "objected to"} this version.</p>
+    return <div className="glass-float z-10 lg:sticky lg:bottom-5 mt-6 flex flex-wrap items-center gap-3 rounded-2xl border px-4 py-3">
+      <span aria-hidden="true" className={`size-2 rounded-full ${current.state === "APPROVED" ? "bg-live" : "bg-danger"}`} />
+      <p className="flex-1 text-sm text-text-primary">You {current.state === "APPROVED" ? "approved" : "objected to"} this version.</p>
       <button type="button" onClick={() => setEditing(true)} className={quiet}>Change your review</button>
     </div>;
   }
 
-  return <form onSubmit={submit} aria-labelledby="your-review-heading" className="mt-5 space-y-3 rounded-sm border border-brand-accent bg-surface-subtle px-4 py-4 sm:px-5">
-    <h3 id="your-review-heading" className="text-sm font-semibold text-text-primary">Your review</h3>
+  return <form onSubmit={submit} aria-labelledby="your-review-heading" className="glass-float z-10 lg:sticky lg:bottom-5 mt-6 space-y-3 rounded-2xl border px-4 py-4 sm:px-5">
+    <div className="flex items-center gap-2.5">
+      <span aria-hidden="true" className="size-2 rounded-full bg-attention" />
+      <h3 id="your-review-heading" className="text-sm font-medium text-text-primary">Your review</h3>
+      <span className="text-xs text-text-muted">on version {version}</span>
+    </div>
     <div role="radiogroup" aria-label="Your answer" className="flex flex-wrap gap-2">
-      {(["APPROVED", "OBJECTED"] as const).map((value) => <label key={value} className={`flex min-h-10 cursor-pointer items-center gap-2 rounded-sm border px-3 text-sm font-semibold ${choice === value ? "border-brand-action bg-surface text-text-primary" : "border-border text-text-secondary hover:bg-surface-hover"}`}>
+      {(["APPROVED", "OBJECTED"] as const).map((value) => <label key={value} className={`flex min-h-9 cursor-pointer items-center gap-2 rounded-[9px] border px-3 text-[0.8125rem] font-medium focus-within:outline-2 focus-within:outline-focus-ring ${choice === value ? "border-brand-action bg-surface text-text-primary" : "border-border text-text-secondary hover:bg-surface-hover"}`}>
         <input type="radio" name="review-answer" value={value} checked={choice === value} onChange={() => { setChoice(value); setMissingReason(false); }} className="size-4 accent-[var(--color-brand-action)]" />
         {value === "APPROVED" ? "Approve" : "Object"}
       </label>)}
     </div>
     <div>
       <label htmlFor="review-note" className="text-sm font-medium text-text-primary">{choice === "OBJECTED" ? "Why do you object?" : "Note (optional)"}</label>
-      <textarea id="review-note" ref={noteRef} rows={3} maxLength={2000} value={note} onChange={(event) => { setNote(event.target.value); setMissingReason(false); }} aria-invalid={missingReason} aria-describedby={missingReason ? "review-note-error" : undefined} className={`mt-1 ${field}`} />
+      <textarea id="review-note" ref={noteRef} rows={2} maxLength={2000} value={note} onChange={(event) => { setNote(event.target.value); setMissingReason(false); }} aria-invalid={missingReason} aria-describedby={missingReason ? "review-note-error" : undefined} className={`mt-1 ${field}`} />
       {missingReason ? <p id="review-note-error" role="alert" className="mt-1 text-xs text-danger">Say why you object, so the author can respond.</p> : null}
     </div>
     {respond.error ? <p role="alert" className="text-sm text-danger">{respond.error.data?.code === "CONFLICT" ? "The proposal changed since you opened it. Reload and review the current version." : respond.error.message || "Could not send your review."}</p> : null}
@@ -205,22 +217,23 @@ export function DecisionReviews({ workspaceId, decisionId, authorId }: { workspa
   const [requesting, setRequesting] = useState(false);
   const data = reviews.data;
 
-  return <section aria-labelledby="review-heading" className="mt-8 border-t border-border pt-8 sm:mt-10">
-    <p className="text-xs font-semibold uppercase text-brand-link">Review</p>
-    <div className="mt-1 flex flex-wrap items-baseline justify-between gap-3">
-      <h2 id="review-heading" className="text-xl font-semibold text-text-primary">{data ? `Review · ${reviewProgress(data.summary)}` : "Review"}</h2>
+  const share = data && data.summary.needed ? Math.min(100, Math.round((data.summary.approved / data.summary.needed) * 100)) : 0;
+  return <section aria-labelledby="review-heading" className="mt-8 border-t border-border-subtle pt-6">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <h2 id="review-heading" className="type-canopy-label m-0">{data ? `Review · ${reviewProgress(data.summary)}` : "Review"}</h2>
       {data?.viewer.canManage ? <button type="button" onClick={() => setRequesting(true)} disabled={data.summary.active >= MAX_REVIEWERS} className={`${quiet} inline-flex items-center gap-2`}><UserPlus size={15} aria-hidden="true" /> Request review</button> : null}
     </div>
     {reviews.isLoading ? <div className="py-5"><LoadingState label="Loading reviews..." /></div> : null}
     {reviews.error && !data ? <div className="py-5"><ErrorState title="Could not load reviews" onRetry={() => void reviews.refetch()} retrying={reviews.isFetching} /></div> : null}
     {data ? <>
-      {data.summary.active ? <p className="mt-2 text-sm text-text-secondary">{ruleText(data.summary)}. {data.summary.met ? <strong className="font-semibold text-success">The rule is met.</strong> : <span>Waiting for {data.summary.needed - data.summary.approved} more {data.summary.needed - data.summary.approved === 1 ? "approval" : "approvals"}.</span>}</p>
+      {data.summary.active ? <div aria-hidden="true" className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface-active"><div className="canopy-grow h-full rounded-full bg-live" style={{ width: `${share}%` }} /></div> : null}
+      {data.summary.active ? <p className="mt-2.5 text-sm text-text-secondary">{ruleText(data.summary)}. {data.summary.met ? <strong className="font-semibold text-success">The rule is met.</strong> : <span>Waiting for {data.summary.needed - data.summary.approved} more {data.summary.needed - data.summary.approved === 1 ? "approval" : "approvals"}.</span>}</p>
         : <p className="mt-2 max-w-[62ch] text-sm leading-6 text-text-secondary">{data.viewer.canManage ? "Ask teammates to approve or object before this is finalized. Their answers are kept with the decision." : "Nobody has been asked to review this proposal."}</p>}
       {data.viewer.canManage && data.summary.active ? <RuleEditor key={`${data.summary.rule}-${data.requiredApprovals}`} workspaceId={workspaceId} decisionId={decisionId} summary={data.summary} requiredApprovals={data.requiredApprovals} /> : null}
-      {data.reviews.length ? <ul aria-label="Reviewers" className="mt-4 border-t border-border-subtle">
-        {data.reviews.map((review) => <li key={`${review.reviewerId ?? review.reviewerLabel}-${review.createdAt.toString()}`} className="flex flex-wrap items-start gap-x-3 gap-y-2 border-b border-border-subtle py-3">
+      {data.reviews.length ? <ul aria-label="Reviewers" className="mt-4 grid gap-2.5 sm:grid-cols-2">
+        {data.reviews.map((review) => <li key={`${review.reviewerId ?? review.reviewerLabel}-${review.createdAt.toString()}`} className={`flex flex-wrap items-start gap-x-3 gap-y-2 rounded-xl border px-3.5 py-3 ${CARD_STYLE[review.state]}`}>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2"><span className={`text-sm font-semibold ${review.state === "WITHDRAWN" ? "text-text-muted line-through" : "text-text-primary"}`}>{review.reviewerLabel}</span><StateBadge state={review.state} />{review.stale ? <span className="text-xs text-text-muted">answered an earlier version</span> : null}</div>
+            <div className="flex flex-wrap items-center gap-2"><span className={`text-sm font-medium ${review.state === "WITHDRAWN" ? "text-text-muted line-through" : "text-text-primary"}`}>{review.reviewerLabel}</span><StateBadge state={review.state} />{review.stale ? <span className="text-xs text-text-muted">answered an earlier version</span> : null}</div>
             {review.note ? <div className="mt-1 border-l-2 border-border-subtle pl-3 text-sm text-text-secondary"><Markdown text={review.note} /></div> : null}
             <p className="mt-1 text-xs text-text-muted">{review.respondedAt ? <>Answered <DecisionDate value={review.respondedAt} /></> : <>Asked by {review.requestedByLabel} · <DecisionDate value={review.createdAt} /></>}</p>
           </div>

@@ -16,6 +16,7 @@ Every pull request starts from a GitHub issue, which records why the work exists
 - Open it with the `/issue` command or the templates in `.github/ISSUE_TEMPLATE/` (feature, bug, chore). The title uses the same product language as the pull request.
 - The branch starts with the issue number, and the pull request description starts with `Closes #N`.
 - Pull requests target `dev`, and GitHub only acts on closing keywords that reach the default branch. So the squash commit message must also end with `Closes #N`: the `Close issues on dev` workflow (`.github/workflows/close-issues.yml`) closes the issue as soon as that commit lands on `dev`, and the board moves it to Done. The repository builds the squash message from the pull request description (setting `squash_merge_commit_message: PR_BODY`, since 2026-11-25), so `Closes #N` at the top of the description is enough; before that it used the branch's commit messages and issues stayed open.
+- A pull request that delivers only part of an issue says `Part of #N` and never puts `close`, `closes`, `fix`, `fixes`, `resolve` or `resolves` before the issue number anywhere in its description, even across a line break: the workflow reads the whole message as one line and would close the issue early (it happened with #172).
 - A project planned with `/prd` gets one issue per pull request in its delivery plan.
 
 ### Branch Naming
