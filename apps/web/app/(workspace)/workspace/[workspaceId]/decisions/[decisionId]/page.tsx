@@ -29,6 +29,7 @@ import { UserAvatar } from "@/components/common/UserAvatar";
 import { TopBarActions } from "@/components/shell/TopBarActions";
 import { Button } from "@/components/ui/Button";
 import { SectionLabel, StatusPill } from "@/components/ui/Canopy";
+import { dialogPanelClasses, dialogTitleClasses, overlayLabelClasses, scrimClasses } from "@/components/ui/overlay";
 
 function RevisionHistory({ workspaceId, decisionId }: { workspaceId: string; decisionId: string }) {
   const revisions = useDecisionRevisions(workspaceId, decisionId);
@@ -198,7 +199,7 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
     </article>
     {superseding && canSupersede ? <SupersedeDecisionDialog workspaceId={workspaceId} oldDecision={{ id: record.id, question: record.question, version: record.version }} onClose={() => { setSuperseding(false); requestAnimationFrame(() => supersedeButton.current?.focus()); }} /> : null}
     {deleting && canDelete ? <DeleteDecisionDialog workspaceId={workspaceId} decision={{ id: record.id, question: record.question, version: record.version, status: record.status }} onClose={() => { setDeleting(false); requestAnimationFrame(() => deleteButton.current?.focus()); }} /> : null}
-    {confirming && canFinalize ? <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onKeyDown={(event) => {
+    {confirming && canFinalize ? <div className={`${scrimClasses} z-50 flex items-center justify-center p-4`} onKeyDown={(event) => {
       if (event.key === "Escape" && !finalize.isPending) { setConfirming(false); requestAnimationFrame(() => finalizeButton.current?.focus()); }
       if (event.key === "Tab" && confirmationRef.current) {
         const controls = Array.from(confirmationRef.current.querySelectorAll<HTMLElement>("button:not(:disabled), textarea"));
@@ -208,17 +209,18 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
         }
       }
     }}>
-      <div ref={confirmationRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="finalize-title" aria-describedby="finalize-description" className="w-full max-w-lg rounded-sm border border-border bg-surface p-5 shadow-xl outline-none sm:p-7">
-        <h2 id="finalize-title" className="text-xl font-semibold text-text-primary">Finalize this decision?</h2><p id="finalize-description" className="mt-3 text-sm leading-6 text-text-secondary">The outcome and rationale will become immutable. You can still read every earlier revision.</p>
-        {!record.sourceDiscussionId ? <p className="mt-3 border-l-2 border-info px-3 text-sm text-text-secondary">The supporting discussion is unavailable. Its title has been retained: {record.sourceDiscussionTitle}.</p> : null}
-        {needsOverride && reviewSummary ? <div className="mt-4 space-y-2 border-l-2 border-warning px-3">
+      <div ref={confirmationRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="finalize-title" aria-describedby="finalize-description" className={`${dialogPanelClasses} w-full max-w-lg !rounded-2xl p-5 sm:p-7`}>
+        <p className={overlayLabelClasses}>Finalize</p>
+        <h2 id="finalize-title" className={`${dialogTitleClasses} mt-1.5`}>Finalize this decision?</h2><p id="finalize-description" className="mt-3 text-sm leading-6 text-text-secondary">The outcome and rationale will become immutable. You can still read every earlier revision.</p>
+        {!record.sourceDiscussionId ? <p className="mt-3 rounded-[10px] border-l-2 border-info bg-surface-subtle px-3 py-2 text-sm text-text-secondary">The supporting discussion is unavailable. Its title has been retained: {record.sourceDiscussionTitle}.</p> : null}
+        {needsOverride && reviewSummary ? <div className="mt-4 space-y-2 rounded-xl border border-dashed border-attention/45 bg-attention-soft/40 px-3.5 py-3">
           <p className="text-sm text-text-primary"><strong>The review rule is not met.</strong> {reviewSummary.rule === "ALL" ? `Waiting for ${waitingFor}.` : `It needs ${reviewSummary.needed} ${reviewSummary.needed === 1 ? "approval" : "approvals"} and has ${reviewSummary.approved}.`}</p>
           <label htmlFor="override-reason" className="block text-sm font-medium text-text-primary">Why finalize anyway? This is shown on the decision.</label>
-          <textarea id="override-reason" rows={3} maxLength={2000} value={overrideReason} onChange={(event) => setOverrideReason(event.target.value)} aria-describedby="override-help" className="w-full rounded-sm border border-control-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:border-focus-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/25" />
+          <textarea id="override-reason" rows={3} maxLength={2000} value={overrideReason} onChange={(event) => setOverrideReason(event.target.value)} aria-describedby="override-help" className="w-full rounded-[10px] border border-control-border bg-surface px-3 py-2 text-sm text-text-primary focus-visible:border-focus-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-ring/25" />
           <p id="override-help" className="text-xs text-text-muted">At least 10 characters.</p>
         </div> : null}
         {finalize.error ? <div role="alert" className="mt-4 text-sm text-danger">{decisionError(finalize.error, "Finalization failed. Please try again.")}{finalize.error.data?.code === "CONFLICT" ? <button type="button" onClick={() => { setConfirming(false); void decision.refetch(); requestAnimationFrame(() => headingRef.current?.focus()); }} className="ml-2 font-semibold underline">Review latest version</button> : null}</div> : null}
-        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" disabled={finalize.isPending} onClick={() => { setConfirming(false); requestAnimationFrame(() => finalizeButton.current?.focus()); }} className="min-h-11 px-4 text-sm font-semibold text-text-secondary">Cancel</button><button type="button" disabled={finalize.isPending || (needsOverride && overrideReason.trim().length < 10)} onClick={() => void onFinalize()} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action disabled:opacity-60">{finalize.isPending ? "Finalizing..." : needsOverride ? "Finalize anyway" : "Confirm finalization"}</button></div>
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><Button variant="ghost" disabled={finalize.isPending} onClick={() => { setConfirming(false); requestAnimationFrame(() => finalizeButton.current?.focus()); }}>Cancel</Button><Button variant="primary" disabled={finalize.isPending || (needsOverride && overrideReason.trim().length < 10)} onClick={() => void onFinalize()}>{finalize.isPending ? "Finalizing..." : needsOverride ? "Finalize anyway" : "Confirm finalization"}</Button></div>
       </div>
     </div> : null}
     {record.status === "PROPOSED" || reviews.data?.reviews.length ? <DecisionReviews workspaceId={workspaceId} decisionId={decisionId} authorId={record.createdById} /> : null}
