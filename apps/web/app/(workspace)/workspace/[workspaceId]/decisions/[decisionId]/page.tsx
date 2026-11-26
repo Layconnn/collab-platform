@@ -12,7 +12,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateN
 import { DecisionReviews } from "@/components/decision/DecisionReviews";
 import { SaveButton } from "@/components/common/SaveButton";
 import { DeleteDecisionDialog } from "@/components/decision/DeleteDecisionDialog";
-import { DecisionDate, DecisionSection, DecisionStatus, decisionError } from "@/components/decision/decisionUI";
+import { DecisionDate, DecisionStatus, decisionError } from "@/components/decision/decisionUI";
 import { decisionDraftSchema, DecisionFields, optionalEdit, type DecisionDraft } from "@/components/decision/decisionFields";
 import { ReplacementHistory } from "@/components/decision/ReplacementHistory";
 import { AttachmentComposer } from "@/components/files/AttachmentComposer";
@@ -23,31 +23,36 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDecisionActions, useDecisionDetail, useDecisionRevisions, useReplacementHistory } from "@/hooks/useDecision";
 import { useDecisionReviews } from "@/hooks/useDecisionReviews";
 import { useWorkspaceDetail } from "@/hooks/useWorkspace";
+import { timeAgo } from "@/components/activity/RecentActivity";
+import { Markdown } from "@/components/common/Markdown";
+import { UserAvatar } from "@/components/common/UserAvatar";
+import { TopBarActions } from "@/components/shell/TopBarActions";
+import { Button } from "@/components/ui/Button";
+import { SectionLabel, StatusPill } from "@/components/ui/Canopy";
 
 function RevisionHistory({ workspaceId, decisionId }: { workspaceId: string; decisionId: string }) {
   const revisions = useDecisionRevisions(workspaceId, decisionId);
   const denied = ["FORBIDDEN", "UNAUTHORIZED", "NOT_FOUND"].includes(revisions.error?.data?.code ?? "");
   if (denied) return <ErrorState title="Decision history unavailable" description="Access to this decision may have changed." />;
   const items = revisions.data?.pages.flatMap((page) => page.items) ?? [];
-  return <section aria-labelledby="revision-heading" className="mt-8 border-t border-border pt-8 sm:mt-10">
-    <p className="text-xs font-semibold uppercase text-brand-link">Decision record</p>
-    <h2 id="revision-heading" className="mt-1 text-xl font-semibold text-text-primary">Revision history</h2>
+  return <section aria-labelledby="revision-heading" className="mt-8 border-t border-border-subtle pt-6">
+    <h2 id="revision-heading" className="type-canopy-label m-0">Revision history</h2>
     <p className="mt-2 max-w-[62ch] text-sm leading-6 text-text-secondary">Each entry keeps the content recorded at that moment. Earlier reasoning stays visible.</p>
     {revisions.isLoading && !revisions.data ? <div className="py-6"><LoadingState label="Loading history..." /></div> : null}
     {revisions.error && !revisions.data ? <div className="py-6"><ErrorState title="Could not load history" onRetry={() => void revisions.refetch()} retrying={revisions.isFetching} /></div> : null}
     {revisions.error && revisions.data ? <div className="py-5"><ErrorState title={revisions.isFetchNextPageError ? "Could not load more history" : "Could not refresh history"} onRetry={() => void (revisions.isFetchNextPageError ? revisions.fetchNextPage() : revisions.refetch())} retrying={revisions.isFetching} /></div> : null}
     {!revisions.isLoading && !revisions.error && !items.length ? <div className="py-6"><EmptyState title="No revisions available" /></div> : null}
-    {items.length ? <ol className="mt-6 border-l border-border-subtle pl-4 sm:pl-6">{items.map((revision) => <li key={revision.id} className="relative border-b border-border-subtle py-4 first:pt-0 last:border-0">
-      <span aria-hidden="true" className="absolute -left-[1.3rem] top-5 size-2 rounded-full bg-brand-accent sm:-left-[1.8rem]" />
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1"><h3 className="text-sm font-semibold text-text-primary">{revision.action === "CREATE" ? "Proposal created" : revision.action === "EDIT" ? "Proposal edited" : revision.action === "FINALIZE" ? "Decision finalized" : revision.action === "SUPERSEDE" ? revision.status === "SUPERSEDED" ? "Decision superseded" : "Linked as replacement" : "Decision deleted"}</h3><span className="text-xs text-text-muted">Version {revision.version}</span></div>
+    {items.length ? <ol className="ml-1 mt-5 flex flex-col gap-4 border-l border-border-subtle pl-4">{items.map((revision, index) => <li key={revision.id} className="relative">
+      <span aria-hidden="true" className={`absolute -left-[20.5px] top-1.5 size-[7px] rounded-full ring-[3px] ring-canvas ${index === 0 ? "bg-live" : "bg-border"}`} />
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1"><h3 className="text-sm font-medium text-text-primary">{revision.action === "CREATE" ? "Proposal created" : revision.action === "EDIT" ? "Proposal edited" : revision.action === "FINALIZE" ? "Decision finalized" : revision.action === "SUPERSEDE" ? revision.status === "SUPERSEDED" ? "Decision superseded" : "Linked as replacement" : "Decision deleted"}</h3><span className="text-xs text-text-muted">Version {revision.version}</span></div>
       <p className="mt-1 text-xs text-text-muted">{revision.actorLabel} · <DecisionDate value={revision.createdAt} /></p>
       {revision.reason ? <p className="mt-3 whitespace-pre-wrap wrap-anywhere text-sm text-text-secondary">Reason: {revision.reason}</p> : null}
       {revision.overrideReason ? <p className="mt-3 whitespace-pre-wrap wrap-anywhere text-sm text-text-secondary">Finalized before the review rule was met. Reason: {revision.overrideReason}</p> : null}
-      <details className="mt-2 text-sm"><summary className="min-h-10 cursor-pointer rounded-sm px-2 py-2 font-medium text-brand-link hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Recorded content</summary>
-        <dl className="space-y-3 border-t border-border-subtle px-2 pt-3 text-text-secondary"><div><dt className="font-semibold text-text-primary">Recorded status</dt><dd className="mt-1"><DecisionStatus status={revision.status} /></dd></div><div><dt className="font-semibold text-text-primary">Question</dt><dd className="whitespace-pre-wrap wrap-anywhere">{revision.question}</dd></div>{(["outcome", "rationale", "alternatives", "followUp"] as const).map((field) => <div key={field}><dt className="font-semibold text-text-primary">{{ outcome: "Outcome", rationale: "Rationale", alternatives: "Alternatives", followUp: "Follow-up" }[field]}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{revision[field] || "Not recorded"}</dd></div>)}<div><dt className="font-semibold text-text-primary">Files</dt><dd className="wrap-anywhere">{revision.fileNames?.length ? revision.fileNames.join(", ") : "None"}</dd></div></dl>
+      <details className="mt-1.5 text-sm"><summary className="inline-flex min-h-8 cursor-pointer items-center rounded-lg px-2 text-xs font-medium text-brand-link hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Recorded content</summary>
+        <dl className="mt-2 space-y-3 rounded-xl border border-border-subtle bg-surface px-3.5 py-3 text-text-secondary"><div><dt className="font-semibold text-text-primary">Recorded status</dt><dd className="mt-1"><DecisionStatus status={revision.status} /></dd></div><div><dt className="font-semibold text-text-primary">Question</dt><dd className="whitespace-pre-wrap wrap-anywhere">{revision.question}</dd></div>{(["outcome", "rationale", "alternatives", "followUp"] as const).map((field) => <div key={field}><dt className="font-semibold text-text-primary">{{ outcome: "Outcome", rationale: "Rationale", alternatives: "Alternatives", followUp: "Follow-up" }[field]}</dt><dd className="whitespace-pre-wrap wrap-anywhere">{revision[field] || "Not recorded"}</dd></div>)}<div><dt className="font-semibold text-text-primary">Files</dt><dd className="wrap-anywhere">{revision.fileNames?.length ? revision.fileNames.join(", ") : "None"}</dd></div></dl>
       </details>
     </li>)}</ol> : null}
-    {revisions.hasNextPage ? <button type="button" disabled={revisions.isFetchingNextPage} onClick={() => void revisions.fetchNextPage()} className="mt-4 min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{revisions.isFetchingNextPage ? "Loading..." : "Load more history"}</button> : null}
+    {revisions.hasNextPage ? <Button variant="secondary" className="mt-4" disabled={revisions.isFetchingNextPage} onClick={() => void revisions.fetchNextPage()}>{revisions.isFetchingNextPage ? "Loading..." : "Load more history"}</Button> : null}
   </section>;
 }
 
@@ -94,9 +99,9 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
   const linked = Boolean(decision.data?.previousDecision || decision.data?.supersession);
   const canDelete = Boolean(user && workspace.data && !workspace.error && decision.data && !linked && (manager || (decision.data.status === "PROPOSED" && decision.data.createdById === user.id)));
 
-  if (denied || actionAccessLost) return <div className="mx-auto max-w-[52rem] space-y-4"><ErrorState title="Decision access restricted" description="You may no longer have access to this workspace's decisions." /><Link href="/workspace" className="font-semibold text-brand-link">All workspaces</Link></div>;
-  if (decision.isLoading && !decision.data) return <div className="mx-auto max-w-[52rem] py-8"><LoadingState label="Loading decision..." /></div>;
-  if (missing || (!decision.data && !decision.isLoading)) return <div className="mx-auto max-w-[52rem] space-y-4 py-8"><ErrorState title={missing ? "Decision unavailable" : "Could not load decision"} description={missing ? "This decision may have been removed or belongs to another workspace." : "Please try again."} onRetry={missing ? undefined : () => void decision.refetch()} retrying={decision.isFetching} /><Link href={`/workspace/${workspaceId}/decisions`} className="font-semibold text-brand-link">Back to decisions</Link></div>;
+  if (denied || actionAccessLost) return <div className="max-w-[52rem] space-y-4"><ErrorState title="Decision access restricted" description="You may no longer have access to this workspace's decisions." /><Link href="/workspace" className="font-semibold text-brand-link">All workspaces</Link></div>;
+  if (decision.isLoading && !decision.data) return <div className="max-w-[52rem] py-8"><LoadingState label="Loading decision..." /></div>;
+  if (missing || (!decision.data && !decision.isLoading)) return <div className="max-w-[52rem] space-y-4 py-8"><ErrorState title={missing ? "Decision unavailable" : "Could not load decision"} description={missing ? "This decision may have been removed or belongs to another workspace." : "Please try again."} onRetry={missing ? undefined : () => void decision.refetch()} retrying={decision.isFetching} /><Link href={`/workspace/${workspaceId}/decisions`} className="font-semibold text-brand-link">Back to decisions</Link></div>;
   if (!decision.data) return null;
   const record = decision.data;
 
@@ -128,33 +133,67 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
     catch { /* The error and refresh action stay in the confirmation. */ }
   };
 
-  return <main className="mx-auto w-full min-w-0 max-w-[52rem] pb-16">
-    <Link href={`/workspace/${workspaceId}/decisions`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-brand-link hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring"><ArrowLeft size={16} aria-hidden="true" /> Back to decisions</Link>
-    <article className="mt-6">
-      <div className="flex flex-wrap items-center gap-3"><p className="text-xs font-semibold uppercase text-brand-link">Decision</p><DecisionStatus status={record.status} /><span className="text-xs text-text-muted">Version {record.version}</span><span className="ml-auto"><SaveButton workspaceId={workspaceId} target={{ decisionId }} label="decision" /></span></div>
-      <h1 ref={headingRef} tabIndex={-1} className="mt-3 wrap-anywhere text-[1.85rem] font-semibold leading-tight text-text-primary outline-none sm:text-[2.35rem]">{record.question}</h1>
-      <p className="mt-6 text-sm text-text-secondary">Proposed by <strong className="text-text-primary">{record.createdByLabel}</strong> · <DecisionDate value={record.createdAt} /></p>
-      {record.decidedAt ? <p className="mt-1 text-sm text-text-secondary">Finalized {finalization ? <>by <strong className="text-text-primary">{finalization.actorLabel}</strong> · </> : null}<DecisionDate value={record.decidedAt} />{!finalization && revisions.hasNextPage ? " · Load more history to see who finalized it" : !finalization && !revisions.isLoading && !revisions.error ? " · Finalizer unavailable" : null}</p> : null}
-      {finalization?.overrideReason ? <p className="mt-2 whitespace-pre-wrap wrap-anywhere border-l-2 border-warning px-3 text-sm text-text-secondary"><strong className="text-text-primary">Finalized before the review rule was met.</strong> {finalization.overrideReason}</p> : null}
-      {record.status === "DECIDED" ? <p className="mt-2 text-sm font-semibold text-brand-link">Current decision</p> : null}
-      <div className="mt-7 border-y border-border-subtle py-4 text-sm leading-6 text-text-secondary">
-        <span className="font-semibold text-text-primary">Source discussion: </span>
-        {record.sourceDiscussionId ? <Link href={`/workspace/${workspaceId}/discussions/${record.sourceDiscussionId}`} className="wrap-anywhere font-medium text-brand-link underline-offset-2 hover:underline">{record.sourceDiscussionTitle}</Link> : <span className="wrap-anywhere">{record.sourceDiscussionTitle} <span className="text-text-muted">(original discussion unavailable)</span></span>}
+  const pill = record.status === "PROPOSED" ? { tone: "proposal" as const, label: "Proposal" } : record.status === "DECIDED" ? { tone: "decided" as const, label: "Decided" } : { tone: "replaced" as const, label: "Replaced" };
+  const files = record.attachments.length;
+
+  return <div className="min-w-0 max-w-[60rem] pb-8">
+    <TopBarActions>
+      <SaveButton workspaceId={workspaceId} target={{ decisionId }} label="decision" />
+      {!editing && canEdit ? <Button ref={editButton} variant="secondary" onClick={startEdit}>Edit proposal</Button> : null}
+      {!editing && canFinalize ? <Button ref={finalizeButton} variant="primary" onClick={() => { finalize.reset(); setOverrideReason(""); setConfirming(true); }} disabled={!record.outcome?.trim() || !record.rationale?.trim()} title={!record.outcome?.trim() || !record.rationale?.trim() ? "Add an outcome and rationale before finalizing" : undefined}>Finalize decision</Button> : null}
+      {canSupersede ? <Button ref={supersedeButton} variant="secondary" onClick={() => setSuperseding(true)}>Supersede decision</Button> : null}
+      {!editing && canDelete ? <Button ref={deleteButton} variant="ghost" className="!text-danger" onClick={() => setDeleting(true)}>{record.status === "PROPOSED" ? "Delete proposal" : "Delete decision"}</Button> : null}
+    </TopBarActions>
+
+    <Link href={`/workspace/${workspaceId}/decisions`} className="mb-5 inline-flex min-h-9 items-center gap-2 text-sm font-medium text-brand-link hover:underline focus-visible:outline-2 focus-visible:outline-focus-ring lg:hidden"><ArrowLeft size={16} aria-hidden="true" /> Back to decisions</Link>
+
+    <article className="canopy-rise">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5">
+        <StatusPill tone={pill.tone}>{pill.label}</StatusPill>
+        {record.status === "DECIDED" ? <span className="text-xs font-medium text-success">Current decision</span> : null}
+        <span className="type-canopy-label min-w-0 text-xs tracking-[0.06em]">
+          Version {record.version} · from {record.sourceDiscussionId
+            ? <Link href={`/workspace/${workspaceId}/discussions/${record.sourceDiscussionId}`} className="font-sans normal-case tracking-normal text-brand-link hover:underline">{record.sourceDiscussionTitle}</Link>
+            : <span className="font-sans normal-case tracking-normal">{record.sourceDiscussionTitle} <span className="text-text-muted">(original discussion unavailable)</span></span>}
+        </span>
       </div>
-      {record.previousDecision ? <div className="border-b border-border-subtle py-4 text-sm text-text-secondary"><span className="font-semibold text-text-primary">Previous decision: </span><Link href={`/workspace/${workspaceId}/decisions/${record.previousDecision.id}`} className="wrap-anywhere font-medium text-brand-link underline-offset-2 hover:underline">{record.previousDecision.question}</Link></div> : null}
-      {record.supersession ? <div className="border-b border-border-subtle py-4 text-sm leading-6 text-text-secondary"><p><span className="font-semibold text-text-primary">Replaced by: </span>{record.replacementDecision ? <Link href={`/workspace/${workspaceId}/decisions/${record.replacementDecision.id}`} className="wrap-anywhere font-medium text-brand-link underline-offset-2 hover:underline">{record.replacementDecision.question}</Link> : "Replacement unavailable"}</p><p className="mt-2 whitespace-pre-wrap wrap-anywhere"><span className="font-semibold text-text-primary">Why: </span>{record.supersession.reason}</p><p className="mt-1 text-xs text-text-muted">Authorized by {record.supersession.authorizedByLabel} · <DecisionDate value={record.supersession.createdAt} /></p></div> : null}
+      <h1 ref={headingRef} tabIndex={-1} className="type-canopy-title mt-3 max-w-[22ch] text-[2.35rem] wrap-anywhere outline-none sm:text-[2.875rem]">{record.question}</h1>
+      <div className="mt-4 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-text-muted">
+        <UserAvatar name={record.createdByLabel} className="size-[26px] text-[10px]" />
+        <span className="font-medium text-text-primary">{record.createdByLabel}</span>
+        <span aria-hidden="true">·</span>
+        <span>proposed <time dateTime={new Date(record.createdAt).toISOString()} title={new Date(record.createdAt).toLocaleString()}>{timeAgo(record.createdAt)}</time></span>
+        {files ? <><span aria-hidden="true">·</span><span>{files} {files === 1 ? "file" : "files"}</span></> : null}
+      </div>
+      {record.decidedAt ? <p className="mt-2 text-[0.8125rem] text-text-secondary">Finalized {finalization ? <>by <strong className="font-medium text-text-primary">{finalization.actorLabel}</strong> · </> : null}<DecisionDate value={record.decidedAt} />{!finalization && revisions.hasNextPage ? " · Load more history to see who finalized it" : !finalization && !revisions.isLoading && !revisions.error ? " · Finalizer unavailable" : null}</p> : null}
+      {finalization?.overrideReason ? <p className="mt-3 whitespace-pre-wrap wrap-anywhere rounded-xl border-l-2 border-warning bg-surface-subtle px-3.5 py-2.5 text-sm text-text-secondary"><strong className="font-medium text-text-primary">Finalized before the review rule was met.</strong> {finalization.overrideReason}</p> : null}
+      {record.previousDecision ? <p className="mt-3 text-sm text-text-secondary"><span className="text-text-muted">Replaces </span><Link href={`/workspace/${workspaceId}/decisions/${record.previousDecision.id}`} className="wrap-anywhere font-medium text-brand-link hover:underline">{record.previousDecision.question}</Link></p> : null}
+      {record.supersession ? <div className="mt-5 rounded-2xl border border-border-subtle bg-status-replaced/50 px-5 py-4 text-sm leading-6 text-text-secondary">
+        <p><span className="font-medium text-on-status-replaced">Replaced by </span>{record.replacementDecision ? <Link href={`/workspace/${workspaceId}/decisions/${record.replacementDecision.id}`} className="wrap-anywhere font-medium text-brand-link hover:underline">{record.replacementDecision.question}</Link> : "Replacement unavailable"}</p>
+        <p className="mt-1.5 whitespace-pre-wrap wrap-anywhere"><span className="font-medium text-text-primary">Why: </span>{record.supersession.reason}</p>
+        <p className="mt-1 text-xs text-text-muted">Authorized by {record.supersession.authorizedByLabel} · <DecisionDate value={record.supersession.createdAt} /></p>
+      </div> : null}
       {decision.error && decision.data ? <p role="alert" className="mt-5 text-sm text-danger">This decision could not be refreshed. Check again before making changes.</p> : null}
-      {editing && canEdit ? <form onSubmit={onEdit} noValidate className="mt-8 space-y-4 border-l-2 border-brand-accent bg-surface-subtle px-4 py-5 sm:px-6">
-        <div><h2 className="text-lg font-semibold text-text-primary">Edit proposal</h2><p className="mt-1 text-sm text-text-secondary">Changes create a new revision. Finalized content cannot be edited.</p></div>
+
+      {editing && canEdit ? <form onSubmit={onEdit} noValidate className="mt-7 space-y-4 rounded-2xl border border-border-subtle bg-surface p-5 shadow-card sm:p-6">
+        <div><h2 className="font-serif text-[1.5rem] text-text-primary">Edit proposal</h2><p className="mt-1 text-sm text-text-secondary">Changes create a new revision. Finalized content cannot be edited.</p></div>
         <AttachmentComposer uploader={uploader} disabled={edit.isPending}>
           <DecisionFields prefix="edit-decision" register={form.register} errors={form.formState.errors} disabled={edit.isPending} />
         </AttachmentComposer>
         {filesProblem ? <p role="alert" className="text-sm text-danger">{filesProblem}</p> : null}
         {edit.error ? <div role="alert" className="text-sm text-danger">{decisionError(edit.error, "Could not save changes. Your draft is still here.")}{edit.error.data?.code === "CONFLICT" ? <button type="button" onClick={() => void decision.refetch()} className="ml-2 font-semibold underline">Refresh latest version (then cancel to reopen the editor)</button> : null}</div> : null}
-        <div className="flex flex-wrap gap-2 border-t border-border-subtle pt-4"><button type="submit" disabled={edit.isPending || form.formState.isSubmitting} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">{edit.isPending ? "Saving..." : "Save revision"}</button><button type="button" disabled={edit.isPending} onClick={stopEdit} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Cancel</button></div>
+        <div className="flex flex-wrap gap-2 border-t border-border-subtle pt-4"><Button type="submit" variant="primary" disabled={edit.isPending || form.formState.isSubmitting}>{edit.isPending ? "Saving..." : "Save revision"}</Button><Button variant="ghost" disabled={edit.isPending} onClick={stopEdit}>Cancel</Button></div>
       </form> : <>
-        <div className="mt-8"><DecisionSection title={record.status === "PROPOSED" ? "Proposed outcome" : "Outcome"}>{record.outcome || <span className="text-text-muted">Not recorded yet.</span>}</DecisionSection><DecisionSection title="Rationale">{record.rationale || <span className="text-text-muted">Not recorded yet.</span>}</DecisionSection>{record.alternatives ? <DecisionSection title="Alternatives considered">{record.alternatives}</DecisionSection> : null}{record.followUp ? <DecisionSection title="Follow-up notes">{record.followUp}</DecisionSection> : null}{record.attachments.length ? <DecisionSection title="Files"><Attachments attachments={record.attachments} /></DecisionSection> : null}</div>
-        {canEdit || canFinalize || canSupersede || canDelete ? <div className="flex flex-wrap gap-2 border-t border-border-subtle pt-5">{canEdit ? <button ref={editButton} type="button" onClick={startEdit} className="min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Edit proposal</button> : null}{canFinalize ? <button ref={finalizeButton} type="button" onClick={() => { finalize.reset(); setOverrideReason(""); setConfirming(true); }} disabled={!record.outcome?.trim() || !record.rationale?.trim()} title={!record.outcome?.trim() || !record.rationale?.trim() ? "Add an outcome and rationale before finalizing" : undefined} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60">Finalize decision</button> : null}{canSupersede ? <button ref={supersedeButton} type="button" onClick={() => setSuperseding(true)} className="min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Supersede decision</button> : null}{canDelete ? <button ref={deleteButton} type="button" onClick={() => setDeleting(true)} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-danger hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring sm:ml-auto">{record.status === "PROPOSED" ? "Delete proposal" : "Delete decision"}</button> : null}</div> : null}
+        <div className="mt-7 rounded-2xl border border-callout-line bg-callout px-6 py-5">
+          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-brand-link">{record.status === "PROPOSED" ? "Proposed outcome" : "Outcome"}</p>
+          <div className="mt-2 text-[1.25rem] leading-snug text-text-primary">{record.outcome ? <Markdown text={record.outcome} /> : <span className="text-base text-text-muted">Not recorded yet.</span>}</div>
+        </div>
+        <div className={`mt-7 grid gap-7 ${record.alternatives ? "md:grid-cols-2" : ""}`}>
+          <section aria-labelledby="rationale-heading"><SectionLabel as="h3" id="rationale-heading">Rationale</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary">{record.rationale ? <Markdown text={record.rationale} /> : <span className="text-text-muted">Not recorded yet.</span>}</div></section>
+          {record.alternatives ? <section aria-labelledby="alternatives-heading"><SectionLabel as="h3" id="alternatives-heading">Alternatives considered</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary"><Markdown text={record.alternatives} /></div></section> : null}
+        </div>
+        {record.followUp ? <section aria-labelledby="follow-up-heading" className="mt-7"><SectionLabel as="h3" id="follow-up-heading">Follow-up notes</SectionLabel><div className="mt-2.5 leading-relaxed text-text-secondary"><Markdown text={record.followUp} /></div></section> : null}
+        {files ? <section aria-labelledby="files-heading" className="mt-7"><SectionLabel as="h3" id="files-heading">Files · {files}</SectionLabel><Attachments attachments={record.attachments} /></section> : null}
       </>}
     </article>
     {superseding && canSupersede ? <SupersedeDecisionDialog workspaceId={workspaceId} oldDecision={{ id: record.id, question: record.question, version: record.version }} onClose={() => { setSuperseding(false); requestAnimationFrame(() => supersedeButton.current?.focus()); }} /> : null}
@@ -185,7 +224,7 @@ function DecisionContent({ workspaceId, decisionId }: { workspaceId: string; dec
     {record.status === "PROPOSED" || reviews.data?.reviews.length ? <DecisionReviews workspaceId={workspaceId} decisionId={decisionId} authorId={record.createdById} /> : null}
     <ReplacementHistory workspaceId={workspaceId} decisionId={decisionId} history={replacementHistory} />
     <RevisionHistory workspaceId={workspaceId} decisionId={decisionId} />
-  </main>;
+  </div>;
 }
 
 export default function DecisionDetailPage() {

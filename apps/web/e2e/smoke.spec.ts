@@ -98,7 +98,7 @@ test("a new user registers, records a decision from a discussion and signs out",
     // The grouped list sits beside the record (Decisions v2).
     const rail = page.getByRole("navigation", { name: "Decision list" });
     await expect(rail.getByRole("link", { name: question })).toHaveAttribute("aria-current", "page");
-    await page.getByRole("link", { name: "Back to decisions" }).click();
+    await page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Decisions" }).click();
     await expect(rail.getByRole("region", { name: /^Proposals/ }).getByRole("link", { name: question })).toBeVisible();
   });
 
