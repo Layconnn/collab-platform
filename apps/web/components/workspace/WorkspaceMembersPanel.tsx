@@ -23,7 +23,6 @@ import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 import { ErrorState } from "@/components/common/StateNotice";
 import { UserAvatar } from "@/components/common/UserAvatar";
 import { resolveUserIdentity } from "@/lib/user-identity";
-import { workspaceInitials } from "@/lib/workspace-identity";
 import { floatPanelClasses, menuItemClasses } from "@/components/ui/overlay";
 
 type Member =
@@ -47,10 +46,10 @@ function memberDate(value: Date | string): string {
 
 function roleStyle(role: Member["role"]): string {
   return role === "OWNER"
-    ? "bg-warning/10 text-warning"
+    ? "bg-status-proposal text-on-status-proposal"
     : role === "ADMIN"
-      ? "bg-info/10 text-info"
-      : "bg-surface-subtle text-text-secondary";
+      ? "bg-status-decided text-on-status-decided"
+      : "bg-surface-active text-text-secondary";
 }
 
 export function WorkspaceMembersPanel({
@@ -213,36 +212,17 @@ export function WorkspaceMembersPanel({
     );
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] min-w-0 space-y-8 pb-10">
-      <header className="border-b border-border-subtle pb-7">
-        <Link
-          href={`/workspace/${workspaceId}`}
-          className="inline-flex min-h-9 max-w-full min-w-0 items-center gap-1.5 wrap-anywhere text-xs font-semibold text-brand-link hover:text-brand-link-hover focus-visible:outline-2 focus-visible:outline-focus-ring"
-        >
-          <ArrowLeft size={14} aria-hidden="true" /> {workspace.data.name}
-        </Link>
-        <div className="mt-4 flex min-w-0 items-start gap-4">
-          <span
-            aria-hidden="true"
-            className="grid size-12 shrink-0 place-items-center rounded-sm bg-brand-action text-sm font-semibold text-on-brand-action"
-          >
-            {workspaceInitials(workspace.data.name)}
-          </span>
-          <div className="min-w-0">
-            <h1 className="text-[1.7rem] font-semibold leading-tight text-text-primary sm:text-[2rem]">
-              Members
-            </h1>
-            <p className="mt-1 break-all text-xs text-text-muted">
-              /{workspace.data.slug}
-            </p>
-          </div>
-        </div>
-        <p className="mt-4 max-w-[60ch] text-sm leading-6 text-text-secondary">
-          The people who can contribute to this workspace and the roles they
-          hold.
+    <div className="w-full min-w-0 space-y-8 pb-10">
+      <header className="canopy-rise border-b border-border-subtle pb-7">
+        <p className="type-canopy-label m-0 text-xs tracking-[0.06em]">
+          <Link href={`/workspace/${workspaceId}`} className="wrap-anywhere font-sans normal-case tracking-normal text-brand-link hover:underline focus-visible:outline-2 focus-visible:outline-focus-ring">{workspace.data.name}</Link>
+          {" · "}/{workspace.data.slug}
+        </p>
+        <h1 className="type-canopy-title mt-2 text-[2.35rem] sm:text-[2.875rem]">Members</h1>
+        <p className="mt-3 max-w-[60ch] text-[0.8125rem] leading-6 text-text-muted">
+          The people who can contribute to this workspace and the roles they hold.
         </p>
       </header>
-
       {rosterDenied ? (
         <div className="max-w-2xl space-y-5">
           <ErrorState
@@ -283,23 +263,15 @@ export function WorkspaceMembersPanel({
           </button>
         </div>
       ) : (
-        <div className="grid min-w-0 items-start gap-9 xl:grid-cols-[minmax(0,1fr)_19rem] xl:gap-12">
+        <div className="flex min-w-0 flex-col gap-8 min-[1100px]:flex-row min-[1100px]:items-start min-[1100px]:gap-0">
           <section
             aria-labelledby="member-directory-heading"
-            className="min-w-0"
+            className="min-w-0 flex-1 min-[1100px]:pr-10"
           >
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase text-brand-link">
-                  Workspace directory
-                </p>
-                <h2
-                  id="member-directory-heading"
-                  className="mt-1 text-lg font-semibold text-text-primary"
-                >
-                  People
-                </h2>
-              </div>
+            <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3">
+              <h2 id="member-directory-heading" className="type-canopy-label m-0">
+                People
+              </h2>
               <span className="text-xs font-medium text-text-muted">
                 {allMembers.length}
                 {members.hasNextPage ? "+" : ""}{" "}
@@ -311,7 +283,7 @@ export function WorkspaceMembersPanel({
             {actionError ? (
               <p
                 role="alert"
-                className="mb-4 border-l-2 border-danger bg-surface-subtle px-3 py-2.5 text-sm text-danger"
+                className="mb-4 rounded-[10px] border-l-2 border-danger bg-surface-subtle px-3 py-2.5 text-sm text-danger"
               >
                 {actionError}
               </p>
@@ -319,7 +291,7 @@ export function WorkspaceMembersPanel({
             {actionStatus ? (
               <p
                 role="status"
-                className="mb-4 border-l-2 border-success bg-surface-subtle px-3 py-2.5 text-sm text-text-primary"
+                className="mb-4 rounded-[10px] border-l-2 border-success bg-callout px-3 py-2.5 text-sm text-text-primary"
               >
                 {actionStatus}
               </p>
@@ -344,11 +316,11 @@ export function WorkspaceMembersPanel({
               </div>
             ) : null}
             {allMembers.length === 0 ? (
-              <p className="border-y border-border-subtle py-8 text-sm text-text-secondary">
+              <p className="rounded-2xl border border-dashed border-border px-5 py-8 text-sm text-text-secondary">
                 No members are available right now.
               </p>
             ) : (
-              <ul className="border-t border-border-subtle">
+              <ul aria-label="Members" className="canopy-rise overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-card">
                 {allMembers.map((member) => {
                   const identity = resolveUserIdentity(member.user);
                   const mayRemove =
@@ -358,14 +330,14 @@ export function WorkspaceMembersPanel({
                   return (
                     <li
                       key={member.id}
-                      className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border-subtle py-3.5 sm:flex-nowrap sm:gap-4"
+                      className="canopy-row flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 border-t border-border-subtle px-4 py-3.5 first:border-t-0 hover:bg-surface-subtle sm:flex-nowrap sm:gap-4 sm:px-5"
                     >
                       <UserAvatar
                         name={identity.avatarName}
-                        className="size-10"
+                        className="size-9"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="wrap-anywhere text-sm font-semibold leading-5 text-text-primary">
+                        <p className="wrap-anywhere text-sm font-medium leading-5 text-text-primary">
                           {identity.label}
                           {member.userId === user?.id ? (
                             <span className="ml-2 text-xs font-normal text-text-muted">
@@ -404,14 +376,14 @@ export function WorkspaceMembersPanel({
                                 event.target.value as "ADMIN" | "MEMBER",
                               )
                             }
-                            className="h-10 rounded-sm border border-control-border bg-surface px-2 text-xs font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+                            className="h-9 rounded-[9px] border border-control-border bg-surface px-2.5 text-xs font-medium text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                           >
                             <option value="MEMBER">Member</option>
                             <option value="ADMIN">Admin</option>
                           </select>
                         ) : (
                           <span
-                            className={`inline-flex min-h-8 items-center rounded-sm px-2 text-xs font-semibold ${roleStyle(member.role)}`}
+                            className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${roleStyle(member.role)}`}
                           >
                             {member.role.charAt(0) +
                               member.role.slice(1).toLowerCase()}
@@ -436,7 +408,7 @@ export function WorkspaceMembersPanel({
                                   removeMember.isPending ||
                                   transferOwnership.isPending
                                 }
-                                className="grid size-10 place-items-center rounded-sm text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+                                className="grid size-9 place-items-center rounded-lg text-text-muted hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
                               >
                                 <Ellipsis size={18} aria-hidden="true" />
                               </button>
@@ -499,17 +471,15 @@ export function WorkspaceMembersPanel({
               </button>
             ) : null}
           </section>
-          <aside className="min-w-0 space-y-6 border-t border-border-subtle pt-6 xl:border-l xl:border-t-0 xl:pl-7 xl:pt-0">
+          <aside aria-label="Add people" className="canopy-rise min-w-0 space-y-6 border-border-subtle text-sm max-[1099px]:border-t max-[1099px]:pt-7 min-[1100px]:w-[22rem] min-[1100px]:shrink-0 min-[1100px]:border-l min-[1100px]:pl-7">
             {workspace.data?.viewerRole === "OWNER" || workspace.data?.viewerRole === "ADMIN" ? (
               <div className="border-b border-border-subtle pb-6">
                 <InviteLinks workspaceId={workspaceId} />
               </div>
             ) : null}
             <div>
-              <p className="text-xs font-semibold uppercase text-brand-link">
-                Participation
-              </p>
-              <h2 className="mt-1 text-lg font-semibold text-text-primary">
+              <p className="type-canopy-label m-0">Participation</p>
+              <h2 className="mt-1.5 font-serif text-[1.375rem] leading-tight text-text-primary">
                 Add a teammate
               </h2>
               <p className="mt-2 text-sm leading-6 text-text-secondary">
@@ -563,7 +533,7 @@ export function WorkspaceMembersPanel({
             event.preventDefault();
             closeConfirm();
           }}
-          className="w-[min(30rem,calc(100vw-2rem))] max-w-none rounded-sm border border-border bg-surface p-0 text-text-primary shadow-xl backdrop:bg-black/55"
+          className="canopy-panel canopy-pop m-auto w-[min(30rem,calc(100vw-2rem))] max-w-none rounded-2xl border border-border bg-surface p-0 text-text-primary shadow-float backdrop:bg-[var(--scrim)] backdrop:backdrop-blur-[3px]"
         >
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-brand-link">
@@ -572,11 +542,9 @@ export function WorkspaceMembersPanel({
               ) : (
                 <UsersRound size={20} aria-hidden="true" />
               )}
-              <span className="text-xs font-semibold uppercase">
-                Workspace membership
-              </span>
+              <span className="type-canopy-label">Workspace membership</span>
             </div>
-            <h2 className="mt-4 text-lg font-semibold text-text-primary">
+            <h2 className="mt-3 font-serif text-[1.625rem] leading-tight text-text-primary">
               {confirm.kind === "transfer"
                 ? "Transfer ownership?"
                 : "Remove this member?"}
@@ -597,7 +565,7 @@ export function WorkspaceMembersPanel({
                 type="button"
                 onClick={closeConfirm}
                 disabled={removeMember.isPending || transferOwnership.isPending}
-                className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
+                className="inline-flex min-h-9 items-center justify-center rounded-[9px] px-3.5 text-[0.8125rem] font-medium text-text-secondary hover:bg-surface-hover hover:text-text-primary focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -605,7 +573,7 @@ export function WorkspaceMembersPanel({
                 type="button"
                 onClick={() => void confirmMutation()}
                 disabled={removeMember.isPending || transferOwnership.isPending}
-                className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-sm px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 ${confirm.kind === "remove" ? "bg-danger-action text-on-danger-action hover:opacity-90" : "bg-brand-action text-on-brand-action hover:bg-brand-action-hover"}`}
+                className={`inline-flex min-h-9 items-center justify-center gap-2 rounded-[9px] px-3.5 text-[0.8125rem] font-medium focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60 ${confirm.kind === "remove" ? "bg-danger-action text-on-danger-action hover:opacity-90" : "bg-brand-action text-on-brand-action hover:bg-brand-action-hover"}`}
               >
                 {removeMember.isPending || transferOwnership.isPending ? (
                   <LoaderCircle

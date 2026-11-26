@@ -12,7 +12,7 @@ type Created = { url: string; role: "MEMBER" | "ADMIN"; expiresAt: Date | string
 const dateLabel = (value: Date | string) =>
   new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
 
-const field = "mt-1.5 min-h-11 w-full rounded-sm border border-control-border bg-surface px-3 text-sm text-text-primary focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60";
+const field = "mt-1.5 min-h-10 w-full rounded-[9px] border border-control-border bg-surface px-3 text-sm text-text-primary focus-visible:border-brand-link focus-visible:outline-2 focus-visible:outline-focus-ring disabled:opacity-60";
 
 // Invite links PRD (FR-1 to FR-4): managers create links to share, see who
 // used them and when they end, and revoke them. A link is shown once.
@@ -53,11 +53,11 @@ export function InviteLinks({ workspaceId }: { workspaceId: string }) {
 
   return <div className="space-y-4">
     <div>
-      <p className="text-xs font-semibold uppercase text-brand-link">Invite</p>
-      <h2 className="mt-1 text-lg font-semibold text-text-primary">Invite with a link</h2>
+      <p className="type-canopy-label m-0">Invite</p>
+      <h2 className="mt-1.5 font-serif text-[1.375rem] leading-tight text-text-primary">Invite with a link</h2>
       <p className="mt-2 text-sm leading-6 text-text-secondary">Anyone with the link can join, with or without a Commons account, until it expires or you revoke it.</p>
     </div>
-    <button type="button" onClick={openDialog} className="inline-flex min-h-11 items-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
+    <button type="button" onClick={openDialog} className="inline-flex min-h-10 items-center gap-2 rounded-[9px] bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
       <Plus size={16} aria-hidden="true" /> Invite people
     </button>
 
@@ -70,7 +70,7 @@ export function InviteLinks({ workspaceId }: { workspaceId: string }) {
           <div className="min-w-0 flex-1">
             <p className="flex min-w-0 flex-wrap items-center gap-2 text-sm font-semibold text-text-primary">
               <span className="truncate">{invite.name ?? "Invite link"}</span>
-              <span className={`rounded-sm px-1.5 py-0.5 text-[11px] font-semibold ${invite.role === "ADMIN" ? "bg-warning/15 text-warning" : "bg-surface-subtle text-text-secondary"}`}>{invite.role === "ADMIN" ? "Admin" : "Member"}</span>
+              <span className={`rounded-[9px] px-1.5 py-0.5 text-[11px] font-semibold ${invite.role === "ADMIN" ? "bg-warning/15 text-warning" : "bg-surface-subtle text-text-secondary"}`}>{invite.role === "ADMIN" ? "Admin" : "Member"}</span>
             </p>
             <p className="mt-0.5 text-xs leading-5 text-text-muted">
               {invite.maxUses ? `${invite.uses} of ${invite.maxUses} joined` : `${invite.uses} joined`}
@@ -78,12 +78,12 @@ export function InviteLinks({ workspaceId }: { workspaceId: string }) {
               {" · "}by {invite.createdBy}
             </p>
           </div>
-          {invite.status === "ACTIVE" && confirming !== invite.id ? <button type="button" onClick={() => setConfirming(invite.id)} aria-label={`Revoke ${invite.name ?? "invite link"}`} className="min-h-9 shrink-0 rounded-sm px-2 text-xs font-semibold text-danger hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Revoke</button> : null}
+          {invite.status === "ACTIVE" && confirming !== invite.id ? <button type="button" onClick={() => setConfirming(invite.id)} aria-label={`Revoke ${invite.name ?? "invite link"}`} className="min-h-9 shrink-0 rounded-[9px] px-2 text-xs font-semibold text-danger hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus-ring">Revoke</button> : null}
         </div>
         {confirming === invite.id ? <div role="group" aria-label="Confirm revoking" className="mt-2 flex flex-wrap items-center gap-2 pl-6 text-xs">
           <span className="text-text-secondary">The link stops working at once.</span>
-          <button type="button" autoFocus disabled={revoke.isPending} onClick={() => revoke.mutate({ workspaceId, inviteId: invite.id }, { onSuccess: () => setConfirming(null) })} className="min-h-9 rounded-sm bg-danger px-3 font-semibold text-white disabled:opacity-60">{revoke.isPending ? "Revoking..." : "Revoke link"}</button>
-          <button type="button" onClick={() => setConfirming(null)} className="min-h-9 rounded-sm px-2 font-semibold text-text-secondary hover:bg-surface-hover">Keep</button>
+          <button type="button" autoFocus disabled={revoke.isPending} onClick={() => revoke.mutate({ workspaceId, inviteId: invite.id }, { onSuccess: () => setConfirming(null) })} className="min-h-9 rounded-[9px] bg-danger px-3 font-semibold text-white disabled:opacity-60">{revoke.isPending ? "Revoking..." : "Revoke link"}</button>
+          <button type="button" onClick={() => setConfirming(null)} className="min-h-9 rounded-[9px] px-2 font-semibold text-text-secondary hover:bg-surface-hover">Keep</button>
         </div> : null}
       </li>)}
     </ul> : null}
@@ -94,13 +94,13 @@ export function InviteLinks({ workspaceId }: { workspaceId: string }) {
         <label className="block text-sm font-semibold text-text-primary" htmlFor="invite-url">Link</label>
         <div className="flex min-w-0 gap-2">
           <input id="invite-url" readOnly value={created.url} onFocus={(event) => event.target.select()} className={`${field} mt-0 min-w-0 flex-1 font-mono text-xs`} />
-          <button type="button" data-invite-copy onClick={() => void copy()} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
+          <button type="button" data-invite-copy onClick={() => void copy()} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-[9px] bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover focus-visible:outline-2 focus-visible:outline-focus-ring">
             {copied === "copied" ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />} {copied === "copied" ? "Copied" : "Copy"}
           </button>
         </div>
         <p role="status" className="text-sm text-text-secondary">{copied === "failed" ? "Could not copy. Select the link and copy it yourself." : copied === "copied" ? "Copied. Paste it wherever your team talks." : ""}</p>
         <p className="border-l-2 border-warning px-3 text-sm leading-6 text-text-secondary"><strong className="text-text-primary">Copy it now.</strong> For safety, Commons does not show this link again. People join as {created.role === "ADMIN" ? "admins" : "members"} until {dateLabel(created.expiresAt)}.</p>
-        <div className="flex justify-end"><button type="button" onClick={() => setOpen(false)} className="min-h-11 rounded-sm border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover">Done</button></div>
+        <div className="flex justify-end"><button type="button" onClick={() => setOpen(false)} className="min-h-10 rounded-[9px] border border-border px-4 text-sm font-semibold text-text-primary hover:bg-surface-hover">Done</button></div>
       </div> : <form onSubmit={onCreate} className="space-y-4" noValidate>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-semibold text-text-primary">Join as
@@ -127,8 +127,8 @@ export function InviteLinks({ workspaceId }: { workspaceId: string }) {
         {role === "ADMIN" ? <p className="border-l-2 border-warning px-3 text-sm text-text-secondary">People who join with this link can manage members, discussions and decisions.</p> : null}
         {create.error ? <p role="alert" className="text-sm text-danger">{create.error.message.includes("up to 20") ? create.error.message : "Could not create the link. Try again."}</p> : null}
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <button type="button" onClick={() => setOpen(false)} disabled={create.isPending} className="min-h-11 rounded-sm px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover">Cancel</button>
-          <button type="submit" disabled={create.isPending || limitInvalid} className="min-h-11 rounded-sm bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover disabled:opacity-60">{create.isPending ? "Creating..." : "Create link"}</button>
+          <button type="button" onClick={() => setOpen(false)} disabled={create.isPending} className="min-h-10 rounded-[9px] px-4 text-sm font-semibold text-text-secondary hover:bg-surface-hover">Cancel</button>
+          <button type="submit" disabled={create.isPending || limitInvalid} className="min-h-10 rounded-[9px] bg-brand-action px-4 text-sm font-semibold text-on-brand-action hover:bg-brand-action-hover disabled:opacity-60">{create.isPending ? "Creating..." : "Create link"}</button>
         </div>
       </form>}
     </Modal> : null}
