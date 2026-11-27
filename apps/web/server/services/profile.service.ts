@@ -1,6 +1,11 @@
+import { randomBytes } from "node:crypto";
+
 import {
+  PHOTO_LIMITS,
   usernameSchema,
   type ChangeUsernameInput,
+  type PhotoUploadInput,
+  type SetPhotoInput,
   type UpdateProfileInput,
   type UsernameAvailableInput,
 } from "@repo/validators/auth";
@@ -8,6 +13,7 @@ import {
 import { Prisma } from "../../app/generated/prisma/client";
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
+import { configuredStorage, type FileStorage } from "./files/storage";
 import { invalidateMembershipCaches } from "./workspace.service";
 
 // Your profile in Settings (settings PRD, FR-1 and FR-2): the name teammates
@@ -27,6 +33,20 @@ export function usernameChangeableAt(changedAt: Date | null, now = new Date()): 
 async function refreshMemberLists(userId: string) {
   const memberships = await prisma.workspaceMember.findMany({ where: { userId }, select: { workspaceId: true } });
   await Promise.all(memberships.map((membership) => invalidateMembershipCaches(membership.workspaceId, userId)));
+}
+
+const PHOTO_UPLOAD_SECONDS = 300;
+
+// A WebP file starts "RIFF", four size bytes, then "WEBP"; a JPEG with FF D8 FF.
+function matchesType(key: string, bytes: Uint8Array) {
+  const text = (from: number, to: number) => String.fromCharCode(...bytes.slice(from, to));
+  if (key.endsWith(".jpg")) return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  return bytes.length >= 12 && text(0, 4) === "RIFF" && text(8, 12) === "WEBP";
+}
+
+function requireStorage(storage: FileStorage | null): FileStorage {
+  if (!storage) throw new AppError("BAD_REQUEST", "Photos are not available right now.");
+  return storage;
 }
 
 export const profileService = {
@@ -76,5 +96,38 @@ export const profileService = {
     }
     await refreshMemberLists(userId);
     return { username: input.username, usernameChangedAt: now };
+  },
+
+  // A signed URL for the cropped photo (FR-3). The key is random and under
+  // the person's own folder; nothing points at it until setPhoto checks it.
+  async createPhotoUpload(userId: string, input: PhotoUploadInput, storage: FileStorage | null = configuredStorage()) {
+    const store = requireStorage(storage);
+    const key = `avatars/${userId}/${randomBytes(16).toString("hex")}.${input.contentType === "image/jpeg" ? "jpg" : "webp"}`;
+    const upload = await store.signUpload(key, { contentType: input.contentType, size: input.size }, PHOTO_UPLOAD_SECONDS);
+    return { key, uploadUrl: upload.url, headers: upload.headers };
+  },
+
+  async setPhoto(userId: string, input: SetPhotoInput, storage: FileStorage | null = configuredStorage()) {
+    const store = requireStorage(storage);
+    if (!input.key.startsWith(`avatars/${userId}/`)) throw new AppError("FORBIDDEN", "That photo isn't yours.");
+    const stored = await store.head(input.key);
+    if (!stored) throw new AppError("BAD_REQUEST", "The photo didn't finish uploading. Try again.");
+    if (stored.size > PHOTO_LIMITS.maxBytes || !matchesType(input.key, await store.readStart(input.key, 12))) {
+      await store.delete(input.key);
+      throw new AppError("BAD_REQUEST", "That photo couldn't be used. Try another image.");
+    }
+    const previous = await prisma.user.findUnique({ where: { id: userId }, select: { avatarKey: true } });
+    await prisma.user.update({ where: { id: userId }, data: { avatarKey: input.key } });
+    if (previous?.avatarKey && previous.avatarKey !== input.key) await store.delete(previous.avatarKey).catch(() => undefined);
+    await refreshMemberLists(userId);
+    return { avatarKey: input.key };
+  },
+
+  async removePhoto(userId: string, storage: FileStorage | null = configuredStorage()) {
+    const previous = await prisma.user.findUnique({ where: { id: userId }, select: { avatarKey: true } });
+    await prisma.user.update({ where: { id: userId }, data: { avatarKey: null } });
+    if (previous?.avatarKey && storage) await storage.delete(previous.avatarKey).catch(() => undefined);
+    await refreshMemberLists(userId);
+    return { avatarKey: null };
   },
 };

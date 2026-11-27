@@ -199,7 +199,7 @@ export default function DiscussionDetailPage() {
             <p className="type-canopy-label m-0 text-xs tracking-[0.06em]">Discussion · opened <time dateTime={createdAt.toISOString()} title={dateLabel(createdAt)}>{timeAgo(createdAt)}</time></p>
             <h1 className="type-canopy-title mt-2 text-[2.35rem] wrap-anywhere sm:text-[2.875rem]">{discussion.data.title}</h1>
             <div className="mt-4 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1 text-[0.8125rem] text-text-muted">
-              <UserAvatar name={author.avatarName} className="size-[26px] text-[10px]" />
+              <UserAvatar name={author.avatarName} photo={author.photo} className="size-[26px] text-[10px]" />
               <span className="font-medium text-text-primary">{author.label}</span>
               {replies !== undefined ? <><span aria-hidden="true">·</span><span>{replies} {replies === 1 ? "reply" : "replies"}</span></> : null}
               {files ? <><span aria-hidden="true">·</span><span>{files} {files === 1 ? "file" : "files"}</span></> : null}

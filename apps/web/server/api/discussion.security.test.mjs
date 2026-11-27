@@ -378,7 +378,7 @@ test("2. Workspace member can create discussion -> 200", async () => {
   assert.equal(created.author.id, memberUserId);
   assert.equal(created.author.name, "Member One");
   assert.equal(created.author.username, "member_002");
-  assert.deepEqual(Object.keys(created.author).sort(), ["id", "name", "username"]);
+  assert.deepEqual(Object.keys(created.author).sort(), ["avatarKey", "id", "name", "username"]);
   assert.equal(created.title, "Member create");
 });
 
@@ -705,7 +705,7 @@ test("12. Cursor from other workspace cannot leak results or behavior", async ()
     assert.equal(item.workspaceId, workspaceId);
     assert.notEqual(item.id, makeCuid(1203));
     assert.equal(typeof item.author.username, "string");
-    assert.deepEqual(Object.keys(item.author).sort(), ["id", "name", "username"]);
+    assert.deepEqual(Object.keys(item.author).sort(), ["avatarKey", "id", "name", "username"]);
   }
 });
 

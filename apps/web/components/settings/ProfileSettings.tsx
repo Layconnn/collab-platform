@@ -3,12 +3,13 @@
 import { Check, LoaderCircle, X } from "lucide-react";
 import { useEffect, useId, useState, type FormEvent } from "react";
 
+import { ProfilePhoto } from "@/components/settings/ProfilePhoto";
 import { SettingsHeader } from "@/components/settings/SettingsFrame";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc/api-client";
 
-// Profile (settings PRD, FR-1 and FR-2): the name teammates see and the
+// Profile (settings PRD, FR-1 to FR-3): the photo and name teammates see and the
 // username they mention you by. Availability is checked as you type.
 
 const COOLDOWN_DAYS = 30;
@@ -36,6 +37,7 @@ export function ProfileSettings() {
   return <div className="min-w-0 max-w-[40rem]">
     <SettingsHeader title="Profile" intro="How you appear to teammates in every workspace." back={{ href: "/settings/account", label: "Your account" }} />
     {user ? <>
+      <ProfilePhoto name={user.name?.trim() || user.username} photo={user.avatarKey ?? null} />
       <NameForm current={user.name ?? ""} username={user.username} />
       <UsernameForm current={user.username} changedAt={user.usernameChangedAt ? new Date(user.usernameChangedAt) : null} />
     </> : null}

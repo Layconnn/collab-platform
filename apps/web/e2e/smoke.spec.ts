@@ -41,6 +41,19 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect(page.getByRole("main").getByText(`smoke_${id}`, { exact: true })).toBeVisible();
   });
 
+  await test.step("add a profile photo", async () => {
+    // Settings PRD, FR-3: crop in the browser, upload, and serve it back.
+    const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
+    await page.goto("/settings/account/profile");
+    await page.locator('input[type="file"]').setInputFiles({ name: "me.png", mimeType: "image/png", buffer: png });
+    const crop = page.getByRole("dialog", { name: "Crop your photo" });
+    await crop.getByRole("button", { name: "Save photo" }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Photo saved." })).toBeVisible();
+    const photo = page.getByRole("region", { name: "Photo" }).locator("img");
+    await expect.poll(() => photo.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBe(256);
+    await page.goto("/workspace");
+  });
+
   await test.step("create a workspace", async () => {
     await page.getByRole("main").getByRole("button", { name: "Create a workspace" }).click();
     const dialog = page.getByRole("dialog", { name: "Create a workspace" });

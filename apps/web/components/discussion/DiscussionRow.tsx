@@ -55,7 +55,7 @@ export function DiscussionRow({
   return (
     <li className="canopy-row group/row relative min-w-0 border-t border-border-subtle first:border-t-0 hover:bg-surface-subtle focus-within:bg-surface-subtle">
       <div className="flex min-w-0 items-start gap-3 px-4 py-3.5 sm:items-center sm:px-5">
-        <UserAvatar name={author.avatarName} className="mt-0.5 size-8 sm:mt-0" />
+        <UserAvatar name={author.avatarName} photo={author.photo} className="mt-0.5 size-8 sm:mt-0" />
         <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-5">
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">

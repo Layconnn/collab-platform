@@ -69,6 +69,7 @@ async function resolveMentionUserIds(
       user: {
         select: {
           username: true,
+          avatarKey: true,
         },
       },
     },
@@ -433,7 +434,7 @@ export const notificationService = {
       metadata: Prisma.JsonValue | null;
       readAt: Date | null;
       createdAt: Date;
-      actor: { id: string; name: string | null; username: string | null } | null;
+      actor: { id: string; name: string | null; username: string | null; avatarKey?: string | null } | null;
     }>
   > {
     const rows = await prisma.notification.findMany({
@@ -467,6 +468,7 @@ export const notificationService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
       },

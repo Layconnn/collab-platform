@@ -17,6 +17,9 @@ vi.mock("@/lib/trpc/api-client", () => ({
   trpc: {
     useUtils: () => ({ auth: { me: { invalidate: vi.fn() } } }),
     profile: {
+      removePhoto: { useMutation: () => ({ mutate: vi.fn(), isPending: false, error: null }) },
+      photoUpload: { useMutation: () => ({ mutateAsync: vi.fn() }) },
+      setPhoto: { useMutation: () => ({ mutateAsync: vi.fn() }) },
       update: { useMutation: () => ({ mutate: mocks.update, reset: vi.fn(), isPending: false, isSuccess: false, error: null }) },
       changeUsername: { useMutation: () => ({ mutate: mocks.change, reset: vi.fn(), isPending: false, isSuccess: false, error: null, data: undefined }) },
       usernameAvailable: {

@@ -334,6 +334,7 @@ export function WorkspaceMembersPanel({
                     >
                       <UserAvatar
                         name={identity.avatarName}
+                        photo={identity.photo}
                         className="size-9"
                       />
                       <div className="min-w-0 flex-1">

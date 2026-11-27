@@ -63,7 +63,7 @@ export function DiscussionContext({ workspaceId, discussionId, files, canPropose
         {people.map((person) => {
           const identity = resolveUserIdentity(person);
           return <li key={person.id} className="flex min-w-0 items-center gap-2.5">
-            <UserAvatar name={identity.avatarName} className="size-6 text-[10px]" />
+            <UserAvatar name={identity.avatarName} photo={identity.photo} className="size-6 text-[10px]" />
             <span className="min-w-0 flex-1 truncate text-text-primary">{identity.label}</span>
             <span className="shrink-0 text-text-muted">{person.author ? "Author" : plural(person.replies, "reply", "replies")}</span>
           </li>;
