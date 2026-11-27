@@ -420,7 +420,8 @@ export const ModelName = {
   WorkspaceInviteUse: 'WorkspaceInviteUse',
   DiscussionRevision: 'DiscussionRevision',
   CommentRevision: 'CommentRevision',
-  UserPreference: 'UserPreference'
+  UserPreference: 'UserPreference',
+  WorkspaceNotificationLevel: 'WorkspaceNotificationLevel'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent" | "attachment" | "deletedFile" | "workspaceInvite" | "workspaceInviteUse" | "discussionRevision" | "commentRevision" | "userPreference"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent" | "attachment" | "deletedFile" | "workspaceInvite" | "workspaceInviteUse" | "discussionRevision" | "commentRevision" | "userPreference" | "workspaceNotificationLevel"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2216,6 +2217,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WorkspaceNotificationLevel: {
+      payload: Prisma.$WorkspaceNotificationLevelPayload<ExtArgs>
+      fields: Prisma.WorkspaceNotificationLevelFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkspaceNotificationLevelFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkspaceNotificationLevelFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>
+        }
+        findFirst: {
+          args: Prisma.WorkspaceNotificationLevelFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkspaceNotificationLevelFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>
+        }
+        findMany: {
+          args: Prisma.WorkspaceNotificationLevelFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>[]
+        }
+        create: {
+          args: Prisma.WorkspaceNotificationLevelCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>
+        }
+        createMany: {
+          args: Prisma.WorkspaceNotificationLevelCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkspaceNotificationLevelCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>[]
+        }
+        delete: {
+          args: Prisma.WorkspaceNotificationLevelDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>
+        }
+        update: {
+          args: Prisma.WorkspaceNotificationLevelUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkspaceNotificationLevelDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkspaceNotificationLevelUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkspaceNotificationLevelUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkspaceNotificationLevelUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkspaceNotificationLevelPayload>
+        }
+        aggregate: {
+          args: Prisma.WorkspaceNotificationLevelAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkspaceNotificationLevel>
+        }
+        groupBy: {
+          args: Prisma.WorkspaceNotificationLevelGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceNotificationLevelGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkspaceNotificationLevelCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkspaceNotificationLevelCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2613,10 +2688,23 @@ export const UserPreferenceScalarFieldEnum = {
   startPage: 'startPage',
   defaultWorkspaceId: 'defaultWorkspaceId',
   lastWorkspaceId: 'lastWorkspaceId',
+  mutedKinds: 'mutedKinds',
+  digestHour: 'digestHour',
+  timeZone: 'timeZone',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserPreferenceScalarFieldEnum = (typeof UserPreferenceScalarFieldEnum)[keyof typeof UserPreferenceScalarFieldEnum]
+
+
+export const WorkspaceNotificationLevelScalarFieldEnum = {
+  workspaceId: 'workspaceId',
+  userId: 'userId',
+  level: 'level',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceNotificationLevelScalarFieldEnum = (typeof WorkspaceNotificationLevelScalarFieldEnum)[keyof typeof WorkspaceNotificationLevelScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2884,6 +2972,20 @@ export type ListEnumAttachmentStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'NotificationLevel'
+ */
+export type EnumNotificationLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationLevel'>
+    
+
+
+/**
+ * Reference to a field of type 'NotificationLevel[]'
+ */
+export type ListEnumNotificationLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationLevel[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -3071,6 +3173,7 @@ export type GlobalOmitConfig = {
   discussionRevision?: Prisma.DiscussionRevisionOmit
   commentRevision?: Prisma.CommentRevisionOmit
   userPreference?: Prisma.UserPreferenceOmit
+  workspaceNotificationLevel?: Prisma.WorkspaceNotificationLevelOmit
 }
 
 /* Types for Logging */

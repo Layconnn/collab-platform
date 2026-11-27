@@ -137,3 +137,8 @@ export type CommentRevision = Prisma.CommentRevisionModel
  * 
  */
 export type UserPreference = Prisma.UserPreferenceModel
+/**
+ * Model WorkspaceNotificationLevel
+ * 
+ */
+export type WorkspaceNotificationLevel = Prisma.WorkspaceNotificationLevelModel

@@ -135,3 +135,12 @@ export const AttachmentStatus = {
 } as const
 
 export type AttachmentStatus = (typeof AttachmentStatus)[keyof typeof AttachmentStatus]
+
+
+export const NotificationLevel = {
+  ALL: 'ALL',
+  INVOLVED: 'INVOLVED',
+  NONE: 'NONE'
+} as const
+
+export type NotificationLevel = (typeof NotificationLevel)[keyof typeof NotificationLevel]

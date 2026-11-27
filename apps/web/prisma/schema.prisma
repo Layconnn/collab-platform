@@ -240,14 +240,15 @@ model Notification {
 }
 
 model WorkspaceMember {
-  id          String        @id @default(cuid())
-  workspaceId String
-  userId      String
-  role        WorkspaceRole @default(MEMBER)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String                      @id @default(cuid())
+  workspaceId       String
+  userId            String
+  role              WorkspaceRole               @default(MEMBER)
+  createdAt         DateTime                    @default(now())
+  updatedAt         DateTime                    @updatedAt
+  workspace         Workspace                   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user              User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationLevel WorkspaceNotificationLevel?
   // Recommended (optional): @@index([userId, workspaceId, role]) for permission-heavy joins.
 
   @@unique([workspaceId, userId])
@@ -669,15 +670,39 @@ model CommentRevision {
 // Settings that follow a person to every device (settings PRD, FR-15, FR-16).
 // Values are checked by CHECK constraints in migration 20261127_user_preferences.
 model UserPreference {
-  userId             String     @id
-  theme              String     @default("system")
-  motion             String     @default("system")
-  density            String     @default("comfortable")
-  startPage          String     @default("home")
+  userId             String             @id
+  theme              String             @default("system")
+  motion             String             @default("system")
+  density            String             @default("comfortable")
+  startPage          String             @default("home")
   defaultWorkspaceId String?
   lastWorkspaceId    String?
-  updatedAt          DateTime   @updatedAt
-  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  defaultWorkspace   Workspace? @relation("PreferenceDefaultWorkspace", fields: [defaultWorkspaceId], references: [id], onDelete: SetNull)
-  lastWorkspace      Workspace? @relation("PreferenceLastWorkspace", fields: [lastWorkspaceId], references: [id], onDelete: SetNull)
+  // Notification kinds turned off everywhere (settings PRD, FR-4).
+  mutedKinds         NotificationType[] @default([])
+  // The daily digest arrives at this hour in this time zone (FR-6).
+  digestHour         Int                @default(6)
+  timeZone           String             @default("UTC")
+  updatedAt          DateTime           @updatedAt
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultWorkspace   Workspace?         @relation("PreferenceDefaultWorkspace", fields: [defaultWorkspaceId], references: [id], onDelete: SetNull)
+  lastWorkspace      Workspace?         @relation("PreferenceLastWorkspace", fields: [lastWorkspaceId], references: [id], onDelete: SetNull)
+}
+
+// How much one workspace may notify a member (settings PRD, FR-5). No row
+// means ALL; the row goes when the membership does.
+enum NotificationLevel {
+  ALL
+  INVOLVED
+  NONE
+}
+
+model WorkspaceNotificationLevel {
+  workspaceId String
+  userId      String
+  level       NotificationLevel
+  updatedAt   DateTime          @updatedAt
+  membership  WorkspaceMember   @relation(fields: [workspaceId, userId], references: [workspaceId, userId], onDelete: Cascade)
+
+  @@id([workspaceId, userId])
+  @@index([userId])
 }

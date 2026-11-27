@@ -56,7 +56,7 @@ after(async () => {
 test("defaults until saved, then the saved values everywhere", async () => {
   const maya = await user("Maya");
   const fresh = await prefs(maya.id).get();
-  assert.deepEqual(fresh, { theme: "system", motion: "system", density: "comfortable", startPage: "home", defaultWorkspaceId: null, lastWorkspaceId: null, saved: false });
+  assert.deepEqual(fresh, { theme: "system", motion: "system", density: "comfortable", startPage: "home", defaultWorkspaceId: null, lastWorkspaceId: null, mutedKinds: [], digestHour: 6, timeZone: "UTC", saved: false });
   await prefs(maya.id).update({ theme: "dark" });
   const saved = await prefs(maya.id).update({ motion: "reduce", density: "compact" });
   assert.equal(saved.theme, "dark");

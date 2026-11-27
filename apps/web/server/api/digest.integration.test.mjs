@@ -130,7 +130,7 @@ function fakeSender(plan = () => "ok") {
   };
   return { sender, sent };
 }
-const run = (options) => runDigest({ delivery: "all", allowlist: [], deadline: Date.now() + 60_000, ...options });
+const run = (options) => runDigest({ delivery: "all", allowlist: [], deadline: Date.now() + 60_000, ignoreSchedule: true, ...options });
 const deliveries = (userIds, date) => prisma.digestDelivery.findMany({ where: { userId: { in: userIds }, digestDate: new Date(`${date}T00:00:00.000Z`) } });
 
 async function teamWithNews() {
@@ -172,12 +172,12 @@ test("the allow list holds everyone else's digest, and so does a missing sender"
   const lee = await user("Lee");
   await prisma.workspaceMember.create({ data: { workspaceId: ws.id, userId: lee.id, role: "MEMBER" } });
   const { sender, sent } = fakeSender();
-  const result = await runDigest({ sender, delivery: "allowlist", allowlist: [` ${busy.email.toUpperCase()} `], deadline: Date.now() + 60_000, onlyUserIds: [busy.id, lee.id] });
+  const result = await runDigest({ sender, delivery: "allowlist", allowlist: [` ${busy.email.toUpperCase()} `], deadline: Date.now() + 60_000, ignoreSchedule: true, onlyUserIds: [busy.id, lee.id] });
   assert.deepEqual([result.sent, result.held], [1, 1]);
   assert.deepEqual(sent.map((email) => email.to), [busy.email]);
 
   const tomorrow = new Date(Date.now() + 24 * HOUR);
-  const unconfigured = await runDigest({ sender: null, delivery: "all", allowlist: [], deadline: Date.now() + 60_000, now: tomorrow, onlyUserIds: [lee.id] });
+  const unconfigured = await runDigest({ sender: null, delivery: "all", allowlist: [], deadline: Date.now() + 60_000, ignoreSchedule: true, now: tomorrow, onlyUserIds: [lee.id] });
   const [row] = await deliveries([lee.id], unconfigured.date);
   assert.ok(row, "a row is recorded for tomorrow");
   assert.ok(["HELD", "SKIPPED_EMPTY"].includes(row.status));
@@ -185,7 +185,7 @@ test("the allow list holds everyone else's digest, and so does a missing sender"
 
 test("without a sender, a digest with news is held and says why", async () => {
   const { busy } = await teamWithNews();
-  const result = await runDigest({ sender: null, delivery: "all", allowlist: [], deadline: Date.now() + 60_000, onlyUserIds: [busy.id] });
+  const result = await runDigest({ sender: null, delivery: "all", allowlist: [], deadline: Date.now() + 60_000, ignoreSchedule: true, onlyUserIds: [busy.id] });
   assert.equal(result.held, 1);
   const [row] = await deliveries([busy.id], result.date);
   assert.deepEqual([row.status, row.error], ["HELD", "Email is not configured."]);

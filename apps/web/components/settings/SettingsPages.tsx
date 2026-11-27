@@ -5,6 +5,7 @@ import { useId, useState, type FormEvent } from "react";
 
 import { ErrorState, LoadingState } from "@/components/common/StateNotice";
 import { EmailSettings } from "@/components/settings/EmailSettings";
+import { DigestTimeSettings, hourLabel, KINDS } from "@/components/settings/NotificationPreferences";
 import { cacheAppearance } from "@/components/settings/PreferencesSync";
 import { SettingsGroup, SettingsHeader, SettingsRow } from "@/components/settings/SettingsFrame";
 import { useTheme } from "@/components/theme/ThemeProvider";
@@ -99,23 +100,34 @@ export function PasswordSettings() {
 }
 
 export function NotificationSettings() {
-  const preferences = useDigestPreferences();
-  const value = preferences.data
-    ? preferences.data.enabled
-      ? `On · ${preferences.data.workspaces.filter((workspace) => workspace.included).length} of ${preferences.data.workspaces.length} workspaces`
+  const digest = useDigestPreferences();
+  const preferences = trpc.preferences.get.useQuery(undefined, { staleTime: 60_000 });
+  const levels = trpc.preferences.notificationLevels.useQuery();
+  const prefs = preferences.data;
+  const time = prefs ? ` · ${hourLabel(prefs.digestHour)} ${prefs.timeZone.replaceAll("_", " ")}` : "";
+  const digestValue = digest.data
+    ? digest.data.enabled
+      ? `On · ${digest.data.workspaces.filter((workspace) => workspace.included).length} of ${digest.data.workspaces.length} workspaces${time}`
       : "Off"
-    : preferences.error ? "Unavailable" : "…";
+    : digest.error ? "Unavailable" : "…";
+  const on = prefs ? KINDS.length - prefs.mutedKinds.length : null;
+  const quieter = levels.data?.filter((row) => row.level !== "ALL").length;
   return <div className="min-w-0 max-w-[48rem]">
-    <SettingsHeader title="Notifications" intro="How Commons reaches you outside the app. Notifications inside Commons appear in your Inbox." />
+    <SettingsHeader title="Notifications" intro="What reaches you in your Inbox, and the email that sums up your day." />
+    <SettingsGroup label="In Commons">
+      <SettingsRow label="What notifies you" description="Mentions, reviews, replies, new discussions and more." value={on === null ? "…" : on === KINDS.length ? "All on" : `${on} of ${KINDS.length} on`} href="/settings/notifications/kinds" />
+      <SettingsRow label="Workspaces" description="Everything, only what involves you, or nothing, per workspace." value={quieter === undefined ? "…" : quieter ? `${quieter} quieter` : "Everything"} href="/settings/notifications/workspaces" />
+    </SettingsGroup>
     <SettingsGroup label="Email">
-      <SettingsRow label="Daily digest" description="Once a day: what needs you and what changed." value={value} href="/settings/notifications/digest" />
+      <SettingsRow label="Daily digest" description="Once a day: what needs you and what changed." value={digestValue} href="/settings/notifications/digest" />
     </SettingsGroup>
   </div>;
 }
 
 export function DigestSettings() {
   return <div className="min-w-0 max-w-[52rem]">
-    <SettingsHeader title="Daily digest" intro="Once a day at 06:00 UTC: what needs you, what was decided in the last day and what changed in your workspaces. Nothing is sent on days with nothing to say." back={{ href: "/settings/notifications", label: "Notifications" }} />
+    <SettingsHeader title="Daily digest" intro="Once a day at the time you choose: what needs you, what was decided in the last day and what changed in your workspaces. Nothing is sent on days with nothing to say." back={{ href: "/settings/notifications", label: "Notifications" }} />
+    <DigestTimeSettings />
     <EmailSettings embedded />
   </div>;
 }

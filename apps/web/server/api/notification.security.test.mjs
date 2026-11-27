@@ -14,6 +14,12 @@ const { notificationService } = jiti("../services/notification.service.ts");
 const { notificationRouter } = jiti("./routers/notification.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 
+// Notification preferences (#210): nobody in these fakes has turned anything off.
+const originalPreferenceFindMany = prisma.userPreference.findMany;
+const originalLevelFindMany = prisma.workspaceNotificationLevel.findMany;
+prisma.userPreference.findMany = async () => [];
+prisma.workspaceNotificationLevel.findMany = async () => [];
+
 // Discussion follows, kept in memory (Markdown, reactions, follow and pin PRD).
 const fakeFollows = [];
 prisma.discussionFollow.upsert = async ({ where, create }) => {
@@ -114,6 +120,8 @@ redisCache.setJSON = async () => {
 };
 
 after(async () => {
+  prisma.userPreference.findMany = originalPreferenceFindMany;
+  prisma.workspaceNotificationLevel.findMany = originalLevelFindMany;
   prisma.notification.findMany = originalFindMany;
   prisma.notification.updateMany = originalUpdateMany;
   redisCache.getJSON = originalCacheGet;

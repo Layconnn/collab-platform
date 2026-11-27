@@ -15,7 +15,7 @@ An entity in Commons runs through every layer. Follow the closest existing examp
 pnpm -C apps/web exec prisma migrate dev --create-only --name <change>
 ```
 
-Review the generated SQL. Add constraints Prisma cannot express (CHECK constraints, deferrable foreign keys) by hand with a comment explaining why, and mention them in a comment above the model. CI fails if the migrated database and `schema.prisma` disagree.
+Migrations apply in the alphabetical order of their folder names, so two migrations made on the same day must sort in the order they were written: name a later one so it sorts after the earlier (for example `20261127_user_preferences_notifications` after `20261127_user_preferences`), or use a full timestamp. CI applies every migration to a clean database and catches a wrong order. Review the generated SQL. Add constraints Prisma cannot express (CHECK constraints, deferrable foreign keys) by hand with a comment explaining why, and mention them in a comment above the model. CI fails if the migrated database and `schema.prisma` disagree.
 
 ## 3. Validators (`packages/validators/src/<entity>.ts`)
 
