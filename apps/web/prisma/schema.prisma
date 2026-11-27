@@ -104,6 +104,7 @@ model User {
   attachmentsUploaded      Attachment[]
   invitesCreated           WorkspaceInvite[]
   inviteUses               WorkspaceInviteUse[]
+  preference               UserPreference?
   discussionRevisions      DiscussionRevision[]    @relation("DiscussionRevisionEditor")
   commentRevisions         CommentRevision[]       @relation("CommentRevisionEditor")
 }
@@ -123,6 +124,8 @@ model Workspace {
   comments            Comment[]
   discussionRevisions DiscussionRevision[]
   commentRevisions    CommentRevision[]
+  defaultFor          UserPreference[]        @relation("PreferenceDefaultWorkspace")
+  lastVisitedBy       UserPreference[]        @relation("PreferenceLastWorkspace")
   decisions           Decision[]
   decisionReviews     DecisionReview[]
   reactions           Reaction[]
@@ -661,4 +664,20 @@ model CommentRevision {
 
   @@unique([commentId, version])
   @@index([workspaceId, discussionId])
+}
+
+// Settings that follow a person to every device (settings PRD, FR-15, FR-16).
+// Values are checked by CHECK constraints in migration 20261127_user_preferences.
+model UserPreference {
+  userId             String     @id
+  theme              String     @default("system")
+  motion             String     @default("system")
+  density            String     @default("comfortable")
+  startPage          String     @default("home")
+  defaultWorkspaceId String?
+  lastWorkspaceId    String?
+  updatedAt          DateTime   @updatedAt
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultWorkspace   Workspace? @relation("PreferenceDefaultWorkspace", fields: [defaultWorkspaceId], references: [id], onDelete: SetNull)
+  lastWorkspace      Workspace? @relation("PreferenceLastWorkspace", fields: [lastWorkspaceId], references: [id], onDelete: SetNull)
 }

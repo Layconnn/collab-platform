@@ -132,3 +132,8 @@ export type DiscussionRevision = Prisma.DiscussionRevisionModel
  * 
  */
 export type CommentRevision = Prisma.CommentRevisionModel
+/**
+ * Model UserPreference
+ * 
+ */
+export type UserPreference = Prisma.UserPreferenceModel

@@ -33,6 +33,7 @@
     "test:discussion-list-api": "node --test server/api/discussion-list.integration.test.mjs",
     "test:edit-history-api": "node --test server/api/edit-history.integration.test.mjs",
     "test:profile-api": "node --test server/api/profile.integration.test.mjs",
+    "test:preferences-api": "node --test server/api/preferences.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },

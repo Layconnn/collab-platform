@@ -23,7 +23,8 @@ export type SettingEntry = {
 export const SETTINGS_CATEGORIES: SettingsCategory[] = [
   { id: "account", name: "Your account", description: "Your details and your password.", icon: "account", href: "/settings/account" },
   { id: "notifications", name: "Notifications", description: "The daily digest email and which workspaces it covers.", icon: "inbox", href: "/settings/notifications" },
-  { id: "appearance", name: "Appearance", description: "Light, dark, or matching your device.", icon: "appearance", href: "/settings/appearance" },
+  { id: "workspaces", name: "Workspaces", description: "Where Commons opens and your default workspace.", icon: "workspaces", href: "/settings/workspaces" },
+  { id: "appearance", name: "Appearance", description: "Theme, motion and density, on every device.", icon: "appearance", href: "/settings/appearance" },
 ];
 
 // Every setting, for search: matched by label, description and keywords.
@@ -34,6 +35,10 @@ export const SETTING_ENTRIES: SettingEntry[] = [
   { label: "Change your password", description: "Signs out your other devices.", category: "account", href: "/settings/account/password", keywords: "password security sign in" },
   { label: "Daily digest", description: "Turn the daily email on or off and choose its workspaces.", category: "notifications", href: "/settings/notifications/digest", keywords: "email digest unsubscribe preview workspaces" },
   { label: "Theme", description: "Light, dark or system.", category: "appearance", href: "/settings/appearance", keywords: "dark mode light mode colour color appearance" },
+  { label: "Reduce motion", description: "Turn off animations on every device.", category: "appearance", href: "/settings/appearance", keywords: "motion animation accessibility transitions" },
+  { label: "Density", description: "Comfortable or compact.", category: "appearance", href: "/settings/appearance", keywords: "compact comfortable spacing size text" },
+  { label: "Start page", description: "Where Commons opens when you sign in.", category: "workspaces", href: "/settings/workspaces", keywords: "open home landing first page sign in" },
+  { label: "Default workspace", description: "The workspace that's yours by default.", category: "workspaces", href: "/settings/workspaces", keywords: "workspace default primary" },
 ];
 
 export function categoryOf(id: string) {

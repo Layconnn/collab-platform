@@ -73,7 +73,8 @@ export const ModelName = {
   WorkspaceInvite: 'WorkspaceInvite',
   WorkspaceInviteUse: 'WorkspaceInviteUse',
   DiscussionRevision: 'DiscussionRevision',
-  CommentRevision: 'CommentRevision'
+  CommentRevision: 'CommentRevision',
+  UserPreference: 'UserPreference'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -440,6 +441,20 @@ export const CommentRevisionScalarFieldEnum = {
 } as const
 
 export type CommentRevisionScalarFieldEnum = (typeof CommentRevisionScalarFieldEnum)[keyof typeof CommentRevisionScalarFieldEnum]
+
+
+export const UserPreferenceScalarFieldEnum = {
+  userId: 'userId',
+  theme: 'theme',
+  motion: 'motion',
+  density: 'density',
+  startPage: 'startPage',
+  defaultWorkspaceId: 'defaultWorkspaceId',
+  lastWorkspaceId: 'lastWorkspaceId',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserPreferenceScalarFieldEnum = (typeof UserPreferenceScalarFieldEnum)[keyof typeof UserPreferenceScalarFieldEnum]
 
 
 export const SortOrder = {

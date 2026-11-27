@@ -5,6 +5,7 @@ import { IconButton } from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+import { PreferencesSync } from "@/components/settings/PreferencesSync";
 import { AccountMenu } from "@/components/shell/AccountMenu";
 import { AppIcon } from "@/components/common/AppIcon";
 import { WorkspaceSwitcher } from "@/components/shell/WorkspaceSwitcher";
@@ -237,6 +238,7 @@ export function WorkspaceAppShell({ children }: { children: React.ReactNode }) {
       <a href="#main-content" className="sr-only z-[60] rounded bg-surface px-3 py-2 text-sm font-medium text-text-primary focus:not-sr-only focus:fixed focus:left-3 focus:top-3">
         Skip to content
       </a>
+      <PreferencesSync workspaceId={visibleWorkspaceId} />
 
       <aside
         aria-label="Application sidebar"
