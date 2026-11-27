@@ -13,6 +13,10 @@ const jiti = createJiti(import.meta.url);
 const { createTRPCContext, createTRPCRouter, protectedProcedure } = jiti("./trpc.ts");
 const { redis } = jiti("../cache/redis.ts");
 const { persistSession, invalidateSession, invalidateUserSessions, signAccessToken } = jiti("../middleware/auth.ts");
+// Session rows (settings PRD, FR-8) live in the database; this suite checks
+// tokens only, so "last active" is not recorded here.
+const { sessionService } = jiti("../services/session.service.ts");
+sessionService.touch = async () => undefined;
 
 const userId = "ckv7z4v8m0000k8u7r4h4c9a1";
 const spoofedUserId = "ckv7z4v8m0000k8u7r4h4c9a2";

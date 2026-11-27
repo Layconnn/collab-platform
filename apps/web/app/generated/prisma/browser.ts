@@ -142,3 +142,13 @@ export type UserPreference = Prisma.UserPreferenceModel
  * 
  */
 export type WorkspaceNotificationLevel = Prisma.WorkspaceNotificationLevelModel
+/**
+ * Model UserSession
+ * 
+ */
+export type UserSession = Prisma.UserSessionModel
+/**
+ * Model SecurityEvent
+ * 
+ */
+export type SecurityEvent = Prisma.SecurityEventModel

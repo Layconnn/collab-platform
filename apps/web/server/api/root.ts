@@ -17,12 +17,14 @@ import { inviteRouter } from "./routers/invite.router";
 import { notificationRouter } from "./routers/notification.router";
 import { preferencesRouter } from "./routers/preferences.router";
 import { profileRouter } from "./routers/profile.router";
+import { securityRouter } from "./routers/security.router";
 import { workspaceRouter } from "./routers/workspace.router";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
   profile: profileRouter,
   preferences: preferencesRouter,
+  security: securityRouter,
   workspace: workspaceRouter,
   discussion: discussionRouter,
   decision: decisionRouter,

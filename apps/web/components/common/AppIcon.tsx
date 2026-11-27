@@ -1,4 +1,5 @@
 import {
+  ShieldCheck,
   Bell,
   Building2,
   ChevronDown,
@@ -42,7 +43,8 @@ export type AppIconName =
   | "settings"
   | "account"
   | "appearance"
-  | "overview";
+  | "overview"
+  | "security";
 
 const icons: Record<AppIconName, LucideIcon> = {
   home: House,
@@ -65,6 +67,7 @@ const icons: Record<AppIconName, LucideIcon> = {
   account: UserRound,
   appearance: SunMoon,
   overview: LayoutGrid,
+  security: ShieldCheck,
 };
 
 export function AppIcon({ name, className = "size-4" }: { name: AppIconName; className?: string }) {

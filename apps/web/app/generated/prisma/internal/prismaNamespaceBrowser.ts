@@ -75,7 +75,9 @@ export const ModelName = {
   DiscussionRevision: 'DiscussionRevision',
   CommentRevision: 'CommentRevision',
   UserPreference: 'UserPreference',
-  WorkspaceNotificationLevel: 'WorkspaceNotificationLevel'
+  WorkspaceNotificationLevel: 'WorkspaceNotificationLevel',
+  UserSession: 'UserSession',
+  SecurityEvent: 'SecurityEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -469,6 +471,33 @@ export const WorkspaceNotificationLevelScalarFieldEnum = {
 } as const
 
 export type WorkspaceNotificationLevelScalarFieldEnum = (typeof WorkspaceNotificationLevelScalarFieldEnum)[keyof typeof WorkspaceNotificationLevelScalarFieldEnum]
+
+
+export const UserSessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  device: 'device',
+  userAgent: 'userAgent',
+  country: 'country',
+  createdAt: 'createdAt',
+  lastSeenAt: 'lastSeenAt',
+  endedAt: 'endedAt'
+} as const
+
+export type UserSessionScalarFieldEnum = (typeof UserSessionScalarFieldEnum)[keyof typeof UserSessionScalarFieldEnum]
+
+
+export const SecurityEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  kind: 'kind',
+  sessionId: 'sessionId',
+  device: 'device',
+  country: 'country',
+  createdAt: 'createdAt'
+} as const
+
+export type SecurityEventScalarFieldEnum = (typeof SecurityEventScalarFieldEnum)[keyof typeof SecurityEventScalarFieldEnum]
 
 
 export const SortOrder = {
