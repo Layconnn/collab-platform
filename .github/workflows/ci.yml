@@ -147,6 +147,8 @@ jobs:
         run: pnpm -C apps/web run test:discussion-list-api
       - name: Edit history (real database)
         run: pnpm -C apps/web run test:edit-history-api
+      - name: Profile (real database)
+        run: pnpm -C apps/web run test:profile-api
 
   frontend-tests:
     name: Frontend tests
