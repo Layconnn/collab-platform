@@ -159,12 +159,31 @@ test("a new user registers, records a decision from a discussion and signs out",
     await expect(results.getByRole("link", { name: discussionTitle })).toBeVisible();
   });
 
+  await test.step("open Commons on the default workspace", async () => {
+    // Settings PRD, FR-15.
+    await page.goto("/settings/workspaces");
+    await page.getByLabel("Workspace", { exact: true }).selectOption({ label: workspaceName });
+    const startOnDefault = page.getByRole("radio", { name: /^Your default workspace/ });
+    await startOnDefault.click();
+    await expect(startOnDefault).toBeChecked();
+    await expect(page.getByRole("status").filter({ hasText: "Saved." })).toBeVisible();
+  });
+
   await test.step("sign out", async () => {
     await page.getByLabel(/^Account menu for /).click();
     await page.getByRole("button", { name: "Sign out" }).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.goto("/workspace");
     await expect(page).toHaveURL(/\/login\?next=/);
+  });
+
+  await test.step("signing in opens the default workspace", async () => {
+    await page.goto("/login");
+    await page.getByLabel("Email").fill(`smoke_${id}@example.test`);
+    await page.getByLabel("Password", { exact: true }).fill(`smoke-password-${id}`);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await expect(page).toHaveURL(/\/workspace\/[a-z0-9]+$/);
+    await expect(page.getByRole("heading", { level: 1, name: workspaceName })).toBeVisible();
   });
 });
 

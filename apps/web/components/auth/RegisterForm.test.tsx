@@ -43,7 +43,7 @@ describe("RegisterForm", () => {
       username: "newperson",
       password: "correct-horse-42",
     });
-    expect(mocks.replace).toHaveBeenCalledWith("/workspace");
+    expect(mocks.replace).toHaveBeenCalledWith("/start");
   });
 
   it("does not submit invalid credentials", async () => {

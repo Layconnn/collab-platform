@@ -40,7 +40,7 @@ describe("LoginForm", () => {
     mocks.replace.mockReset();
     window.history.replaceState(null, "", "/login?next=%2F%2Fevil.example");
     await signIn();
-    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/workspace"));
+    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/start"));
     window.history.replaceState(null, "", "/");
   });
 
@@ -55,7 +55,7 @@ describe("LoginForm", () => {
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledWith({ email: "person@example.com", password: "correct-horse-42" }));
-    expect(mocks.replace).toHaveBeenCalledWith("/workspace");
+    expect(mocks.replace).toHaveBeenCalledWith("/start");
     expect(screen.getByRole("button", { name: "Opening workspace..." }).hasAttribute("disabled")).toBe(true);
   });
 
@@ -95,6 +95,6 @@ describe("LoginForm", () => {
     fireEvent.submit(form);
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledTimes(1));
     finishLogin({});
-    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/workspace"));
+    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/start"));
   });
 });

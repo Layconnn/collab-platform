@@ -1,14 +1,18 @@
 "use client";
 
-import { Monitor, Moon, Settings, Sun } from "lucide-react";
+import { History, House, Monitor, Moon, Pause, Rows3, Rows4, Settings, Sparkles, Star, Sun } from "lucide-react";
 import { useId, useState, type FormEvent } from "react";
 
+import { ErrorState, LoadingState } from "@/components/common/StateNotice";
 import { EmailSettings } from "@/components/settings/EmailSettings";
+import { cacheAppearance } from "@/components/settings/PreferencesSync";
 import { SettingsGroup, SettingsHeader, SettingsRow } from "@/components/settings/SettingsFrame";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { useDigestPreferences } from "@/hooks/useDigest";
+import { useWorkspaceSwitcherList } from "@/hooks/useWorkspace";
+import { DENSITY_STORAGE_KEY, MOTION_STORAGE_KEY } from "@/lib/theme";
 import { trpc } from "@/lib/trpc/api-client";
 
 // The pages inside Settings (dashboard redesign PRD, FR-8). Each category
@@ -122,23 +126,108 @@ const THEMES = [
   { value: "system", label: "System", description: "Follows your device's setting.", Icon: Monitor },
 ] as const;
 
+const MOTIONS = [
+  { value: "system", label: "Follow your device", description: "Animations play unless your device asks for less motion.", Icon: Sparkles },
+  { value: "reduce", label: "Reduce motion", description: "No fades, slides or animated transitions on any device.", Icon: Pause },
+] as const;
+
+const DENSITIES = [
+  { value: "comfortable", label: "Comfortable", description: "The standard size, with room between rows.", Icon: Rows3 },
+  { value: "compact", label: "Compact", description: "Slightly smaller text and tighter spacing, to see more at once.", Icon: Rows4 },
+] as const;
+
+type Choice<T extends string> = { value: T; label: string; description: string; Icon: typeof Sun };
+
+// A list of radio rows, as in X's settings (FR-16).
+export function ChoiceGroup<T extends string>({ legend, choices, value, onChange }: { legend: string; choices: readonly Choice<T>[]; value: T; onChange: (value: T) => void }) {
+  const name = useId();
+  return <fieldset className="mt-7">
+    <legend className="type-canopy-label m-0 mb-2.5">{legend}</legend>
+    <div className="overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-card">
+      {choices.map(({ value: option, label, description, Icon }) => <label key={option} className="canopy-row flex cursor-pointer items-center gap-4 border-t border-border-subtle px-5 py-4 first:border-t-0 hover:bg-surface-subtle focus-within:bg-surface-subtle">
+        <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-callout text-brand-link"><Icon size={17} /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[0.9375rem] font-medium text-text-primary">{label}</span>
+          <span className="mt-0.5 block text-[0.8125rem] text-text-muted">{description}</span>
+        </span>
+        <input type="radio" name={name} value={option} checked={value === option} onChange={() => onChange(option)} className="size-4 shrink-0 accent-[var(--color-brand-action)]" />
+      </label>)}
+    </div>
+  </fieldset>;
+}
+
+function readCached<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
+  try {
+    const value = localStorage.getItem(key);
+    return allowed.includes(value as T) ? value as T : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export function AppearanceSettings() {
   const { mode, setMode } = useTheme();
-  const name = useId();
+  const preferences = trpc.preferences.get.useQuery(undefined, { staleTime: 5 * 60_000 });
+  const utils = trpc.useUtils();
+  const save = trpc.preferences.update.useMutation({ onSuccess: (data) => utils.preferences.get.setData(undefined, data) });
+  const [motion, setMotion] = useState<"system" | "reduce">(() => readCached(MOTION_STORAGE_KEY, ["system", "reduce"], "system"));
+  const [density, setDensity] = useState<"comfortable" | "compact">(() => readCached(DENSITY_STORAGE_KEY, ["comfortable", "compact"], "comfortable"));
+  const saved = preferences.data?.saved ? preferences.data : null;
+  const shownMotion = (saved?.motion as typeof motion | undefined) ?? motion;
+  const shownDensity = (saved?.density as typeof density | undefined) ?? density;
+
   return <div className="min-w-0 max-w-[48rem]">
-    <SettingsHeader title="Appearance" intro="How Commons looks on this device." />
-    <fieldset className="mt-7">
-      <legend className="type-canopy-label m-0 mb-2.5">Theme</legend>
-      <div className="overflow-hidden rounded-2xl border border-border-subtle bg-surface shadow-card">
-        {THEMES.map(({ value, label, description, Icon }) => <label key={value} className="canopy-row flex cursor-pointer items-center gap-4 border-t border-border-subtle px-5 py-4 first:border-t-0 hover:bg-surface-subtle focus-within:bg-surface-subtle">
-          <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-callout text-brand-link"><Icon size={17} /></span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[0.9375rem] font-medium text-text-primary">{label}</span>
-            <span className="mt-0.5 block text-[0.8125rem] text-text-muted">{description}</span>
-          </span>
-          <input type="radio" name={name} value={value} checked={mode === value} onChange={() => setMode(value)} className="size-4 shrink-0 accent-[var(--color-brand-action)]" />
-        </label>)}
-      </div>
-    </fieldset>
+    <SettingsHeader title="Appearance" intro="How Commons looks. Saved to your account, so it follows you to every device you sign in on." />
+    <ChoiceGroup legend="Theme" choices={THEMES} value={mode} onChange={(next) => { setMode(next); save.mutate({ theme: next }); }} />
+    <ChoiceGroup legend="Motion" choices={MOTIONS} value={shownMotion} onChange={(next) => { setMotion(next); cacheAppearance({ motion: next }); save.mutate({ motion: next }); }} />
+    <ChoiceGroup legend="Density" choices={DENSITIES} value={shownDensity} onChange={(next) => { setDensity(next); cacheAppearance({ density: next }); save.mutate({ density: next }); }} />
+    {save.error ? <p role="alert" className="mt-4 rounded-[10px] border-l-2 border-danger bg-surface-subtle px-3 py-2 text-sm text-danger">Applied here, but not saved to your account. It will apply on other devices once saved; try again.</p> : null}
+  </div>;
+}
+
+const START_PAGES = [
+  { value: "home", label: "Home", description: "What needs you across every workspace.", Icon: House },
+  { value: "default", label: "Your default workspace", description: "The workspace you choose below.", Icon: Star },
+  { value: "last", label: "The last workspace you opened", description: "Pick up where you left off.", Icon: History },
+] as const;
+
+// Where Commons opens and which workspace is yours by default (FR-15).
+export function WorkspacesSettings() {
+  const id = useId();
+  const preferences = trpc.preferences.get.useQuery(undefined, { staleTime: 5 * 60_000 });
+  const workspaces = useWorkspaceSwitcherList();
+  const utils = trpc.useUtils();
+  const save = trpc.preferences.update.useMutation({ onSuccess: (data) => utils.preferences.get.setData(undefined, data) });
+  const list = workspaces.data?.pages.flatMap((page) => page.items) ?? [];
+  // Show a choice at once while it saves.
+  const pending = save.isPending ? save.variables : undefined;
+  const data = preferences.data ? { ...preferences.data, ...pending } : undefined;
+  const startPage = (data?.startPage ?? "home") as (typeof START_PAGES)[number]["value"];
+  const defaultId = data?.defaultWorkspaceId && list.some((item) => item.workspaceId === data.defaultWorkspaceId) ? data.defaultWorkspaceId : "";
+  const problem = save.error
+    ? save.error.data?.code === "NOT_FOUND" ? "You're no longer a member of that workspace." : "Could not save. Try again."
+    : startPage === "default" && !defaultId && data ? "Choose a default workspace, or Commons opens on Home." : null;
+
+  return <div className="min-w-0 max-w-[48rem]">
+    <SettingsHeader title="Workspaces" intro="Where Commons opens when you sign in, and the workspace that's yours by default." />
+    {data ? <>
+      <ChoiceGroup legend="Open Commons on" choices={START_PAGES} value={startPage} onChange={(next) => save.mutate({ startPage: next })} />
+      <section aria-labelledby={`${id}-title`} className="mt-7">
+        <h2 id={`${id}-title`} className="type-canopy-label m-0 mb-2.5">Default workspace</h2>
+        <div className="rounded-2xl border border-border-subtle bg-surface p-5 shadow-card">
+          <label htmlFor={id} className="text-sm font-medium text-text-primary">Workspace</label>
+          <select id={id} value={defaultId} disabled={workspaces.isLoading} onChange={(event) => save.mutate({ defaultWorkspaceId: event.target.value || null })}
+            className="mt-1.5 min-h-10 w-full rounded-[10px] border border-control-border bg-surface px-3 text-sm text-text-primary">
+            <option value="">No default</option>
+            {list.map((item) => <option key={item.workspaceId} value={item.workspaceId}>{item.name}</option>)}
+          </select>
+          <p className="mt-1.5 text-xs text-text-muted">Opens when you choose “Your default workspace” above.</p>
+        </div>
+      </section>
+    </> : preferences.error
+      ? <div className="mt-7"><ErrorState title="Could not load your settings" description="Please try again in a moment." onRetry={() => void preferences.refetch()} retrying={preferences.isFetching} /></div>
+      : <div className="mt-7"><LoadingState label="Loading your settings…" /></div>}
+    {problem ? <p role={save.error ? "alert" : "status"} className="mt-4 rounded-[10px] border-l-2 border-attention bg-surface-subtle px-3 py-2 text-sm text-text-primary">{problem}</p> : null}
+    {save.isSuccess && !problem ? <p role="status" className="mt-4 text-sm text-text-muted">Saved.</p> : null}
   </div>;
 }

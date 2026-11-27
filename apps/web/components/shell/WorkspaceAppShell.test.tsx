@@ -56,6 +56,8 @@ vi.mock("@/components/shell/WorkspaceSwitcher", () => ({ WorkspaceSwitcher: ({ c
 vi.mock("@/components/notification/NotificationDropdown", () => ({ NotificationDropdown: () => <div>Notifications</div> }));
 vi.mock("@/components/workspace/WorkspaceNavigation", () => ({ WorkspaceNavigation: ({ workspaceId }: { workspaceId?: string }) => <nav data-workspace-id={workspaceId ?? ""}>Workspace links</nav> }));
 
+vi.mock("@/components/settings/PreferencesSync", () => ({ PreferencesSync: () => null }));
+
 import { WorkspaceAppShell } from "@/components/shell/WorkspaceAppShell";
 
 describe("WorkspaceAppShell mobile navigation", () => {

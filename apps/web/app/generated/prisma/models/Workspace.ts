@@ -196,6 +196,8 @@ export type WorkspaceWhereInput = {
   comments?: Prisma.CommentListRelationFilter
   discussionRevisions?: Prisma.DiscussionRevisionListRelationFilter
   commentRevisions?: Prisma.CommentRevisionListRelationFilter
+  defaultFor?: Prisma.UserPreferenceListRelationFilter
+  lastVisitedBy?: Prisma.UserPreferenceListRelationFilter
   decisions?: Prisma.DecisionListRelationFilter
   decisionReviews?: Prisma.DecisionReviewListRelationFilter
   reactions?: Prisma.ReactionListRelationFilter
@@ -221,6 +223,8 @@ export type WorkspaceOrderByWithRelationInput = {
   comments?: Prisma.CommentOrderByRelationAggregateInput
   discussionRevisions?: Prisma.DiscussionRevisionOrderByRelationAggregateInput
   commentRevisions?: Prisma.CommentRevisionOrderByRelationAggregateInput
+  defaultFor?: Prisma.UserPreferenceOrderByRelationAggregateInput
+  lastVisitedBy?: Prisma.UserPreferenceOrderByRelationAggregateInput
   decisions?: Prisma.DecisionOrderByRelationAggregateInput
   decisionReviews?: Prisma.DecisionReviewOrderByRelationAggregateInput
   reactions?: Prisma.ReactionOrderByRelationAggregateInput
@@ -249,6 +253,8 @@ export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
   comments?: Prisma.CommentListRelationFilter
   discussionRevisions?: Prisma.DiscussionRevisionListRelationFilter
   commentRevisions?: Prisma.CommentRevisionListRelationFilter
+  defaultFor?: Prisma.UserPreferenceListRelationFilter
+  lastVisitedBy?: Prisma.UserPreferenceListRelationFilter
   decisions?: Prisma.DecisionListRelationFilter
   decisionReviews?: Prisma.DecisionReviewListRelationFilter
   reactions?: Prisma.ReactionListRelationFilter
@@ -297,6 +303,8 @@ export type WorkspaceCreateInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -321,6 +329,8 @@ export type WorkspaceUncheckedCreateInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -345,6 +355,8 @@ export type WorkspaceUpdateInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -369,6 +381,8 @@ export type WorkspaceUncheckedUpdateInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -447,6 +461,11 @@ export type WorkspaceMinOrderByAggregateInput = {
 export type WorkspaceScalarRelationFilter = {
   is?: Prisma.WorkspaceWhereInput
   isNot?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceNullableScalarRelationFilter = {
+  is?: Prisma.WorkspaceWhereInput | null
+  isNot?: Prisma.WorkspaceWhereInput | null
 }
 
 export type WorkspaceCreateNestedManyWithoutOwnerInput = {
@@ -701,6 +720,38 @@ export type WorkspaceUpdateOneRequiredWithoutCommentRevisionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutCommentRevisionsInput, Prisma.WorkspaceUpdateWithoutCommentRevisionsInput>, Prisma.WorkspaceUncheckedUpdateWithoutCommentRevisionsInput>
 }
 
+export type WorkspaceCreateNestedOneWithoutDefaultForInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutDefaultForInput, Prisma.WorkspaceUncheckedCreateWithoutDefaultForInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutDefaultForInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceCreateNestedOneWithoutLastVisitedByInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutLastVisitedByInput, Prisma.WorkspaceUncheckedCreateWithoutLastVisitedByInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutLastVisitedByInput
+  connect?: Prisma.WorkspaceWhereUniqueInput
+}
+
+export type WorkspaceUpdateOneWithoutDefaultForNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutDefaultForInput, Prisma.WorkspaceUncheckedCreateWithoutDefaultForInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutDefaultForInput
+  upsert?: Prisma.WorkspaceUpsertWithoutDefaultForInput
+  disconnect?: Prisma.WorkspaceWhereInput | boolean
+  delete?: Prisma.WorkspaceWhereInput | boolean
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutDefaultForInput, Prisma.WorkspaceUpdateWithoutDefaultForInput>, Prisma.WorkspaceUncheckedUpdateWithoutDefaultForInput>
+}
+
+export type WorkspaceUpdateOneWithoutLastVisitedByNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceCreateWithoutLastVisitedByInput, Prisma.WorkspaceUncheckedCreateWithoutLastVisitedByInput>
+  connectOrCreate?: Prisma.WorkspaceCreateOrConnectWithoutLastVisitedByInput
+  upsert?: Prisma.WorkspaceUpsertWithoutLastVisitedByInput
+  disconnect?: Prisma.WorkspaceWhereInput | boolean
+  delete?: Prisma.WorkspaceWhereInput | boolean
+  connect?: Prisma.WorkspaceWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceUpdateToOneWithWhereWithoutLastVisitedByInput, Prisma.WorkspaceUpdateWithoutLastVisitedByInput>, Prisma.WorkspaceUncheckedUpdateWithoutLastVisitedByInput>
+}
+
 export type WorkspaceCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -712,6 +763,8 @@ export type WorkspaceCreateWithoutOwnerInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -735,6 +788,8 @@ export type WorkspaceUncheckedCreateWithoutOwnerInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -796,6 +851,8 @@ export type WorkspaceCreateWithoutDiscussionsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -819,6 +876,8 @@ export type WorkspaceUncheckedCreateWithoutDiscussionsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -858,6 +917,8 @@ export type WorkspaceUpdateWithoutDiscussionsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -881,6 +942,8 @@ export type WorkspaceUncheckedUpdateWithoutDiscussionsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -904,6 +967,8 @@ export type WorkspaceCreateWithoutCommentsInput = {
   discussions?: Prisma.DiscussionCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -927,6 +992,8 @@ export type WorkspaceUncheckedCreateWithoutCommentsInput = {
   discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -966,6 +1033,8 @@ export type WorkspaceUpdateWithoutCommentsInput = {
   discussions?: Prisma.DiscussionUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -989,6 +1058,8 @@ export type WorkspaceUncheckedUpdateWithoutCommentsInput = {
   discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1013,6 +1084,8 @@ export type WorkspaceCreateWithoutNotificationsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -1036,6 +1109,8 @@ export type WorkspaceUncheckedCreateWithoutNotificationsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1075,6 +1150,8 @@ export type WorkspaceUpdateWithoutNotificationsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -1098,6 +1175,8 @@ export type WorkspaceUncheckedUpdateWithoutNotificationsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1120,6 +1199,8 @@ export type WorkspaceCreateWithoutMembersInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -1143,6 +1224,8 @@ export type WorkspaceUncheckedCreateWithoutMembersInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1182,6 +1265,8 @@ export type WorkspaceUpdateWithoutMembersInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -1205,6 +1290,8 @@ export type WorkspaceUncheckedUpdateWithoutMembersInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1229,6 +1316,8 @@ export type WorkspaceCreateWithoutDecisionsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutWorkspaceInput
@@ -1252,6 +1341,8 @@ export type WorkspaceUncheckedCreateWithoutDecisionsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1291,6 +1382,8 @@ export type WorkspaceUpdateWithoutDecisionsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutWorkspaceNestedInput
@@ -1314,6 +1407,8 @@ export type WorkspaceUncheckedUpdateWithoutDecisionsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1337,6 +1432,8 @@ export type WorkspaceCreateWithoutDecisionReviewsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutWorkspaceInput
@@ -1360,6 +1457,8 @@ export type WorkspaceUncheckedCreateWithoutDecisionReviewsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1399,6 +1498,8 @@ export type WorkspaceUpdateWithoutDecisionReviewsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutWorkspaceNestedInput
@@ -1422,6 +1523,8 @@ export type WorkspaceUncheckedUpdateWithoutDecisionReviewsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1445,6 +1548,8 @@ export type WorkspaceCreateWithoutDiscussionFollowsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -1468,6 +1573,8 @@ export type WorkspaceUncheckedCreateWithoutDiscussionFollowsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1507,6 +1614,8 @@ export type WorkspaceUpdateWithoutDiscussionFollowsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -1530,6 +1639,8 @@ export type WorkspaceUncheckedUpdateWithoutDiscussionFollowsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1553,6 +1664,8 @@ export type WorkspaceCreateWithoutDigestOptOutsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -1576,6 +1689,8 @@ export type WorkspaceUncheckedCreateWithoutDigestOptOutsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1615,6 +1730,8 @@ export type WorkspaceUpdateWithoutDigestOptOutsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -1638,6 +1755,8 @@ export type WorkspaceUncheckedUpdateWithoutDigestOptOutsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1661,6 +1780,8 @@ export type WorkspaceCreateWithoutSavedItemsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -1684,6 +1805,8 @@ export type WorkspaceUncheckedCreateWithoutSavedItemsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1723,6 +1846,8 @@ export type WorkspaceUpdateWithoutSavedItemsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -1746,6 +1871,8 @@ export type WorkspaceUncheckedUpdateWithoutSavedItemsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1769,6 +1896,8 @@ export type WorkspaceCreateWithoutReactionsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutWorkspaceInput
@@ -1792,6 +1921,8 @@ export type WorkspaceUncheckedCreateWithoutReactionsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1831,6 +1962,8 @@ export type WorkspaceUpdateWithoutReactionsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutWorkspaceNestedInput
@@ -1854,6 +1987,8 @@ export type WorkspaceUncheckedUpdateWithoutReactionsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1877,6 +2012,8 @@ export type WorkspaceCreateWithoutActivityEventsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -1900,6 +2037,8 @@ export type WorkspaceUncheckedCreateWithoutActivityEventsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -1939,6 +2078,8 @@ export type WorkspaceUpdateWithoutActivityEventsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -1962,6 +2103,8 @@ export type WorkspaceUncheckedUpdateWithoutActivityEventsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -1985,6 +2128,8 @@ export type WorkspaceCreateWithoutAttachmentsInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -2008,6 +2153,8 @@ export type WorkspaceUncheckedCreateWithoutAttachmentsInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -2047,6 +2194,8 @@ export type WorkspaceUpdateWithoutAttachmentsInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -2070,6 +2219,8 @@ export type WorkspaceUncheckedUpdateWithoutAttachmentsInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -2093,6 +2244,8 @@ export type WorkspaceCreateWithoutInvitesInput = {
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -2116,6 +2269,8 @@ export type WorkspaceUncheckedCreateWithoutInvitesInput = {
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -2155,6 +2310,8 @@ export type WorkspaceUpdateWithoutInvitesInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -2178,6 +2335,8 @@ export type WorkspaceUncheckedUpdateWithoutInvitesInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -2200,6 +2359,8 @@ export type WorkspaceCreateWithoutDiscussionRevisionsInput = {
   discussions?: Prisma.DiscussionCreateNestedManyWithoutWorkspaceInput
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -2223,6 +2384,8 @@ export type WorkspaceUncheckedCreateWithoutDiscussionRevisionsInput = {
   discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutWorkspaceInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -2262,6 +2425,8 @@ export type WorkspaceUpdateWithoutDiscussionRevisionsInput = {
   discussions?: Prisma.DiscussionUpdateManyWithoutWorkspaceNestedInput
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -2285,6 +2450,8 @@ export type WorkspaceUncheckedUpdateWithoutDiscussionRevisionsInput = {
   discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutWorkspaceNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -2308,6 +2475,8 @@ export type WorkspaceCreateWithoutCommentRevisionsInput = {
   discussions?: Prisma.DiscussionCreateNestedManyWithoutWorkspaceInput
   comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
@@ -2331,6 +2500,8 @@ export type WorkspaceUncheckedCreateWithoutCommentRevisionsInput = {
   discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutWorkspaceInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
   decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
   decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
   reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
@@ -2370,6 +2541,8 @@ export type WorkspaceUpdateWithoutCommentRevisionsInput = {
   discussions?: Prisma.DiscussionUpdateManyWithoutWorkspaceNestedInput
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -2393,6 +2566,240 @@ export type WorkspaceUncheckedUpdateWithoutCommentRevisionsInput = {
   discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutWorkspaceNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
+  decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutWorkspaceNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutWorkspaceNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutWorkspaceNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceCreateWithoutDefaultForInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedSpacesInput
+  members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutWorkspaceInput
+  comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
+  discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
+  commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceCreateNestedManyWithoutLastWorkspaceInput
+  decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutWorkspaceInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutWorkspaceInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutWorkspaceInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutDefaultForInput = {
+  id?: string
+  name: string
+  slug: string
+  ownerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutWorkspaceInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutLastWorkspaceInput
+  decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutWorkspaceInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutWorkspaceInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutWorkspaceInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutDefaultForInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutDefaultForInput, Prisma.WorkspaceUncheckedCreateWithoutDefaultForInput>
+}
+
+export type WorkspaceCreateWithoutLastVisitedByInput = {
+  id?: string
+  name: string
+  slug: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedSpacesInput
+  members?: Prisma.WorkspaceMemberCreateNestedManyWithoutWorkspaceInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutWorkspaceInput
+  comments?: Prisma.CommentCreateNestedManyWithoutWorkspaceInput
+  discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutWorkspaceInput
+  commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceCreateNestedManyWithoutDefaultWorkspaceInput
+  decisions?: Prisma.DecisionCreateNestedManyWithoutWorkspaceInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutWorkspaceInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutWorkspaceInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutWorkspaceInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutWorkspaceInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutWorkspaceInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutWorkspaceInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutWorkspaceInput
+  attachments?: Prisma.AttachmentCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceUncheckedCreateWithoutLastVisitedByInput = {
+  id?: string
+  name: string
+  slug: string
+  ownerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutWorkspaceInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  defaultFor?: Prisma.UserPreferenceUncheckedCreateNestedManyWithoutDefaultWorkspaceInput
+  decisions?: Prisma.DecisionUncheckedCreateNestedManyWithoutWorkspaceInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutWorkspaceInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutWorkspaceInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutWorkspaceInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutWorkspaceInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutWorkspaceInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutWorkspaceInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  attachments?: Prisma.AttachmentUncheckedCreateNestedManyWithoutWorkspaceInput
+  invites?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutWorkspaceInput
+}
+
+export type WorkspaceCreateOrConnectWithoutLastVisitedByInput = {
+  where: Prisma.WorkspaceWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutLastVisitedByInput, Prisma.WorkspaceUncheckedCreateWithoutLastVisitedByInput>
+}
+
+export type WorkspaceUpsertWithoutDefaultForInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutDefaultForInput, Prisma.WorkspaceUncheckedUpdateWithoutDefaultForInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutDefaultForInput, Prisma.WorkspaceUncheckedCreateWithoutDefaultForInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutDefaultForInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutDefaultForInput, Prisma.WorkspaceUncheckedUpdateWithoutDefaultForInput>
+}
+
+export type WorkspaceUpdateWithoutDefaultForInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedSpacesNestedInput
+  members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutWorkspaceNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
+  discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
+  commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
+  decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutWorkspaceNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutWorkspaceNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutWorkspaceNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutDefaultForInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
+  decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutWorkspaceNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutWorkspaceNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutWorkspaceNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutWorkspaceNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  attachments?: Prisma.AttachmentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUpsertWithoutLastVisitedByInput = {
+  update: Prisma.XOR<Prisma.WorkspaceUpdateWithoutLastVisitedByInput, Prisma.WorkspaceUncheckedUpdateWithoutLastVisitedByInput>
+  create: Prisma.XOR<Prisma.WorkspaceCreateWithoutLastVisitedByInput, Prisma.WorkspaceUncheckedCreateWithoutLastVisitedByInput>
+  where?: Prisma.WorkspaceWhereInput
+}
+
+export type WorkspaceUpdateToOneWithWhereWithoutLastVisitedByInput = {
+  where?: Prisma.WorkspaceWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceUpdateWithoutLastVisitedByInput, Prisma.WorkspaceUncheckedUpdateWithoutLastVisitedByInput>
+}
+
+export type WorkspaceUpdateWithoutLastVisitedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedSpacesNestedInput
+  members?: Prisma.WorkspaceMemberUpdateManyWithoutWorkspaceNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutWorkspaceNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
+  discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
+  commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutWorkspaceNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutWorkspaceNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutWorkspaceNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutWorkspaceNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutWorkspaceNestedInput
+  attachments?: Prisma.AttachmentUpdateManyWithoutWorkspaceNestedInput
+  invites?: Prisma.WorkspaceInviteUpdateManyWithoutWorkspaceNestedInput
+}
+
+export type WorkspaceUncheckedUpdateWithoutLastVisitedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
+  discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -2424,6 +2831,8 @@ export type WorkspaceUpdateWithoutOwnerInput = {
   comments?: Prisma.CommentUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUpdateManyWithoutWorkspaceNestedInput
@@ -2447,6 +2856,8 @@ export type WorkspaceUncheckedUpdateWithoutOwnerInput = {
   comments?: Prisma.CommentUncheckedUpdateManyWithoutWorkspaceNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutWorkspaceNestedInput
+  defaultFor?: Prisma.UserPreferenceUncheckedUpdateManyWithoutDefaultWorkspaceNestedInput
+  lastVisitedBy?: Prisma.UserPreferenceUncheckedUpdateManyWithoutLastWorkspaceNestedInput
   decisions?: Prisma.DecisionUncheckedUpdateManyWithoutWorkspaceNestedInput
   decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutWorkspaceNestedInput
   reactions?: Prisma.ReactionUncheckedUpdateManyWithoutWorkspaceNestedInput
@@ -2478,6 +2889,8 @@ export type WorkspaceCountOutputType = {
   comments: number
   discussionRevisions: number
   commentRevisions: number
+  defaultFor: number
+  lastVisitedBy: number
   decisions: number
   decisionReviews: number
   reactions: number
@@ -2496,6 +2909,8 @@ export type WorkspaceCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensi
   comments?: boolean | WorkspaceCountOutputTypeCountCommentsArgs
   discussionRevisions?: boolean | WorkspaceCountOutputTypeCountDiscussionRevisionsArgs
   commentRevisions?: boolean | WorkspaceCountOutputTypeCountCommentRevisionsArgs
+  defaultFor?: boolean | WorkspaceCountOutputTypeCountDefaultForArgs
+  lastVisitedBy?: boolean | WorkspaceCountOutputTypeCountLastVisitedByArgs
   decisions?: boolean | WorkspaceCountOutputTypeCountDecisionsArgs
   decisionReviews?: boolean | WorkspaceCountOutputTypeCountDecisionReviewsArgs
   reactions?: boolean | WorkspaceCountOutputTypeCountReactionsArgs
@@ -2551,6 +2966,20 @@ export type WorkspaceCountOutputTypeCountDiscussionRevisionsArgs<ExtArgs extends
  */
 export type WorkspaceCountOutputTypeCountCommentRevisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CommentRevisionWhereInput
+}
+
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountDefaultForArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserPreferenceWhereInput
+}
+
+/**
+ * WorkspaceCountOutputType without action
+ */
+export type WorkspaceCountOutputTypeCountLastVisitedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserPreferenceWhereInput
 }
 
 /**
@@ -2637,6 +3066,8 @@ export type WorkspaceSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   comments?: boolean | Prisma.Workspace$commentsArgs<ExtArgs>
   discussionRevisions?: boolean | Prisma.Workspace$discussionRevisionsArgs<ExtArgs>
   commentRevisions?: boolean | Prisma.Workspace$commentRevisionsArgs<ExtArgs>
+  defaultFor?: boolean | Prisma.Workspace$defaultForArgs<ExtArgs>
+  lastVisitedBy?: boolean | Prisma.Workspace$lastVisitedByArgs<ExtArgs>
   decisions?: boolean | Prisma.Workspace$decisionsArgs<ExtArgs>
   decisionReviews?: boolean | Prisma.Workspace$decisionReviewsArgs<ExtArgs>
   reactions?: boolean | Prisma.Workspace$reactionsArgs<ExtArgs>
@@ -2687,6 +3118,8 @@ export type WorkspaceInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   comments?: boolean | Prisma.Workspace$commentsArgs<ExtArgs>
   discussionRevisions?: boolean | Prisma.Workspace$discussionRevisionsArgs<ExtArgs>
   commentRevisions?: boolean | Prisma.Workspace$commentRevisionsArgs<ExtArgs>
+  defaultFor?: boolean | Prisma.Workspace$defaultForArgs<ExtArgs>
+  lastVisitedBy?: boolean | Prisma.Workspace$lastVisitedByArgs<ExtArgs>
   decisions?: boolean | Prisma.Workspace$decisionsArgs<ExtArgs>
   decisionReviews?: boolean | Prisma.Workspace$decisionReviewsArgs<ExtArgs>
   reactions?: boolean | Prisma.Workspace$reactionsArgs<ExtArgs>
@@ -2715,6 +3148,8 @@ export type $WorkspacePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     comments: Prisma.$CommentPayload<ExtArgs>[]
     discussionRevisions: Prisma.$DiscussionRevisionPayload<ExtArgs>[]
     commentRevisions: Prisma.$CommentRevisionPayload<ExtArgs>[]
+    defaultFor: Prisma.$UserPreferencePayload<ExtArgs>[]
+    lastVisitedBy: Prisma.$UserPreferencePayload<ExtArgs>[]
     decisions: Prisma.$DecisionPayload<ExtArgs>[]
     decisionReviews: Prisma.$DecisionReviewPayload<ExtArgs>[]
     reactions: Prisma.$ReactionPayload<ExtArgs>[]
@@ -3133,6 +3568,8 @@ export interface Prisma__WorkspaceClient<T, Null = never, ExtArgs extends runtim
   comments<T extends Prisma.Workspace$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   discussionRevisions<T extends Prisma.Workspace$discussionRevisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$discussionRevisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DiscussionRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   commentRevisions<T extends Prisma.Workspace$commentRevisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$commentRevisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  defaultFor<T extends Prisma.Workspace$defaultForArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$defaultForArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  lastVisitedBy<T extends Prisma.Workspace$lastVisitedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$lastVisitedByArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   decisions<T extends Prisma.Workspace$decisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$decisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   decisionReviews<T extends Prisma.Workspace$decisionReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$decisionReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DecisionReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reactions<T extends Prisma.Workspace$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Workspace$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3696,6 +4133,54 @@ export type Workspace$commentRevisionsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.CommentRevisionScalarFieldEnum | Prisma.CommentRevisionScalarFieldEnum[]
+}
+
+/**
+ * Workspace.defaultFor
+ */
+export type Workspace$defaultForArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserPreference
+   */
+  select?: Prisma.UserPreferenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserPreference
+   */
+  omit?: Prisma.UserPreferenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserPreferenceInclude<ExtArgs> | null
+  where?: Prisma.UserPreferenceWhereInput
+  orderBy?: Prisma.UserPreferenceOrderByWithRelationInput | Prisma.UserPreferenceOrderByWithRelationInput[]
+  cursor?: Prisma.UserPreferenceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserPreferenceScalarFieldEnum | Prisma.UserPreferenceScalarFieldEnum[]
+}
+
+/**
+ * Workspace.lastVisitedBy
+ */
+export type Workspace$lastVisitedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserPreference
+   */
+  select?: Prisma.UserPreferenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserPreference
+   */
+  omit?: Prisma.UserPreferenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserPreferenceInclude<ExtArgs> | null
+  where?: Prisma.UserPreferenceWhereInput
+  orderBy?: Prisma.UserPreferenceOrderByWithRelationInput | Prisma.UserPreferenceOrderByWithRelationInput[]
+  cursor?: Prisma.UserPreferenceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserPreferenceScalarFieldEnum | Prisma.UserPreferenceScalarFieldEnum[]
 }
 
 /**

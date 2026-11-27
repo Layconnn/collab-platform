@@ -6,6 +6,8 @@ const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
   change: { isPending: false, isSuccess: false, error: null as null | { data: { code: string } } },
   setMode: vi.fn(),
+  save: vi.fn(),
+  preferences: { saved: true, theme: "system", motion: "system", density: "comfortable", startPage: "default", defaultWorkspaceId: "w2", lastWorkspaceId: null } as Record<string, unknown>,
   prefs: { data: { enabled: true, workspaces: [{ id: "w1", name: "Platform", included: true }, { id: "w2", name: "Marketing", included: false }] }, error: null } as unknown,
 }));
 
@@ -13,18 +15,26 @@ vi.mock("next/navigation", () => ({ usePathname: () => mocks.pathname }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: "u1", name: "Maya Okafor", username: "maya_okafor", email: "maya@example.test" } }) }));
 vi.mock("@/hooks/useDigest", () => ({ useDigestPreferences: () => mocks.prefs }));
 vi.mock("@/components/settings/EmailSettings", () => ({ EmailSettings: ({ embedded }: { embedded?: boolean }) => <p>Digest controls {embedded ? "embedded" : "standalone"}</p> }));
+vi.mock("@/hooks/useWorkspace", () => ({ useWorkspaceSwitcherList: () => ({ isLoading: false, data: { pages: [{ items: [{ workspaceId: "w1", name: "Platform" }, { workspaceId: "w2", name: "Marketing" }] }] } }) }));
 vi.mock("@/components/theme/ThemeProvider", () => ({ useTheme: () => ({ mode: "system", setMode: mocks.setMode }) }));
 vi.mock("@/lib/trpc/api-client", () => ({
-  trpc: { auth: { changePassword: { useMutation: () => ({ ...mocks.change, mutate: mocks.mutate }) } } },
+  trpc: {
+    useUtils: () => ({ preferences: { get: { setData: vi.fn() } } }),
+    auth: { changePassword: { useMutation: () => ({ ...mocks.change, mutate: mocks.mutate }) } },
+    preferences: {
+      get: { useQuery: () => ({ data: mocks.preferences }) },
+      update: { useMutation: () => ({ mutate: mocks.save, isPending: false, isSuccess: false, error: null, variables: undefined }) },
+    },
+  },
 }));
 
 import { SettingsFrame } from "./SettingsFrame";
-import { AccountSettings, AppearanceSettings, DigestSettings, NotificationSettings, PasswordSettings } from "./SettingsPages";
+import { AccountSettings, AppearanceSettings, DigestSettings, NotificationSettings, PasswordSettings, WorkspacesSettings } from "./SettingsPages";
 import { searchSettings } from "./settingsIndex";
 
 describe("Settings", () => {
   beforeEach(() => {
-    mocks.pathname = "/settings"; mocks.mutate.mockReset(); mocks.setMode.mockReset();
+    mocks.pathname = "/settings"; mocks.mutate.mockReset(); mocks.setMode.mockReset(); mocks.save.mockReset();
     mocks.change = { isPending: false, isSuccess: false, error: null };
   });
   afterEach(cleanup);
@@ -34,7 +44,7 @@ describe("Settings", () => {
     render(<SettingsFrame><p>Detail</p></SettingsFrame>);
     const nav = screen.getByRole("navigation", { name: "Settings" });
     const links = within(nav).getAllByRole("link");
-    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/settings/account", "/settings/notifications", "/settings/appearance"]);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/settings/account", "/settings/notifications", "/settings/workspaces", "/settings/appearance"]);
     expect(links[0]!.getAttribute("aria-current")).toBe("page");
     expect(links[1]!.textContent).toContain("The daily digest email");
     expect(screen.getByText("Detail")).toBeTruthy();
@@ -105,10 +115,29 @@ describe("Settings", () => {
     expect(screen.getByRole("link", { name: /Notifications/ }).getAttribute("href")).toBe("/settings/notifications");
   });
 
-  it("switches the theme from Appearance", () => {
+  it("switches theme, motion and density, saving each to the account", () => {
     render(<AppearanceSettings />);
-    expect((screen.getByRole("radio", { name: /System/ }) as HTMLInputElement).checked).toBe(true);
-    fireEvent.click(screen.getByRole("radio", { name: /Dark/ }));
+    expect((screen.getByRole("radio", { name: /^System/ }) as HTMLInputElement).checked).toBe(true);
+    fireEvent.click(screen.getByRole("radio", { name: /^Dark/ }));
     expect(mocks.setMode).toHaveBeenCalledWith("dark");
+    expect(mocks.save).toHaveBeenCalledWith({ theme: "dark" });
+    fireEvent.click(screen.getByRole("radio", { name: /^Reduce motion/ }));
+    expect(mocks.save).toHaveBeenCalledWith({ motion: "reduce" });
+    expect(document.documentElement.dataset.motion).toBe("reduce");
+    fireEvent.click(screen.getByRole("radio", { name: /^Compact/ }));
+    expect(mocks.save).toHaveBeenCalledWith({ density: "compact" });
+    expect(document.documentElement.dataset.density).toBe("compact");
+    delete document.documentElement.dataset.motion; delete document.documentElement.dataset.density;
+  });
+
+  it("chooses where Commons opens and the default workspace", () => {
+    render(<WorkspacesSettings />);
+    expect((screen.getByRole("radio", { name: /^Your default workspace/ }) as HTMLInputElement).checked).toBe(true);
+    const select = screen.getByLabelText("Workspace") as HTMLSelectElement;
+    expect(select.value).toBe("w2");
+    fireEvent.change(select, { target: { value: "w1" } });
+    expect(mocks.save).toHaveBeenCalledWith({ defaultWorkspaceId: "w1" });
+    fireEvent.click(screen.getByRole("radio", { name: /^The last workspace/ }));
+    expect(mocks.save).toHaveBeenCalledWith({ startPage: "last" });
   });
 });

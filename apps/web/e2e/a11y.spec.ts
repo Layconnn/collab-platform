@@ -54,7 +54,7 @@ test("signed-in pages meet WCAG 2.2 AA in light and dark", async ({ page }) => {
   const pages = [
     "/workspace", workspace, `${workspace}/discussions`, discussion, `${workspace}/decisions`,
     `${workspace}/members`, "/search?q=queue", "/saved", "/settings", "/settings/account",
-    "/settings/account/profile", "/settings/account/password", "/settings/notifications", "/settings/notifications/digest", "/settings/appearance",
+    "/settings/account/profile", "/settings/account/password", "/settings/notifications", "/settings/notifications/digest", "/settings/workspaces", "/settings/appearance",
   ];
   const problems: string[] = [];
   for (const colorScheme of ["light", "dark"] as const) {
