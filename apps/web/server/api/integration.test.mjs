@@ -647,11 +647,11 @@ test("mention search is bounded, member-accessible, and tenant-scoped", async ()
   );
   await owner.workspace.addMember({ workspaceId: first.id, userId: userB, role: "MEMBER" });
   assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "USER_A" }), [
-    { id: userA, name: "User A", username: "user_a" },
+    { id: userA, name: "User A", username: "user_a", avatarKey: undefined },
   ]);
   assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "user a".replace(" ", "") }), []);
   assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "A" }), [
-    { id: userA, name: "User A", username: "user_a" },
+    { id: userA, name: "User A", username: "user_a", avatarKey: undefined },
   ]);
   await assert.rejects(
     () => member.workspace.searchMentionMembers({ workspaceId: second.id, query: "" }),
@@ -667,7 +667,7 @@ test("mention search is bounded, member-accessible, and tenant-scoped", async ()
   }
   const matches = await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "mention" });
   assert.equal(matches.length, 8);
-  assert.ok(matches.every((result) => Object.keys(result).sort().join(",") === "id,name,username"));
+  assert.ok(matches.every((result) => Object.keys(result).sort().join(",") === "avatarKey,id,name,username"));
   await owner.workspace.removeMember({ workspaceId: first.id, userId: userB });
   await assert.rejects(
     () => member.workspace.searchMentionMembers({ workspaceId: first.id, query: "mention" }),
