@@ -1,10 +1,18 @@
-import { closeAccountInputSchema, disableTwoStepInputSchema, enableTwoStepInputSchema, regenerateRecoveryCodesInputSchema } from "@repo/validators/auth";
+import {
+  closeAccountInputSchema,
+  confirmEmailChangeInputSchema,
+  disableTwoStepInputSchema,
+  enableTwoStepInputSchema,
+  regenerateRecoveryCodesInputSchema,
+  requestEmailChangeInputSchema,
+} from "@repo/validators/auth";
 import { securityLogInputSchema, signOutSessionInputSchema } from "@repo/validators/security";
 
 import { execute } from "../../errors/app-error";
 import { getSessionCookieToken } from "../../middleware/auth";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { accountService } from "../../services/account.service";
+import { emailChangeService } from "../../services/email-change.service";
 import { clientOf, sessionService } from "../../services/session.service";
 import { buildLogoutCookies } from "../../utils/auth-cookies";
 import { twoStepService } from "../../services/two-step.service";
@@ -51,6 +59,21 @@ export const securityRouter = createTRPCRouter({
   disableTwoStep: limited("security.disableTwoStep", 5).input(disableTwoStepInputSchema).mutation(({ ctx, input }) =>
     execute(() => twoStepService.disable(ctx.user.id, input, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),
   ),
+  // Changing your email (FR-20). Asking sends mail, so three an hour;
+  // each code check is limited too.
+  emailChange: limited("security.emailChange", 60).query(({ ctx }) =>
+    execute(() => emailChangeService.status(ctx.user.id)),
+  ),
+  requestEmailChange: limited("security.requestEmailChange", 3, 3600).input(requestEmailChangeInputSchema).mutation(({ ctx, input }) =>
+    execute(() => emailChangeService.request(ctx.user.id, input)),
+  ),
+  confirmEmailChange: limited("security.confirmEmailChange", 10).input(confirmEmailChangeInputSchema).mutation(({ ctx, input }) =>
+    execute(() => emailChangeService.confirm(ctx.user.id, input, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),
+  ),
+  cancelEmailChange: limited("security.cancelEmailChange", 20).mutation(({ ctx }) =>
+    execute(() => emailChangeService.cancel(ctx.user.id)),
+  ),
+
   // Your data (FR-17, FR-18). One export an hour; closing checks the
   // password, so five tries in ten minutes.
   exportData: limited("security.exportData", 1, 3600).mutation(({ ctx }) =>

@@ -87,6 +87,10 @@ Limits (`packages/validators/src/files.ts`): 10 MB per file, 10 files per post, 
 
 Authenticator secrets are stored encrypted (AES-256-GCM) in `User.totpSecret`. The key comes from `TOTP_ENCRYPTION_KEY` (32+ characters) or, when it is unset, is derived from `JWT_SECRET`. Rotating `JWT_SECRET` without `TOTP_ENCRYPTION_KEY` set makes every stored secret unreadable, and people with two-step on could then only sign in with a recovery code. Before rotating `JWT_SECRET`, set `TOTP_ENCRYPTION_KEY` to its current value: the derived key stays the same. Recovery codes are kept only as SHA-256 hashes; sign-in challenges live in Redis (`auth:2fa-challenge:*`, five minutes, five codes).
 
+## Changing an email address
+
+Settings → Your account → Email sends a 6-digit code to the new address through the same Resend sender as the digest (`RESEND_API_KEY`, `DIGEST_FROM`). Codes are kept in Redis as a hash for 15 minutes (`auth:email-change:<userId>`, 5 attempts). While `DIGEST_DELIVERY=allowlist`, codes and the notice to the old address only go to addresses in `DIGEST_ALLOWLIST`, and the page says so; without `RESEND_API_KEY` changing email is switched off. Switching `DIGEST_DELIVERY` to `all` once the sending domain is verified opens it to everyone.
+
 ## Closed accounts and erasure
 
 Closing an account (Settings → Your account → Your data) sets `User.closedAt`, ends every session and starts a 30-day grace period; signing in during it clears `closedAt`. Closed accounts get no digest email.

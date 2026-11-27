@@ -161,6 +161,8 @@ jobs:
         run: pnpm -C apps/web run test:leave-workspace-api
       - name: Your data and closing an account (real database)
         run: pnpm -C apps/web run test:account-api
+      - name: Changing your email (real database)
+        run: pnpm -C apps/web run test:email-change-api
 
   frontend-tests:
     name: Frontend tests

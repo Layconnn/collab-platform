@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Download, KeyRound, LogIn, LogOut, Monitor, ShieldCheck, ShieldOff, Smartphone, UserCheck, UserPen, UserPlus, UserX } from "lucide-react";
+import { AlertTriangle, Download, KeyRound, Mail, LogIn, LogOut, Monitor, ShieldCheck, ShieldOff, Smartphone, UserCheck, UserPen, UserPlus, UserX } from "lucide-react";
 import { useState } from "react";
 
 import { timeAgo } from "@/components/activity/RecentActivity";
@@ -111,6 +111,7 @@ const EVENTS = {
   DATA_EXPORTED: { title: "Downloaded your data", Icon: Download, warn: false },
   ACCOUNT_CLOSED: { title: "Account closed", Icon: UserX, warn: true },
   ACCOUNT_RESTORED: { title: "Account reopened by signing in", Icon: UserCheck, warn: false },
+  EMAIL_CHANGED: { title: "Email address changed", Icon: Mail, warn: false },
 } as const;
 
 export function SecurityLogSettings() {
