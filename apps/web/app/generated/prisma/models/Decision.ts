@@ -1022,14 +1022,6 @@ export type EnumDecisionReviewRuleFieldUpdateOperationsInput = {
   set?: $Enums.DecisionReviewRule
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type DecisionCreateNestedOneWithoutRevisionsInput = {
   create?: Prisma.XOR<Prisma.DecisionCreateWithoutRevisionsInput, Prisma.DecisionUncheckedCreateWithoutRevisionsInput>
   connectOrCreate?: Prisma.DecisionCreateOrConnectWithoutRevisionsInput

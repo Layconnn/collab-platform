@@ -155,6 +155,8 @@ jobs:
         run: pnpm -C apps/web run test:notification-preferences-api
       - name: Sessions and security log (real database)
         run: pnpm -C apps/web run test:sessions-api
+      - name: Two-step sign-in (real database)
+        run: pnpm -C apps/web run test:two-step-api
 
   frontend-tests:
     name: Frontend tests

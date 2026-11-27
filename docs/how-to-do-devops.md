@@ -83,6 +83,10 @@ Locally and in the end-to-end job, `FILES_LOCAL_DIR=<folder>` keeps files in a f
 
 Limits (`packages/validators/src/files.ts`): 10 MB per file, 10 files per post, 1 GB per workspace. R2's free plan covers 10 GB stored, 1 million writes and 10 million reads a month, with free downloads.
 
+## Two-step sign-in
+
+Authenticator secrets are stored encrypted (AES-256-GCM) in `User.totpSecret`. The key comes from `TOTP_ENCRYPTION_KEY` (32+ characters) or, when it is unset, is derived from `JWT_SECRET`. Rotating `JWT_SECRET` without `TOTP_ENCRYPTION_KEY` set makes every stored secret unreadable, and people with two-step on could then only sign in with a recovery code. Before rotating `JWT_SECRET`, set `TOTP_ENCRYPTION_KEY` to its current value: the derived key stays the same. Recovery codes are kept only as SHA-256 hashes; sign-in challenges live in Redis (`auth:2fa-challenge:*`, five minutes, five codes).
+
 ## Production database migrations
 
 Migrations reach production through `.github/workflows/migrate-production.yml`, never from a laptop.

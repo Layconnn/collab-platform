@@ -1,9 +1,11 @@
+import { disableTwoStepInputSchema, enableTwoStepInputSchema, regenerateRecoveryCodesInputSchema } from "@repo/validators/auth";
 import { securityLogInputSchema, signOutSessionInputSchema } from "@repo/validators/security";
 
 import { execute } from "../../errors/app-error";
 import { getSessionCookieToken } from "../../middleware/auth";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
 import { clientOf, sessionService } from "../../services/session.service";
+import { twoStepService } from "../../services/two-step.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 function limited(routeKey: string, limit: number) {
@@ -31,5 +33,23 @@ export const securityRouter = createTRPCRouter({
   ),
   log: limited("security.log", 60).input(securityLogInputSchema).query(({ ctx, input }) =>
     execute(() => sessionService.log(ctx.user.id, input)),
+  ),
+
+  // Two-step sign-in (FR-11, FR-12). Every call that checks a code is limited
+  // to a few tries a minute.
+  twoStep: limited("security.twoStep", 60).query(({ ctx }) =>
+    execute(() => twoStepService.status(ctx.user.id)),
+  ),
+  beginTwoStep: limited("security.beginTwoStep", 10).mutation(({ ctx }) =>
+    execute(() => twoStepService.begin(ctx.user.id)),
+  ),
+  enableTwoStep: limited("security.enableTwoStep", 6).input(enableTwoStepInputSchema).mutation(({ ctx, input }) =>
+    execute(() => twoStepService.enable(ctx.user.id, input.code, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),
+  ),
+  disableTwoStep: limited("security.disableTwoStep", 5).input(disableTwoStepInputSchema).mutation(({ ctx, input }) =>
+    execute(() => twoStepService.disable(ctx.user.id, input, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),
+  ),
+  regenerateRecoveryCodes: limited("security.regenerateRecoveryCodes", 5).input(regenerateRecoveryCodesInputSchema).mutation(({ ctx, input }) =>
+    execute(() => twoStepService.regenerateRecoveryCodes(ctx.user.id, input.code, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),
   ),
 });

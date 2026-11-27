@@ -25,6 +25,9 @@ const envSchema = z.object({
   R2_BUCKET: z.string().min(1).optional(),
   // Local runs and end-to-end tests only: keep files in this folder instead.
   FILES_LOCAL_DIR: z.string().min(1).optional(),
+  // Encrypts authenticator secrets (two-step sign-in). Falls back to a key
+  // derived from JWT_SECRET; set it before rotating JWT_SECRET.
+  TOTP_ENCRYPTION_KEY: z.string().min(32).optional(),
 });
 
 export const env = envSchema.parse(process.env);

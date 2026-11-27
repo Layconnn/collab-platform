@@ -79,6 +79,12 @@ model User {
   usernameChangedAt        DateTime?
   // The profile photo in storage, avatars/<userId>/<random>.webp (settings PRD, FR-3).
   avatarKey                String?
+  // Two-step sign-in (settings PRD, FR-11 to FR-13). The authenticator secret
+  // is encrypted (AES-256-GCM); the last accepted 30-second step stops a code
+  // being used twice.
+  totpSecret               String?
+  totpEnabledAt            DateTime?
+  totpLastStep             Int?
   createdAt                DateTime                @default(now())
   updatedAt                DateTime                @updatedAt
   ownedSpaces              Workspace[]
@@ -107,6 +113,7 @@ model User {
   preference               UserPreference?
   sessions                 UserSession[]
   securityEvents           SecurityEvent[]
+  recoveryCodes            RecoveryCode[]
   discussionRevisions      DiscussionRevision[]    @relation("DiscussionRevisionEditor")
   commentRevisions         CommentRevision[]       @relation("CommentRevisionEditor")
 }
@@ -736,6 +743,23 @@ enum SecurityEventKind {
   OTHER_SESSIONS_SIGNED_OUT
   PASSWORD_CHANGED
   USERNAME_CHANGED
+  TWO_STEP_ENABLED
+  TWO_STEP_DISABLED
+  RECOVERY_CODES_REGENERATED
+  RECOVERY_CODE_USED
+}
+
+// Single-use codes for when the authenticator is lost (settings PRD, FR-12).
+// Only a hash is kept; the codes are shown once.
+model RecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, codeHash])
 }
 
 model SecurityEvent {

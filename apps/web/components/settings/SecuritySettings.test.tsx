@@ -14,6 +14,7 @@ vi.mock("@/lib/trpc/api-client", () => ({
     useUtils: () => ({ security: { sessions: { invalidate: vi.fn() }, log: { invalidate: vi.fn() } } }),
     security: {
       sessions: { useQuery: () => ({ data: mocks.sessions, error: null }) },
+      twoStep: { useQuery: () => ({ data: { enabled: true, enabledAt: new Date(), recoveryCodesLeft: 10 }, error: null }) },
       signOutSession: { useMutation: () => ({ mutate: mocks.signOut, isPending: false, error: null }) },
       signOutOthers: { useMutation: () => ({ mutate: mocks.signOutOthers, isPending: false, error: null }) },
       log: { useInfiniteQuery: () => ({ data: { pages: [{ items: mocks.log, nextCursor: null }] }, hasNextPage: false, error: null }) },
@@ -37,6 +38,7 @@ describe("Security settings", () => {
     render(<SecurityOverview />);
     expect(screen.getByRole("link", { name: /Sessions/ }).textContent).toContain("3 active");
     expect(screen.getByRole("link", { name: /Password/ }).getAttribute("href")).toBe("/settings/account/password");
+    expect(screen.getByRole("link", { name: /Two-step sign-in/ }).textContent).toContain("On");
   });
 
   it("lists sessions with this device first and signs one out", () => {
@@ -69,11 +71,13 @@ describe("Security settings", () => {
     mocks.log = [
       { id: "e2", kind: "SIGN_IN_FAILED", device: "Chrome on Windows", country: "NG", createdAt: now, sessionId: null },
       { id: "e1", kind: "PASSWORD_CHANGED", device: null, country: null, createdAt: now, sessionId: null },
+      { id: "e0", kind: "RECOVERY_CODE_USED", device: null, country: null, createdAt: now, sessionId: null },
     ];
     render(<SecurityLogSettings />);
     const events = within(screen.getByRole("list", { name: "Security events" })).getAllByRole("listitem");
     expect(events[0]!.textContent).toContain("Failed sign-in attempt");
     expect(events[0]!.textContent).toContain("Chrome on Windows · Nigeria");
     expect(events[1]!.textContent).toContain("Password changed");
+    expect(events[2]!.textContent).toContain("Signed in with a recovery code");
   });
 });
