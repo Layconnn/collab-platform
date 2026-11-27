@@ -19,6 +19,7 @@ import {
 } from "../middleware/auth";
 import { recordAuthFailure } from "../observability/security-events";
 import { recordSecurityEvent, recordSessionStart, sessionService, type Client } from "./session.service";
+import { accountService } from "./account.service";
 import { twoStepService } from "./two-step.service";
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
@@ -47,6 +48,8 @@ async function startSession(userId: string, client: Client, kind: "ACCOUNT_CREAT
   await persistSession(sessionToken, userId, sessionId, SESSION_TTL_SECONDS);
   await recordSessionStart(userId, sessionId, client);
   await recordSecurityEvent(userId, kind, { sessionId, client });
+  // Signing in during the 30-day grace period reopens a closed account (FR-18).
+  if (kind === "SIGNED_IN") await accountService.restoreIfClosed(userId, { sessionId, client });
 
   return {
     accessToken: signAccessToken(userId, sessionId),

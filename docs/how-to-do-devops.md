@@ -87,6 +87,12 @@ Limits (`packages/validators/src/files.ts`): 10 MB per file, 10 files per post, 
 
 Authenticator secrets are stored encrypted (AES-256-GCM) in `User.totpSecret`. The key comes from `TOTP_ENCRYPTION_KEY` (32+ characters) or, when it is unset, is derived from `JWT_SECRET`. Rotating `JWT_SECRET` without `TOTP_ENCRYPTION_KEY` set makes every stored secret unreadable, and people with two-step on could then only sign in with a recovery code. Before rotating `JWT_SECRET`, set `TOTP_ENCRYPTION_KEY` to its current value: the derived key stays the same. Recovery codes are kept only as SHA-256 hashes; sign-in challenges live in Redis (`auth:2fa-challenge:*`, five minutes, five codes).
 
+## Closed accounts and erasure
+
+Closing an account (Settings → Your account → Your data) sets `User.closedAt`, ends every session and starts a 30-day grace period; signing in during it clears `closedAt`. Closed accounts get no digest email.
+
+`.github/workflows/account-erasure.yml` runs at 04:15 UTC with `DIGEST_RUN_SECRET` and calls `POST /api/accounts/erase` until `done: true`. For each account closed more than 30 days ago it keeps the `User` row (discussions, replies and decisions reference it) but replaces the email, username and name ("Former member"), clears the password, photo and authenticator secret, sets `erasedAt`, removes memberships (recorded as leaving), and deletes sessions, the security log, preferences, saved items, follows, recovery codes, notifications and digest rows. Names copied next to content (decision, review, revision and activity labels) are rewritten to "Former member", and the photo is deleted from R2. An account that owns a workspace again is skipped and listed in the run's warning; transfer that workspace by hand. Erasing is idempotent.
+
 ## Production database migrations
 
 Migrations reach production through `.github/workflows/migrate-production.yml`, never from a laptop.

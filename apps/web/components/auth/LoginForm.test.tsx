@@ -145,4 +145,11 @@ describe("LoginForm", () => {
     expect((screen.getByLabelText("Password") as HTMLInputElement).value).toBe("");
     expect((screen.getByLabelText("Email") as HTMLInputElement).value).toBe("person@example.com");
   });
+
+  it("says the account is closed after closing it", () => {
+    window.history.replaceState(null, "", "/login?closed=1");
+    render(<LoginForm />);
+    expect(screen.getByRole("status").textContent).toContain("Sign in within 30 days to reopen it.");
+    window.history.replaceState(null, "", "/");
+  });
 });

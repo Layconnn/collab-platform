@@ -45,6 +45,8 @@ export type UserMinAggregateOutputType = {
   totpSecret: string | null
   totpEnabledAt: Date | null
   totpLastStep: number | null
+  closedAt: Date | null
+  erasedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,6 +62,8 @@ export type UserMaxAggregateOutputType = {
   totpSecret: string | null
   totpEnabledAt: Date | null
   totpLastStep: number | null
+  closedAt: Date | null
+  erasedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -75,6 +79,8 @@ export type UserCountAggregateOutputType = {
   totpSecret: number
   totpEnabledAt: number
   totpLastStep: number
+  closedAt: number
+  erasedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -100,6 +106,8 @@ export type UserMinAggregateInputType = {
   totpSecret?: true
   totpEnabledAt?: true
   totpLastStep?: true
+  closedAt?: true
+  erasedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -115,6 +123,8 @@ export type UserMaxAggregateInputType = {
   totpSecret?: true
   totpEnabledAt?: true
   totpLastStep?: true
+  closedAt?: true
+  erasedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -130,6 +140,8 @@ export type UserCountAggregateInputType = {
   totpSecret?: true
   totpEnabledAt?: true
   totpLastStep?: true
+  closedAt?: true
+  erasedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -232,6 +244,8 @@ export type UserGroupByOutputType = {
   totpSecret: string | null
   totpEnabledAt: Date | null
   totpLastStep: number | null
+  closedAt: Date | null
+  erasedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -270,6 +284,8 @@ export type UserWhereInput = {
   totpSecret?: Prisma.StringNullableFilter<"User"> | string | null
   totpEnabledAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   totpLastStep?: Prisma.IntNullableFilter<"User"> | number | null
+  closedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  erasedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ownedSpaces?: Prisma.WorkspaceListRelationFilter
@@ -314,6 +330,8 @@ export type UserOrderByWithRelationInput = {
   totpSecret?: Prisma.SortOrderInput | Prisma.SortOrder
   totpEnabledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totpLastStep?: Prisma.SortOrderInput | Prisma.SortOrder
+  closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  erasedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownedSpaces?: Prisma.WorkspaceOrderByRelationAggregateInput
@@ -361,6 +379,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   totpSecret?: Prisma.StringNullableFilter<"User"> | string | null
   totpEnabledAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   totpLastStep?: Prisma.IntNullableFilter<"User"> | number | null
+  closedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  erasedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ownedSpaces?: Prisma.WorkspaceListRelationFilter
@@ -405,6 +425,8 @@ export type UserOrderByWithAggregationInput = {
   totpSecret?: Prisma.SortOrderInput | Prisma.SortOrder
   totpEnabledAt?: Prisma.SortOrderInput | Prisma.SortOrder
   totpLastStep?: Prisma.SortOrderInput | Prisma.SortOrder
+  closedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  erasedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -428,6 +450,8 @@ export type UserScalarWhereWithAggregatesInput = {
   totpSecret?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   totpEnabledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   totpLastStep?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
+  closedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  erasedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -443,6 +467,8 @@ export type UserCreateInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -487,6 +513,8 @@ export type UserUncheckedCreateInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -531,6 +559,8 @@ export type UserUpdateInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -575,6 +605,8 @@ export type UserUncheckedUpdateInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -619,6 +651,8 @@ export type UserCreateManyInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -634,6 +668,8 @@ export type UserUpdateManyMutationInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -649,6 +685,8 @@ export type UserUncheckedUpdateManyInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -664,6 +702,8 @@ export type UserCountOrderByAggregateInput = {
   totpSecret?: Prisma.SortOrder
   totpEnabledAt?: Prisma.SortOrder
   totpLastStep?: Prisma.SortOrder
+  closedAt?: Prisma.SortOrder
+  erasedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -683,6 +723,8 @@ export type UserMaxOrderByAggregateInput = {
   totpSecret?: Prisma.SortOrder
   totpEnabledAt?: Prisma.SortOrder
   totpLastStep?: Prisma.SortOrder
+  closedAt?: Prisma.SortOrder
+  erasedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -698,6 +740,8 @@ export type UserMinOrderByAggregateInput = {
   totpSecret?: Prisma.SortOrder
   totpEnabledAt?: Prisma.SortOrder
   totpLastStep?: Prisma.SortOrder
+  closedAt?: Prisma.SortOrder
+  erasedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1183,6 +1227,8 @@ export type UserCreateWithoutOwnedSpacesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
@@ -1226,6 +1272,8 @@ export type UserUncheckedCreateWithoutOwnedSpacesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
@@ -1285,6 +1333,8 @@ export type UserUpdateWithoutOwnedSpacesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
@@ -1328,6 +1378,8 @@ export type UserUncheckedUpdateWithoutOwnedSpacesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -1371,6 +1423,8 @@ export type UserCreateWithoutDiscussionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1414,6 +1468,8 @@ export type UserUncheckedCreateWithoutDiscussionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1473,6 +1529,8 @@ export type UserUpdateWithoutDiscussionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1516,6 +1574,8 @@ export type UserUncheckedUpdateWithoutDiscussionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1559,6 +1619,8 @@ export type UserCreateWithoutCommentsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1602,6 +1664,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1650,6 +1714,8 @@ export type UserCreateWithoutCommentsPinnedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1693,6 +1759,8 @@ export type UserUncheckedCreateWithoutCommentsPinnedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1752,6 +1820,8 @@ export type UserUpdateWithoutCommentsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1795,6 +1865,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1849,6 +1921,8 @@ export type UserUpdateWithoutCommentsPinnedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1892,6 +1966,8 @@ export type UserUncheckedUpdateWithoutCommentsPinnedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1935,6 +2011,8 @@ export type UserCreateWithoutNotificationsReceivedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1978,6 +2056,8 @@ export type UserUncheckedCreateWithoutNotificationsReceivedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2026,6 +2106,8 @@ export type UserCreateWithoutNotificationsSentInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2069,6 +2151,8 @@ export type UserUncheckedCreateWithoutNotificationsSentInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2128,6 +2212,8 @@ export type UserUpdateWithoutNotificationsReceivedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2171,6 +2257,8 @@ export type UserUncheckedUpdateWithoutNotificationsReceivedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2225,6 +2313,8 @@ export type UserUpdateWithoutNotificationsSentInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2268,6 +2358,8 @@ export type UserUncheckedUpdateWithoutNotificationsSentInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2311,6 +2403,8 @@ export type UserCreateWithoutMembershipsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2354,6 +2448,8 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2413,6 +2509,8 @@ export type UserUpdateWithoutMembershipsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2456,6 +2554,8 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2499,6 +2599,8 @@ export type UserCreateWithoutDecisionsCreatedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2542,6 +2644,8 @@ export type UserUncheckedCreateWithoutDecisionsCreatedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2590,6 +2694,8 @@ export type UserCreateWithoutDecisionsDeletedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2633,6 +2739,8 @@ export type UserUncheckedCreateWithoutDecisionsDeletedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2692,6 +2800,8 @@ export type UserUpdateWithoutDecisionsCreatedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2735,6 +2845,8 @@ export type UserUncheckedUpdateWithoutDecisionsCreatedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2789,6 +2901,8 @@ export type UserUpdateWithoutDecisionsDeletedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2832,6 +2946,8 @@ export type UserUncheckedUpdateWithoutDecisionsDeletedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2875,6 +2991,8 @@ export type UserCreateWithoutDecisionRevisionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2918,6 +3036,8 @@ export type UserUncheckedCreateWithoutDecisionRevisionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2977,6 +3097,8 @@ export type UserUpdateWithoutDecisionRevisionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3020,6 +3142,8 @@ export type UserUncheckedUpdateWithoutDecisionRevisionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3063,6 +3187,8 @@ export type UserCreateWithoutDecisionReviewsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3106,6 +3232,8 @@ export type UserUncheckedCreateWithoutDecisionReviewsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3154,6 +3282,8 @@ export type UserCreateWithoutDecisionReviewsRequestedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3197,6 +3327,8 @@ export type UserUncheckedCreateWithoutDecisionReviewsRequestedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3256,6 +3388,8 @@ export type UserUpdateWithoutDecisionReviewsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3299,6 +3433,8 @@ export type UserUncheckedUpdateWithoutDecisionReviewsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3353,6 +3489,8 @@ export type UserUpdateWithoutDecisionReviewsRequestedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3396,6 +3534,8 @@ export type UserUncheckedUpdateWithoutDecisionReviewsRequestedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3439,6 +3579,8 @@ export type UserCreateWithoutDiscussionFollowsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3482,6 +3624,8 @@ export type UserUncheckedCreateWithoutDiscussionFollowsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3541,6 +3685,8 @@ export type UserUpdateWithoutDiscussionFollowsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3584,6 +3730,8 @@ export type UserUncheckedUpdateWithoutDiscussionFollowsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3627,6 +3775,8 @@ export type UserCreateWithoutDigestPreferenceInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3670,6 +3820,8 @@ export type UserUncheckedCreateWithoutDigestPreferenceInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3729,6 +3881,8 @@ export type UserUpdateWithoutDigestPreferenceInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3772,6 +3926,8 @@ export type UserUncheckedUpdateWithoutDigestPreferenceInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3815,6 +3971,8 @@ export type UserCreateWithoutDigestOptOutsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3858,6 +4016,8 @@ export type UserUncheckedCreateWithoutDigestOptOutsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3917,6 +4077,8 @@ export type UserUpdateWithoutDigestOptOutsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3960,6 +4122,8 @@ export type UserUncheckedUpdateWithoutDigestOptOutsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4003,6 +4167,8 @@ export type UserCreateWithoutDigestDeliveriesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4046,6 +4212,8 @@ export type UserUncheckedCreateWithoutDigestDeliveriesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4105,6 +4273,8 @@ export type UserUpdateWithoutDigestDeliveriesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4148,6 +4318,8 @@ export type UserUncheckedUpdateWithoutDigestDeliveriesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4191,6 +4363,8 @@ export type UserCreateWithoutSavedItemsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4234,6 +4408,8 @@ export type UserUncheckedCreateWithoutSavedItemsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4293,6 +4469,8 @@ export type UserUpdateWithoutSavedItemsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4336,6 +4514,8 @@ export type UserUncheckedUpdateWithoutSavedItemsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4379,6 +4559,8 @@ export type UserCreateWithoutReactionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4422,6 +4604,8 @@ export type UserUncheckedCreateWithoutReactionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4481,6 +4665,8 @@ export type UserUpdateWithoutReactionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4524,6 +4710,8 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4567,6 +4755,8 @@ export type UserCreateWithoutSupersessionsAuthorizedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4610,6 +4800,8 @@ export type UserUncheckedCreateWithoutSupersessionsAuthorizedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4669,6 +4861,8 @@ export type UserUpdateWithoutSupersessionsAuthorizedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4712,6 +4906,8 @@ export type UserUncheckedUpdateWithoutSupersessionsAuthorizedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4755,6 +4951,8 @@ export type UserCreateWithoutActivityEventsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4798,6 +4996,8 @@ export type UserUncheckedCreateWithoutActivityEventsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4857,6 +5057,8 @@ export type UserUpdateWithoutActivityEventsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4900,6 +5102,8 @@ export type UserUncheckedUpdateWithoutActivityEventsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4943,6 +5147,8 @@ export type UserCreateWithoutAttachmentsUploadedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4986,6 +5192,8 @@ export type UserUncheckedCreateWithoutAttachmentsUploadedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5045,6 +5253,8 @@ export type UserUpdateWithoutAttachmentsUploadedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5088,6 +5298,8 @@ export type UserUncheckedUpdateWithoutAttachmentsUploadedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5131,6 +5343,8 @@ export type UserCreateWithoutInvitesCreatedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5174,6 +5388,8 @@ export type UserUncheckedCreateWithoutInvitesCreatedInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5233,6 +5449,8 @@ export type UserUpdateWithoutInvitesCreatedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5276,6 +5494,8 @@ export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5319,6 +5539,8 @@ export type UserCreateWithoutInviteUsesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5362,6 +5584,8 @@ export type UserUncheckedCreateWithoutInviteUsesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5421,6 +5645,8 @@ export type UserUpdateWithoutInviteUsesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5464,6 +5690,8 @@ export type UserUncheckedUpdateWithoutInviteUsesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5507,6 +5735,8 @@ export type UserCreateWithoutDiscussionRevisionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5550,6 +5780,8 @@ export type UserUncheckedCreateWithoutDiscussionRevisionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5609,6 +5841,8 @@ export type UserUpdateWithoutDiscussionRevisionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5652,6 +5886,8 @@ export type UserUncheckedUpdateWithoutDiscussionRevisionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5695,6 +5931,8 @@ export type UserCreateWithoutCommentRevisionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5738,6 +5976,8 @@ export type UserUncheckedCreateWithoutCommentRevisionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5797,6 +6037,8 @@ export type UserUpdateWithoutCommentRevisionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5840,6 +6082,8 @@ export type UserUncheckedUpdateWithoutCommentRevisionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5883,6 +6127,8 @@ export type UserCreateWithoutPreferenceInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5926,6 +6172,8 @@ export type UserUncheckedCreateWithoutPreferenceInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5985,6 +6233,8 @@ export type UserUpdateWithoutPreferenceInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -6028,6 +6278,8 @@ export type UserUncheckedUpdateWithoutPreferenceInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6071,6 +6323,8 @@ export type UserCreateWithoutSessionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -6114,6 +6368,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -6173,6 +6429,8 @@ export type UserUpdateWithoutSessionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -6216,6 +6474,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6259,6 +6519,8 @@ export type UserCreateWithoutRecoveryCodesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -6302,6 +6564,8 @@ export type UserUncheckedCreateWithoutRecoveryCodesInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -6361,6 +6625,8 @@ export type UserUpdateWithoutRecoveryCodesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -6404,6 +6670,8 @@ export type UserUncheckedUpdateWithoutRecoveryCodesInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6447,6 +6715,8 @@ export type UserCreateWithoutSecurityEventsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -6490,6 +6760,8 @@ export type UserUncheckedCreateWithoutSecurityEventsInput = {
   totpSecret?: string | null
   totpEnabledAt?: Date | string | null
   totpLastStep?: number | null
+  closedAt?: Date | string | null
+  erasedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -6549,6 +6821,8 @@ export type UserUpdateWithoutSecurityEventsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -6592,6 +6866,8 @@ export type UserUncheckedUpdateWithoutSecurityEventsInput = {
   totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  closedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  erasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6900,6 +7176,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   totpSecret?: boolean
   totpEnabledAt?: boolean
   totpLastStep?: boolean
+  closedAt?: boolean
+  erasedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownedSpaces?: boolean | Prisma.User$ownedSpacesArgs<ExtArgs>
@@ -6945,6 +7223,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   totpSecret?: boolean
   totpEnabledAt?: boolean
   totpLastStep?: boolean
+  closedAt?: boolean
+  erasedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -6960,6 +7240,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   totpSecret?: boolean
   totpEnabledAt?: boolean
   totpLastStep?: boolean
+  closedAt?: boolean
+  erasedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -6975,11 +7257,13 @@ export type UserSelectScalar = {
   totpSecret?: boolean
   totpEnabledAt?: boolean
   totpLastStep?: boolean
+  closedAt?: boolean
+  erasedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "passwordHash" | "name" | "usernameChangedAt" | "avatarKey" | "totpSecret" | "totpEnabledAt" | "totpLastStep" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "passwordHash" | "name" | "usernameChangedAt" | "avatarKey" | "totpSecret" | "totpEnabledAt" | "totpLastStep" | "closedAt" | "erasedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ownedSpaces?: boolean | Prisma.User$ownedSpacesArgs<ExtArgs>
   memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>
@@ -7059,6 +7343,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     totpSecret: string | null
     totpEnabledAt: Date | null
     totpLastStep: number | null
+    closedAt: Date | null
+    erasedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -7523,6 +7809,8 @@ export interface UserFieldRefs {
   readonly totpSecret: Prisma.FieldRef<"User", 'String'>
   readonly totpEnabledAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly totpLastStep: Prisma.FieldRef<"User", 'Int'>
+  readonly closedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly erasedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

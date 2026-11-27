@@ -33,7 +33,7 @@ export function SettingsWelcome() {
 export function AccountSettings() {
   const { user } = useAuth();
   return <div className="min-w-0 max-w-[48rem]">
-    <SettingsHeader title="Your account" intro="Your details as your teammates see them, and the password you sign in with." />
+    <SettingsHeader title="Your account" intro="Your details as your teammates see them, the password you sign in with, and your data." />
     <SettingsGroup label="Account information">
       <SettingsRow label="Name" description="Shown on your discussions, replies and decisions." value={user?.name?.trim() || "Not set"} href="/settings/account/profile" />
       <SettingsRow label="Username" description="How teammates add and mention you." value={user ? `@${user.username}` : ""} href="/settings/account/profile" />
@@ -42,6 +42,10 @@ export function AccountSettings() {
     <SettingsGroup label="Security">
       <SettingsRow label="Change your password" description="Your other devices are signed out when it changes." href="/settings/account/password" />
       <SettingsRow label="Sessions and security log" description="Where you're signed in, and what happened to your account." href="/settings/security" />
+    </SettingsGroup>
+    <SettingsGroup label="Your data">
+      <SettingsRow label="Download your data" description="Everything you've put into Commons, as one file." href="/settings/account/data" />
+      <SettingsRow label="Close your account" description="Signs you out everywhere; you have 30 days to change your mind." href="/settings/account/data" />
     </SettingsGroup>
   </div>;
 }

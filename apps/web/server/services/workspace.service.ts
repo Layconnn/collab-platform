@@ -110,12 +110,12 @@ async function enforceOwnerInvariant(workspaceId: string, dbClient: typeof prism
   }
 }
 
-async function invalidateWorkspaceCache(workspaceId: string): Promise<void> {
+export async function invalidateWorkspaceCache(workspaceId: string): Promise<void> {
   await redisCache.del(workspaceByIdCacheKey(workspaceId));
   await redisCache.delByPattern(`workspace:${workspaceId}:members:*`);
 }
 
-async function invalidateUserWorkspaceLists(userId: string): Promise<void> {
+export async function invalidateUserWorkspaceLists(userId: string): Promise<void> {
   await redisCache.delByPattern(`user:${userId}:workspaces:*`);
 }
 
@@ -689,6 +689,12 @@ export const workspaceService = {
     const targetRole = await getMembershipRole(input.workspaceId, input.newOwnerUserId);
     if (!targetRole) {
       throw new AppError("NOT_FOUND", "Target member not found in workspace.");
+    }
+
+    // An account waiting to be erased can't take a workspace on (settings PRD, FR-19).
+    const newOwner = await prisma.user.findUnique({ where: { id: input.newOwnerUserId }, select: { closedAt: true } });
+    if (newOwner?.closedAt) {
+      throw new AppError("CONFLICT", "That member has closed their account.");
     }
 
     await prisma.$transaction(async (tx) => {

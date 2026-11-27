@@ -85,6 +85,11 @@ model User {
   totpSecret               String?
   totpEnabledAt            DateTime?
   totpLastStep             Int?
+  // Closing an account (settings PRD, FR-18 and FR-19): closedAt starts a
+  // 30-day grace period that signing in ends; erasedAt marks the row as
+  // stripped of personal data and kept as "Former member" for content.
+  closedAt                 DateTime?
+  erasedAt                 DateTime?
   createdAt                DateTime                @default(now())
   updatedAt                DateTime                @updatedAt
   ownedSpaces              Workspace[]
@@ -116,6 +121,9 @@ model User {
   recoveryCodes            RecoveryCode[]
   discussionRevisions      DiscussionRevision[]    @relation("DiscussionRevisionEditor")
   commentRevisions         CommentRevision[]       @relation("CommentRevisionEditor")
+
+  // The daily erasure job finds accounts past their grace period.
+  @@index([closedAt])
 }
 
 model Workspace {
@@ -747,6 +755,9 @@ enum SecurityEventKind {
   TWO_STEP_DISABLED
   RECOVERY_CODES_REGENERATED
   RECOVERY_CODE_USED
+  DATA_EXPORTED
+  ACCOUNT_CLOSED
+  ACCOUNT_RESTORED
 }
 
 // Single-use codes for when the authenticator is lost (settings PRD, FR-12).

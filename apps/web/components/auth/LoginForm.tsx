@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, LoaderCircle } from "lucide-react";
 
 import { loginInputSchema, type LoginInput } from "@repo/validators/auth";
@@ -16,6 +16,9 @@ import { safeNextPath } from "@/lib/safe-next";
 
 const submitClass = "flex h-12 w-full items-center justify-center gap-2 rounded-sm bg-brand-action px-5 text-sm font-semibold text-on-brand-action transition-colors hover:bg-brand-action-hover active:bg-brand-action-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:opacity-65";
 const alertClass = "rounded-sm border border-danger/30 bg-surface-subtle px-3.5 py-3 text-sm text-danger outline-none focus-visible:ring-2 focus-visible:ring-focus-ring";
+
+const noSubscription = () => () => undefined;
+const closedFromUrl = () => new URLSearchParams(window.location.search).get("closed") === "1";
 
 const failureOf = (error: unknown) => {
   const value = typeof error === "object" && error !== null ? error as { message?: unknown; data?: { code?: string } | null } : {};
@@ -98,6 +101,8 @@ export function LoginForm() {
   const errorRef = useRef<HTMLParagraphElement>(null);
   const [redirecting, setRedirecting] = useState(false);
   const [challenge, setChallenge] = useState<string | null>(null);
+  // After closing an account (settings PRD, FR-18).
+  const closed = useSyncExternalStore(noSubscription, closedFromUrl, () => false);
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginInputSchema),
     defaultValues: { email: "", password: "" },
@@ -146,6 +151,7 @@ export function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} onChangeCapture={() => form.clearErrors("root")} className="space-y-5" noValidate>
+      {closed ? <p role="status" className="rounded-sm border border-border-subtle bg-surface-subtle px-3.5 py-3 text-sm text-text-primary">Your account is closed and you’ve been signed out everywhere. Sign in within 30 days to reopen it.</p> : null}
       <AuthField id="login-email" label="Email" type="email" autoComplete="email" registration={form.register("email")} error={form.formState.errors.email} disabled={busy} />
       <AuthField id="login-password" label="Password" type="password" autoComplete="current-password" registration={form.register("password")} error={form.formState.errors.password} disabled={busy} />
       {rootError ? <p ref={errorRef} tabIndex={-1} role="alert" className={alertClass}>{rootError}</p> : null}
