@@ -97,7 +97,9 @@ export function createMemoryStorage() {
 
 // For local runs and end-to-end tests without R2: files on disk, served by
 // app/api/files/local with URLs signed like R2's. Refused on Vercel.
-const LOCAL_KEY = /^files\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+$/;
+// Attachment keys and profile photo keys (settings PRD, FR-3); nothing else,
+// so a key can never climb out of the folder.
+const LOCAL_KEY = /^(files\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+|avatars\/[a-z0-9]+\/[a-f0-9]{32}\.(webp|jpg))$/;
 
 export function localSignature(secret: string, parts: string[]) {
   return createHmac("sha256", `commons:local-files:${secret}`).update(parts.join("\n")).digest("base64url");

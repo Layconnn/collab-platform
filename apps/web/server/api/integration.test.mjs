@@ -15,6 +15,12 @@ const jiti = createJiti(import.meta.url);
 const { appRouter } = jiti("./root.ts");
 const { prisma } = jiti("../db/prisma.ts");
 
+// Notification preferences (#210): nobody in these fakes has turned anything off.
+const originalPreferenceFindMany = prisma.userPreference.findMany;
+const originalLevelFindMany = prisma.workspaceNotificationLevel.findMany;
+prisma.userPreference.findMany = async () => [];
+prisma.workspaceNotificationLevel.findMany = async () => [];
+
 // Discussion follows, kept in memory (Markdown, reactions, follow and pin PRD).
 const fakeFollows = [];
 prisma.discussionFollow.upsert = async ({ where, create }) => {
@@ -440,12 +446,38 @@ prisma.discussion.findMany = async ({ where, take, skip, cursor, select }) => {
   );
 };
 
+// Edit history (#200): the edit locks the row, reads the version it replaces
+// and keeps it as a revision.
+state.revisions = [];
+const originalQueryRaw = prisma.$queryRaw;
+const originalDiscussionFindUniqueOrThrow = prisma.discussion.findUniqueOrThrow;
+const originalCommentFindUniqueOrThrow = prisma.comment.findUniqueOrThrow;
+const originalDiscussionRevisionCreate = prisma.discussionRevision.create;
+const originalCommentRevisionCreate = prisma.commentRevision.create;
+prisma.$queryRaw = async () => [];
+const lockedVersion = (rows, fields) => async ({ where }) => {
+  const rec = rows.get(where.id);
+  if (!rec) {
+    const err = new Error("Not found");
+    err.code = "P2025";
+    throw err;
+  }
+  return { ...Object.fromEntries(fields.map((field) => [field, rec[field]])), editCount: rec.editCount ?? 0, attachments: [] };
+};
+prisma.discussion.findUniqueOrThrow = lockedVersion(state.discussions, ["title", "body"]);
+prisma.comment.findUniqueOrThrow = lockedVersion(state.comments, ["body"]);
+prisma.discussionRevision.create = async ({ data }) => { state.revisions.push(data); return data; };
+prisma.commentRevision.create = async ({ data }) => { state.revisions.push(data); return data; };
+
 prisma.discussion.update = async ({ where, data, select }) => {
   const rec = state.discussions.get(where.id);
   if (!rec) {
     const err = new Error("Not found");
     err.code = "P2025";
     throw err;
+  }
+  if (data.editCount?.increment) {
+    data = { ...data, editCount: (rec.editCount ?? 0) + data.editCount.increment };
   }
   const next = { ...rec, ...data, updatedAt: new Date() };
   state.discussions.set(where.id, next);
@@ -539,6 +571,9 @@ prisma.comment.update = async ({ where, data, select }) => {
     err.code = "P2025";
     throw err;
   }
+  if (data.editCount?.increment) {
+    data = { ...data, editCount: (rec.editCount ?? 0) + data.editCount.increment };
+  }
   const next = { ...rec, ...data, updatedAt: new Date() };
   state.comments.set(where.id, next);
   return projectSelect(next, select, {
@@ -561,6 +596,13 @@ prisma.comment.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.userPreference.findMany = originalPreferenceFindMany;
+  prisma.workspaceNotificationLevel.findMany = originalLevelFindMany;
+  prisma.$queryRaw = originalQueryRaw;
+  prisma.discussion.findUniqueOrThrow = originalDiscussionFindUniqueOrThrow;
+  prisma.comment.findUniqueOrThrow = originalCommentFindUniqueOrThrow;
+  prisma.discussionRevision.create = originalDiscussionRevisionCreate;
+  prisma.commentRevision.create = originalCommentRevisionCreate;
   prisma.activityEvent.create = originalActivityEventCreate;
   redis.incr = originalRedisIncr;
   redis.expire = originalRedisExpire;
@@ -613,11 +655,11 @@ test("mention search is bounded, member-accessible, and tenant-scoped", async ()
   );
   await owner.workspace.addMember({ workspaceId: first.id, userId: userB, role: "MEMBER" });
   assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "USER_A" }), [
-    { id: userA, name: "User A", username: "user_a" },
+    { id: userA, name: "User A", username: "user_a", avatarKey: undefined },
   ]);
   assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "user a".replace(" ", "") }), []);
   assert.deepEqual(await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "A" }), [
-    { id: userA, name: "User A", username: "user_a" },
+    { id: userA, name: "User A", username: "user_a", avatarKey: undefined },
   ]);
   await assert.rejects(
     () => member.workspace.searchMentionMembers({ workspaceId: second.id, query: "" }),
@@ -633,7 +675,7 @@ test("mention search is bounded, member-accessible, and tenant-scoped", async ()
   }
   const matches = await member.workspace.searchMentionMembers({ workspaceId: first.id, query: "mention" });
   assert.equal(matches.length, 8);
-  assert.ok(matches.every((result) => Object.keys(result).sort().join(",") === "id,name,username"));
+  assert.ok(matches.every((result) => Object.keys(result).sort().join(",") === "avatarKey,id,name,username"));
   await owner.workspace.removeMember({ workspaceId: first.id, userId: userB });
   await assert.rejects(
     () => member.workspace.searchMentionMembers({ workspaceId: first.id, query: "mention" }),
@@ -840,7 +882,7 @@ test("workspace + discussion + comment integration flow", async () => {
     const roster = await callerB.workspace.listMembers({ workspaceId: workspace.id });
     assert.equal(roster.items.length, 2);
     assert.equal(roster.items.find((member) => member.userId === userA).user.username, "user_a");
-    assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["id", "name", "username"]);
+    assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["avatarKey", "id", "name", "username"]);
 
     // 3. User B creates discussion in workspace.
     state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v3:start:20`, JSON.stringify({}));

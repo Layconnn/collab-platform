@@ -21,17 +21,35 @@ export type SettingEntry = {
 };
 
 export const SETTINGS_CATEGORIES: SettingsCategory[] = [
-  { id: "account", name: "Your account", description: "Your details and your password.", icon: "account", href: "/settings/account" },
-  { id: "notifications", name: "Notifications", description: "The daily digest email and which workspaces it covers.", icon: "inbox", href: "/settings/notifications" },
-  { id: "appearance", name: "Appearance", description: "Light, dark, or matching your device.", icon: "appearance", href: "/settings/appearance" },
+  { id: "account", name: "Your account", description: "Your details, your password and your data.", icon: "account", href: "/settings/account" },
+  { id: "security", name: "Security", description: "Two-step sign-in, your sessions, the security log and your password.", icon: "security", href: "/settings/security" },
+  { id: "notifications", name: "Notifications", description: "What reaches your Inbox, per workspace, and the daily digest.", icon: "inbox", href: "/settings/notifications" },
+  { id: "workspaces", name: "Workspaces", description: "Where Commons opens, your default workspace, and leaving one.", icon: "workspaces", href: "/settings/workspaces" },
+  { id: "appearance", name: "Appearance", description: "Theme, motion and density, on every device.", icon: "appearance", href: "/settings/appearance" },
 ];
 
 // Every setting, for search: matched by label, description and keywords.
 export const SETTING_ENTRIES: SettingEntry[] = [
   { label: "Account information", description: "Your name, username and email.", category: "account", href: "/settings/account", keywords: "profile name username email" },
+  { label: "Display name", description: "The name teammates see on your posts.", category: "account", href: "/settings/account/profile", keywords: "profile name rename" },
+  { label: "Username", description: "Change the name teammates mention you by.", category: "account", href: "/settings/account/profile", keywords: "profile handle mention rename at" },
+  { label: "Two-step sign-in", description: "A code from your phone when you sign in.", category: "security", href: "/settings/security/two-step", keywords: "2fa mfa two factor authenticator totp otp recovery codes backup verification" },
+  { label: "Sessions", description: "Where you're signed in; sign out a device.", category: "security", href: "/settings/security/sessions", keywords: "devices sign out logout signed in browser lost phone" },
+  { label: "Security log", description: "Sign-ins and changes in the last 90 days.", category: "security", href: "/settings/security/log", keywords: "activity history audit login failed attempts" },
+  { label: "Change your email", description: "A code goes to the new address to confirm it.", category: "account", href: "/settings/account/email", keywords: "email address e-mail mail change update sign in login" },
+  { label: "Download your data", description: "Everything you've put into Commons, as one file.", category: "account", href: "/settings/account/data", keywords: "export download json copy backup gdpr portability archive" },
+  { label: "Close your account", description: "Sign out everywhere; erased after 30 days.", category: "account", href: "/settings/account/data", keywords: "delete remove deactivate close account erase gdpr leave commons" },
   { label: "Change your password", description: "Signs out your other devices.", category: "account", href: "/settings/account/password", keywords: "password security sign in" },
+  { label: "What notifies you", description: "Turn mentions, reviews, replies and more on or off.", category: "notifications", href: "/settings/notifications/kinds", keywords: "notifications mute inbox bell mentions replies reviews discussions" },
+  { label: "Workspace notifications", description: "Everything, only what involves you, or nothing.", category: "notifications", href: "/settings/notifications/workspaces", keywords: "notifications mute quiet workspace level" },
+  { label: "Digest time", description: "The hour and time zone the digest arrives.", category: "notifications", href: "/settings/notifications/digest", keywords: "email digest time hour time zone schedule" },
   { label: "Daily digest", description: "Turn the daily email on or off and choose its workspaces.", category: "notifications", href: "/settings/notifications/digest", keywords: "email digest unsubscribe preview workspaces" },
   { label: "Theme", description: "Light, dark or system.", category: "appearance", href: "/settings/appearance", keywords: "dark mode light mode colour color appearance" },
+  { label: "Reduce motion", description: "Turn off animations on every device.", category: "appearance", href: "/settings/appearance", keywords: "motion animation accessibility transitions" },
+  { label: "Density", description: "Comfortable or compact.", category: "appearance", href: "/settings/appearance", keywords: "compact comfortable spacing size text" },
+  { label: "Start page", description: "Where Commons opens when you sign in.", category: "workspaces", href: "/settings/workspaces", keywords: "open home landing first page sign in" },
+  { label: "Default workspace", description: "The workspace that's yours by default.", category: "workspaces", href: "/settings/workspaces", keywords: "workspace default primary" },
+  { label: "Leave a workspace", description: "Stop being a member of a workspace.", category: "workspaces", href: "/settings/workspaces", keywords: "leave quit exit remove myself membership workspaces" },
 ];
 
 export function categoryOf(id: string) {

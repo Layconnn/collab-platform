@@ -1,4 +1,5 @@
 import type {
+  GetCommentByIdInput,
   CreateCommentInput,
   DeleteCommentInput,
   ListCommentsInput,
@@ -20,6 +21,13 @@ import { attachmentService, attachmentsSelect, newUploadIds, type PublicAttachme
 import { followOnParticipation } from "./follow.service";
 import { notificationService } from "./notification.service";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
+import {
+  buildHistory,
+  commentEditChanges,
+  HISTORY_MAX_VERSIONS,
+  keepCommentRevision,
+  lockCommentVersion,
+} from "./revision.service";
 import { requireWorkspaceAction as requireMemberAction } from "./workspace.access";
 import {
   WORKSPACE_ACTIONS,
@@ -51,10 +59,13 @@ type PublicComment = {
     id: string;
     name: string | null;
     username: string;
+    avatarKey?: string | null;
   };
   attachments: PublicAttachment[];
   createdAt: Date;
   updatedAt: Date;
+  // Recorded edits; "Edited" shows only when this is above zero (edit history PRD, FR-3).
+  editCount: number;
 };
 
 type CommentWithWorkspace = PublicComment & {
@@ -162,10 +173,12 @@ async function getCommentByIdWithWorkspace(
           id: true,
           name: true,
           username: true,
+          avatarKey: true,
         },
       },
       createdAt: true,
       updatedAt: true,
+      editCount: true,
     },
   });
 }
@@ -183,6 +196,41 @@ function normalizeForeignTenantDeniedAsNotFound(error: unknown): never {
 }
 
 export const commentService = {
+  // Every version of a reply, newest first (edit history PRD, FR-4, FR-5).
+  // Readable by members of its discussion's workspace; others get not found.
+  async history(userId: string, input: GetCommentByIdInput, context: RequestContext) {
+    const comment = await prisma.comment.findUnique({
+      where: { id: input.commentId },
+      select: {
+        workspaceId: true,
+        body: true,
+        editCount: true,
+        createdAt: true,
+        author: { select: { name: true, username: true } },
+        attachments: { select: { fileName: true }, orderBy: { position: "asc" } },
+      },
+    });
+    if (!comment) {
+      throw new AppError("NOT_FOUND", "Comment not found.");
+    }
+    try {
+      await requireWorkspaceAction(comment.workspaceId, userId, WORKSPACE_ACTIONS.READ_DISCUSSION, context.requestId);
+    } catch (error) {
+      normalizeForeignTenantDeniedAsNotFound(error);
+    }
+    const revisions = await prisma.commentRevision.findMany({
+      where: { commentId: input.commentId },
+      orderBy: { version: "desc" },
+      take: HISTORY_MAX_VERSIONS,
+      select: { version: true, body: true, fileNames: true, editorLabel: true, createdAt: true },
+    });
+    return buildHistory({
+      current: { body: comment.body, fileNames: comment.attachments.map((file) => file.fileName), editCount: comment.editCount },
+      author: { label: activityActorLabel(comment.author), at: comment.createdAt },
+      revisions,
+    });
+  },
+
   async create(
     userId: string,
     input: CreateCommentInput,
@@ -277,10 +325,12 @@ export const commentService = {
                 id: true,
                 name: true,
                 username: true,
+                avatarKey: true,
               },
             },
             createdAt: true,
             updatedAt: true,
+            editCount: true,
           },
         });
         await attachmentService.attach(tx, { userId, workspaceId: discussion.workspaceId, attachmentIds, target: { commentId: draft.id } });
@@ -435,10 +485,12 @@ export const commentService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
         createdAt: true,
         updatedAt: true,
+        editCount: true,
       },
     });
 
@@ -660,6 +712,7 @@ export const commentService = {
       await attachmentService.verifyUploads(userId, comment.workspaceId, await newUploadIds(target, input.attachmentIds));
     }
     const updated = await prisma.$transaction(async (tx) => {
+      const before = await lockCommentVersion(tx, comment.id);
       const files = input.attachmentIds
         ? await attachmentService.sync(tx, { userId, workspaceId: comment.workspaceId, target, desired: input.attachmentIds })
         : null;
@@ -667,10 +720,17 @@ export const commentService = {
       if (!input.body.trim() && (files ? files.count === 0 : (await tx.attachment.count({ where: target })) === 0)) {
         throw new AppError("BAD_REQUEST", "Write a reply or attach a file.");
       }
+      const edited = await commentEditChanges(tx, before, { commentId: comment.id, body: input.body, filesSynced: Boolean(files) });
+      if (edited) {
+        await keepCommentRevision(tx, {
+          workspaceId: comment.workspaceId, discussionId: comment.discussionId, commentId: comment.id, editorId: userId, before,
+        });
+      }
       const changed = await tx.comment.update({
         where: { id: input.commentId },
         data: {
           body: input.body,
+          ...(edited ? { editCount: { increment: 1 } } : {}),
         },
         select: {
           id: true,
@@ -684,10 +744,12 @@ export const commentService = {
               id: true,
               name: true,
               username: true,
+              avatarKey: true,
             },
           },
           createdAt: true,
           updatedAt: true,
+          editCount: true,
         },
       });
       await recordActivity(tx, {

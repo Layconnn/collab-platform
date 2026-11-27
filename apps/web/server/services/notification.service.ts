@@ -16,6 +16,7 @@ import { enqueueNotificationFanout, type NotificationJobData } from "../queue/no
 import { discussionFollowerIds } from "./follow.service";
 import { extractMentions, normalizeUsername } from "../utils/mentions";
 import { toPaginatedResult, type PaginatedResult } from "../../src/common/utils/pagination";
+import { applyNotificationPreferences } from "./notification.preferences";
 
 type RequestContext = {
   requestId: string;
@@ -69,6 +70,7 @@ async function resolveMentionUserIds(
       user: {
         select: {
           username: true,
+          avatarKey: true,
         },
       },
     },
@@ -201,9 +203,15 @@ function buildDeliveries(params: {
   });
 }
 
-// Resolves recipients against current membership. Runs in the queue consumer
-// (and in tests); it only reads, so a retried job plans the same deliveries.
+// Resolves recipients against current membership and each person's
+// notification preferences (settings PRD, FR-4, FR-5). Runs in the queue
+// consumer (and in tests); it only reads, so a retried job plans the same
+// deliveries.
 export async function planNotificationDeliveries(event: NotificationEvent): Promise<NotificationJobData[]> {
+  return applyNotificationPreferences(await planEventDeliveries(event));
+}
+
+async function planEventDeliveries(event: NotificationEvent): Promise<NotificationJobData[]> {
   if (event.kind === "decision_review") {
     // Only people who are still members, never the person who acted.
     const members = await prisma.workspaceMember.findMany({
@@ -433,7 +441,7 @@ export const notificationService = {
       metadata: Prisma.JsonValue | null;
       readAt: Date | null;
       createdAt: Date;
-      actor: { id: string; name: string | null; username: string | null } | null;
+      actor: { id: string; name: string | null; username: string | null; avatarKey?: string | null } | null;
     }>
   > {
     const rows = await prisma.notification.findMany({
@@ -467,6 +475,7 @@ export const notificationService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
       },

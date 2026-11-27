@@ -14,6 +14,12 @@ const jiti = createJiti(import.meta.url);
 const { commentRouter } = jiti("./routers/comment.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 
+// Notification preferences (#210): nobody in these fakes has turned anything off.
+const originalPreferenceFindMany = prisma.userPreference.findMany;
+const originalLevelFindMany = prisma.workspaceNotificationLevel.findMany;
+prisma.userPreference.findMany = async () => [];
+prisma.workspaceNotificationLevel.findMany = async () => [];
+
 // Discussion follows, kept in memory (Markdown, reactions, follow and pin PRD).
 const fakeFollows = [];
 prisma.discussionFollow.upsert = async ({ where, create }) => {
@@ -309,7 +315,31 @@ prisma.comment.findUnique = async ({ where, select }) => {
   return projectCommentWithSelect(row, select);
 };
 
+// Edit history (#200): the edit locks the row, reads the version it replaces
+// and keeps it as a revision.
+state.revisions = [];
+const originalQueryRaw = prisma.$queryRaw;
+const originalCommentFindUniqueOrThrow = prisma.comment.findUniqueOrThrow;
+const originalRevisionCreate = prisma.commentRevision.create;
+prisma.$queryRaw = async () => [];
+prisma.comment.findUniqueOrThrow = async ({ where }) => {
+  const row = state.comments.get(where.id);
+  if (!row) {
+    const error = new Error("Not found");
+    error.code = "P2025";
+    throw error;
+  }
+  return { body: row.body, editCount: row.editCount ?? 0, attachments: [] };
+};
+prisma.commentRevision.create = async ({ data }) => {
+  state.revisions.push(data);
+  return data;
+};
+
 prisma.comment.update = async ({ where, data, select }) => {
+  if (data.editCount?.increment) {
+    data = { ...data, editCount: (state.comments.get(where.id)?.editCount ?? 0) + data.editCount.increment };
+  }
   const row = state.comments.get(where.id);
   if (!row) {
     const error = new Error("Not found");
@@ -337,6 +367,11 @@ prisma.comment.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.userPreference.findMany = originalPreferenceFindMany;
+  prisma.workspaceNotificationLevel.findMany = originalLevelFindMany;
+  prisma.$queryRaw = originalQueryRaw;
+  prisma.comment.findUniqueOrThrow = originalCommentFindUniqueOrThrow;
+  prisma.commentRevision.create = originalRevisionCreate;
   prisma.$transaction = originalPrismaTransactionForActivity;
   prisma.activityEvent.create = originalActivityEventCreate;
   prisma.user.findUnique = originalUserFindUniqueForActivity;
@@ -666,7 +701,7 @@ test("13. Author appears as a public identity DTO only", async () => {
 
   const caller = createCaller(memberUserId);
   const comment = await caller.getById({ commentId });
-  assert.deepEqual(Object.keys(comment.author).sort(), ["id", "name", "username"]);
+  assert.deepEqual(Object.keys(comment.author).sort(), ["avatarKey", "id", "name", "username"]);
   assert.equal("authorId" in comment, false);
 });
 
@@ -781,7 +816,7 @@ test("17. Cross-discussion cursor cannot leak behavior", async () => {
   for (const item of result.items) {
     assert.equal(item.discussionId, discussionId);
     assert.notEqual(item.id, makeCuid(952));
-    assert.deepEqual(Object.keys(item.author).sort(), ["id", "name", "username"]);
+    assert.deepEqual(Object.keys(item.author).sort(), ["avatarKey", "id", "name", "username"]);
   }
 });
 

@@ -14,6 +14,12 @@ const jiti = createJiti(import.meta.url);
 const { discussionRouter } = jiti("./routers/discussion.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 
+// Notification preferences (#210): nobody in these fakes has turned anything off.
+const originalPreferenceFindMany = prisma.userPreference.findMany;
+const originalLevelFindMany = prisma.workspaceNotificationLevel.findMany;
+prisma.userPreference.findMany = async () => [];
+prisma.workspaceNotificationLevel.findMany = async () => [];
+
 // Discussion follows, kept in memory (Markdown, reactions, follow and pin PRD).
 const fakeFollows = [];
 prisma.discussionFollow.upsert = async ({ where, create }) => {
@@ -269,7 +275,31 @@ prisma.discussion.findUnique = async ({ where, select }) => {
   return projectDiscussionWithSelect(row, select);
 };
 
+// Edit history (#200): the edit locks the row, reads the version it replaces
+// and keeps it as a revision.
+state.revisions = [];
+const originalQueryRaw = prisma.$queryRaw;
+const originalDiscussionFindUniqueOrThrow = prisma.discussion.findUniqueOrThrow;
+const originalRevisionCreate = prisma.discussionRevision.create;
+prisma.$queryRaw = async () => [];
+prisma.discussion.findUniqueOrThrow = async ({ where }) => {
+  const row = state.discussions.get(where.id);
+  if (!row) {
+    const error = new Error("Not found");
+    error.code = "P2025";
+    throw error;
+  }
+  return { title: row.title, body: row.body, editCount: row.editCount ?? 0, attachments: [] };
+};
+prisma.discussionRevision.create = async ({ data }) => {
+  state.revisions.push(data);
+  return data;
+};
+
 prisma.discussion.update = async ({ where, data, select }) => {
+  if (data.editCount?.increment) {
+    data = { ...data, editCount: (state.discussions.get(where.id)?.editCount ?? 0) + data.editCount.increment };
+  }
   const row = state.discussions.get(where.id);
   if (!row) {
     const error = new Error("Not found");
@@ -298,6 +328,11 @@ prisma.discussion.delete = async ({ where }) => {
 };
 
 after(async () => {
+  prisma.userPreference.findMany = originalPreferenceFindMany;
+  prisma.workspaceNotificationLevel.findMany = originalLevelFindMany;
+  prisma.$queryRaw = originalQueryRaw;
+  prisma.discussion.findUniqueOrThrow = originalDiscussionFindUniqueOrThrow;
+  prisma.discussionRevision.create = originalRevisionCreate;
   prisma.$transaction = originalPrismaTransactionForActivity;
   prisma.activityEvent.create = originalActivityEventCreate;
   prisma.user.findUnique = originalUserFindUniqueForActivity;
@@ -351,7 +386,7 @@ test("2. Workspace member can create discussion -> 200", async () => {
   assert.equal(created.author.id, memberUserId);
   assert.equal(created.author.name, "Member One");
   assert.equal(created.author.username, "member_002");
-  assert.deepEqual(Object.keys(created.author).sort(), ["id", "name", "username"]);
+  assert.deepEqual(Object.keys(created.author).sort(), ["avatarKey", "id", "name", "username"]);
   assert.equal(created.title, "Member create");
 });
 
@@ -678,7 +713,7 @@ test("12. Cursor from other workspace cannot leak results or behavior", async ()
     assert.equal(item.workspaceId, workspaceId);
     assert.notEqual(item.id, makeCuid(1203));
     assert.equal(typeof item.author.username, "string");
-    assert.deepEqual(Object.keys(item.author).sort(), ["id", "name", "username"]);
+    assert.deepEqual(Object.keys(item.author).sort(), ["avatarKey", "id", "name", "username"]);
   }
 });
 

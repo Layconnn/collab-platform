@@ -78,6 +78,11 @@ export const removeWorkspaceMemberInputSchema = z.object({
   userId: userIdSchema,
 });
 
+// Settings PRD, FR-14: leave a workspace you don't own.
+export const leaveWorkspaceInputSchema = z.object({
+  workspaceId: workspaceIdSchema,
+});
+
 export const transferWorkspaceOwnershipInputSchema = z.object({
   workspaceId: workspaceIdSchema,
   newOwnerUserId: userIdSchema,
@@ -96,6 +101,7 @@ export type AddWorkspaceMemberByUsernameInput = z.infer<typeof addWorkspaceMembe
 export type UpdateWorkspaceMemberRoleInput = z.infer<typeof updateWorkspaceMemberRoleInputSchema>;
 export type RemoveWorkspaceMemberInput = z.infer<typeof removeWorkspaceMemberInputSchema>;
 export type TransferWorkspaceOwnershipInput = z.infer<typeof transferWorkspaceOwnershipInputSchema>;
+export type LeaveWorkspaceInput = z.infer<typeof leaveWorkspaceInputSchema>;
 
 // Invite links (invite links PRD).
 export const INVITE_EXPIRY_DAYS = [1, 7, 30] as const;

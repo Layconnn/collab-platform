@@ -11,9 +11,12 @@ import {
 } from "../middleware/auth";
 import { requireCsrfToken } from "../middleware/csrf";
 import { buildAccessTokenCookie } from "../utils/auth-cookies";
+import { sessionService } from "../services/session.service";
 
 export type RequestUser = {
   id: string;
+  // The signed-in session, when the request carries one (settings PRD, FR-9).
+  sessionId?: string;
 };
 
 export type TRPCContext = {
@@ -56,8 +59,13 @@ export async function createTRPCContext(opts: {
     );
   }
 
+  // Last active for Settings > Sessions, at most every 10 minutes.
+  if (authenticated?.sessionId) {
+    await sessionService.touch(authenticated.id, authenticated.sessionId, opts.headers).catch(() => undefined);
+  }
+
   return {
-    user: authenticated ? { id: authenticated.id } : null,
+    user: authenticated ? { id: authenticated.id, sessionId: authenticated.sessionId } : null,
     requestId,
     headers: opts.headers,
     requestMethod: opts.request.method,

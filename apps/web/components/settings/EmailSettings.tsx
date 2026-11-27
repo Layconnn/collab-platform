@@ -41,7 +41,7 @@ export function EmailSettings({ embedded = false }: { embedded?: boolean }) {
         <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-sm bg-surface-active text-brand-link"><Mail size={17} /></span>
         <div className="min-w-0">
           <h2 id="digest-heading" className="text-lg font-semibold text-text-primary">Daily digest</h2>
-          <p className="mt-1 max-w-[62ch] text-sm leading-6 text-text-secondary">Once a day at 06:00 UTC: what needs you, what was decided in the last day and what changed in your workspaces. Nothing is sent on days with nothing to say.</p>
+          <p className="mt-1 max-w-[62ch] text-sm leading-6 text-text-secondary">Once a day at the time you choose in Settings: what needs you, what was decided in the last day and what changed in your workspaces. Nothing is sent on days with nothing to say.</p>
         </div>
       </div>
       {preferences.data ? <div className="mt-5 space-y-4">

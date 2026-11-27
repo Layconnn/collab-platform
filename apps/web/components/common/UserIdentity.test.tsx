@@ -7,7 +7,9 @@ describe("resolveUserIdentity", () => {
     expect(resolveUserIdentity({ name: "  Maya Chen  ", username: "maya" })).toEqual({
       label: "Maya Chen",
       avatarName: "Maya Chen",
+      photo: null,
     });
+    expect(resolveUserIdentity({ name: "Maya", username: "maya", avatarKey: "avatars/u/k.webp" }).photo).toBe("avatars/u/k.webp");
   });
 
   it("uses the username when the display name is absent or blank", () => {
@@ -20,11 +22,12 @@ describe("resolveUserIdentity", () => {
     expect(resolveUserIdentity(user)).toEqual({
       label: "Workspace member",
       avatarName: null,
+      photo: null,
     });
   });
 
   it("uses a safe fallback for an unavailable author", () => {
-    expect(resolveUserIdentity(null)).toEqual({ label: "Unavailable account", avatarName: null });
-    expect(resolveUserIdentity(undefined)).toEqual({ label: "Unavailable account", avatarName: null });
+    expect(resolveUserIdentity(null)).toEqual({ label: "Unavailable account", avatarName: null, photo: null });
+    expect(resolveUserIdentity(undefined)).toEqual({ label: "Unavailable account", avatarName: null, photo: null });
   });
 });

@@ -109,7 +109,7 @@ function NotificationRow({
       <div className="flex min-w-0 gap-3 px-4 py-3.5 hover:bg-surface-hover/70 focus-within:bg-surface-hover/70">
         <div className="pt-0.5">
           {actor ? (
-            <UserAvatar name={actor.avatarName} className="size-8" />
+            <UserAvatar name={actor.avatarName} photo={actor.photo} className="size-8" />
           ) : (
             <span
               aria-hidden="true"

@@ -135,3 +135,34 @@ export const AttachmentStatus = {
 } as const
 
 export type AttachmentStatus = (typeof AttachmentStatus)[keyof typeof AttachmentStatus]
+
+
+export const NotificationLevel = {
+  ALL: 'ALL',
+  INVOLVED: 'INVOLVED',
+  NONE: 'NONE'
+} as const
+
+export type NotificationLevel = (typeof NotificationLevel)[keyof typeof NotificationLevel]
+
+
+export const SecurityEventKind = {
+  ACCOUNT_CREATED: 'ACCOUNT_CREATED',
+  SIGNED_IN: 'SIGNED_IN',
+  SIGN_IN_FAILED: 'SIGN_IN_FAILED',
+  SIGNED_OUT: 'SIGNED_OUT',
+  SESSION_SIGNED_OUT: 'SESSION_SIGNED_OUT',
+  OTHER_SESSIONS_SIGNED_OUT: 'OTHER_SESSIONS_SIGNED_OUT',
+  PASSWORD_CHANGED: 'PASSWORD_CHANGED',
+  USERNAME_CHANGED: 'USERNAME_CHANGED',
+  TWO_STEP_ENABLED: 'TWO_STEP_ENABLED',
+  TWO_STEP_DISABLED: 'TWO_STEP_DISABLED',
+  RECOVERY_CODES_REGENERATED: 'RECOVERY_CODES_REGENERATED',
+  RECOVERY_CODE_USED: 'RECOVERY_CODE_USED',
+  DATA_EXPORTED: 'DATA_EXPORTED',
+  ACCOUNT_CLOSED: 'ACCOUNT_CLOSED',
+  ACCOUNT_RESTORED: 'ACCOUNT_RESTORED',
+  EMAIL_CHANGED: 'EMAIL_CHANGED'
+} as const
+
+export type SecurityEventKind = (typeof SecurityEventKind)[keyof typeof SecurityEventKind]

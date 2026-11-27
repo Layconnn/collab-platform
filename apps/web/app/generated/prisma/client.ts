@@ -146,3 +146,38 @@ export type WorkspaceInvite = Prisma.WorkspaceInviteModel
  * 
  */
 export type WorkspaceInviteUse = Prisma.WorkspaceInviteUseModel
+/**
+ * Model DiscussionRevision
+ * 
+ */
+export type DiscussionRevision = Prisma.DiscussionRevisionModel
+/**
+ * Model CommentRevision
+ * 
+ */
+export type CommentRevision = Prisma.CommentRevisionModel
+/**
+ * Model UserPreference
+ * 
+ */
+export type UserPreference = Prisma.UserPreferenceModel
+/**
+ * Model WorkspaceNotificationLevel
+ * 
+ */
+export type WorkspaceNotificationLevel = Prisma.WorkspaceNotificationLevelModel
+/**
+ * Model UserSession
+ * 
+ */
+export type UserSession = Prisma.UserSessionModel
+/**
+ * Model RecoveryCode
+ * 
+ */
+export type RecoveryCode = Prisma.RecoveryCodeModel
+/**
+ * Model SecurityEvent
+ * 
+ */
+export type SecurityEvent = Prisma.SecurityEventModel

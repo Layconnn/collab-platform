@@ -10,6 +10,7 @@ import type {
   RemoveWorkspaceMemberInput,
   ResolveWorkspaceMemberCandidateInput,
   SearchMentionMembersInput,
+  LeaveWorkspaceInput,
   TransferWorkspaceOwnershipInput,
   UpdateWorkspaceInput,
   UpdateWorkspaceMemberRoleInput,
@@ -109,12 +110,12 @@ async function enforceOwnerInvariant(workspaceId: string, dbClient: typeof prism
   }
 }
 
-async function invalidateWorkspaceCache(workspaceId: string): Promise<void> {
+export async function invalidateWorkspaceCache(workspaceId: string): Promise<void> {
   await redisCache.del(workspaceByIdCacheKey(workspaceId));
   await redisCache.delByPattern(`workspace:${workspaceId}:members:*`);
 }
 
-async function invalidateUserWorkspaceLists(userId: string): Promise<void> {
+export async function invalidateUserWorkspaceLists(userId: string): Promise<void> {
   await redisCache.delByPattern(`user:${userId}:workspaces:*`);
 }
 
@@ -329,7 +330,7 @@ export const workspaceService = {
 
     const cacheKey = membersCacheKey(input.workspaceId, input.cursor, input.take);
     const cached = await redisCache.getJSON<
-      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; name: string | null; username: string } }>
+      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; name: string | null; username: string; avatarKey?: string | null } }>
     >(cacheKey);
     if (cached) {
       return cached;
@@ -353,6 +354,7 @@ export const workspaceService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
       },
@@ -384,7 +386,7 @@ export const workspaceService = {
       orderBy: [{ user: { username: "asc" } }],
       take: 8,
       select: {
-        user: { select: { id: true, name: true, username: true } },
+        user: { select: { id: true, name: true, username: true, avatarKey: true } },
       },
     });
 
@@ -396,7 +398,7 @@ export const workspaceService = {
 
     const user = await prisma.user.findUnique({
       where: { username: input.username },
-      select: { id: true, name: true, username: true },
+      select: { id: true, name: true, username: true, avatarKey: true },
     });
     if (!user) return { status: "unavailable" as const };
 
@@ -618,6 +620,56 @@ export const workspaceService = {
     return { success: true as const };
   },
 
+  // Settings PRD, FR-14. A member or admin leaves on their own; an owner
+  // transfers ownership first. Recorded as a removal the person made of
+  // themselves, so the activity feed reads "left the workspace".
+  async leave(userId: string, input: LeaveWorkspaceInput, context: RequestContext) {
+    const role = await getMembershipRole(input.workspaceId, userId);
+    if (!role) {
+      throw new AppError("NOT_FOUND", "Workspace not found.");
+    }
+    if (role === "OWNER") {
+      throw new AppError("CONFLICT", "Transfer ownership before leaving this workspace.");
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const label = await memberLabel(tx, userId);
+      const { count } = await tx.workspaceMember.deleteMany({ where: { workspaceId: input.workspaceId, userId, role: { not: "OWNER" } } });
+      if (count !== 1) {
+        throw new AppError("NOT_FOUND", "Workspace not found.");
+      }
+      // Open review requests leave with the member (decision reviews, FR-7).
+      await withdrawReviewsForMember(tx, input.workspaceId, userId, { userId, label });
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId: userId,
+        kind: "MEMBER_REMOVED",
+        subjectType: "MEMBER",
+        subjectId: userId,
+        summary: { member: label, previousRole: role, left: true },
+      });
+      // Commons no longer opens on a workspace you've left.
+      await tx.userPreference.updateMany({ where: { userId, defaultWorkspaceId: input.workspaceId }, data: { defaultWorkspaceId: null } });
+      await tx.userPreference.updateMany({ where: { userId, lastWorkspaceId: input.workspaceId }, data: { lastWorkspaceId: null } });
+    });
+
+    await invalidateWorkspaceCache(input.workspaceId);
+    await invalidateMembershipCaches(input.workspaceId, userId);
+    await invalidateUserWorkspaceLists(userId);
+    await recordWorkspacePermissionAudit({
+      operation: "leave",
+      requestId: context.requestId,
+      actorUserId: userId,
+      workspaceId: input.workspaceId,
+      targetUserId: userId,
+      oldRole: role,
+      newRole: null,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { success: true as const };
+  },
+
   async transferOwnership(actorUserId: string, input: TransferWorkspaceOwnershipInput, context: RequestContext) {
     const actor = await requireRoleForAction(
       input.workspaceId,
@@ -637,6 +689,12 @@ export const workspaceService = {
     const targetRole = await getMembershipRole(input.workspaceId, input.newOwnerUserId);
     if (!targetRole) {
       throw new AppError("NOT_FOUND", "Target member not found in workspace.");
+    }
+
+    // An account waiting to be erased can't take a workspace on (settings PRD, FR-19).
+    const newOwner = await prisma.user.findUnique({ where: { id: input.newOwnerUserId }, select: { closedAt: true } });
+    if (newOwner?.closedAt) {
+      throw new AppError("CONFLICT", "That member has closed their account.");
     }
 
     await prisma.$transaction(async (tx) => {

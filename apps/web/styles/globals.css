@@ -532,6 +532,23 @@ select:not([multiple]):not([size]) {
   }
 }
 
+/* "Reduce motion" in Settings → Appearance (settings PRD, FR-16) does what
+   the system setting does, on any device. */
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Compact density: every rem-based size and gap shrinks by about 6%. */
+:root[data-density="compact"] {
+  font-size: 15px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -569,3 +586,22 @@ select:not([multiple]):not([size]) {
 .thread-reveal {
   animation: thread-reveal 160ms ease-out;
 }
+
+/* Edit history (edit history PRD, FR-7, NFR-3): what an edit removed and
+   added, marked by line-through and underline as well as colour. */
+.history-removed {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--text-primary);
+  text-decoration: line-through;
+  text-decoration-color: var(--danger);
+  border-radius: 3px;
+}
+.history-added {
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--success);
+  text-underline-offset: 3px;
+  border-radius: 3px;
+}
+.history-removed + .history-added { margin-inline-start: 0.3em; }

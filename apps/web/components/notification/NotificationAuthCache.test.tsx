@@ -42,6 +42,7 @@ vi.mock("@/lib/trpc/api-client", () => ({
         },
       },
       changePassword: { useMutation: () => ({}) },
+      verifyTwoStep: { useMutation: () => ({}) },
     },
   },
 }));

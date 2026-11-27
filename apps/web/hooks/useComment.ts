@@ -9,6 +9,11 @@ export function useCommentList(discussionId: string, parentCommentId?: string, e
   );
 }
 
+// Every version of a reply, loaded when its history is opened (edit history PRD, FR-7).
+export function useCommentHistory(commentId: string, enabled: boolean) {
+  return trpc.comment.history.useQuery({ commentId }, { enabled: enabled && Boolean(commentId) });
+}
+
 export function useCommentActions(discussionId: string, workspaceId: string) {
   const utils = trpc.useUtils();
   const refresh = () => utils.comment.listByDiscussion.invalidate({ discussionId });
@@ -32,7 +37,7 @@ export function useCommentActions(discussionId: string, workspaceId: string) {
   });
   const update = trpc.comment.update.useMutation({
     onSuccess: async (comment) => {
-      await Promise.all([refresh(), utils.comment.getById.invalidate({ commentId: comment.id })]);
+      await Promise.all([refresh(), utils.comment.getById.invalidate({ commentId: comment.id }), utils.comment.history.invalidate({ commentId: comment.id })]);
     },
     onError: refreshAfterRejection,
   });

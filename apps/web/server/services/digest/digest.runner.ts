@@ -3,14 +3,17 @@ import { Prisma } from "../../../app/generated/prisma/client";
 import { prisma } from "../../db/prisma";
 import { EmailError, type EmailSender } from "../email/email";
 import { appBaseUrl, renderDigest } from "./digest.email";
-import { digestSettingsFor } from "./digest.preferences";
+import { digestSettingsFor, silencedWorkspaceIds } from "./digest.preferences";
 import { createUnsubscribeToken } from "./digest.tokens";
 import { buildDigest } from "./digest.service";
 
-// The daily run (daily digest PRD, FR-5 to FR-8). Each member gets at most one
-// digest a day: a delivery row is claimed (SENDING) before anything is sent,
-// so overlapping or repeated runs never send twice. A run stops at its
-// deadline and the scheduler calls again until a call finds nobody left.
+// The digest run (daily digest PRD, FR-5 to FR-8). It runs every hour and
+// takes the members whose chosen hour it now is in their own time zone
+// (settings PRD, FR-6); people who never chose get 06:00 UTC. Each member gets
+// at most one digest per day of their own calendar: a delivery row for that
+// date is claimed (SENDING) before anything is sent, so overlapping or
+// repeated runs never send twice. A run stops at its deadline and the
+// scheduler calls again until a call finds nobody left.
 
 export const MAX_ATTEMPTS = 3;
 const BATCH = 25;
@@ -26,6 +29,8 @@ export type DigestRunOptions = {
   pauseMs?: number;
   // Limits a run to some members; tests use it to stay independent.
   onlyUserIds?: string[];
+  // Everyone is due, on the UTC date; tests use it to run at any hour.
+  ignoreSchedule?: boolean;
 };
 
 export type DigestRunResult = {
@@ -40,6 +45,43 @@ export type DigestRunResult = {
 };
 
 export const digestDateOf = (now: Date) => now.toISOString().slice(0, 10);
+
+export const DEFAULT_DIGEST_HOUR = 6;
+
+// The calendar date and hour at this moment in a time zone.
+export function zoneClock(now: Date, timeZone: string): { date: string; hour: number } {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+    timeZone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", hourCycle: "h23",
+  }).formatToParts(now).map((part) => [part.type, part.value]));
+  return { date: `${parts.year}-${parts.month}-${parts.day}`, hour: Number(parts.hour) };
+}
+
+const dayOf = (date: string) => new Date(`${date}T00:00:00.000Z`);
+
+// Not yet sent for that day, or failed with attempts left.
+const pendingOn = (digestDate: Date): Prisma.UserWhereInput => ({
+  OR: [
+    { digestDeliveries: { none: { digestDate } } },
+    { digestDeliveries: { some: { digestDate, status: "FAILED", attempts: { lt: MAX_ATTEMPTS } } } },
+  ],
+});
+
+// Who is due now: one condition per time zone in use.
+async function dueNow(now: Date, ignoreSchedule: boolean): Promise<Prisma.UserWhereInput | null> {
+  if (ignoreSchedule) return pendingOn(dayOf(digestDateOf(now)));
+  const zones = new Set((await prisma.userPreference.findMany({ distinct: ["timeZone"], select: { timeZone: true } })).map((row) => row.timeZone));
+  zones.add("UTC");
+  const terms: Prisma.UserWhereInput[] = [];
+  for (const timeZone of zones) {
+    let clock: { date: string; hour: number };
+    try { clock = zoneClock(now, timeZone); } catch { continue; }
+    terms.push({ AND: [{ preference: { is: { timeZone, digestHour: clock.hour } } }, pendingOn(dayOf(clock.date))] });
+    if (timeZone === "UTC" && clock.hour === DEFAULT_DIGEST_HOUR) {
+      terms.push({ AND: [{ preference: { is: null } }, pendingOn(dayOf(clock.date))] });
+    }
+  }
+  return terms.length ? { OR: terms } : null;
+}
 
 // The email with its stop links (one for everything, one per workspace in the
 // digest) and the one-click unsubscribe headers mail apps use (FR-10, FR-11).
@@ -83,11 +125,10 @@ async function claim(userId: string, digestDate: Date): Promise<boolean> {
 export async function runDigest(options: DigestRunOptions): Promise<DigestRunResult> {
   const now = options.now ?? new Date();
   const date = digestDateOf(now);
-  const digestDate = new Date(`${date}T00:00:00.000Z`);
   const allowed = new Set(options.allowlist.map((email) => email.trim().toLowerCase()).filter(Boolean));
   const result: DigestRunResult = { date, sent: 0, skippedEmpty: 0, skippedOff: 0, held: 0, failed: 0, done: false };
-  const finish = (userId: string, data: Prisma.DigestDeliveryUpdateManyMutationInput) =>
-    prisma.digestDelivery.updateMany({ where: { userId, digestDate, status: "SENDING" }, data });
+  const due = await dueNow(now, Boolean(options.ignoreSchedule));
+  if (!due) return { ...result, done: true };
 
   let cursor: string | undefined;
   let processed = 0;
@@ -96,13 +137,12 @@ export async function runDigest(options: DigestRunOptions): Promise<DigestRunRes
     const batch = await prisma.user.findMany({
       where: {
         memberships: { some: {} },
+        // Closed accounts get no email during their grace period.
+        closedAt: null,
         id: { ...(cursor ? { gt: cursor } : {}), ...(options.onlyUserIds ? { in: options.onlyUserIds } : {}) },
-        OR: [
-          { digestDeliveries: { none: { digestDate } } },
-          { digestDeliveries: { some: { digestDate, status: "FAILED", attempts: { lt: MAX_ATTEMPTS } } } },
-        ],
+        ...due,
       },
-      select: { id: true, email: true },
+      select: { id: true, email: true, preference: { select: { timeZone: true } } },
       orderBy: { id: "asc" },
       take: BATCH,
     });
@@ -113,6 +153,10 @@ export async function runDigest(options: DigestRunOptions): Promise<DigestRunRes
     for (const user of batch) {
       if (Date.now() >= options.deadline) return result;
       cursor = user.id;
+      // The day is the member's own calendar day.
+      const digestDate = dayOf(options.ignoreSchedule ? date : zoneClock(now, user.preference?.timeZone ?? "UTC").date);
+      const finish = (userId: string, data: Prisma.DigestDeliveryUpdateManyMutationInput) =>
+        prisma.digestDelivery.updateMany({ where: { userId, digestDate, status: "SENDING" }, data });
       if (!(await claim(user.id, digestDate))) continue;
       processed += 1;
       const settings = await digestSettingsFor(user.id);
@@ -121,7 +165,9 @@ export async function runDigest(options: DigestRunOptions): Promise<DigestRunRes
         result.skippedOff += 1;
         continue;
       }
-      const digest = await buildDigest(user.id, { now, excludedWorkspaceIds: settings.excludedWorkspaceIds });
+      // Workspaces set to notify nothing stay out of the digest too (FR-7).
+      const excludedWorkspaceIds = [...settings.excludedWorkspaceIds, ...await silencedWorkspaceIds(user.id)];
+      const digest = await buildDigest(user.id, { now, excludedWorkspaceIds });
       if (!digest || digest.empty) {
         await finish(user.id, { status: "SKIPPED_EMPTY" });
         result.skippedEmpty += 1;

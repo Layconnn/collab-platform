@@ -391,7 +391,7 @@ export async function recordWorkspacePermissionAudit(data: BaseEvent & {
   targetUserId: string;
   oldRole: string | null;
   newRole: string | null;
-  operation: "addMember" | "removeMember" | "updateMemberRole" | "transferOwnership";
+  operation: "addMember" | "removeMember" | "updateMemberRole" | "transferOwnership" | "leave";
 }): Promise<void> {
   logSecurityEvent("INFO", "workspace.permission.audit", data);
 }

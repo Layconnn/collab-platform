@@ -31,6 +31,15 @@
     "test:files-api": "node --test server/api/files.integration.test.mjs",
     "test:invite-api": "node --test server/api/invite.integration.test.mjs",
     "test:discussion-list-api": "node --test server/api/discussion-list.integration.test.mjs",
+    "test:edit-history-api": "node --test server/api/edit-history.integration.test.mjs",
+    "test:profile-api": "node --test server/api/profile.integration.test.mjs",
+    "test:preferences-api": "node --test server/api/preferences.integration.test.mjs",
+    "test:notification-preferences-api": "node --test server/api/notification-preferences.integration.test.mjs",
+    "test:sessions-api": "node --test server/api/sessions.integration.test.mjs",
+    "test:two-step-api": "node --test server/api/two-step.integration.test.mjs",
+    "test:leave-workspace-api": "node --test server/api/leave-workspace.integration.test.mjs",
+    "test:account-api": "node --test server/api/account.integration.test.mjs",
+    "test:email-change-api": "node --test server/api/email-change.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },
@@ -70,6 +79,7 @@
     "remark-gfm": "^4.0.1",
     "superjson": "^2.2.6",
     "tsx": "4.23.15",
+    "uqr": "0.1.2",
     "zod": "^4.6.7",
     "zustand": "^5.1.0"
   },

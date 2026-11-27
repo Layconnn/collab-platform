@@ -1,0 +1,46 @@
+name: Account erasure
+
+# Erases accounts closed more than 30 days ago (settings PRD, FR-19): personal
+# data is deleted and their content stays, attributed to "Former member". Each
+# call to /api/accounts/erase works for up to about 45 seconds and answers
+# done: false until nothing is due; erasing is idempotent, so re-running this
+# workflow is safe.
+
+on:
+  schedule:
+    - cron: "15 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    name: Erase closed accounts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Call /api/accounts/erase until done
+        env:
+          RUN_URL: https://collab-platform-web.vercel.app/api/accounts/erase
+          DIGEST_RUN_SECRET: ${{ secrets.DIGEST_RUN_SECRET }}
+        run: |
+          if [ -z "$DIGEST_RUN_SECRET" ]; then
+            echo "::notice::DIGEST_RUN_SECRET is not set; scheduled jobs are not switched on yet."
+            exit 0
+          fi
+          for call in $(seq 1 20); do
+            code=$(curl -sS -o body.json -w '%{http_code}' --retry 2 --retry-delay 10 --max-time 90 \
+              -X POST -H "Authorization: Bearer $DIGEST_RUN_SECRET" "$RUN_URL" || echo "000")
+            echo "Call $call: HTTP $code $(cat body.json 2>/dev/null)"
+            if [ "$code" != "200" ]; then
+              echo "::error::Account erasure failed (HTTP $code). See docs/how-to-do-devops.md."
+              exit 1
+            fi
+            if [ "$(jq -r '.skipped | length' body.json)" != "0" ]; then
+              echo "::warning::Some accounts own a workspace again and were skipped: $(jq -c '.skipped' body.json)"
+            fi
+            if [ "$(jq -r '.done' body.json)" = "true" ]; then exit 0; fi
+          done
+          echo "::error::Account erasure did not finish in 20 calls."
+          exit 1

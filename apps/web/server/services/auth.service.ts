@@ -6,6 +6,7 @@ import type {
   ChangePasswordInput,
   LoginInput,
   RegisterInput,
+  VerifyTwoStepInput,
 } from "@repo/validators/auth";
 
 import { prisma } from "../db/prisma";
@@ -17,11 +18,17 @@ import {
   signAccessToken,
 } from "../middleware/auth";
 import { recordAuthFailure } from "../observability/security-events";
+import { recordSecurityEvent, recordSessionStart, sessionService, type Client } from "./session.service";
+import { accountService } from "./account.service";
+import { twoStepService } from "./two-step.service";
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
+const UNKNOWN_CLIENT: Client = { userAgent: "", device: "Unknown device", country: null };
 
 type RequestContext = {
   requestId: string;
+  // Device and country, for sessions and the security log (settings PRD, FR-8).
+  client?: Client;
 };
 
 type AuthTokens = {
@@ -31,11 +38,18 @@ type AuthTokens = {
   csrfToken: string;
 };
 
-async function startSession(userId: string): Promise<AuthTokens> {
+// With two-step sign-in on, the password alone gives no session (FR-13).
+type TwoStepChallenge = { challengeToken: string };
+
+async function startSession(userId: string, client: Client, kind: "ACCOUNT_CREATED" | "SIGNED_IN"): Promise<AuthTokens> {
   const sessionId = randomUUID();
   const sessionToken = randomUUID();
 
   await persistSession(sessionToken, userId, sessionId, SESSION_TTL_SECONDS);
+  await recordSessionStart(userId, sessionId, client);
+  await recordSecurityEvent(userId, kind, { sessionId, client });
+  // Signing in during the 30-day grace period reopens a closed account (FR-18).
+  if (kind === "SIGNED_IN") await accountService.restoreIfClosed(userId, { sessionId, client });
 
   return {
     accessToken: signAccessToken(userId, sessionId),
@@ -49,7 +63,7 @@ export const authService = {
   async getCurrentUser(userId: string) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, username: true, name: true },
+      select: { id: true, email: true, username: true, name: true, usernameChangedAt: true, avatarKey: true },
     });
     if (!user) {
       throw new AppError("UNAUTHORIZED", "Authentication required.");
@@ -87,10 +101,10 @@ export const authService = {
       },
     });
 
-    return startSession(user.id);
+    return startSession(user.id, context.client ?? UNKNOWN_CLIENT, "ACCOUNT_CREATED");
   },
 
-  async login(input: LoginInput, context: RequestContext): Promise<AuthTokens> {
+  async login(input: LoginInput, context: RequestContext): Promise<AuthTokens | TwoStepChallenge> {
     const email = input.email.toLowerCase();
     const user = await prisma.user.findUnique({
       where: { email },
@@ -125,15 +139,30 @@ export const authService = {
         reason: "login_invalid_password",
         timestamp: new Date().toISOString(),
       });
+      await recordSecurityEvent(user.id, "SIGN_IN_FAILED", { client: context.client });
       throw new AppError("UNAUTHORIZED", "Invalid credentials.");
     }
 
-    return startSession(user.id);
+    if (await twoStepService.isEnabled(user.id)) {
+      return { challengeToken: await twoStepService.createChallenge(user.id) };
+    }
+
+    return startSession(user.id, context.client ?? UNKNOWN_CLIENT, "SIGNED_IN");
   },
 
-  async logout(sessionToken: string | null): Promise<{ success: true }> {
+  // The code step of signing in (FR-13): an authenticator or recovery code.
+  async verifyTwoStep(input: VerifyTwoStepInput, context: RequestContext): Promise<AuthTokens> {
+    const userId = await twoStepService.completeChallenge(input.challengeToken, input.code, { client: context.client });
+    return startSession(userId, context.client ?? UNKNOWN_CLIENT, "SIGNED_IN");
+  },
+
+  async logout(sessionToken: string | null, user?: { id: string; sessionId?: string } | null, client?: Client): Promise<{ success: true }> {
     if (sessionToken) {
       await invalidateSession(sessionToken);
+    }
+    if (user?.sessionId) {
+      await sessionService.endSessions(user.id, [user.sessionId]);
+      await recordSecurityEvent(user.id, "SIGNED_OUT", { sessionId: user.sessionId, client });
     }
 
     return { success: true as const };
@@ -142,7 +171,7 @@ export const authService = {
   async changePassword(
     userId: string,
     input: ChangePasswordInput,
-    context: RequestContext & { sessionToken: string | null },
+    context: RequestContext & { sessionToken: string | null; sessionId?: string },
   ): Promise<{ success: true }> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -179,6 +208,9 @@ export const authService = {
 
     // Every other signed-in device loses access; the current session stays.
     await invalidateUserSessions(userId, context.sessionToken);
+    const others = await prisma.userSession.findMany({ where: { userId, endedAt: null, NOT: { id: context.sessionId ?? "" } }, select: { id: true } });
+    await sessionService.endSessions(userId, others.map((row) => row.id));
+    await recordSecurityEvent(userId, "PASSWORD_CHANGED", { sessionId: context.sessionId, client: context.client });
 
     return { success: true as const };
   },

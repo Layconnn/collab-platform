@@ -75,6 +75,21 @@ model User {
   username                 String                  @unique
   passwordHash             String?
   name                     String?
+  // Last username change; another is allowed 30 days later (settings PRD, FR-2).
+  usernameChangedAt        DateTime?
+  // The profile photo in storage, avatars/<userId>/<random>.webp (settings PRD, FR-3).
+  avatarKey                String?
+  // Two-step sign-in (settings PRD, FR-11 to FR-13). The authenticator secret
+  // is encrypted (AES-256-GCM); the last accepted 30-second step stops a code
+  // being used twice.
+  totpSecret               String?
+  totpEnabledAt            DateTime?
+  totpLastStep             Int?
+  // Closing an account (settings PRD, FR-18 and FR-19): closedAt starts a
+  // 30-day grace period that signing in ends; erasedAt marks the row as
+  // stripped of personal data and kept as "Former member" for content.
+  closedAt                 DateTime?
+  erasedAt                 DateTime?
   createdAt                DateTime                @default(now())
   updatedAt                DateTime                @updatedAt
   ownedSpaces              Workspace[]
@@ -100,31 +115,44 @@ model User {
   attachmentsUploaded      Attachment[]
   invitesCreated           WorkspaceInvite[]
   inviteUses               WorkspaceInviteUse[]
+  preference               UserPreference?
+  sessions                 UserSession[]
+  securityEvents           SecurityEvent[]
+  recoveryCodes            RecoveryCode[]
+  discussionRevisions      DiscussionRevision[]    @relation("DiscussionRevisionEditor")
+  commentRevisions         CommentRevision[]       @relation("CommentRevisionEditor")
+
+  // The daily erasure job finds accounts past their grace period.
+  @@index([closedAt])
 }
 
 model Workspace {
-  id                String                  @id @default(cuid())
-  name              String
-  slug              String                  @unique
-  ownerId           String
-  createdAt         DateTime                @default(now())
-  updatedAt         DateTime                @updatedAt
+  id                  String                  @id @default(cuid())
+  name                String
+  slug                String                  @unique
+  ownerId             String
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
   // Restrict: deleting a user must not silently delete the workspaces they own.
   // Transfer ownership or delete the workspace first.
-  owner             User                    @relation(fields: [ownerId], references: [id], onDelete: Restrict)
-  members           WorkspaceMember[]
-  discussions       Discussion[]
-  comments          Comment[]
-  decisions         Decision[]
-  decisionReviews   DecisionReview[]
-  reactions         Reaction[]
-  discussionFollows DiscussionFollow[]
-  savedItems        SavedItem[]
-  digestOptOuts     DigestWorkspaceOptOut[]
-  notifications     Notification[]
-  activityEvents    ActivityEvent[]
-  attachments       Attachment[]
-  invites           WorkspaceInvite[]
+  owner               User                    @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  members             WorkspaceMember[]
+  discussions         Discussion[]
+  comments            Comment[]
+  discussionRevisions DiscussionRevision[]
+  commentRevisions    CommentRevision[]
+  defaultFor          UserPreference[]        @relation("PreferenceDefaultWorkspace")
+  lastVisitedBy       UserPreference[]        @relation("PreferenceLastWorkspace")
+  decisions           Decision[]
+  decisionReviews     DecisionReview[]
+  reactions           Reaction[]
+  discussionFollows   DiscussionFollow[]
+  savedItems          SavedItem[]
+  digestOptOuts       DigestWorkspaceOptOut[]
+  notifications       Notification[]
+  activityEvents      ActivityEvent[]
+  attachments         Attachment[]
+  invites             WorkspaceInvite[]
   // Recommended (optional): @@index([createdAt]) for global recent-workspaces feeds.
 
   @@index([ownerId, createdAt])
@@ -150,6 +178,10 @@ model Discussion {
   follows     DiscussionFollow[]
   savedItems  SavedItem[]
   attachments Attachment[]
+  // Edit history (edit history PRD): how many times the title or context was
+  // edited, and the versions those edits replaced.
+  editCount   Int                  @default(0)
+  revisions   DiscussionRevision[]
   // Recommended (optional): @@index([workspaceId, updatedAt]) for active-discussion sort views.
 
   @@unique([workspaceId, id])
@@ -184,7 +216,10 @@ model Comment {
   // (Markdown, reactions, follow and pin PRD, FR-13 to FR-15).
   pinnedAt    DateTime?
   pinnedById  String?
-  pinnedBy    User?        @relation("CommentPinner", fields: [pinnedById], references: [id], onDelete: SetNull)
+  pinnedBy    User?             @relation("CommentPinner", fields: [pinnedById], references: [id], onDelete: SetNull)
+  // Edit history (edit history PRD): edits made and the versions they replaced.
+  editCount   Int               @default(0)
+  revisions   CommentRevision[]
   // Recommended (optional): @@index([discussionId, createdAt]) for chronological thread views.
 
   @@index([searchVector], type: Gin)
@@ -222,14 +257,15 @@ model Notification {
 }
 
 model WorkspaceMember {
-  id          String        @id @default(cuid())
-  workspaceId String
-  userId      String
-  role        WorkspaceRole @default(MEMBER)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String                      @id @default(cuid())
+  workspaceId       String
+  userId            String
+  role              WorkspaceRole               @default(MEMBER)
+  createdAt         DateTime                    @default(now())
+  updatedAt         DateTime                    @updatedAt
+  workspace         Workspace                   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user              User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationLevel WorkspaceNotificationLevel?
   // Recommended (optional): @@index([userId, workspaceId, role]) for permission-heavy joins.
 
   @@unique([workspaceId, userId])
@@ -604,4 +640,149 @@ model WorkspaceInviteUse {
 
   @@unique([inviteId, userId])
   @@index([userId])
+}
+
+// The version of a discussion that an edit replaced (edit history PRD, FR-1).
+// CHECK version >= 1 and editCount >= 0 are in migration 20261126_edit_history.
+// The current version is the discussion itself; `version` 1 is the original.
+model DiscussionRevision {
+  id           String     @id @default(cuid())
+  workspaceId  String
+  discussionId String
+  version      Int
+  title        String
+  body         String
+  fileNames    String[]   @default([])
+  editedById   String?
+  editorLabel  String
+  createdAt    DateTime   @default(now())
+  workspace    Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  editedBy     User?      @relation("DiscussionRevisionEditor", fields: [editedById], references: [id], onDelete: SetNull)
+
+  @@unique([discussionId, version])
+}
+
+// The version of a reply that an edit replaced (edit history PRD, FR-2).
+// CHECK version >= 1 and editCount >= 0 are in migration 20261126_edit_history.
+model CommentRevision {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  discussionId String
+  commentId    String
+  version      Int
+  body         String
+  fileNames    String[]  @default([])
+  editedById   String?
+  editorLabel  String
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  comment      Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  editedBy     User?     @relation("CommentRevisionEditor", fields: [editedById], references: [id], onDelete: SetNull)
+
+  @@unique([commentId, version])
+  @@index([workspaceId, discussionId])
+}
+
+// Settings that follow a person to every device (settings PRD, FR-15, FR-16).
+// Values are checked by CHECK constraints in migration 20261127_user_preferences.
+model UserPreference {
+  userId             String             @id
+  theme              String             @default("system")
+  motion             String             @default("system")
+  density            String             @default("comfortable")
+  startPage          String             @default("home")
+  defaultWorkspaceId String?
+  lastWorkspaceId    String?
+  // Notification kinds turned off everywhere (settings PRD, FR-4).
+  mutedKinds         NotificationType[] @default([])
+  // The daily digest arrives at this hour in this time zone (FR-6).
+  digestHour         Int                @default(6)
+  timeZone           String             @default("UTC")
+  updatedAt          DateTime           @updatedAt
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultWorkspace   Workspace?         @relation("PreferenceDefaultWorkspace", fields: [defaultWorkspaceId], references: [id], onDelete: SetNull)
+  lastWorkspace      Workspace?         @relation("PreferenceLastWorkspace", fields: [lastWorkspaceId], references: [id], onDelete: SetNull)
+}
+
+// How much one workspace may notify a member (settings PRD, FR-5). No row
+// means ALL; the row goes when the membership does.
+enum NotificationLevel {
+  ALL
+  INVOLVED
+  NONE
+}
+
+model WorkspaceNotificationLevel {
+  workspaceId String
+  userId      String
+  level       NotificationLevel
+  updatedAt   DateTime          @updatedAt
+  membership  WorkspaceMember   @relation(fields: [workspaceId, userId], references: [workspaceId, userId], onDelete: Cascade)
+
+  @@id([workspaceId, userId])
+  @@index([userId])
+}
+
+// A signed-in session as the person sees it in Settings (settings PRD,
+// FR-8, FR-9). Redis decides whether a session is alive; this row describes
+// it. `id` is the session id carried in access tokens.
+model UserSession {
+  id         String    @id
+  userId     String
+  device     String
+  userAgent  String
+  country    String?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  endedAt    DateTime?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, endedAt])
+}
+
+// What the security log lists (FR-10). Kept for 90 days.
+enum SecurityEventKind {
+  ACCOUNT_CREATED
+  SIGNED_IN
+  SIGN_IN_FAILED
+  SIGNED_OUT
+  SESSION_SIGNED_OUT
+  OTHER_SESSIONS_SIGNED_OUT
+  PASSWORD_CHANGED
+  USERNAME_CHANGED
+  TWO_STEP_ENABLED
+  TWO_STEP_DISABLED
+  RECOVERY_CODES_REGENERATED
+  RECOVERY_CODE_USED
+  DATA_EXPORTED
+  ACCOUNT_CLOSED
+  ACCOUNT_RESTORED
+  EMAIL_CHANGED
+}
+
+// Single-use codes for when the authenticator is lost (settings PRD, FR-12).
+// Only a hash is kept; the codes are shown once.
+model RecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, codeHash])
+}
+
+model SecurityEvent {
+  id        String            @id @default(cuid())
+  userId    String
+  kind      SecurityEventKind
+  sessionId String?
+  device    String?
+  country   String?
+  createdAt DateTime          @default(now())
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
 }

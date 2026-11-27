@@ -4,6 +4,7 @@ import {
   loginInputSchema,
   logoutInputSchema,
   registerInputSchema,
+  verifyTwoStepInputSchema,
 } from "@repo/validators/auth";
 
 import { execute } from "../../errors/app-error";
@@ -11,11 +12,19 @@ import { getSessionCookieToken } from "../../middleware/auth";
 import { createRateLimitGuardByKey } from "../../middleware/rateLimit";
 import { authService } from "../../services/auth.service";
 import { buildAuthCookies, buildLogoutCookies } from "../../utils/auth-cookies";
+import { clientOf } from "../../services/session.service";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 const loginRateLimit = createRateLimitGuardByKey({
   routeKey: "auth.login",
   limit: 5,
+  windowSeconds: 60,
+});
+
+// Five codes per challenge, and at most ten tries a minute from one address.
+const verifyTwoStepRateLimit = createRateLimitGuardByKey({
+  routeKey: "auth.verifyTwoStep",
+  limit: 10,
   windowSeconds: 60,
 });
 
@@ -58,7 +67,7 @@ export const authRouter = createTRPCRouter({
 
   register: registerProcedure.input(registerInputSchema).mutation(({ ctx, input }) =>
     execute(async () => {
-      const result = await authService.register(input, { requestId: ctx.requestId });
+      const result = await authService.register(input, { requestId: ctx.requestId, client: clientOf(ctx.headers) });
       appendSetCookies(ctx.responseHeaders, buildAuthCookies(result));
       return {
         success: true as const,
@@ -70,20 +79,43 @@ export const authRouter = createTRPCRouter({
 
   login: loginProcedure.input(loginInputSchema).mutation(({ ctx, input }) =>
     execute(async () => {
-      const result = await authService.login(input, { requestId: ctx.requestId });
+      const result = await authService.login(input, { requestId: ctx.requestId, client: clientOf(ctx.headers) });
+      if ("challengeToken" in result) {
+        return { success: false as const, twoStep: true as const, challengeToken: result.challengeToken };
+      }
       appendSetCookies(ctx.responseHeaders, buildAuthCookies(result));
       return {
         success: true as const,
+        twoStep: false as const,
         csrfToken: result.csrfToken,
         expiresInSeconds: result.expiresInSeconds,
       };
     }),
   ),
 
+  verifyTwoStep: publicProcedure
+    .use(async ({ ctx, next }) => {
+      await verifyTwoStepRateLimit(ctx.ip ?? "unknown", ctx.requestId);
+      return next();
+    })
+    .input(verifyTwoStepInputSchema)
+    .mutation(({ ctx, input }) =>
+      execute(async () => {
+        const result = await authService.verifyTwoStep(input, { requestId: ctx.requestId, client: clientOf(ctx.headers) });
+        appendSetCookies(ctx.responseHeaders, buildAuthCookies(result));
+        return {
+          success: true as const,
+          twoStep: false as const,
+          csrfToken: result.csrfToken,
+          expiresInSeconds: result.expiresInSeconds,
+        };
+      }),
+    ),
+
   logout: protectedProcedure.input(logoutInputSchema).mutation(({ ctx, input }) =>
     execute(async () => {
       const sessionToken = input.sessionToken ?? getSessionCookieToken(ctx.headers);
-      const result = await authService.logout(sessionToken);
+      const result = await authService.logout(sessionToken, ctx.user, clientOf(ctx.headers));
       appendSetCookies(ctx.responseHeaders, buildLogoutCookies());
       return result;
     }),
@@ -101,6 +133,8 @@ export const authRouter = createTRPCRouter({
         authService.changePassword(ctx.user.id, input, {
           requestId: ctx.requestId,
           sessionToken: getSessionCookieToken(ctx.headers),
+          sessionId: ctx.user.sessionId,
+          client: clientOf(ctx.headers),
         }),
       ),
     ),

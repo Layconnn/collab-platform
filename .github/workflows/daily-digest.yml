@@ -1,13 +1,15 @@
 name: Daily digest
 
-# Sends the daily digest email at 06:00 UTC (daily digest PRD). Each call to
+# Runs every hour and sends the daily digest to members whose chosen hour it
+# is in their own time zone (settings PRD, FR-6; 06:00 UTC for anyone who
+# never chose). An hour with nobody due ends after one call. Each call to
 # /api/digest/run processes members for up to about 45 seconds and answers
 # done: false until a call finds nobody left; at most one email per member a
 # day is enforced by the app, so re-running this workflow is safe.
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 permissions:
