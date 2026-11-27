@@ -7,6 +7,7 @@ import { ErrorState, LoadingState } from "@/components/common/StateNotice";
 import { EmailSettings } from "@/components/settings/EmailSettings";
 import { DigestTimeSettings, hourLabel, KINDS } from "@/components/settings/NotificationPreferences";
 import { cacheAppearance } from "@/components/settings/PreferencesSync";
+import { YourWorkspaces } from "@/components/settings/YourWorkspaces";
 import { SettingsGroup, SettingsHeader, SettingsRow } from "@/components/settings/SettingsFrame";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { Button } from "@/components/ui/Button";
@@ -222,7 +223,7 @@ export function WorkspacesSettings() {
     : startPage === "default" && !defaultId && data ? "Choose a default workspace, or Commons opens on Home." : null;
 
   return <div className="min-w-0 max-w-[48rem]">
-    <SettingsHeader title="Workspaces" intro="Where Commons opens when you sign in, and the workspace that's yours by default." />
+    <SettingsHeader title="Workspaces" intro="Where Commons opens when you sign in, your default workspace, and the workspaces you're in." />
     {data ? <>
       <ChoiceGroup legend="Open Commons on" choices={START_PAGES} value={startPage} onChange={(next) => save.mutate({ startPage: next })} />
       <section aria-labelledby={`${id}-title`} className="mt-7">
@@ -237,6 +238,7 @@ export function WorkspacesSettings() {
           <p className="mt-1.5 text-xs text-text-muted">Opens when you choose “Your default workspace” above.</p>
         </div>
       </section>
+      <YourWorkspaces titleId={`${id}-yours`} />
     </> : preferences.error
       ? <div className="mt-7"><ErrorState title="Could not load your settings" description="Please try again in a moment." onRetry={() => void preferences.refetch()} retrying={preferences.isFetching} /></div>
       : <div className="mt-7"><LoadingState label="Loading your settings…" /></div>}

@@ -24,7 +24,7 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
   { id: "account", name: "Your account", description: "Your details and your password.", icon: "account", href: "/settings/account" },
   { id: "security", name: "Security", description: "Two-step sign-in, your sessions, the security log and your password.", icon: "security", href: "/settings/security" },
   { id: "notifications", name: "Notifications", description: "What reaches your Inbox, per workspace, and the daily digest.", icon: "inbox", href: "/settings/notifications" },
-  { id: "workspaces", name: "Workspaces", description: "Where Commons opens and your default workspace.", icon: "workspaces", href: "/settings/workspaces" },
+  { id: "workspaces", name: "Workspaces", description: "Where Commons opens, your default workspace, and leaving one.", icon: "workspaces", href: "/settings/workspaces" },
   { id: "appearance", name: "Appearance", description: "Theme, motion and density, on every device.", icon: "appearance", href: "/settings/appearance" },
 ];
 
@@ -46,6 +46,7 @@ export const SETTING_ENTRIES: SettingEntry[] = [
   { label: "Density", description: "Comfortable or compact.", category: "appearance", href: "/settings/appearance", keywords: "compact comfortable spacing size text" },
   { label: "Start page", description: "Where Commons opens when you sign in.", category: "workspaces", href: "/settings/workspaces", keywords: "open home landing first page sign in" },
   { label: "Default workspace", description: "The workspace that's yours by default.", category: "workspaces", href: "/settings/workspaces", keywords: "workspace default primary" },
+  { label: "Leave a workspace", description: "Stop being a member of a workspace.", category: "workspaces", href: "/settings/workspaces", keywords: "leave quit exit remove myself membership workspaces" },
 ];
 
 export function categoryOf(id: string) {

@@ -157,6 +157,8 @@ jobs:
         run: pnpm -C apps/web run test:sessions-api
       - name: Two-step sign-in (real database)
         run: pnpm -C apps/web run test:two-step-api
+      - name: Leave a workspace (real database)
+        run: pnpm -C apps/web run test:leave-workspace-api
 
   frontend-tests:
     name: Frontend tests

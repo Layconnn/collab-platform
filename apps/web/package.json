@@ -37,6 +37,7 @@
     "test:notification-preferences-api": "node --test server/api/notification-preferences.integration.test.mjs",
     "test:sessions-api": "node --test server/api/sessions.integration.test.mjs",
     "test:two-step-api": "node --test server/api/two-step.integration.test.mjs",
+    "test:leave-workspace-api": "node --test server/api/leave-workspace.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },

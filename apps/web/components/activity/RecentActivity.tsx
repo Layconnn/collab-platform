@@ -113,7 +113,9 @@ export function describeActivity(item: ActivityEntry, workspaceId: string): { le
       ? { lead: "joined with an invite link", subject: "", tail: `as ${roleLabel(item.summary?.role)}` }
       : { lead: "added", subject: plain(member), tail: `as ${roleLabel(item.summary?.role)}` };
     case "MEMBER_ROLE_CHANGED": return { lead: "changed the role of", subject: plain(member), tail: `from ${roleLabel(item.summary?.previousRole)} to ${roleLabel(item.summary?.role)}` };
-    case "MEMBER_REMOVED": return { lead: "removed", subject: plain(member) };
+    case "MEMBER_REMOVED": return item.summary?.left === true
+      ? { lead: "left the workspace", subject: "" }
+      : { lead: "removed", subject: plain(member) };
     case "OWNERSHIP_TRANSFERRED": return { lead: "transferred ownership to", subject: plain(member) };
     case "WORKSPACE_CREATED": return { lead: "created the workspace", subject: plain(summaryText(item.summary, "name", "")) };
     case "WORKSPACE_UPDATED": return { lead: "renamed the workspace to", subject: plain(summaryText(item.summary, "name", "a new name")) };
@@ -173,7 +175,7 @@ export function RecentActivity({ workspaceId }: { workspaceId: string }) {
             return (
               <li key={item.id} className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border-subtle py-3.5 text-sm">
                 <p className="min-w-0 flex-1 wrap-anywhere text-text-secondary">
-                  <span className="font-semibold text-text-primary">{item.actor.label}</span> {sentence.lead} {sentence.subject}
+                  <span className="font-semibold text-text-primary">{item.actor.label}</span> {sentence.lead}{sentence.subject ? <> {sentence.subject}</> : null}
                   {sentence.tail ? ` ${sentence.tail}` : null}
                   {sentence.gone ? <span className="text-text-muted"> (no longer available)</span> : null}
                 </p>

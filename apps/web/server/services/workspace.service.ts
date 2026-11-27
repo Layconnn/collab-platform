@@ -10,6 +10,7 @@ import type {
   RemoveWorkspaceMemberInput,
   ResolveWorkspaceMemberCandidateInput,
   SearchMentionMembersInput,
+  LeaveWorkspaceInput,
   TransferWorkspaceOwnershipInput,
   UpdateWorkspaceInput,
   UpdateWorkspaceMemberRoleInput,
@@ -612,6 +613,56 @@ export const workspaceService = {
       workspaceId: input.workspaceId,
       targetUserId: input.userId,
       oldRole: targetRole,
+      newRole: null,
+      timestamp: new Date().toISOString(),
+    });
+
+    return { success: true as const };
+  },
+
+  // Settings PRD, FR-14. A member or admin leaves on their own; an owner
+  // transfers ownership first. Recorded as a removal the person made of
+  // themselves, so the activity feed reads "left the workspace".
+  async leave(userId: string, input: LeaveWorkspaceInput, context: RequestContext) {
+    const role = await getMembershipRole(input.workspaceId, userId);
+    if (!role) {
+      throw new AppError("NOT_FOUND", "Workspace not found.");
+    }
+    if (role === "OWNER") {
+      throw new AppError("CONFLICT", "Transfer ownership before leaving this workspace.");
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const label = await memberLabel(tx, userId);
+      const { count } = await tx.workspaceMember.deleteMany({ where: { workspaceId: input.workspaceId, userId, role: { not: "OWNER" } } });
+      if (count !== 1) {
+        throw new AppError("NOT_FOUND", "Workspace not found.");
+      }
+      // Open review requests leave with the member (decision reviews, FR-7).
+      await withdrawReviewsForMember(tx, input.workspaceId, userId, { userId, label });
+      await recordActivity(tx, {
+        workspaceId: input.workspaceId,
+        actorUserId: userId,
+        kind: "MEMBER_REMOVED",
+        subjectType: "MEMBER",
+        subjectId: userId,
+        summary: { member: label, previousRole: role, left: true },
+      });
+      // Commons no longer opens on a workspace you've left.
+      await tx.userPreference.updateMany({ where: { userId, defaultWorkspaceId: input.workspaceId }, data: { defaultWorkspaceId: null } });
+      await tx.userPreference.updateMany({ where: { userId, lastWorkspaceId: input.workspaceId }, data: { lastWorkspaceId: null } });
+    });
+
+    await invalidateWorkspaceCache(input.workspaceId);
+    await invalidateMembershipCaches(input.workspaceId, userId);
+    await invalidateUserWorkspaceLists(userId);
+    await recordWorkspacePermissionAudit({
+      operation: "leave",
+      requestId: context.requestId,
+      actorUserId: userId,
+      workspaceId: input.workspaceId,
+      targetUserId: userId,
+      oldRole: role,
       newRole: null,
       timestamp: new Date().toISOString(),
     });
