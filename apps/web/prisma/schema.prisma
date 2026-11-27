@@ -105,6 +105,8 @@ model User {
   invitesCreated           WorkspaceInvite[]
   inviteUses               WorkspaceInviteUse[]
   preference               UserPreference?
+  sessions                 UserSession[]
+  securityEvents           SecurityEvent[]
   discussionRevisions      DiscussionRevision[]    @relation("DiscussionRevisionEditor")
   commentRevisions         CommentRevision[]       @relation("CommentRevisionEditor")
 }
@@ -705,4 +707,46 @@ model WorkspaceNotificationLevel {
 
   @@id([workspaceId, userId])
   @@index([userId])
+}
+
+// A signed-in session as the person sees it in Settings (settings PRD,
+// FR-8, FR-9). Redis decides whether a session is alive; this row describes
+// it. `id` is the session id carried in access tokens.
+model UserSession {
+  id         String    @id
+  userId     String
+  device     String
+  userAgent  String
+  country    String?
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  endedAt    DateTime?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, endedAt])
+}
+
+// What the security log lists (FR-10). Kept for 90 days.
+enum SecurityEventKind {
+  ACCOUNT_CREATED
+  SIGNED_IN
+  SIGN_IN_FAILED
+  SIGNED_OUT
+  SESSION_SIGNED_OUT
+  OTHER_SESSIONS_SIGNED_OUT
+  PASSWORD_CHANGED
+  USERNAME_CHANGED
+}
+
+model SecurityEvent {
+  id        String            @id @default(cuid())
+  userId    String
+  kind      SecurityEventKind
+  sessionId String?
+  device    String?
+  country   String?
+  createdAt DateTime          @default(now())
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
 }

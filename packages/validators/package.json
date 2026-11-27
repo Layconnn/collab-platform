@@ -14,7 +14,8 @@
     "./search": "./src/search.ts",
     "./home": "./src/home.ts",
     "./files": "./src/files.ts",
-    "./preferences": "./src/preferences.ts"
+    "./preferences": "./src/preferences.ts",
+    "./security": "./src/security.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

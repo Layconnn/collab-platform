@@ -45,9 +45,9 @@ describe("Settings", () => {
     render(<SettingsFrame><p>Detail</p></SettingsFrame>);
     const nav = screen.getByRole("navigation", { name: "Settings" });
     const links = within(nav).getAllByRole("link");
-    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/settings/account", "/settings/notifications", "/settings/workspaces", "/settings/appearance"]);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual(["/settings/account", "/settings/security", "/settings/notifications", "/settings/workspaces", "/settings/appearance"]);
     expect(links[0]!.getAttribute("aria-current")).toBe("page");
-    expect(links[1]!.textContent).toContain("the daily digest");
+    expect(links[2]!.textContent).toContain("the daily digest");
     expect(screen.getByText("Detail")).toBeTruthy();
   });
 

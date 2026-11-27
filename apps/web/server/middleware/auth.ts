@@ -249,3 +249,21 @@ export async function invalidateUserSessions(userId: string, keepSessionToken?: 
     }
   }
 }
+
+// The session token behind a session id, for signing out one session from
+// Settings (settings PRD, FR-9). Only the person's own sessions are searched.
+export async function findSessionToken(userId: string, sessionId: string): Promise<string | null> {
+  const sessionTokens = await redis.smembers(`${USER_SESSIONS_KEY_PREFIX}${userId}`);
+  for (const sessionToken of sessionTokens) {
+    const record = await readSessionRecord(sessionToken);
+    if (record?.userId === userId && record.sessionId === sessionId) return sessionToken;
+  }
+  return null;
+}
+
+// Which of these session ids are still alive for this person.
+export async function liveSessionIds(userId: string, sessionIds: string[]): Promise<Set<string>> {
+  if (!sessionIds.length) return new Set();
+  const owners = await redis.mget(...sessionIds.map((id) => `${SESSION_ID_KEY_PREFIX}${id}`));
+  return new Set(sessionIds.filter((_, index) => owners[index] === userId));
+}

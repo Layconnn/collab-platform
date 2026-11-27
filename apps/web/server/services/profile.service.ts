@@ -14,6 +14,7 @@ import { Prisma } from "../../app/generated/prisma/client";
 import { prisma } from "../db/prisma";
 import { AppError } from "../errors/app-error";
 import { configuredStorage, type FileStorage } from "./files/storage";
+import { recordSecurityEvent } from "./session.service";
 import { invalidateMembershipCaches } from "./workspace.service";
 
 // Your profile in Settings (settings PRD, FR-1 and FR-2): the name teammates
@@ -95,6 +96,7 @@ export const profileService = {
       throw error;
     }
     await refreshMemberLists(userId);
+    await recordSecurityEvent(userId, "USERNAME_CHANGED");
     return { username: input.username, usernameChangedAt: now };
   },
 

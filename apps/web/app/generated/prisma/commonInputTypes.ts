@@ -457,6 +457,23 @@ export type EnumNotificationLevelWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumNotificationLevelFilter<$PrismaModel>
 }
 
+export type EnumSecurityEventKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.SecurityEventKind | Prisma.EnumSecurityEventKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSecurityEventKindFilter<$PrismaModel> | $Enums.SecurityEventKind
+}
+
+export type EnumSecurityEventKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SecurityEventKind | Prisma.EnumSecurityEventKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSecurityEventKindWithAggregatesFilter<$PrismaModel> | $Enums.SecurityEventKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSecurityEventKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSecurityEventKindFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -884,6 +901,23 @@ export type NestedEnumNotificationLevelWithAggregatesFilter<$PrismaModel = never
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumNotificationLevelFilter<$PrismaModel>
   _max?: Prisma.NestedEnumNotificationLevelFilter<$PrismaModel>
+}
+
+export type NestedEnumSecurityEventKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.SecurityEventKind | Prisma.EnumSecurityEventKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSecurityEventKindFilter<$PrismaModel> | $Enums.SecurityEventKind
+}
+
+export type NestedEnumSecurityEventKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SecurityEventKind | Prisma.EnumSecurityEventKindFieldRefInput<$PrismaModel>
+  in?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SecurityEventKind[] | Prisma.ListEnumSecurityEventKindFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSecurityEventKindWithAggregatesFilter<$PrismaModel> | $Enums.SecurityEventKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSecurityEventKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSecurityEventKindFilter<$PrismaModel>
 }
 
 

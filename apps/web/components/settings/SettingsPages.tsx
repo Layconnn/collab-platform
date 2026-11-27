@@ -40,6 +40,7 @@ export function AccountSettings() {
     </SettingsGroup>
     <SettingsGroup label="Security">
       <SettingsRow label="Change your password" description="Your other devices are signed out when it changes." href="/settings/account/password" />
+      <SettingsRow label="Sessions and security log" description="Where you're signed in, and what happened to your account." href="/settings/security" />
     </SettingsGroup>
   </div>;
 }

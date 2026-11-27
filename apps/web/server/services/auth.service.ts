@@ -17,11 +17,15 @@ import {
   signAccessToken,
 } from "../middleware/auth";
 import { recordAuthFailure } from "../observability/security-events";
+import { recordSecurityEvent, recordSessionStart, sessionService, type Client } from "./session.service";
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
+const UNKNOWN_CLIENT: Client = { userAgent: "", device: "Unknown device", country: null };
 
 type RequestContext = {
   requestId: string;
+  // Device and country, for sessions and the security log (settings PRD, FR-8).
+  client?: Client;
 };
 
 type AuthTokens = {
@@ -31,11 +35,13 @@ type AuthTokens = {
   csrfToken: string;
 };
 
-async function startSession(userId: string): Promise<AuthTokens> {
+async function startSession(userId: string, client: Client, kind: "ACCOUNT_CREATED" | "SIGNED_IN"): Promise<AuthTokens> {
   const sessionId = randomUUID();
   const sessionToken = randomUUID();
 
   await persistSession(sessionToken, userId, sessionId, SESSION_TTL_SECONDS);
+  await recordSessionStart(userId, sessionId, client);
+  await recordSecurityEvent(userId, kind, { sessionId, client });
 
   return {
     accessToken: signAccessToken(userId, sessionId),
@@ -87,7 +93,7 @@ export const authService = {
       },
     });
 
-    return startSession(user.id);
+    return startSession(user.id, context.client ?? UNKNOWN_CLIENT, "ACCOUNT_CREATED");
   },
 
   async login(input: LoginInput, context: RequestContext): Promise<AuthTokens> {
@@ -125,15 +131,20 @@ export const authService = {
         reason: "login_invalid_password",
         timestamp: new Date().toISOString(),
       });
+      await recordSecurityEvent(user.id, "SIGN_IN_FAILED", { client: context.client });
       throw new AppError("UNAUTHORIZED", "Invalid credentials.");
     }
 
-    return startSession(user.id);
+    return startSession(user.id, context.client ?? UNKNOWN_CLIENT, "SIGNED_IN");
   },
 
-  async logout(sessionToken: string | null): Promise<{ success: true }> {
+  async logout(sessionToken: string | null, user?: { id: string; sessionId?: string } | null, client?: Client): Promise<{ success: true }> {
     if (sessionToken) {
       await invalidateSession(sessionToken);
+    }
+    if (user?.sessionId) {
+      await sessionService.endSessions(user.id, [user.sessionId]);
+      await recordSecurityEvent(user.id, "SIGNED_OUT", { sessionId: user.sessionId, client });
     }
 
     return { success: true as const };
@@ -142,7 +153,7 @@ export const authService = {
   async changePassword(
     userId: string,
     input: ChangePasswordInput,
-    context: RequestContext & { sessionToken: string | null },
+    context: RequestContext & { sessionToken: string | null; sessionId?: string },
   ): Promise<{ success: true }> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -179,6 +190,9 @@ export const authService = {
 
     // Every other signed-in device loses access; the current session stays.
     await invalidateUserSessions(userId, context.sessionToken);
+    const others = await prisma.userSession.findMany({ where: { userId, endedAt: null, NOT: { id: context.sessionId ?? "" } }, select: { id: true } });
+    await sessionService.endSessions(userId, others.map((row) => row.id));
+    await recordSecurityEvent(userId, "PASSWORD_CHANGED", { sessionId: context.sessionId, client: context.client });
 
     return { success: true as const };
   },

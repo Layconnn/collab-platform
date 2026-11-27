@@ -144,3 +144,17 @@ export const NotificationLevel = {
 } as const
 
 export type NotificationLevel = (typeof NotificationLevel)[keyof typeof NotificationLevel]
+
+
+export const SecurityEventKind = {
+  ACCOUNT_CREATED: 'ACCOUNT_CREATED',
+  SIGNED_IN: 'SIGNED_IN',
+  SIGN_IN_FAILED: 'SIGN_IN_FAILED',
+  SIGNED_OUT: 'SIGNED_OUT',
+  SESSION_SIGNED_OUT: 'SESSION_SIGNED_OUT',
+  OTHER_SESSIONS_SIGNED_OUT: 'OTHER_SESSIONS_SIGNED_OUT',
+  PASSWORD_CHANGED: 'PASSWORD_CHANGED',
+  USERNAME_CHANGED: 'USERNAME_CHANGED'
+} as const
+
+export type SecurityEventKind = (typeof SecurityEventKind)[keyof typeof SecurityEventKind]
