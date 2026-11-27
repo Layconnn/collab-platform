@@ -329,7 +329,7 @@ export const workspaceService = {
 
     const cacheKey = membersCacheKey(input.workspaceId, input.cursor, input.take);
     const cached = await redisCache.getJSON<
-      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; name: string | null; username: string } }>
+      PaginatedResult<{ id: string; userId: string; role: WorkspaceRole; createdAt: Date; user: { id: string; name: string | null; username: string; avatarKey?: string | null } }>
     >(cacheKey);
     if (cached) {
       return cached;
@@ -353,6 +353,7 @@ export const workspaceService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
       },
@@ -384,7 +385,7 @@ export const workspaceService = {
       orderBy: [{ user: { username: "asc" } }],
       take: 8,
       select: {
-        user: { select: { id: true, name: true, username: true } },
+        user: { select: { id: true, name: true, username: true, avatarKey: true } },
       },
     });
 
@@ -396,7 +397,7 @@ export const workspaceService = {
 
     const user = await prisma.user.findUnique({
       where: { username: input.username },
-      select: { id: true, name: true, username: true },
+      select: { id: true, name: true, username: true, avatarKey: true },
     });
     if (!user) return { status: "unavailable" as const };
 

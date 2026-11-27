@@ -204,7 +204,7 @@ export function MentionTextarea({ as = "textarea", workspaceId, registration, va
             const identity = resolveUserIdentity(member);
             return (
               <button key={member.id} id={`${id}-option-${index}`} role="option" aria-selected={index === selectedIndex} type="button" tabIndex={-1} onPointerDown={(event) => event.preventDefault()} onClick={() => void choose(index)} className={`flex min-h-11 w-full min-w-0 items-center gap-2 rounded-sm px-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-focus-ring ${index === selectedIndex ? "bg-surface-active" : "hover:bg-surface-hover"}`}>
-                <UserAvatar name={identity.avatarName} className="size-7" />
+                <UserAvatar name={identity.avatarName} photo={identity.photo} className="size-7" />
                 <span className="min-w-0 flex-1 truncate font-medium text-text-primary">{identity.label}</span>
                 <span className="max-w-[48%] shrink-0 truncate text-xs text-brand-link">@{member.username}</span>
               </button>

@@ -70,13 +70,13 @@ type ListedDiscussion = {
   id: string;
   workspaceId: string;
   title: string;
-  author: { id: string; name: string | null; username: string };
+  author: { id: string; name: string | null; username: string; avatarKey?: string | null };
   files: number;
   createdAt: Date;
   updatedAt: Date;
 };
 
-type Participant = { id: string; name: string | null; username: string };
+type Participant = { id: string; name: string | null; username: string; avatarKey?: string | null };
 
 // What each row of the discussions list shows beyond the cached page
 // (dashboard redesign, #170): replies, when the last one came, who else took
@@ -102,7 +102,7 @@ async function withActivity(workspaceId: string, items: ListedDiscussion[]) {
   ]);
   const people = await prisma.user.findMany({
     where: { id: { in: [...new Set(byAuthor.map((row) => row.authorId))] } },
-    select: { id: true, name: true, username: true },
+    select: { id: true, name: true, username: true, avatarKey: true },
   });
   const person = new Map<string, Participant>(people.map((user) => [user.id, user]));
 
@@ -202,7 +202,7 @@ export const discussionService = {
     const shown = repliers.slice(0, CONTEXT_PEOPLE - 1);
     const users = await prisma.user.findMany({
       where: { id: { in: [discussion.authorId, ...shown.map((row) => row.authorId)] } },
-      select: { id: true, name: true, username: true },
+      select: { id: true, name: true, username: true, avatarKey: true },
     });
     const byId = new Map(users.map((user) => [user.id, user]));
     const authorReplies = byAuthor.find((row) => row.authorId === discussion.authorId)?._count._all ?? 0;
@@ -303,6 +303,7 @@ export const discussionService = {
                 id: true,
                 name: true,
                 username: true,
+                avatarKey: true,
               },
             },
             createdAt: true,
@@ -442,6 +443,7 @@ export const discussionService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
         _count: { select: { attachments: true } },
@@ -487,6 +489,7 @@ export const discussionService = {
         id: string;
         name: string | null;
         username: string;
+        avatarKey?: string | null;
       };
       attachments: PublicAttachment[];
       createdAt: Date;
@@ -518,6 +521,7 @@ export const discussionService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
         createdAt: true,
@@ -622,6 +626,7 @@ export const discussionService = {
                 id: true,
                 name: true,
                 username: true,
+                avatarKey: true,
               },
             },
             createdAt: true,

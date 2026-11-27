@@ -28,7 +28,7 @@ export function AccountMenu({
         title={collapsed ? label : undefined}
         className={`flex min-h-12 w-full cursor-pointer list-none items-center gap-2.5 rounded-[10px] bg-sidebar-field px-2 text-left transition-colors duration-150 ease-out hover:bg-sidebar-hover focus-visible:ring-2 focus-visible:ring-sidebar-live ${collapsed ? "justify-center" : ""}`}
       >
-        <UserAvatar name={identity.avatarName} className="size-8 !bg-sidebar-live !text-brand-primary" />
+        <UserAvatar name={identity.avatarName} photo={identity.photo} className="size-8 !bg-sidebar-live !text-brand-primary" />
         {!collapsed ? (
           <>
             <span className="min-w-0 flex-1">
@@ -41,7 +41,7 @@ export function AccountMenu({
       </summary>
       <div className={`${solidPanelClasses} absolute bottom-full z-30 mb-2 w-[min(18rem,calc(100vw-2rem))] p-1.5 ${collapsed ? "left-full ml-2" : "left-0"}`}>
         <div className="flex items-center gap-2.5 border-b border-border-subtle px-2 pb-3 pt-2">
-          <UserAvatar name={identity.avatarName} className="size-9" />
+          <UserAvatar name={identity.avatarName} photo={identity.photo} className="size-9" />
           <div className="min-w-0">
           <p className="truncate text-sm font-medium text-text-primary">{label}</p>
           <p className="truncate text-xs text-text-muted">{user.email}</p>

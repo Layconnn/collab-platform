@@ -92,7 +92,7 @@ function MemberRow({ member }: { member: Member }) {
   const identity = resolveUserIdentity(member.user);
   return (
     <li className="flex min-w-0 items-center gap-2.5 py-1.5">
-      <UserAvatar name={identity.avatarName} className="size-7 text-[10px]" />
+      <UserAvatar name={identity.avatarName} photo={identity.photo} className="size-7 text-[10px]" />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-medium text-text-primary">
           {identity.label}

@@ -1,5 +1,7 @@
 import {
   changeUsernameInputSchema,
+  photoUploadInputSchema,
+  setPhotoInputSchema,
   updateProfileInputSchema,
   usernameAvailableInputSchema,
 } from "@repo/validators/auth";
@@ -25,6 +27,15 @@ export const profileRouter = createTRPCRouter({
   ),
   usernameAvailable: limited("profile.usernameAvailable", 60).input(usernameAvailableInputSchema).query(({ ctx, input }) =>
     execute(() => profileService.usernameAvailable(ctx.user.id, input)),
+  ),
+  photoUpload: limited("profile.photoUpload", 10).input(photoUploadInputSchema).mutation(({ ctx, input }) =>
+    execute(() => profileService.createPhotoUpload(ctx.user.id, input)),
+  ),
+  setPhoto: limited("profile.setPhoto", 10).input(setPhotoInputSchema).mutation(({ ctx, input }) =>
+    execute(() => profileService.setPhoto(ctx.user.id, input)),
+  ),
+  removePhoto: limited("profile.removePhoto", 10).mutation(({ ctx }) =>
+    execute(() => profileService.removePhoto(ctx.user.id)),
   ),
   changeUsername: limited("profile.changeUsername", 5, 600).input(changeUsernameInputSchema).mutation(({ ctx, input }) =>
     execute(() => profileService.changeUsername(ctx.user.id, input)),

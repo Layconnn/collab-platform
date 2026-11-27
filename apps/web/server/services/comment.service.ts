@@ -59,6 +59,7 @@ type PublicComment = {
     id: string;
     name: string | null;
     username: string;
+    avatarKey?: string | null;
   };
   attachments: PublicAttachment[];
   createdAt: Date;
@@ -172,6 +173,7 @@ async function getCommentByIdWithWorkspace(
           id: true,
           name: true,
           username: true,
+          avatarKey: true,
         },
       },
       createdAt: true,
@@ -323,6 +325,7 @@ export const commentService = {
                 id: true,
                 name: true,
                 username: true,
+                avatarKey: true,
               },
             },
             createdAt: true,
@@ -482,6 +485,7 @@ export const commentService = {
             id: true,
             name: true,
             username: true,
+            avatarKey: true,
           },
         },
         createdAt: true,
@@ -740,6 +744,7 @@ export const commentService = {
               id: true,
               name: true,
               username: true,
+              avatarKey: true,
             },
           },
           createdAt: true,

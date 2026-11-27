@@ -22,6 +22,9 @@ const { workspaceRouter } = jiti("./routers/workspace.router.ts");
 const { authRouter } = jiti("./routers/auth.router.ts");
 const { prisma } = jiti("../db/prisma.ts");
 const { redis } = jiti("../cache/redis.ts");
+const { createMemoryStorage, setStorageForTests } = jiti("../services/files/storage.ts");
+const storage = createMemoryStorage();
+setStorageForTests(storage);
 redis.incr = async () => 1;
 redis.expire = async () => 1;
 
@@ -43,6 +46,7 @@ async function user(name) {
 }
 
 after(async () => {
+  setStorageForTests(undefined);
   await prisma.workspace.deleteMany({ where: { ownerId: { in: createdUserIds } } });
   for (const id of createdUserIds.reverse()) await prisma.user.deleteMany({ where: { id } });
   await prisma.$disconnect();
@@ -107,3 +111,53 @@ test("member lists show the new name at once", async () => {
   assert.equal(shown.name, "Samuel");
   assert.equal(shown.username, next);
 });
+
+// A tiny WebP header and a JPEG header, enough for the type check.
+const WEBP = new Uint8Array([0x52, 0x49, 0x46, 0x46, 0x10, 0, 0, 0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50]);
+const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0, 0x10]);
+
+test("a photo is checked before it is used, and replacing it deletes the old one", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const first = await profile(maya.id).photoUpload({ contentType: "image/webp", size: WEBP.length });
+  assert.match(first.key, new RegExp(`^avatars/${maya.id}/[a-f0-9]{32}\.webp$`));
+
+  // Not uploaded yet.
+  await assert.rejects(profile(maya.id).setPhoto({ key: first.key }), (error) => error.code === "BAD_REQUEST");
+  // Someone else's key.
+  const theirs = await profile(sam.id).photoUpload({ contentType: "image/webp", size: WEBP.length });
+  storage.put(theirs.key, WEBP, "image/webp");
+  await assert.rejects(profile(maya.id).setPhoto({ key: theirs.key }), (error) => error.code === "FORBIDDEN");
+  // Not really an image: rejected and removed from storage.
+  storage.put(first.key, new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), "image/webp");
+  await assert.rejects(profile(maya.id).setPhoto({ key: first.key }), (error) => error.code === "BAD_REQUEST");
+  assert.equal(storage.objects.has(first.key), false);
+
+  const good = await profile(maya.id).photoUpload({ contentType: "image/webp", size: WEBP.length });
+  storage.put(good.key, WEBP, "image/webp");
+  await profile(maya.id).setPhoto({ key: good.key });
+  assert.equal((await authRouter.createCaller(context(maya.id)).me()).avatarKey, good.key);
+
+  // Safari sends JPEG; the new photo replaces the old, which is deleted.
+  const jpeg = await profile(maya.id).photoUpload({ contentType: "image/jpeg", size: JPEG.length });
+  assert.ok(jpeg.key.endsWith(".jpg"));
+  storage.put(jpeg.key, JPEG, "image/jpeg");
+  await profile(maya.id).setPhoto({ key: jpeg.key });
+  assert.equal(storage.objects.has(good.key), false);
+
+  await profile(maya.id).removePhoto();
+  assert.equal((await authRouter.createCaller(context(maya.id)).me()).avatarKey, null);
+  assert.equal(storage.objects.has(jpeg.key), false);
+});
+
+test("member lists carry the photo", async () => {
+  const [maya, sam] = await Promise.all([user("Maya"), user("Sam")]);
+  const ws = await prisma.workspace.create({ data: { name: "Photos", slug: `photo-${suffix()}`, ownerId: maya.id } });
+  await prisma.workspaceMember.createMany({ data: [{ workspaceId: ws.id, userId: maya.id, role: "OWNER" }, { workspaceId: ws.id, userId: sam.id, role: "MEMBER" }] });
+  const members = () => workspaceRouter.createCaller(context(maya.id)).listMembers({ workspaceId: ws.id, take: 20 });
+  await members();
+  const upload = await profile(sam.id).photoUpload({ contentType: "image/webp", size: WEBP.length });
+  storage.put(upload.key, WEBP, "image/webp");
+  await profile(sam.id).setPhoto({ key: upload.key });
+  assert.equal((await members()).items.find((item) => item.userId === sam.id).user.avatarKey, upload.key);
+});
+
