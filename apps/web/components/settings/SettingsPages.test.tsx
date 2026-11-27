@@ -16,6 +16,7 @@ vi.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: "u1", name: "M
 vi.mock("@/hooks/useDigest", () => ({ useDigestPreferences: () => mocks.prefs }));
 vi.mock("@/components/settings/EmailSettings", () => ({ EmailSettings: ({ embedded }: { embedded?: boolean }) => <p>Digest controls {embedded ? "embedded" : "standalone"}</p> }));
 vi.mock("@/hooks/useWorkspace", () => ({ useWorkspaceSwitcherList: () => ({ isLoading: false, data: { pages: [{ items: [{ workspaceId: "w1", name: "Platform" }, { workspaceId: "w2", name: "Marketing" }] }] } }) }));
+vi.mock("@/components/settings/YourWorkspaces", () => ({ YourWorkspaces: () => <p>Your workspaces list</p> }));
 vi.mock("@/components/theme/ThemeProvider", () => ({ useTheme: () => ({ mode: "system", setMode: mocks.setMode }) }));
 vi.mock("@/lib/trpc/api-client", () => ({
   trpc: {

@@ -4,6 +4,7 @@ import {
   createWorkspaceInputSchema,
   deleteWorkspaceInputSchema,
   getWorkspaceByIdInputSchema,
+  leaveWorkspaceInputSchema,
   listWorkspaceMembersInputSchema,
   listWorkspacesInputSchema,
   removeWorkspaceMemberInputSchema,
@@ -121,6 +122,10 @@ export const workspaceRouter = createTRPCRouter({
 
   removeMember: removeMemberProcedure.input(removeWorkspaceMemberInputSchema).mutation(({ ctx, input }) =>
     execute(() => workspaceService.removeMember(ctx.user.id, input, { requestId: ctx.requestId })),
+  ),
+
+  leave: removeMemberProcedure.input(leaveWorkspaceInputSchema).mutation(({ ctx, input }) =>
+    execute(() => workspaceService.leave(ctx.user.id, input, { requestId: ctx.requestId })),
   ),
 
   transferOwnership: protectedProcedure.input(transferWorkspaceOwnershipInputSchema).mutation(({ ctx, input }) =>

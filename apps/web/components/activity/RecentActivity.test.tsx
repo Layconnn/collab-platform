@@ -56,6 +56,8 @@ describe("RecentActivity", () => {
       event({ kind: "DECISION_FINALIZED", subjectType: "DECISION", subjectId: "c000000000000000000000003", discussion: null, summary: { question: "Use Vercel Queues", status: "DECIDED" } }),
       event({ kind: "MEMBER_ROLE_CHANGED", subjectType: "MEMBER", subjectId: "u2", discussion: null, summary: { member: "Sam", previousRole: "MEMBER", role: "ADMIN" } }),
       event({ kind: "COMMENT_CREATED", subjectType: "COMMENT", subjectId: "c000000000000000000000004", summary: { discussionId: "c000000000000000000000002" } }),
+      event({ kind: "MEMBER_REMOVED", subjectType: "MEMBER", subjectId: "u3", discussion: null, summary: { member: "Lee", previousRole: "MEMBER" } }),
+      event({ kind: "MEMBER_REMOVED", subjectType: "MEMBER", subjectId: "u1", discussion: null, summary: { member: "Maya", previousRole: "ADMIN", left: true } }),
     ];
     render(<RecentActivity workspaceId={workspaceId} />);
     const rows = within(screen.getByRole("list", { name: "Recent activity" })).getAllByRole("listitem");
@@ -64,6 +66,8 @@ describe("RecentActivity", () => {
       "Maya finalized Use Vercel Queues",
       "Maya changed the role of Sam from member to admin",
       "Maya replied in Pick a queue",
+      "Maya removed Lee",
+      "Maya left the workspace",
     ]);
     expect(within(rows[0]!).getByRole("link", { name: "Pick a queue" }).getAttribute("href")).toBe(`/workspace/${workspaceId}/discussions/c000000000000000000000002`);
     expect(within(rows[1]!).getByRole("link", { name: "Use Vercel Queues" }).getAttribute("href")).toBe(`/workspace/${workspaceId}/decisions/c000000000000000000000003`);

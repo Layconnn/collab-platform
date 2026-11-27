@@ -284,11 +284,25 @@ test("a teammate without an account joins with an invite link", async ({ page, b
     await expect(guest).toHaveURL(/\/join\//);
     await guest.getByRole("button", { name: `Join ${workspaceName}` }).click();
     await expect(guest).toHaveURL(/\/workspace\/[a-z0-9]+$/);
+
+    // Settings PRD, FR-14: leave again from Settings → Workspaces.
+    await guest.goto("/settings/workspaces");
+    await guest.getByRole("button", { name: `Leave ${workspaceName}` }).click();
+    await guest.getByRole("group", { name: `Confirm leaving ${workspaceName}` }).getByRole("button", { name: "Leave workspace" }).click();
+    await expect(guest.getByRole("status").filter({ hasText: `You left ${workspaceName}.` })).toBeVisible();
+    await expect(guest.getByRole("list", { name: "Your workspaces" })).toHaveCount(0);
     await guest.close();
   });
 
   await test.step("the owner sees the use", async () => {
     await page.reload();
     await expect(page.getByRole("list", { name: "Invite links" }).getByText(/^1 joined/)).toBeVisible();
+  });
+
+  await test.step("the owner can't leave, and sees who left", async () => {
+    await page.goto("/settings/workspaces");
+    await expect(page.getByRole("button", { name: `Leave ${workspaceName}` })).toBeDisabled();
+    await page.getByRole("list", { name: "Your workspaces" }).getByRole("link", { name: workspaceName, exact: true }).click();
+    await expect(page.getByRole("list", { name: "Recent activity" }).getByRole("listitem").filter({ hasText: `guest_${id} left the workspace` })).toBeVisible();
   });
 });
