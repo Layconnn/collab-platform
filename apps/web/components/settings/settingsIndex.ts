@@ -22,7 +22,7 @@ export type SettingEntry = {
 
 export const SETTINGS_CATEGORIES: SettingsCategory[] = [
   { id: "account", name: "Your account", description: "Your details and your password.", icon: "account", href: "/settings/account" },
-  { id: "security", name: "Security", description: "Your sessions, the security log and your password.", icon: "security", href: "/settings/security" },
+  { id: "security", name: "Security", description: "Two-step sign-in, your sessions, the security log and your password.", icon: "security", href: "/settings/security" },
   { id: "notifications", name: "Notifications", description: "What reaches your Inbox, per workspace, and the daily digest.", icon: "inbox", href: "/settings/notifications" },
   { id: "workspaces", name: "Workspaces", description: "Where Commons opens and your default workspace.", icon: "workspaces", href: "/settings/workspaces" },
   { id: "appearance", name: "Appearance", description: "Theme, motion and density, on every device.", icon: "appearance", href: "/settings/appearance" },
@@ -33,6 +33,7 @@ export const SETTING_ENTRIES: SettingEntry[] = [
   { label: "Account information", description: "Your name, username and email.", category: "account", href: "/settings/account", keywords: "profile name username email" },
   { label: "Display name", description: "The name teammates see on your posts.", category: "account", href: "/settings/account/profile", keywords: "profile name rename" },
   { label: "Username", description: "Change the name teammates mention you by.", category: "account", href: "/settings/account/profile", keywords: "profile handle mention rename at" },
+  { label: "Two-step sign-in", description: "A code from your phone when you sign in.", category: "security", href: "/settings/security/two-step", keywords: "2fa mfa two factor authenticator totp otp recovery codes backup verification" },
   { label: "Sessions", description: "Where you're signed in; sign out a device.", category: "security", href: "/settings/security/sessions", keywords: "devices sign out logout signed in browser lost phone" },
   { label: "Security log", description: "Sign-ins and changes in the last 90 days.", category: "security", href: "/settings/security/log", keywords: "activity history audit login failed attempts" },
   { label: "Change your password", description: "Signs out your other devices.", category: "account", href: "/settings/account/password", keywords: "password security sign in" },

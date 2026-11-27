@@ -423,6 +423,7 @@ export const ModelName = {
   UserPreference: 'UserPreference',
   WorkspaceNotificationLevel: 'WorkspaceNotificationLevel',
   UserSession: 'UserSession',
+  RecoveryCode: 'RecoveryCode',
   SecurityEvent: 'SecurityEvent'
 } as const
 
@@ -439,7 +440,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent" | "attachment" | "deletedFile" | "workspaceInvite" | "workspaceInviteUse" | "discussionRevision" | "commentRevision" | "userPreference" | "workspaceNotificationLevel" | "userSession" | "securityEvent"
+    modelProps: "user" | "workspace" | "discussion" | "comment" | "notification" | "workspaceMember" | "decision" | "decisionRevision" | "decisionReview" | "discussionFollow" | "digestPreference" | "digestWorkspaceOptOut" | "digestDelivery" | "savedItem" | "reaction" | "decisionSupersession" | "activityEvent" | "attachment" | "deletedFile" | "workspaceInvite" | "workspaceInviteUse" | "discussionRevision" | "commentRevision" | "userPreference" | "workspaceNotificationLevel" | "userSession" | "recoveryCode" | "securityEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2367,6 +2368,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RecoveryCode: {
+      payload: Prisma.$RecoveryCodePayload<ExtArgs>
+      fields: Prisma.RecoveryCodeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RecoveryCodeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RecoveryCodeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>
+        }
+        findFirst: {
+          args: Prisma.RecoveryCodeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RecoveryCodeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>
+        }
+        findMany: {
+          args: Prisma.RecoveryCodeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>[]
+        }
+        create: {
+          args: Prisma.RecoveryCodeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>
+        }
+        createMany: {
+          args: Prisma.RecoveryCodeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RecoveryCodeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>[]
+        }
+        delete: {
+          args: Prisma.RecoveryCodeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>
+        }
+        update: {
+          args: Prisma.RecoveryCodeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>
+        }
+        deleteMany: {
+          args: Prisma.RecoveryCodeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RecoveryCodeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RecoveryCodeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>[]
+        }
+        upsert: {
+          args: Prisma.RecoveryCodeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RecoveryCodePayload>
+        }
+        aggregate: {
+          args: Prisma.RecoveryCodeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRecoveryCode>
+        }
+        groupBy: {
+          args: Prisma.RecoveryCodeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecoveryCodeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RecoveryCodeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RecoveryCodeCountAggregateOutputType> | number
+        }
+      }
+    }
     SecurityEvent: {
       payload: Prisma.$SecurityEventPayload<ExtArgs>
       fields: Prisma.SecurityEventFieldRefs
@@ -2488,6 +2563,9 @@ export const UserScalarFieldEnum = {
   name: 'name',
   usernameChangedAt: 'usernameChangedAt',
   avatarKey: 'avatarKey',
+  totpSecret: 'totpSecret',
+  totpEnabledAt: 'totpEnabledAt',
+  totpLastStep: 'totpLastStep',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2869,6 +2947,17 @@ export const UserSessionScalarFieldEnum = {
 } as const
 
 export type UserSessionScalarFieldEnum = (typeof UserSessionScalarFieldEnum)[keyof typeof UserSessionScalarFieldEnum]
+
+
+export const RecoveryCodeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RecoveryCodeScalarFieldEnum = (typeof RecoveryCodeScalarFieldEnum)[keyof typeof RecoveryCodeScalarFieldEnum]
 
 
 export const SecurityEventScalarFieldEnum = {
@@ -3366,6 +3455,7 @@ export type GlobalOmitConfig = {
   userPreference?: Prisma.UserPreferenceOmit
   workspaceNotificationLevel?: Prisma.WorkspaceNotificationLevelOmit
   userSession?: Prisma.UserSessionOmit
+  recoveryCode?: Prisma.RecoveryCodeOmit
   securityEvent?: Prisma.SecurityEventOmit
 }
 

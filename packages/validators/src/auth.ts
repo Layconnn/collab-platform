@@ -21,6 +21,21 @@ export const loginInputSchema = z.object({
   password: passwordSchema,
 });
 
+// Two-step sign-in (settings PRD, FR-11 to FR-13). A code is six digits from
+// the authenticator, or a recovery code like "abcde-fghjk".
+export const twoStepCodeSchema = z.string().trim().min(6).max(24);
+
+export const verifyTwoStepInputSchema = z.object({
+  challengeToken: z.string().min(32).max(64),
+  code: twoStepCodeSchema,
+});
+
+export const enableTwoStepInputSchema = z.object({ code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code.") });
+export const disableTwoStepInputSchema = z.object({ password: passwordSchema, code: twoStepCodeSchema });
+export const regenerateRecoveryCodesInputSchema = enableTwoStepInputSchema;
+
+export type VerifyTwoStepInput = z.infer<typeof verifyTwoStepInputSchema>;
+
 export const logoutInputSchema = z.object({
   sessionToken: z.string().min(16).optional(),
 });

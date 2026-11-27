@@ -7,6 +7,15 @@ export function useAuth() {
   const me = trpc.auth.me.useQuery(undefined, { retry: false, staleTime: 0, refetchOnWindowFocus: true });
   const login = trpc.auth.login.useMutation({
     onSuccess: async (result) => {
+      // With two-step on, the code step signs in (verifyTwoStep).
+      if (result.twoStep) return;
+      sessionStorage.setItem("csrf_token", result.csrfToken);
+      await utils.notification.listForUser.reset();
+      await utils.auth.me.invalidate();
+    },
+  });
+  const verifyTwoStep = trpc.auth.verifyTwoStep.useMutation({
+    onSuccess: async (result) => {
       sessionStorage.setItem("csrf_token", result.csrfToken);
       await utils.notification.listForUser.reset();
       await utils.auth.me.invalidate();
@@ -30,6 +39,7 @@ export function useAuth() {
 
   return {
     login,
+    verifyTwoStep,
     register,
     logout,
     changePassword,

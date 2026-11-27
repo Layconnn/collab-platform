@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 
 import { expect, test } from "@playwright/test";
 
@@ -184,6 +184,67 @@ test("a new user registers, records a decision from a discussion and signs out",
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/workspace\/[a-z0-9]+$/);
     await expect(page.getByRole("heading", { level: 1, name: workspaceName })).toBeVisible();
+  });
+});
+
+// The code an authenticator app shows for a base32 key (RFC 6238), to sign in
+// the way a person would.
+function authenticatorCode(key: string): string {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  let bits = "";
+  for (const char of key.replace(/\s/g, "")) bits += alphabet.indexOf(char).toString(2).padStart(5, "0");
+  const secret = Buffer.from(bits.match(/.{8}/g)!.map((byte) => parseInt(byte, 2)));
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30_000)));
+  const digest = createHmac("sha1", secret).update(counter).digest();
+  const offset = digest[digest.length - 1]! & 15;
+  return ((digest.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).toString().padStart(6, "0");
+}
+
+test("two-step sign-in asks for a code after the password", async ({ page }) => {
+  const id = unique();
+  const email = `twostep_${id}@example.test`;
+  const password = `twostep-password-${id}`;
+  let recoveryCode = "";
+
+  await test.step("turn it on", async () => {
+    await page.goto("/register");
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Username").fill(`twostep_${id}`);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByRole("button", { name: "Create account" }).click();
+    await expect(page).toHaveURL(/\/workspace$/);
+
+    await page.goto("/settings/security/two-step");
+    await page.getByRole("button", { name: "Set up two-step sign-in" }).click();
+    await expect(page.getByRole("img", { name: /QR code/ })).toBeVisible();
+    const key = (await page.getByLabel("Setup key").textContent()) ?? "";
+    await page.getByLabel("Enter the 6-digit code it shows").fill(authenticatorCode(key));
+    await page.getByRole("button", { name: "Turn on" }).click();
+    const codes = page.getByRole("list", { name: "Recovery codes" }).getByRole("listitem");
+    await expect(codes).toHaveCount(10);
+    recoveryCode = (await codes.first().textContent()) ?? "";
+    await page.getByLabel("I’ve saved my recovery codes").check();
+    await page.getByRole("button", { name: "Done" }).click();
+    await expect(page.getByText("10 of 10 left")).toBeVisible();
+  });
+
+  await test.step("sign out and back in with a recovery code", async () => {
+    await page.getByLabel(/^Account menu for /).click();
+    await page.getByRole("button", { name: "Sign out" }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await page.getByLabel("Email").fill(email);
+    await page.getByLabel("Password", { exact: true }).fill(password);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    // The password alone opens nothing.
+    await expect(page.getByLabel("Authentication code")).toBeFocused();
+    await expect(page).toHaveURL(/\/login$/);
+    await page.getByRole("button", { name: "Use a recovery code" }).click();
+    await page.getByLabel("Recovery code").fill(recoveryCode);
+    await page.getByRole("button", { name: "Verify" }).click();
+    await expect(page).toHaveURL(/\/workspace$/);
+    await page.goto("/settings/security/log");
+    await expect(page.getByRole("list", { name: "Security events" }).getByText("Signed in with a recovery code")).toBeVisible();
   });
 });
 

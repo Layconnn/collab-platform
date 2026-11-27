@@ -77,6 +77,7 @@ export const ModelName = {
   UserPreference: 'UserPreference',
   WorkspaceNotificationLevel: 'WorkspaceNotificationLevel',
   UserSession: 'UserSession',
+  RecoveryCode: 'RecoveryCode',
   SecurityEvent: 'SecurityEvent'
 } as const
 
@@ -104,6 +105,9 @@ export const UserScalarFieldEnum = {
   name: 'name',
   usernameChangedAt: 'usernameChangedAt',
   avatarKey: 'avatarKey',
+  totpSecret: 'totpSecret',
+  totpEnabledAt: 'totpEnabledAt',
+  totpLastStep: 'totpLastStep',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -485,6 +489,17 @@ export const UserSessionScalarFieldEnum = {
 } as const
 
 export type UserSessionScalarFieldEnum = (typeof UserSessionScalarFieldEnum)[keyof typeof UserSessionScalarFieldEnum]
+
+
+export const RecoveryCodeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RecoveryCodeScalarFieldEnum = (typeof RecoveryCodeScalarFieldEnum)[keyof typeof RecoveryCodeScalarFieldEnum]
 
 
 export const SecurityEventScalarFieldEnum = {

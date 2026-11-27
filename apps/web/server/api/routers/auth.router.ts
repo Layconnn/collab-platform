@@ -4,6 +4,7 @@ import {
   loginInputSchema,
   logoutInputSchema,
   registerInputSchema,
+  verifyTwoStepInputSchema,
 } from "@repo/validators/auth";
 
 import { execute } from "../../errors/app-error";
@@ -17,6 +18,13 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 const loginRateLimit = createRateLimitGuardByKey({
   routeKey: "auth.login",
   limit: 5,
+  windowSeconds: 60,
+});
+
+// Five codes per challenge, and at most ten tries a minute from one address.
+const verifyTwoStepRateLimit = createRateLimitGuardByKey({
+  routeKey: "auth.verifyTwoStep",
+  limit: 10,
   windowSeconds: 60,
 });
 
@@ -72,14 +80,37 @@ export const authRouter = createTRPCRouter({
   login: loginProcedure.input(loginInputSchema).mutation(({ ctx, input }) =>
     execute(async () => {
       const result = await authService.login(input, { requestId: ctx.requestId, client: clientOf(ctx.headers) });
+      if ("challengeToken" in result) {
+        return { success: false as const, twoStep: true as const, challengeToken: result.challengeToken };
+      }
       appendSetCookies(ctx.responseHeaders, buildAuthCookies(result));
       return {
         success: true as const,
+        twoStep: false as const,
         csrfToken: result.csrfToken,
         expiresInSeconds: result.expiresInSeconds,
       };
     }),
   ),
+
+  verifyTwoStep: publicProcedure
+    .use(async ({ ctx, next }) => {
+      await verifyTwoStepRateLimit(ctx.ip ?? "unknown", ctx.requestId);
+      return next();
+    })
+    .input(verifyTwoStepInputSchema)
+    .mutation(({ ctx, input }) =>
+      execute(async () => {
+        const result = await authService.verifyTwoStep(input, { requestId: ctx.requestId, client: clientOf(ctx.headers) });
+        appendSetCookies(ctx.responseHeaders, buildAuthCookies(result));
+        return {
+          success: true as const,
+          twoStep: false as const,
+          csrfToken: result.csrfToken,
+          expiresInSeconds: result.expiresInSeconds,
+        };
+      }),
+    ),
 
   logout: protectedProcedure.input(logoutInputSchema).mutation(({ ctx, input }) =>
     execute(async () => {

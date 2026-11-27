@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  totpLastStep: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  totpLastStep: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -32,6 +42,9 @@ export type UserMinAggregateOutputType = {
   name: string | null
   usernameChangedAt: Date | null
   avatarKey: string | null
+  totpSecret: string | null
+  totpEnabledAt: Date | null
+  totpLastStep: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +57,9 @@ export type UserMaxAggregateOutputType = {
   name: string | null
   usernameChangedAt: Date | null
   avatarKey: string | null
+  totpSecret: string | null
+  totpEnabledAt: Date | null
+  totpLastStep: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,11 +72,22 @@ export type UserCountAggregateOutputType = {
   name: number
   usernameChangedAt: number
   avatarKey: number
+  totpSecret: number
+  totpEnabledAt: number
+  totpLastStep: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  totpLastStep?: true
+}
+
+export type UserSumAggregateInputType = {
+  totpLastStep?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -70,6 +97,9 @@ export type UserMinAggregateInputType = {
   name?: true
   usernameChangedAt?: true
   avatarKey?: true
+  totpSecret?: true
+  totpEnabledAt?: true
+  totpLastStep?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +112,9 @@ export type UserMaxAggregateInputType = {
   name?: true
   usernameChangedAt?: true
   avatarKey?: true
+  totpSecret?: true
+  totpEnabledAt?: true
+  totpLastStep?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +127,9 @@ export type UserCountAggregateInputType = {
   name?: true
   usernameChangedAt?: true
   avatarKey?: true
+  totpSecret?: true
+  totpEnabledAt?: true
+  totpLastStep?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -137,6 +173,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -167,6 +215,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -179,9 +229,14 @@ export type UserGroupByOutputType = {
   name: string | null
   usernameChangedAt: Date | null
   avatarKey: string | null
+  totpSecret: string | null
+  totpEnabledAt: Date | null
+  totpLastStep: number | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -212,6 +267,9 @@ export type UserWhereInput = {
   name?: Prisma.StringNullableFilter<"User"> | string | null
   usernameChangedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   avatarKey?: Prisma.StringNullableFilter<"User"> | string | null
+  totpSecret?: Prisma.StringNullableFilter<"User"> | string | null
+  totpEnabledAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  totpLastStep?: Prisma.IntNullableFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ownedSpaces?: Prisma.WorkspaceListRelationFilter
@@ -240,6 +298,7 @@ export type UserWhereInput = {
   preference?: Prisma.XOR<Prisma.UserPreferenceNullableScalarRelationFilter, Prisma.UserPreferenceWhereInput> | null
   sessions?: Prisma.UserSessionListRelationFilter
   securityEvents?: Prisma.SecurityEventListRelationFilter
+  recoveryCodes?: Prisma.RecoveryCodeListRelationFilter
   discussionRevisions?: Prisma.DiscussionRevisionListRelationFilter
   commentRevisions?: Prisma.CommentRevisionListRelationFilter
 }
@@ -252,6 +311,9 @@ export type UserOrderByWithRelationInput = {
   name?: Prisma.SortOrderInput | Prisma.SortOrder
   usernameChangedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  totpSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  totpEnabledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  totpLastStep?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownedSpaces?: Prisma.WorkspaceOrderByRelationAggregateInput
@@ -280,6 +342,7 @@ export type UserOrderByWithRelationInput = {
   preference?: Prisma.UserPreferenceOrderByWithRelationInput
   sessions?: Prisma.UserSessionOrderByRelationAggregateInput
   securityEvents?: Prisma.SecurityEventOrderByRelationAggregateInput
+  recoveryCodes?: Prisma.RecoveryCodeOrderByRelationAggregateInput
   discussionRevisions?: Prisma.DiscussionRevisionOrderByRelationAggregateInput
   commentRevisions?: Prisma.CommentRevisionOrderByRelationAggregateInput
 }
@@ -295,6 +358,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringNullableFilter<"User"> | string | null
   usernameChangedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   avatarKey?: Prisma.StringNullableFilter<"User"> | string | null
+  totpSecret?: Prisma.StringNullableFilter<"User"> | string | null
+  totpEnabledAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  totpLastStep?: Prisma.IntNullableFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ownedSpaces?: Prisma.WorkspaceListRelationFilter
@@ -323,6 +389,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   preference?: Prisma.XOR<Prisma.UserPreferenceNullableScalarRelationFilter, Prisma.UserPreferenceWhereInput> | null
   sessions?: Prisma.UserSessionListRelationFilter
   securityEvents?: Prisma.SecurityEventListRelationFilter
+  recoveryCodes?: Prisma.RecoveryCodeListRelationFilter
   discussionRevisions?: Prisma.DiscussionRevisionListRelationFilter
   commentRevisions?: Prisma.CommentRevisionListRelationFilter
 }, "id" | "email" | "username">
@@ -335,11 +402,16 @@ export type UserOrderByWithAggregationInput = {
   name?: Prisma.SortOrderInput | Prisma.SortOrder
   usernameChangedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  totpSecret?: Prisma.SortOrderInput | Prisma.SortOrder
+  totpEnabledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  totpLastStep?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -353,6 +425,9 @@ export type UserScalarWhereWithAggregatesInput = {
   name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   usernameChangedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   avatarKey?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  totpSecret?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  totpEnabledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  totpLastStep?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -365,6 +440,9 @@ export type UserCreateInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -393,6 +471,7 @@ export type UserCreateInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -405,6 +484,9 @@ export type UserUncheckedCreateInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -433,6 +515,7 @@ export type UserUncheckedCreateInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -445,6 +528,9 @@ export type UserUpdateInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -473,6 +559,7 @@ export type UserUpdateInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -485,6 +572,9 @@ export type UserUncheckedUpdateInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -513,6 +603,7 @@ export type UserUncheckedUpdateInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -525,6 +616,9 @@ export type UserCreateManyInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -537,6 +631,9 @@ export type UserUpdateManyMutationInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -549,6 +646,9 @@ export type UserUncheckedUpdateManyInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -561,8 +661,15 @@ export type UserCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   usernameChangedAt?: Prisma.SortOrder
   avatarKey?: Prisma.SortOrder
+  totpSecret?: Prisma.SortOrder
+  totpEnabledAt?: Prisma.SortOrder
+  totpLastStep?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  totpLastStep?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -573,6 +680,9 @@ export type UserMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   usernameChangedAt?: Prisma.SortOrder
   avatarKey?: Prisma.SortOrder
+  totpSecret?: Prisma.SortOrder
+  totpEnabledAt?: Prisma.SortOrder
+  totpLastStep?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -585,8 +695,15 @@ export type UserMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   usernameChangedAt?: Prisma.SortOrder
   avatarKey?: Prisma.SortOrder
+  totpSecret?: Prisma.SortOrder
+  totpEnabledAt?: Prisma.SortOrder
+  totpLastStep?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  totpLastStep?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -609,6 +726,14 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -1019,6 +1144,20 @@ export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
 }
 
+export type UserCreateNestedOneWithoutRecoveryCodesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRecoveryCodesInput, Prisma.UserUncheckedCreateWithoutRecoveryCodesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRecoveryCodesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutRecoveryCodesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRecoveryCodesInput, Prisma.UserUncheckedCreateWithoutRecoveryCodesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRecoveryCodesInput
+  upsert?: Prisma.UserUpsertWithoutRecoveryCodesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRecoveryCodesInput, Prisma.UserUpdateWithoutRecoveryCodesInput>, Prisma.UserUncheckedUpdateWithoutRecoveryCodesInput>
+}
+
 export type UserCreateNestedOneWithoutSecurityEventsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSecurityEventsInput, Prisma.UserUncheckedCreateWithoutSecurityEventsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSecurityEventsInput
@@ -1041,6 +1180,9 @@ export type UserCreateWithoutOwnedSpacesInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
@@ -1068,6 +1210,7 @@ export type UserCreateWithoutOwnedSpacesInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -1080,6 +1223,9 @@ export type UserUncheckedCreateWithoutOwnedSpacesInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
@@ -1107,6 +1253,7 @@ export type UserUncheckedCreateWithoutOwnedSpacesInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -1135,6 +1282,9 @@ export type UserUpdateWithoutOwnedSpacesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
@@ -1162,6 +1312,7 @@ export type UserUpdateWithoutOwnedSpacesInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -1174,6 +1325,9 @@ export type UserUncheckedUpdateWithoutOwnedSpacesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -1201,6 +1355,7 @@ export type UserUncheckedUpdateWithoutOwnedSpacesInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -1213,6 +1368,9 @@ export type UserCreateWithoutDiscussionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1240,6 +1398,7 @@ export type UserCreateWithoutDiscussionsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -1252,6 +1411,9 @@ export type UserUncheckedCreateWithoutDiscussionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1279,6 +1441,7 @@ export type UserUncheckedCreateWithoutDiscussionsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -1307,6 +1470,9 @@ export type UserUpdateWithoutDiscussionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1334,6 +1500,7 @@ export type UserUpdateWithoutDiscussionsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -1346,6 +1513,9 @@ export type UserUncheckedUpdateWithoutDiscussionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1373,6 +1543,7 @@ export type UserUncheckedUpdateWithoutDiscussionsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -1385,6 +1556,9 @@ export type UserCreateWithoutCommentsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1412,6 +1586,7 @@ export type UserCreateWithoutCommentsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -1424,6 +1599,9 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1451,6 +1629,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -1468,6 +1647,9 @@ export type UserCreateWithoutCommentsPinnedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1495,6 +1677,7 @@ export type UserCreateWithoutCommentsPinnedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -1507,6 +1690,9 @@ export type UserUncheckedCreateWithoutCommentsPinnedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1534,6 +1720,7 @@ export type UserUncheckedCreateWithoutCommentsPinnedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -1562,6 +1749,9 @@ export type UserUpdateWithoutCommentsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1589,6 +1779,7 @@ export type UserUpdateWithoutCommentsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -1601,6 +1792,9 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1628,6 +1822,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -1651,6 +1846,9 @@ export type UserUpdateWithoutCommentsPinnedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1678,6 +1876,7 @@ export type UserUpdateWithoutCommentsPinnedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -1690,6 +1889,9 @@ export type UserUncheckedUpdateWithoutCommentsPinnedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1717,6 +1919,7 @@ export type UserUncheckedUpdateWithoutCommentsPinnedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -1729,6 +1932,9 @@ export type UserCreateWithoutNotificationsReceivedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1756,6 +1962,7 @@ export type UserCreateWithoutNotificationsReceivedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -1768,6 +1975,9 @@ export type UserUncheckedCreateWithoutNotificationsReceivedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1795,6 +2005,7 @@ export type UserUncheckedCreateWithoutNotificationsReceivedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -1812,6 +2023,9 @@ export type UserCreateWithoutNotificationsSentInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1839,6 +2053,7 @@ export type UserCreateWithoutNotificationsSentInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -1851,6 +2066,9 @@ export type UserUncheckedCreateWithoutNotificationsSentInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1878,6 +2096,7 @@ export type UserUncheckedCreateWithoutNotificationsSentInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -1906,6 +2125,9 @@ export type UserUpdateWithoutNotificationsReceivedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1933,6 +2155,7 @@ export type UserUpdateWithoutNotificationsReceivedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -1945,6 +2168,9 @@ export type UserUncheckedUpdateWithoutNotificationsReceivedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1972,6 +2198,7 @@ export type UserUncheckedUpdateWithoutNotificationsReceivedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -1995,6 +2222,9 @@ export type UserUpdateWithoutNotificationsSentInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2022,6 +2252,7 @@ export type UserUpdateWithoutNotificationsSentInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -2034,6 +2265,9 @@ export type UserUncheckedUpdateWithoutNotificationsSentInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2061,6 +2295,7 @@ export type UserUncheckedUpdateWithoutNotificationsSentInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -2073,6 +2308,9 @@ export type UserCreateWithoutMembershipsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2100,6 +2338,7 @@ export type UserCreateWithoutMembershipsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -2112,6 +2351,9 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2139,6 +2381,7 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -2167,6 +2410,9 @@ export type UserUpdateWithoutMembershipsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2194,6 +2440,7 @@ export type UserUpdateWithoutMembershipsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -2206,6 +2453,9 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2233,6 +2483,7 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -2245,6 +2496,9 @@ export type UserCreateWithoutDecisionsCreatedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2272,6 +2526,7 @@ export type UserCreateWithoutDecisionsCreatedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -2284,6 +2539,9 @@ export type UserUncheckedCreateWithoutDecisionsCreatedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2311,6 +2569,7 @@ export type UserUncheckedCreateWithoutDecisionsCreatedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -2328,6 +2587,9 @@ export type UserCreateWithoutDecisionsDeletedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2355,6 +2617,7 @@ export type UserCreateWithoutDecisionsDeletedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -2367,6 +2630,9 @@ export type UserUncheckedCreateWithoutDecisionsDeletedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2394,6 +2660,7 @@ export type UserUncheckedCreateWithoutDecisionsDeletedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -2422,6 +2689,9 @@ export type UserUpdateWithoutDecisionsCreatedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2449,6 +2719,7 @@ export type UserUpdateWithoutDecisionsCreatedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -2461,6 +2732,9 @@ export type UserUncheckedUpdateWithoutDecisionsCreatedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2488,6 +2762,7 @@ export type UserUncheckedUpdateWithoutDecisionsCreatedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -2511,6 +2786,9 @@ export type UserUpdateWithoutDecisionsDeletedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2538,6 +2816,7 @@ export type UserUpdateWithoutDecisionsDeletedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -2550,6 +2829,9 @@ export type UserUncheckedUpdateWithoutDecisionsDeletedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2577,6 +2859,7 @@ export type UserUncheckedUpdateWithoutDecisionsDeletedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -2589,6 +2872,9 @@ export type UserCreateWithoutDecisionRevisionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2616,6 +2902,7 @@ export type UserCreateWithoutDecisionRevisionsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -2628,6 +2915,9 @@ export type UserUncheckedCreateWithoutDecisionRevisionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2655,6 +2945,7 @@ export type UserUncheckedCreateWithoutDecisionRevisionsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -2683,6 +2974,9 @@ export type UserUpdateWithoutDecisionRevisionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2710,6 +3004,7 @@ export type UserUpdateWithoutDecisionRevisionsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -2722,6 +3017,9 @@ export type UserUncheckedUpdateWithoutDecisionRevisionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2749,6 +3047,7 @@ export type UserUncheckedUpdateWithoutDecisionRevisionsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -2761,6 +3060,9 @@ export type UserCreateWithoutDecisionReviewsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2788,6 +3090,7 @@ export type UserCreateWithoutDecisionReviewsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -2800,6 +3103,9 @@ export type UserUncheckedCreateWithoutDecisionReviewsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2827,6 +3133,7 @@ export type UserUncheckedCreateWithoutDecisionReviewsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -2844,6 +3151,9 @@ export type UserCreateWithoutDecisionReviewsRequestedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2871,6 +3181,7 @@ export type UserCreateWithoutDecisionReviewsRequestedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -2883,6 +3194,9 @@ export type UserUncheckedCreateWithoutDecisionReviewsRequestedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2910,6 +3224,7 @@ export type UserUncheckedCreateWithoutDecisionReviewsRequestedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -2938,6 +3253,9 @@ export type UserUpdateWithoutDecisionReviewsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2965,6 +3283,7 @@ export type UserUpdateWithoutDecisionReviewsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -2977,6 +3296,9 @@ export type UserUncheckedUpdateWithoutDecisionReviewsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3004,6 +3326,7 @@ export type UserUncheckedUpdateWithoutDecisionReviewsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -3027,6 +3350,9 @@ export type UserUpdateWithoutDecisionReviewsRequestedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3054,6 +3380,7 @@ export type UserUpdateWithoutDecisionReviewsRequestedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -3066,6 +3393,9 @@ export type UserUncheckedUpdateWithoutDecisionReviewsRequestedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3093,6 +3423,7 @@ export type UserUncheckedUpdateWithoutDecisionReviewsRequestedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -3105,6 +3436,9 @@ export type UserCreateWithoutDiscussionFollowsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3132,6 +3466,7 @@ export type UserCreateWithoutDiscussionFollowsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -3144,6 +3479,9 @@ export type UserUncheckedCreateWithoutDiscussionFollowsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3171,6 +3509,7 @@ export type UserUncheckedCreateWithoutDiscussionFollowsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -3199,6 +3538,9 @@ export type UserUpdateWithoutDiscussionFollowsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3226,6 +3568,7 @@ export type UserUpdateWithoutDiscussionFollowsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -3238,6 +3581,9 @@ export type UserUncheckedUpdateWithoutDiscussionFollowsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3265,6 +3611,7 @@ export type UserUncheckedUpdateWithoutDiscussionFollowsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -3277,6 +3624,9 @@ export type UserCreateWithoutDigestPreferenceInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3304,6 +3654,7 @@ export type UserCreateWithoutDigestPreferenceInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -3316,6 +3667,9 @@ export type UserUncheckedCreateWithoutDigestPreferenceInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3343,6 +3697,7 @@ export type UserUncheckedCreateWithoutDigestPreferenceInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -3371,6 +3726,9 @@ export type UserUpdateWithoutDigestPreferenceInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3398,6 +3756,7 @@ export type UserUpdateWithoutDigestPreferenceInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -3410,6 +3769,9 @@ export type UserUncheckedUpdateWithoutDigestPreferenceInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3437,6 +3799,7 @@ export type UserUncheckedUpdateWithoutDigestPreferenceInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -3449,6 +3812,9 @@ export type UserCreateWithoutDigestOptOutsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3476,6 +3842,7 @@ export type UserCreateWithoutDigestOptOutsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -3488,6 +3855,9 @@ export type UserUncheckedCreateWithoutDigestOptOutsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3515,6 +3885,7 @@ export type UserUncheckedCreateWithoutDigestOptOutsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -3543,6 +3914,9 @@ export type UserUpdateWithoutDigestOptOutsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3570,6 +3944,7 @@ export type UserUpdateWithoutDigestOptOutsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -3582,6 +3957,9 @@ export type UserUncheckedUpdateWithoutDigestOptOutsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3609,6 +3987,7 @@ export type UserUncheckedUpdateWithoutDigestOptOutsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -3621,6 +4000,9 @@ export type UserCreateWithoutDigestDeliveriesInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3648,6 +4030,7 @@ export type UserCreateWithoutDigestDeliveriesInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -3660,6 +4043,9 @@ export type UserUncheckedCreateWithoutDigestDeliveriesInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3687,6 +4073,7 @@ export type UserUncheckedCreateWithoutDigestDeliveriesInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -3715,6 +4102,9 @@ export type UserUpdateWithoutDigestDeliveriesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3742,6 +4132,7 @@ export type UserUpdateWithoutDigestDeliveriesInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -3754,6 +4145,9 @@ export type UserUncheckedUpdateWithoutDigestDeliveriesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3781,6 +4175,7 @@ export type UserUncheckedUpdateWithoutDigestDeliveriesInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -3793,6 +4188,9 @@ export type UserCreateWithoutSavedItemsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3820,6 +4218,7 @@ export type UserCreateWithoutSavedItemsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -3832,6 +4231,9 @@ export type UserUncheckedCreateWithoutSavedItemsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3859,6 +4261,7 @@ export type UserUncheckedCreateWithoutSavedItemsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -3887,6 +4290,9 @@ export type UserUpdateWithoutSavedItemsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3914,6 +4320,7 @@ export type UserUpdateWithoutSavedItemsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -3926,6 +4333,9 @@ export type UserUncheckedUpdateWithoutSavedItemsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3953,6 +4363,7 @@ export type UserUncheckedUpdateWithoutSavedItemsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -3965,6 +4376,9 @@ export type UserCreateWithoutReactionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3992,6 +4406,7 @@ export type UserCreateWithoutReactionsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -4004,6 +4419,9 @@ export type UserUncheckedCreateWithoutReactionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4031,6 +4449,7 @@ export type UserUncheckedCreateWithoutReactionsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -4059,6 +4478,9 @@ export type UserUpdateWithoutReactionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4086,6 +4508,7 @@ export type UserUpdateWithoutReactionsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -4098,6 +4521,9 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4125,6 +4551,7 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -4137,6 +4564,9 @@ export type UserCreateWithoutSupersessionsAuthorizedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4164,6 +4594,7 @@ export type UserCreateWithoutSupersessionsAuthorizedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -4176,6 +4607,9 @@ export type UserUncheckedCreateWithoutSupersessionsAuthorizedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4203,6 +4637,7 @@ export type UserUncheckedCreateWithoutSupersessionsAuthorizedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -4231,6 +4666,9 @@ export type UserUpdateWithoutSupersessionsAuthorizedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4258,6 +4696,7 @@ export type UserUpdateWithoutSupersessionsAuthorizedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -4270,6 +4709,9 @@ export type UserUncheckedUpdateWithoutSupersessionsAuthorizedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4297,6 +4739,7 @@ export type UserUncheckedUpdateWithoutSupersessionsAuthorizedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -4309,6 +4752,9 @@ export type UserCreateWithoutActivityEventsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4336,6 +4782,7 @@ export type UserCreateWithoutActivityEventsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -4348,6 +4795,9 @@ export type UserUncheckedCreateWithoutActivityEventsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4375,6 +4825,7 @@ export type UserUncheckedCreateWithoutActivityEventsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -4403,6 +4854,9 @@ export type UserUpdateWithoutActivityEventsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4430,6 +4884,7 @@ export type UserUpdateWithoutActivityEventsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -4442,6 +4897,9 @@ export type UserUncheckedUpdateWithoutActivityEventsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4469,6 +4927,7 @@ export type UserUncheckedUpdateWithoutActivityEventsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -4481,6 +4940,9 @@ export type UserCreateWithoutAttachmentsUploadedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4508,6 +4970,7 @@ export type UserCreateWithoutAttachmentsUploadedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -4520,6 +4983,9 @@ export type UserUncheckedCreateWithoutAttachmentsUploadedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4547,6 +5013,7 @@ export type UserUncheckedCreateWithoutAttachmentsUploadedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -4575,6 +5042,9 @@ export type UserUpdateWithoutAttachmentsUploadedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4602,6 +5072,7 @@ export type UserUpdateWithoutAttachmentsUploadedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -4614,6 +5085,9 @@ export type UserUncheckedUpdateWithoutAttachmentsUploadedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4641,6 +5115,7 @@ export type UserUncheckedUpdateWithoutAttachmentsUploadedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -4653,6 +5128,9 @@ export type UserCreateWithoutInvitesCreatedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4680,6 +5158,7 @@ export type UserCreateWithoutInvitesCreatedInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -4692,6 +5171,9 @@ export type UserUncheckedCreateWithoutInvitesCreatedInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4719,6 +5201,7 @@ export type UserUncheckedCreateWithoutInvitesCreatedInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -4747,6 +5230,9 @@ export type UserUpdateWithoutInvitesCreatedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4774,6 +5260,7 @@ export type UserUpdateWithoutInvitesCreatedInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -4786,6 +5273,9 @@ export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4813,6 +5303,7 @@ export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -4825,6 +5316,9 @@ export type UserCreateWithoutInviteUsesInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4852,6 +5346,7 @@ export type UserCreateWithoutInviteUsesInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -4864,6 +5359,9 @@ export type UserUncheckedCreateWithoutInviteUsesInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4891,6 +5389,7 @@ export type UserUncheckedCreateWithoutInviteUsesInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -4919,6 +5418,9 @@ export type UserUpdateWithoutInviteUsesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4946,6 +5448,7 @@ export type UserUpdateWithoutInviteUsesInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -4958,6 +5461,9 @@ export type UserUncheckedUpdateWithoutInviteUsesInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4985,6 +5491,7 @@ export type UserUncheckedUpdateWithoutInviteUsesInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -4997,6 +5504,9 @@ export type UserCreateWithoutDiscussionRevisionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5025,6 +5535,7 @@ export type UserCreateWithoutDiscussionRevisionsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
 
@@ -5036,6 +5547,9 @@ export type UserUncheckedCreateWithoutDiscussionRevisionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5064,6 +5578,7 @@ export type UserUncheckedCreateWithoutDiscussionRevisionsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
 
@@ -5091,6 +5606,9 @@ export type UserUpdateWithoutDiscussionRevisionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5119,6 +5637,7 @@ export type UserUpdateWithoutDiscussionRevisionsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
 
@@ -5130,6 +5649,9 @@ export type UserUncheckedUpdateWithoutDiscussionRevisionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5158,6 +5680,7 @@ export type UserUncheckedUpdateWithoutDiscussionRevisionsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
 
@@ -5169,6 +5692,9 @@ export type UserCreateWithoutCommentRevisionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5197,6 +5723,7 @@ export type UserCreateWithoutCommentRevisionsInput = {
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
 }
 
@@ -5208,6 +5735,9 @@ export type UserUncheckedCreateWithoutCommentRevisionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5236,6 +5766,7 @@ export type UserUncheckedCreateWithoutCommentRevisionsInput = {
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
 
@@ -5263,6 +5794,9 @@ export type UserUpdateWithoutCommentRevisionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5291,6 +5825,7 @@ export type UserUpdateWithoutCommentRevisionsInput = {
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
 }
 
@@ -5302,6 +5837,9 @@ export type UserUncheckedUpdateWithoutCommentRevisionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5330,6 +5868,7 @@ export type UserUncheckedUpdateWithoutCommentRevisionsInput = {
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
 
@@ -5341,6 +5880,9 @@ export type UserCreateWithoutPreferenceInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5368,6 +5910,7 @@ export type UserCreateWithoutPreferenceInput = {
   inviteUses?: Prisma.WorkspaceInviteUseCreateNestedManyWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -5380,6 +5923,9 @@ export type UserUncheckedCreateWithoutPreferenceInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5407,6 +5953,7 @@ export type UserUncheckedCreateWithoutPreferenceInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -5435,6 +5982,9 @@ export type UserUpdateWithoutPreferenceInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5462,6 +6012,7 @@ export type UserUpdateWithoutPreferenceInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUpdateManyWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -5474,6 +6025,9 @@ export type UserUncheckedUpdateWithoutPreferenceInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5501,6 +6055,7 @@ export type UserUncheckedUpdateWithoutPreferenceInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -5513,6 +6068,9 @@ export type UserCreateWithoutSessionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5540,6 +6098,7 @@ export type UserCreateWithoutSessionsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseCreateNestedManyWithoutUserInput
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
@@ -5552,6 +6111,9 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5579,6 +6141,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUncheckedCreateNestedManyWithoutUserInput
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -5607,6 +6170,9 @@ export type UserUpdateWithoutSessionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5634,6 +6200,7 @@ export type UserUpdateWithoutSessionsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUpdateManyWithoutUserNestedInput
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -5646,6 +6213,9 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5673,11 +6243,12 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUncheckedUpdateManyWithoutUserNestedInput
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
 
-export type UserCreateWithoutSecurityEventsInput = {
+export type UserCreateWithoutRecoveryCodesInput = {
   id?: string
   email: string
   username: string
@@ -5685,6 +6256,9 @@ export type UserCreateWithoutSecurityEventsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -5712,11 +6286,12 @@ export type UserCreateWithoutSecurityEventsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseCreateNestedManyWithoutUserInput
   preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
+  securityEvents?: Prisma.SecurityEventCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
 }
 
-export type UserUncheckedCreateWithoutSecurityEventsInput = {
+export type UserUncheckedCreateWithoutRecoveryCodesInput = {
   id?: string
   email: string
   username: string
@@ -5724,6 +6299,9 @@ export type UserUncheckedCreateWithoutSecurityEventsInput = {
   name?: string | null
   usernameChangedAt?: Date | string | null
   avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -5751,6 +6329,195 @@ export type UserUncheckedCreateWithoutSecurityEventsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUncheckedCreateNestedManyWithoutUserInput
   preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
   sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
+  securityEvents?: Prisma.SecurityEventUncheckedCreateNestedManyWithoutUserInput
+  discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
+  commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
+}
+
+export type UserCreateOrConnectWithoutRecoveryCodesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRecoveryCodesInput, Prisma.UserUncheckedCreateWithoutRecoveryCodesInput>
+}
+
+export type UserUpsertWithoutRecoveryCodesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRecoveryCodesInput, Prisma.UserUncheckedUpdateWithoutRecoveryCodesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRecoveryCodesInput, Prisma.UserUncheckedCreateWithoutRecoveryCodesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRecoveryCodesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRecoveryCodesInput, Prisma.UserUncheckedUpdateWithoutRecoveryCodesInput>
+}
+
+export type UserUpdateWithoutRecoveryCodesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutActorNestedInput
+  attachmentsUploaded?: Prisma.AttachmentUpdateManyWithoutUploaderNestedInput
+  invitesCreated?: Prisma.WorkspaceInviteUpdateManyWithoutCreatedByNestedInput
+  inviteUses?: Prisma.WorkspaceInviteUseUpdateManyWithoutUserNestedInput
+  preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
+  securityEvents?: Prisma.SecurityEventUpdateManyWithoutUserNestedInput
+  discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
+  commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRecoveryCodesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
+  discussions?: Prisma.DiscussionUncheckedUpdateManyWithoutAuthorNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  decisionsCreated?: Prisma.DecisionUncheckedUpdateManyWithoutCreatedByNestedInput
+  decisionsDeleted?: Prisma.DecisionUncheckedUpdateManyWithoutDeletedByNestedInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedUpdateManyWithoutActorNestedInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedUpdateManyWithoutAuthorizedByNestedInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedUpdateManyWithoutReviewerNestedInput
+  reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedUpdateManyWithoutUserNestedInput
+  commentsPinned?: Prisma.CommentUncheckedUpdateManyWithoutPinnedByNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedUpdateManyWithoutUserNestedInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedUpdateManyWithoutUserNestedInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedUpdateManyWithoutRequestedByNestedInput
+  notificationsReceived?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
+  notificationsSent?: Prisma.NotificationUncheckedUpdateManyWithoutActorNestedInput
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutActorNestedInput
+  attachmentsUploaded?: Prisma.AttachmentUncheckedUpdateManyWithoutUploaderNestedInput
+  invitesCreated?: Prisma.WorkspaceInviteUncheckedUpdateManyWithoutCreatedByNestedInput
+  inviteUses?: Prisma.WorkspaceInviteUseUncheckedUpdateManyWithoutUserNestedInput
+  preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
+  securityEvents?: Prisma.SecurityEventUncheckedUpdateManyWithoutUserNestedInput
+  discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
+  commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
+}
+
+export type UserCreateWithoutSecurityEventsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  usernameChangedAt?: Date | string | null
+  avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutActorInput
+  attachmentsUploaded?: Prisma.AttachmentCreateNestedManyWithoutUploaderInput
+  invitesCreated?: Prisma.WorkspaceInviteCreateNestedManyWithoutCreatedByInput
+  inviteUses?: Prisma.WorkspaceInviteUseCreateNestedManyWithoutUserInput
+  preference?: Prisma.UserPreferenceCreateNestedOneWithoutUserInput
+  sessions?: Prisma.UserSessionCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeCreateNestedManyWithoutUserInput
+  discussionRevisions?: Prisma.DiscussionRevisionCreateNestedManyWithoutEditedByInput
+  commentRevisions?: Prisma.CommentRevisionCreateNestedManyWithoutEditedByInput
+}
+
+export type UserUncheckedCreateWithoutSecurityEventsInput = {
+  id?: string
+  email: string
+  username: string
+  passwordHash?: string | null
+  name?: string | null
+  usernameChangedAt?: Date | string | null
+  avatarKey?: string | null
+  totpSecret?: string | null
+  totpEnabledAt?: Date | string | null
+  totpLastStep?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
+  discussions?: Prisma.DiscussionUncheckedCreateNestedManyWithoutAuthorInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  decisionsCreated?: Prisma.DecisionUncheckedCreateNestedManyWithoutCreatedByInput
+  decisionsDeleted?: Prisma.DecisionUncheckedCreateNestedManyWithoutDeletedByInput
+  decisionRevisions?: Prisma.DecisionRevisionUncheckedCreateNestedManyWithoutActorInput
+  supersessionsAuthorized?: Prisma.DecisionSupersessionUncheckedCreateNestedManyWithoutAuthorizedByInput
+  decisionReviews?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutReviewerInput
+  reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput
+  discussionFollows?: Prisma.DiscussionFollowUncheckedCreateNestedManyWithoutUserInput
+  commentsPinned?: Prisma.CommentUncheckedCreateNestedManyWithoutPinnedByInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  digestDeliveries?: Prisma.DigestDeliveryUncheckedCreateNestedManyWithoutUserInput
+  digestPreference?: Prisma.DigestPreferenceUncheckedCreateNestedOneWithoutUserInput
+  digestOptOuts?: Prisma.DigestWorkspaceOptOutUncheckedCreateNestedManyWithoutUserInput
+  decisionReviewsRequested?: Prisma.DecisionReviewUncheckedCreateNestedManyWithoutRequestedByInput
+  notificationsReceived?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
+  notificationsSent?: Prisma.NotificationUncheckedCreateNestedManyWithoutActorInput
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutActorInput
+  attachmentsUploaded?: Prisma.AttachmentUncheckedCreateNestedManyWithoutUploaderInput
+  invitesCreated?: Prisma.WorkspaceInviteUncheckedCreateNestedManyWithoutCreatedByInput
+  inviteUses?: Prisma.WorkspaceInviteUseUncheckedCreateNestedManyWithoutUserInput
+  preference?: Prisma.UserPreferenceUncheckedCreateNestedOneWithoutUserInput
+  sessions?: Prisma.UserSessionUncheckedCreateNestedManyWithoutUserInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedCreateNestedManyWithoutEditedByInput
   commentRevisions?: Prisma.CommentRevisionUncheckedCreateNestedManyWithoutEditedByInput
 }
@@ -5779,6 +6546,9 @@ export type UserUpdateWithoutSecurityEventsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -5806,6 +6576,7 @@ export type UserUpdateWithoutSecurityEventsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUpdateManyWithoutUserNestedInput
   preference?: Prisma.UserPreferenceUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUpdateManyWithoutEditedByNestedInput
 }
@@ -5818,6 +6589,9 @@ export type UserUncheckedUpdateWithoutSecurityEventsInput = {
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatarKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpSecret?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  totpEnabledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  totpLastStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5845,6 +6619,7 @@ export type UserUncheckedUpdateWithoutSecurityEventsInput = {
   inviteUses?: Prisma.WorkspaceInviteUseUncheckedUpdateManyWithoutUserNestedInput
   preference?: Prisma.UserPreferenceUncheckedUpdateOneWithoutUserNestedInput
   sessions?: Prisma.UserSessionUncheckedUpdateManyWithoutUserNestedInput
+  recoveryCodes?: Prisma.RecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   discussionRevisions?: Prisma.DiscussionRevisionUncheckedUpdateManyWithoutEditedByNestedInput
   commentRevisions?: Prisma.CommentRevisionUncheckedUpdateManyWithoutEditedByNestedInput
 }
@@ -5879,6 +6654,7 @@ export type UserCountOutputType = {
   inviteUses: number
   sessions: number
   securityEvents: number
+  recoveryCodes: number
   discussionRevisions: number
   commentRevisions: number
 }
@@ -5908,6 +6684,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   inviteUses?: boolean | UserCountOutputTypeCountInviteUsesArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   securityEvents?: boolean | UserCountOutputTypeCountSecurityEventsArgs
+  recoveryCodes?: boolean | UserCountOutputTypeCountRecoveryCodesArgs
   discussionRevisions?: boolean | UserCountOutputTypeCountDiscussionRevisionsArgs
   commentRevisions?: boolean | UserCountOutputTypeCountCommentRevisionsArgs
 }
@@ -6093,6 +6870,13 @@ export type UserCountOutputTypeCountSecurityEventsArgs<ExtArgs extends runtime.T
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountRecoveryCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RecoveryCodeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountDiscussionRevisionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.DiscussionRevisionWhereInput
 }
@@ -6113,6 +6897,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   name?: boolean
   usernameChangedAt?: boolean
   avatarKey?: boolean
+  totpSecret?: boolean
+  totpEnabledAt?: boolean
+  totpLastStep?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownedSpaces?: boolean | Prisma.User$ownedSpacesArgs<ExtArgs>
@@ -6141,6 +6928,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   preference?: boolean | Prisma.User$preferenceArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   securityEvents?: boolean | Prisma.User$securityEventsArgs<ExtArgs>
+  recoveryCodes?: boolean | Prisma.User$recoveryCodesArgs<ExtArgs>
   discussionRevisions?: boolean | Prisma.User$discussionRevisionsArgs<ExtArgs>
   commentRevisions?: boolean | Prisma.User$commentRevisionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -6154,6 +6942,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   usernameChangedAt?: boolean
   avatarKey?: boolean
+  totpSecret?: boolean
+  totpEnabledAt?: boolean
+  totpLastStep?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -6166,6 +6957,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   usernameChangedAt?: boolean
   avatarKey?: boolean
+  totpSecret?: boolean
+  totpEnabledAt?: boolean
+  totpLastStep?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -6178,11 +6972,14 @@ export type UserSelectScalar = {
   name?: boolean
   usernameChangedAt?: boolean
   avatarKey?: boolean
+  totpSecret?: boolean
+  totpEnabledAt?: boolean
+  totpLastStep?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "passwordHash" | "name" | "usernameChangedAt" | "avatarKey" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "passwordHash" | "name" | "usernameChangedAt" | "avatarKey" | "totpSecret" | "totpEnabledAt" | "totpLastStep" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ownedSpaces?: boolean | Prisma.User$ownedSpacesArgs<ExtArgs>
   memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>
@@ -6210,6 +7007,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   preference?: boolean | Prisma.User$preferenceArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   securityEvents?: boolean | Prisma.User$securityEventsArgs<ExtArgs>
+  recoveryCodes?: boolean | Prisma.User$recoveryCodesArgs<ExtArgs>
   discussionRevisions?: boolean | Prisma.User$discussionRevisionsArgs<ExtArgs>
   commentRevisions?: boolean | Prisma.User$commentRevisionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -6246,6 +7044,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     preference: Prisma.$UserPreferencePayload<ExtArgs> | null
     sessions: Prisma.$UserSessionPayload<ExtArgs>[]
     securityEvents: Prisma.$SecurityEventPayload<ExtArgs>[]
+    recoveryCodes: Prisma.$RecoveryCodePayload<ExtArgs>[]
     discussionRevisions: Prisma.$DiscussionRevisionPayload<ExtArgs>[]
     commentRevisions: Prisma.$CommentRevisionPayload<ExtArgs>[]
   }
@@ -6257,6 +7056,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     name: string | null
     usernameChangedAt: Date | null
     avatarKey: string | null
+    totpSecret: string | null
+    totpEnabledAt: Date | null
+    totpLastStep: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -6679,6 +7481,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   preference<T extends Prisma.User$preferenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferenceArgs<ExtArgs>>): Prisma.Prisma__UserPreferenceClient<runtime.Types.Result.GetResult<Prisma.$UserPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   securityEvents<T extends Prisma.User$securityEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$securityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SecurityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recoveryCodes<T extends Prisma.User$recoveryCodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$recoveryCodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   discussionRevisions<T extends Prisma.User$discussionRevisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$discussionRevisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DiscussionRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   commentRevisions<T extends Prisma.User$commentRevisionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentRevisionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentRevisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -6717,6 +7520,9 @@ export interface UserFieldRefs {
   readonly name: Prisma.FieldRef<"User", 'String'>
   readonly usernameChangedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly avatarKey: Prisma.FieldRef<"User", 'String'>
+  readonly totpSecret: Prisma.FieldRef<"User", 'String'>
+  readonly totpEnabledAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly totpLastStep: Prisma.FieldRef<"User", 'Int'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -7723,6 +8529,30 @@ export type User$securityEventsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.SecurityEventScalarFieldEnum | Prisma.SecurityEventScalarFieldEnum[]
+}
+
+/**
+ * User.recoveryCodes
+ */
+export type User$recoveryCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RecoveryCode
+   */
+  select?: Prisma.RecoveryCodeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RecoveryCode
+   */
+  omit?: Prisma.RecoveryCodeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecoveryCodeInclude<ExtArgs> | null
+  where?: Prisma.RecoveryCodeWhereInput
+  orderBy?: Prisma.RecoveryCodeOrderByWithRelationInput | Prisma.RecoveryCodeOrderByWithRelationInput[]
+  cursor?: Prisma.RecoveryCodeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RecoveryCodeScalarFieldEnum | Prisma.RecoveryCodeScalarFieldEnum[]
 }
 
 /**

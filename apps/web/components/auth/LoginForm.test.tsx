@@ -5,12 +5,16 @@ import userEvent from "@testing-library/user-event";
 const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
   mutateAsync: vi.fn(),
+  verify: vi.fn(),
   isPending: false,
 }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: mocks.replace }) }));
 vi.mock("@/hooks/useAuth", () => ({
-  useAuth: () => ({ login: { mutateAsync: mocks.mutateAsync, isPending: mocks.isPending } }),
+  useAuth: () => ({
+    login: { mutateAsync: mocks.mutateAsync, isPending: mocks.isPending },
+    verifyTwoStep: { mutateAsync: mocks.verify, isPending: false },
+  }),
 }));
 
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -19,6 +23,7 @@ describe("LoginForm", () => {
   beforeEach(() => {
     mocks.replace.mockReset();
     mocks.mutateAsync.mockReset().mockResolvedValue({});
+    mocks.verify.mockReset().mockResolvedValue({});
     mocks.isPending = false;
   });
   afterEach(cleanup);
@@ -96,5 +101,48 @@ describe("LoginForm", () => {
     await waitFor(() => expect(mocks.mutateAsync).toHaveBeenCalledTimes(1));
     finishLogin({});
     await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/start"));
+  });
+
+  it("asks for a code after the password when two-step sign-in is on", async () => {
+    mocks.mutateAsync.mockResolvedValueOnce({ success: false, twoStep: true, challengeToken: "c".repeat(43) });
+    const user = userEvent.setup();
+    render(<LoginForm />);
+    await user.type(screen.getByLabelText("Email"), "person@example.com");
+    await user.type(screen.getByLabelText("Password"), "correct-horse-42");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    const code = await screen.findByLabelText("Authentication code");
+    expect(mocks.replace).not.toHaveBeenCalled();
+    await waitFor(() => expect(document.activeElement).toBe(code));
+    await user.type(code, "12");
+    await user.click(screen.getByRole("button", { name: "Verify" }));
+    expect((await screen.findByRole("alert")).textContent).toBe("Enter the 6-digit code from your app.");
+
+    mocks.verify.mockRejectedValueOnce({ data: { code: "UNAUTHORIZED" }, message: "That code didn't work." });
+    await user.clear(code);
+    await user.type(code, "123456");
+    await user.click(screen.getByRole("button", { name: "Verify" }));
+    expect((await screen.findByRole("alert")).textContent).toBe("That code didn’t work. Try the newest code in your app.");
+
+    await user.click(screen.getByRole("button", { name: "Use a recovery code" }));
+    await user.type(screen.getByLabelText("Recovery code"), "abcde-fghjk");
+    await user.click(screen.getByRole("button", { name: "Verify" }));
+    await waitFor(() => expect(mocks.verify).toHaveBeenLastCalledWith({ challengeToken: "c".repeat(43), code: "abcde-fghjk" }));
+    await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/start"));
+  });
+
+  it("goes back to the password when the challenge has ended", async () => {
+    mocks.mutateAsync.mockResolvedValueOnce({ success: false, twoStep: true, challengeToken: "c".repeat(43) });
+    mocks.verify.mockRejectedValueOnce({ data: { code: "UNAUTHORIZED" }, message: "Too many wrong codes. Enter your password again." });
+    const user = userEvent.setup();
+    render(<LoginForm />);
+    await user.type(screen.getByLabelText("Email"), "person@example.com");
+    await user.type(screen.getByLabelText("Password"), "correct-horse-42");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.type(await screen.findByLabelText("Authentication code"), "000000");
+    await user.click(screen.getByRole("button", { name: "Verify" }));
+    expect((await screen.findByRole("alert")).textContent).toBe("Too many wrong codes. Enter your password again.");
+    expect((screen.getByLabelText("Password") as HTMLInputElement).value).toBe("");
+    expect((screen.getByLabelText("Email") as HTMLInputElement).value).toBe("person@example.com");
   });
 });

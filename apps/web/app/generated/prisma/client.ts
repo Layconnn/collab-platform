@@ -172,6 +172,11 @@ export type WorkspaceNotificationLevel = Prisma.WorkspaceNotificationLevelModel
  */
 export type UserSession = Prisma.UserSessionModel
 /**
+ * Model RecoveryCode
+ * 
+ */
+export type RecoveryCode = Prisma.RecoveryCodeModel
+/**
  * Model SecurityEvent
  * 
  */

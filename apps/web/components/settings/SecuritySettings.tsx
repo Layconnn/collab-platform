@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, KeyRound, LogIn, LogOut, Monitor, Smartphone, UserPen, UserPlus } from "lucide-react";
+import { AlertTriangle, KeyRound, LogIn, LogOut, Monitor, ShieldCheck, ShieldOff, Smartphone, UserPen, UserPlus } from "lucide-react";
 import { useState } from "react";
 
 import { timeAgo } from "@/components/activity/RecentActivity";
@@ -25,11 +25,13 @@ const notice = "rounded-[10px] border-l-2 px-3 py-2 text-sm";
 
 export function SecurityOverview() {
   const sessions = trpc.security.sessions.useQuery();
+  const twoStep = trpc.security.twoStep.useQuery();
   const count = sessions.data?.length;
   return <div className="min-w-0 max-w-[48rem]">
     <SettingsHeader title="Security" intro="How you sign in, where you're signed in, and what happened to your account." />
     <SettingsGroup label="Sign-in">
       <SettingsRow label="Password" description="Changing it signs out your other devices." href="/settings/account/password" />
+      <SettingsRow label="Two-step sign-in" description="A code from an app on your phone after your password." value={twoStep.data ? (twoStep.data.enabled ? "On" : "Off") : "…"} href="/settings/security/two-step" />
     </SettingsGroup>
     <SettingsGroup label="Activity">
       <SettingsRow label="Sessions" description="Where you're signed in. Sign out a lost or old device." value={count === undefined ? "…" : `${count} active`} href="/settings/security/sessions" />
@@ -102,6 +104,10 @@ const EVENTS = {
   OTHER_SESSIONS_SIGNED_OUT: { title: "Signed out all other sessions", Icon: LogOut, warn: false },
   PASSWORD_CHANGED: { title: "Password changed", Icon: KeyRound, warn: false },
   USERNAME_CHANGED: { title: "Username changed", Icon: UserPen, warn: false },
+  TWO_STEP_ENABLED: { title: "Two-step sign-in turned on", Icon: ShieldCheck, warn: false },
+  TWO_STEP_DISABLED: { title: "Two-step sign-in turned off", Icon: ShieldOff, warn: true },
+  RECOVERY_CODES_REGENERATED: { title: "New recovery codes made", Icon: KeyRound, warn: false },
+  RECOVERY_CODE_USED: { title: "Signed in with a recovery code", Icon: KeyRound, warn: true },
 } as const;
 
 export function SecurityLogSettings() {

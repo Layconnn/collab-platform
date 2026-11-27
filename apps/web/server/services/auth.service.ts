@@ -6,6 +6,7 @@ import type {
   ChangePasswordInput,
   LoginInput,
   RegisterInput,
+  VerifyTwoStepInput,
 } from "@repo/validators/auth";
 
 import { prisma } from "../db/prisma";
@@ -18,6 +19,7 @@ import {
 } from "../middleware/auth";
 import { recordAuthFailure } from "../observability/security-events";
 import { recordSecurityEvent, recordSessionStart, sessionService, type Client } from "./session.service";
+import { twoStepService } from "./two-step.service";
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 const UNKNOWN_CLIENT: Client = { userAgent: "", device: "Unknown device", country: null };
@@ -34,6 +36,9 @@ type AuthTokens = {
   expiresInSeconds: number;
   csrfToken: string;
 };
+
+// With two-step sign-in on, the password alone gives no session (FR-13).
+type TwoStepChallenge = { challengeToken: string };
 
 async function startSession(userId: string, client: Client, kind: "ACCOUNT_CREATED" | "SIGNED_IN"): Promise<AuthTokens> {
   const sessionId = randomUUID();
@@ -96,7 +101,7 @@ export const authService = {
     return startSession(user.id, context.client ?? UNKNOWN_CLIENT, "ACCOUNT_CREATED");
   },
 
-  async login(input: LoginInput, context: RequestContext): Promise<AuthTokens> {
+  async login(input: LoginInput, context: RequestContext): Promise<AuthTokens | TwoStepChallenge> {
     const email = input.email.toLowerCase();
     const user = await prisma.user.findUnique({
       where: { email },
@@ -135,7 +140,17 @@ export const authService = {
       throw new AppError("UNAUTHORIZED", "Invalid credentials.");
     }
 
+    if (await twoStepService.isEnabled(user.id)) {
+      return { challengeToken: await twoStepService.createChallenge(user.id) };
+    }
+
     return startSession(user.id, context.client ?? UNKNOWN_CLIENT, "SIGNED_IN");
+  },
+
+  // The code step of signing in (FR-13): an authenticator or recovery code.
+  async verifyTwoStep(input: VerifyTwoStepInput, context: RequestContext): Promise<AuthTokens> {
+    const userId = await twoStepService.completeChallenge(input.challengeToken, input.code, { client: context.client });
+    return startSession(userId, context.client ?? UNKNOWN_CLIENT, "SIGNED_IN");
   },
 
   async logout(sessionToken: string | null, user?: { id: string; sessionId?: string } | null, client?: Client): Promise<{ success: true }> {
