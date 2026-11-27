@@ -2566,6 +2566,8 @@ export const UserScalarFieldEnum = {
   totpSecret: 'totpSecret',
   totpEnabledAt: 'totpEnabledAt',
   totpLastStep: 'totpLastStep',
+  closedAt: 'closedAt',
+  erasedAt: 'erasedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

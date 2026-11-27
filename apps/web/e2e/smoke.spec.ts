@@ -248,6 +248,43 @@ test("two-step sign-in asks for a code after the password", async ({ page }) => 
   });
 });
 
+test("a person downloads their data, closes their account and reopens it by signing in", async ({ page }) => {
+  const id = unique();
+  const email = `closing_${id}@example.test`;
+  const password = `closing-password-${id}`;
+  await page.goto("/register");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Username").fill(`closing_${id}`);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page).toHaveURL(/\/workspace$/);
+
+  await page.goto("/settings/account/data");
+  const downloading = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download your data" }).click();
+  const file = await downloading;
+  expect(file.suggestedFilename()).toMatch(new RegExp(`^commons-closing_${id}-\\d{4}-\\d{2}-\\d{2}\\.json$`));
+
+  await page.getByRole("button", { name: "Close your account…" }).click();
+  await page.getByLabel("Password").fill(password);
+  await page.getByRole("button", { name: "Close my account" }).click();
+  await expect(page).toHaveURL(/\/login\?closed=1$/);
+  await expect(page.getByRole("status").filter({ hasText: "Sign in within 30 days to reopen it." })).toBeVisible();
+  await page.goto("/workspace");
+  await expect(page).toHaveURL(/\/login\?next=/);
+
+  await page.goto("/login");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/workspace$/);
+  await page.goto("/settings/security/log");
+  const log = page.getByRole("list", { name: "Security events" });
+  await expect(log.getByText("Account reopened by signing in")).toBeVisible();
+  await expect(log.getByText("Account closed")).toBeVisible();
+  await expect(log.getByText("Downloaded your data")).toBeVisible();
+});
+
 test("a teammate without an account joins with an invite link", async ({ page, browser }) => {
   const id = unique();
   const workspaceName = `Invite ${id}`;

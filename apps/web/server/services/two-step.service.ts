@@ -65,6 +65,10 @@ async function acceptCode(userId: string, code: string, { allowRecovery, ...opti
   return true;
 }
 
+// For other checks that need a second factor, such as closing the account.
+export const verifyTwoStepCode = (userId: string, code: string, options: Options = {}) =>
+  acceptCode(userId, code, { allowRecovery: true, ...options });
+
 export const twoStepService = {
   async status(userId: string) {
     const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { totpEnabledAt: true } });

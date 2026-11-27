@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, KeyRound, LogIn, LogOut, Monitor, ShieldCheck, ShieldOff, Smartphone, UserPen, UserPlus } from "lucide-react";
+import { AlertTriangle, Download, KeyRound, LogIn, LogOut, Monitor, ShieldCheck, ShieldOff, Smartphone, UserCheck, UserPen, UserPlus, UserX } from "lucide-react";
 import { useState } from "react";
 
 import { timeAgo } from "@/components/activity/RecentActivity";
@@ -108,6 +108,9 @@ const EVENTS = {
   TWO_STEP_DISABLED: { title: "Two-step sign-in turned off", Icon: ShieldOff, warn: true },
   RECOVERY_CODES_REGENERATED: { title: "New recovery codes made", Icon: KeyRound, warn: false },
   RECOVERY_CODE_USED: { title: "Signed in with a recovery code", Icon: KeyRound, warn: true },
+  DATA_EXPORTED: { title: "Downloaded your data", Icon: Download, warn: false },
+  ACCOUNT_CLOSED: { title: "Account closed", Icon: UserX, warn: true },
+  ACCOUNT_RESTORED: { title: "Account reopened by signing in", Icon: UserCheck, warn: false },
 } as const;
 
 export function SecurityLogSettings() {

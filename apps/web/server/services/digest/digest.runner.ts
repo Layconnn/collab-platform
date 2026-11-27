@@ -137,6 +137,8 @@ export async function runDigest(options: DigestRunOptions): Promise<DigestRunRes
     const batch = await prisma.user.findMany({
       where: {
         memberships: { some: {} },
+        // Closed accounts get no email during their grace period.
+        closedAt: null,
         id: { ...(cursor ? { gt: cursor } : {}), ...(options.onlyUserIds ? { in: options.onlyUserIds } : {}) },
         ...due,
       },

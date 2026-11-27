@@ -1,15 +1,17 @@
-import { disableTwoStepInputSchema, enableTwoStepInputSchema, regenerateRecoveryCodesInputSchema } from "@repo/validators/auth";
+import { closeAccountInputSchema, disableTwoStepInputSchema, enableTwoStepInputSchema, regenerateRecoveryCodesInputSchema } from "@repo/validators/auth";
 import { securityLogInputSchema, signOutSessionInputSchema } from "@repo/validators/security";
 
 import { execute } from "../../errors/app-error";
 import { getSessionCookieToken } from "../../middleware/auth";
 import { createRateLimitGuard } from "../../middleware/rateLimit";
+import { accountService } from "../../services/account.service";
 import { clientOf, sessionService } from "../../services/session.service";
+import { buildLogoutCookies } from "../../utils/auth-cookies";
 import { twoStepService } from "../../services/two-step.service";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
-function limited(routeKey: string, limit: number) {
-  const guard = createRateLimitGuard({ routeKey, limit, windowSeconds: 60 });
+function limited(routeKey: string, limit: number, windowSeconds = 60) {
+  const guard = createRateLimitGuard({ routeKey, limit, windowSeconds });
   return protectedProcedure.use(async ({ ctx, next }) => {
     await guard(ctx.user.id, ctx.requestId);
     return next();
@@ -48,6 +50,18 @@ export const securityRouter = createTRPCRouter({
   ),
   disableTwoStep: limited("security.disableTwoStep", 5).input(disableTwoStepInputSchema).mutation(({ ctx, input }) =>
     execute(() => twoStepService.disable(ctx.user.id, input, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),
+  ),
+  // Your data (FR-17, FR-18). One export an hour; closing checks the
+  // password, so five tries in ten minutes.
+  exportData: limited("security.exportData", 1, 3600).mutation(({ ctx }) =>
+    execute(() => accountService.exportData(ctx.user.id, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),
+  ),
+  closeAccount: limited("security.closeAccount", 5, 600).input(closeAccountInputSchema).mutation(({ ctx, input }) =>
+    execute(async () => {
+      const result = await accountService.close(ctx.user.id, input, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId });
+      for (const cookie of buildLogoutCookies()) ctx.responseHeaders.append("set-cookie", cookie);
+      return result;
+    }),
   ),
   regenerateRecoveryCodes: limited("security.regenerateRecoveryCodes", 5).input(regenerateRecoveryCodesInputSchema).mutation(({ ctx, input }) =>
     execute(() => twoStepService.regenerateRecoveryCodes(ctx.user.id, input.code, { client: clientOf(ctx.headers), sessionId: ctx.user.sessionId })),

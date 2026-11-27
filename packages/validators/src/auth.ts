@@ -34,6 +34,9 @@ export const enableTwoStepInputSchema = z.object({ code: z.string().trim().regex
 export const disableTwoStepInputSchema = z.object({ password: passwordSchema, code: twoStepCodeSchema });
 export const regenerateRecoveryCodesInputSchema = enableTwoStepInputSchema;
 
+// Settings PRD, FR-18: closing needs the password, and a code with two-step on.
+export const closeAccountInputSchema = z.object({ password: passwordSchema, code: twoStepCodeSchema.optional() });
+
 export type VerifyTwoStepInput = z.infer<typeof verifyTwoStepInputSchema>;
 
 export const logoutInputSchema = z.object({
