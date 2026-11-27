@@ -693,7 +693,7 @@ test("13. Author appears as a public identity DTO only", async () => {
 
   const caller = createCaller(memberUserId);
   const comment = await caller.getById({ commentId });
-  assert.deepEqual(Object.keys(comment.author).sort(), ["id", "name", "username"]);
+  assert.deepEqual(Object.keys(comment.author).sort(), ["avatarKey", "id", "name", "username"]);
   assert.equal("authorId" in comment, false);
 });
 
@@ -808,7 +808,7 @@ test("17. Cross-discussion cursor cannot leak behavior", async () => {
   for (const item of result.items) {
     assert.equal(item.discussionId, discussionId);
     assert.notEqual(item.id, makeCuid(952));
-    assert.deepEqual(Object.keys(item.author).sort(), ["id", "name", "username"]);
+    assert.deepEqual(Object.keys(item.author).sort(), ["avatarKey", "id", "name", "username"]);
   }
 });
 

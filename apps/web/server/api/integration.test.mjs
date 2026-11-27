@@ -874,7 +874,7 @@ test("workspace + discussion + comment integration flow", async () => {
     const roster = await callerB.workspace.listMembers({ workspaceId: workspace.id });
     assert.equal(roster.items.length, 2);
     assert.equal(roster.items.find((member) => member.userId === userA).user.username, "user_a");
-    assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["id", "name", "username"]);
+    assert.deepEqual(Object.keys(roster.items[0].user).sort(), ["avatarKey", "id", "name", "username"]);
 
     // 3. User B creates discussion in workspace.
     state.redisKeyValues.set(`workspace:${workspace.id}:discussions:v3:start:20`, JSON.stringify({}));
