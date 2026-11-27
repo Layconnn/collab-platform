@@ -769,10 +769,6 @@ export type CommentUncheckedCreateNestedManyWithoutParentCommentInput = {
   connect?: Prisma.CommentWhereUniqueInput | Prisma.CommentWhereUniqueInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type CommentUpdateOneWithoutRepliesNestedInput = {
   create?: Prisma.XOR<Prisma.CommentCreateWithoutRepliesInput, Prisma.CommentUncheckedCreateWithoutRepliesInput>
   connectOrCreate?: Prisma.CommentCreateOrConnectWithoutRepliesInput

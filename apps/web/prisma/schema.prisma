@@ -75,6 +75,8 @@ model User {
   username                 String                  @unique
   passwordHash             String?
   name                     String?
+  // Last username change; another is allowed 30 days later (settings PRD, FR-2).
+  usernameChangedAt        DateTime?
   createdAt                DateTime                @default(now())
   updatedAt                DateTime                @updatedAt
   ownedSpaces              Workspace[]

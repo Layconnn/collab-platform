@@ -49,7 +49,7 @@ export const authService = {
   async getCurrentUser(userId: string) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, username: true, name: true },
+      select: { id: true, email: true, username: true, name: true, usernameChangedAt: true },
     });
     if (!user) {
       throw new AppError("UNAUTHORIZED", "Authentication required.");

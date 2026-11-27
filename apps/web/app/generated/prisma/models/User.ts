@@ -30,6 +30,7 @@ export type UserMinAggregateOutputType = {
   username: string | null
   passwordHash: string | null
   name: string | null
+  usernameChangedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -40,6 +41,7 @@ export type UserMaxAggregateOutputType = {
   username: string | null
   passwordHash: string | null
   name: string | null
+  usernameChangedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,6 +52,7 @@ export type UserCountAggregateOutputType = {
   username: number
   passwordHash: number
   name: number
+  usernameChangedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -62,6 +65,7 @@ export type UserMinAggregateInputType = {
   username?: true
   passwordHash?: true
   name?: true
+  usernameChangedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -72,6 +76,7 @@ export type UserMaxAggregateInputType = {
   username?: true
   passwordHash?: true
   name?: true
+  usernameChangedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +87,7 @@ export type UserCountAggregateInputType = {
   username?: true
   passwordHash?: true
   name?: true
+  usernameChangedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -165,6 +171,7 @@ export type UserGroupByOutputType = {
   username: string
   passwordHash: string | null
   name: string | null
+  usernameChangedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -196,6 +203,7 @@ export type UserWhereInput = {
   username?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringNullableFilter<"User"> | string | null
+  usernameChangedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ownedSpaces?: Prisma.WorkspaceListRelationFilter
@@ -231,6 +239,7 @@ export type UserOrderByWithRelationInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrderInput | Prisma.SortOrder
+  usernameChangedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   ownedSpaces?: Prisma.WorkspaceOrderByRelationAggregateInput
@@ -269,6 +278,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringNullableFilter<"User"> | string | null
+  usernameChangedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   ownedSpaces?: Prisma.WorkspaceListRelationFilter
@@ -304,6 +314,7 @@ export type UserOrderByWithAggregationInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrderInput | Prisma.SortOrder
+  usernameChangedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -320,6 +331,7 @@ export type UserScalarWhereWithAggregatesInput = {
   username?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  usernameChangedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -330,6 +342,7 @@ export type UserCreateInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -365,6 +378,7 @@ export type UserUncheckedCreateInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -400,6 +414,7 @@ export type UserUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -435,6 +450,7 @@ export type UserUncheckedUpdateInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -470,6 +486,7 @@ export type UserCreateManyInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -480,6 +497,7 @@ export type UserUpdateManyMutationInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -490,6 +508,7 @@ export type UserUncheckedUpdateManyInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -500,6 +519,7 @@ export type UserCountOrderByAggregateInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  usernameChangedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -510,6 +530,7 @@ export type UserMaxOrderByAggregateInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  usernameChangedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -520,6 +541,7 @@ export type UserMinOrderByAggregateInput = {
   username?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  usernameChangedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -540,6 +562,10 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -928,6 +954,7 @@ export type UserCreateWithoutOwnedSpacesInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.WorkspaceMemberCreateNestedManyWithoutUserInput
@@ -962,6 +989,7 @@ export type UserUncheckedCreateWithoutOwnedSpacesInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   memberships?: Prisma.WorkspaceMemberUncheckedCreateNestedManyWithoutUserInput
@@ -1012,6 +1040,7 @@ export type UserUpdateWithoutOwnedSpacesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.WorkspaceMemberUpdateManyWithoutUserNestedInput
@@ -1046,6 +1075,7 @@ export type UserUncheckedUpdateWithoutOwnedSpacesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   memberships?: Prisma.WorkspaceMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -1080,6 +1110,7 @@ export type UserCreateWithoutDiscussionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1114,6 +1145,7 @@ export type UserUncheckedCreateWithoutDiscussionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1164,6 +1196,7 @@ export type UserUpdateWithoutDiscussionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1198,6 +1231,7 @@ export type UserUncheckedUpdateWithoutDiscussionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1232,6 +1266,7 @@ export type UserCreateWithoutCommentsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1266,6 +1301,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1305,6 +1341,7 @@ export type UserCreateWithoutCommentsPinnedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1339,6 +1376,7 @@ export type UserUncheckedCreateWithoutCommentsPinnedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1389,6 +1427,7 @@ export type UserUpdateWithoutCommentsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1423,6 +1462,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1468,6 +1508,7 @@ export type UserUpdateWithoutCommentsPinnedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1502,6 +1543,7 @@ export type UserUncheckedUpdateWithoutCommentsPinnedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1536,6 +1578,7 @@ export type UserCreateWithoutNotificationsReceivedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1570,6 +1613,7 @@ export type UserUncheckedCreateWithoutNotificationsReceivedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1609,6 +1653,7 @@ export type UserCreateWithoutNotificationsSentInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1643,6 +1688,7 @@ export type UserUncheckedCreateWithoutNotificationsSentInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1693,6 +1739,7 @@ export type UserUpdateWithoutNotificationsReceivedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1727,6 +1774,7 @@ export type UserUncheckedUpdateWithoutNotificationsReceivedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1772,6 +1820,7 @@ export type UserUpdateWithoutNotificationsSentInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1806,6 +1855,7 @@ export type UserUncheckedUpdateWithoutNotificationsSentInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1840,6 +1890,7 @@ export type UserCreateWithoutMembershipsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -1874,6 +1925,7 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -1924,6 +1976,7 @@ export type UserUpdateWithoutMembershipsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -1958,6 +2011,7 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1992,6 +2046,7 @@ export type UserCreateWithoutDecisionsCreatedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2026,6 +2081,7 @@ export type UserUncheckedCreateWithoutDecisionsCreatedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2065,6 +2121,7 @@ export type UserCreateWithoutDecisionsDeletedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2099,6 +2156,7 @@ export type UserUncheckedCreateWithoutDecisionsDeletedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2149,6 +2207,7 @@ export type UserUpdateWithoutDecisionsCreatedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2183,6 +2242,7 @@ export type UserUncheckedUpdateWithoutDecisionsCreatedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2228,6 +2288,7 @@ export type UserUpdateWithoutDecisionsDeletedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2262,6 +2323,7 @@ export type UserUncheckedUpdateWithoutDecisionsDeletedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2296,6 +2358,7 @@ export type UserCreateWithoutDecisionRevisionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2330,6 +2393,7 @@ export type UserUncheckedCreateWithoutDecisionRevisionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2380,6 +2444,7 @@ export type UserUpdateWithoutDecisionRevisionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2414,6 +2479,7 @@ export type UserUncheckedUpdateWithoutDecisionRevisionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2448,6 +2514,7 @@ export type UserCreateWithoutDecisionReviewsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2482,6 +2549,7 @@ export type UserUncheckedCreateWithoutDecisionReviewsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2521,6 +2589,7 @@ export type UserCreateWithoutDecisionReviewsRequestedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2555,6 +2624,7 @@ export type UserUncheckedCreateWithoutDecisionReviewsRequestedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2605,6 +2675,7 @@ export type UserUpdateWithoutDecisionReviewsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2639,6 +2710,7 @@ export type UserUncheckedUpdateWithoutDecisionReviewsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2684,6 +2756,7 @@ export type UserUpdateWithoutDecisionReviewsRequestedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2718,6 +2791,7 @@ export type UserUncheckedUpdateWithoutDecisionReviewsRequestedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2752,6 +2826,7 @@ export type UserCreateWithoutDiscussionFollowsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2786,6 +2861,7 @@ export type UserUncheckedCreateWithoutDiscussionFollowsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2836,6 +2912,7 @@ export type UserUpdateWithoutDiscussionFollowsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -2870,6 +2947,7 @@ export type UserUncheckedUpdateWithoutDiscussionFollowsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2904,6 +2982,7 @@ export type UserCreateWithoutDigestPreferenceInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -2938,6 +3017,7 @@ export type UserUncheckedCreateWithoutDigestPreferenceInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -2988,6 +3068,7 @@ export type UserUpdateWithoutDigestPreferenceInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3022,6 +3103,7 @@ export type UserUncheckedUpdateWithoutDigestPreferenceInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3056,6 +3138,7 @@ export type UserCreateWithoutDigestOptOutsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3090,6 +3173,7 @@ export type UserUncheckedCreateWithoutDigestOptOutsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3140,6 +3224,7 @@ export type UserUpdateWithoutDigestOptOutsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3174,6 +3259,7 @@ export type UserUncheckedUpdateWithoutDigestOptOutsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3208,6 +3294,7 @@ export type UserCreateWithoutDigestDeliveriesInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3242,6 +3329,7 @@ export type UserUncheckedCreateWithoutDigestDeliveriesInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3292,6 +3380,7 @@ export type UserUpdateWithoutDigestDeliveriesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3326,6 +3415,7 @@ export type UserUncheckedUpdateWithoutDigestDeliveriesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3360,6 +3450,7 @@ export type UserCreateWithoutSavedItemsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3394,6 +3485,7 @@ export type UserUncheckedCreateWithoutSavedItemsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3444,6 +3536,7 @@ export type UserUpdateWithoutSavedItemsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3478,6 +3571,7 @@ export type UserUncheckedUpdateWithoutSavedItemsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3512,6 +3606,7 @@ export type UserCreateWithoutReactionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3546,6 +3641,7 @@ export type UserUncheckedCreateWithoutReactionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3596,6 +3692,7 @@ export type UserUpdateWithoutReactionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3630,6 +3727,7 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3664,6 +3762,7 @@ export type UserCreateWithoutSupersessionsAuthorizedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3698,6 +3797,7 @@ export type UserUncheckedCreateWithoutSupersessionsAuthorizedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3748,6 +3848,7 @@ export type UserUpdateWithoutSupersessionsAuthorizedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3782,6 +3883,7 @@ export type UserUncheckedUpdateWithoutSupersessionsAuthorizedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3816,6 +3918,7 @@ export type UserCreateWithoutActivityEventsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -3850,6 +3953,7 @@ export type UserUncheckedCreateWithoutActivityEventsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -3900,6 +4004,7 @@ export type UserUpdateWithoutActivityEventsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -3934,6 +4039,7 @@ export type UserUncheckedUpdateWithoutActivityEventsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3968,6 +4074,7 @@ export type UserCreateWithoutAttachmentsUploadedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4002,6 +4109,7 @@ export type UserUncheckedCreateWithoutAttachmentsUploadedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4052,6 +4160,7 @@ export type UserUpdateWithoutAttachmentsUploadedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4086,6 +4195,7 @@ export type UserUncheckedUpdateWithoutAttachmentsUploadedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4120,6 +4230,7 @@ export type UserCreateWithoutInvitesCreatedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4154,6 +4265,7 @@ export type UserUncheckedCreateWithoutInvitesCreatedInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4204,6 +4316,7 @@ export type UserUpdateWithoutInvitesCreatedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4238,6 +4351,7 @@ export type UserUncheckedUpdateWithoutInvitesCreatedInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4272,6 +4386,7 @@ export type UserCreateWithoutInviteUsesInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4306,6 +4421,7 @@ export type UserUncheckedCreateWithoutInviteUsesInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4356,6 +4472,7 @@ export type UserUpdateWithoutInviteUsesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4390,6 +4507,7 @@ export type UserUncheckedUpdateWithoutInviteUsesInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4424,6 +4542,7 @@ export type UserCreateWithoutDiscussionRevisionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4458,6 +4577,7 @@ export type UserUncheckedCreateWithoutDiscussionRevisionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4508,6 +4628,7 @@ export type UserUpdateWithoutDiscussionRevisionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4542,6 +4663,7 @@ export type UserUncheckedUpdateWithoutDiscussionRevisionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4576,6 +4698,7 @@ export type UserCreateWithoutCommentRevisionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceCreateNestedManyWithoutOwnerInput
@@ -4610,6 +4733,7 @@ export type UserUncheckedCreateWithoutCommentRevisionsInput = {
   username: string
   passwordHash?: string | null
   name?: string | null
+  usernameChangedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedCreateNestedManyWithoutOwnerInput
@@ -4660,6 +4784,7 @@ export type UserUpdateWithoutCommentRevisionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUpdateManyWithoutOwnerNestedInput
@@ -4694,6 +4819,7 @@ export type UserUncheckedUpdateWithoutCommentRevisionsInput = {
   username?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usernameChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ownedSpaces?: Prisma.WorkspaceUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4966,6 +5092,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   username?: boolean
   passwordHash?: boolean
   name?: boolean
+  usernameChangedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   ownedSpaces?: boolean | Prisma.User$ownedSpacesArgs<ExtArgs>
@@ -5002,6 +5129,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   passwordHash?: boolean
   name?: boolean
+  usernameChangedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -5012,6 +5140,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   username?: boolean
   passwordHash?: boolean
   name?: boolean
+  usernameChangedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -5022,11 +5151,12 @@ export type UserSelectScalar = {
   username?: boolean
   passwordHash?: boolean
   name?: boolean
+  usernameChangedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "passwordHash" | "name" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "username" | "passwordHash" | "name" | "usernameChangedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ownedSpaces?: boolean | Prisma.User$ownedSpacesArgs<ExtArgs>
   memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>
@@ -5093,6 +5223,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     username: string
     passwordHash: string | null
     name: string | null
+    usernameChangedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -5548,6 +5679,7 @@ export interface UserFieldRefs {
   readonly username: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
+  readonly usernameChangedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

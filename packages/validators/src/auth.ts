@@ -35,6 +35,21 @@ export const currentUserSchema = z.object({
   email: emailSchema,
   username: z.string(),
   name: z.string().nullable(),
+  usernameChangedAt: z.date().nullable(),
+});
+
+// Settings PRD, FR-1 and FR-2. An empty name shows the username instead.
+export const updateProfileInputSchema = z.object({
+  name: z.string().trim().max(60),
+});
+
+export const changeUsernameInputSchema = z.object({
+  username: usernameSchema,
+});
+
+// Checked as the person types, so it takes any text and explains what's wrong.
+export const usernameAvailableInputSchema = z.object({
+  username: z.string().max(60),
 });
 
 export type RegisterInput = z.infer<typeof registerInputSchema>;
@@ -42,3 +57,6 @@ export type LoginInput = z.infer<typeof loginInputSchema>;
 export type LogoutInput = z.infer<typeof logoutInputSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordInputSchema>;
 export type CurrentUser = z.infer<typeof currentUserSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileInputSchema>;
+export type ChangeUsernameInput = z.infer<typeof changeUsernameInputSchema>;
+export type UsernameAvailableInput = z.infer<typeof usernameAvailableInputSchema>;

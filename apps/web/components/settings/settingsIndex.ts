@@ -29,6 +29,8 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
 // Every setting, for search: matched by label, description and keywords.
 export const SETTING_ENTRIES: SettingEntry[] = [
   { label: "Account information", description: "Your name, username and email.", category: "account", href: "/settings/account", keywords: "profile name username email" },
+  { label: "Display name", description: "The name teammates see on your posts.", category: "account", href: "/settings/account/profile", keywords: "profile name rename" },
+  { label: "Username", description: "Change the name teammates mention you by.", category: "account", href: "/settings/account/profile", keywords: "profile handle mention rename at" },
   { label: "Change your password", description: "Signs out your other devices.", category: "account", href: "/settings/account/password", keywords: "password security sign in" },
   { label: "Daily digest", description: "Turn the daily email on or off and choose its workspaces.", category: "notifications", href: "/settings/notifications/digest", keywords: "email digest unsubscribe preview workspaces" },
   { label: "Theme", description: "Light, dark or system.", category: "appearance", href: "/settings/appearance", keywords: "dark mode light mode colour color appearance" },
