@@ -161,7 +161,8 @@ export const SecurityEventKind = {
   RECOVERY_CODE_USED: 'RECOVERY_CODE_USED',
   DATA_EXPORTED: 'DATA_EXPORTED',
   ACCOUNT_CLOSED: 'ACCOUNT_CLOSED',
-  ACCOUNT_RESTORED: 'ACCOUNT_RESTORED'
+  ACCOUNT_RESTORED: 'ACCOUNT_RESTORED',
+  EMAIL_CHANGED: 'EMAIL_CHANGED'
 } as const
 
 export type SecurityEventKind = (typeof SecurityEventKind)[keyof typeof SecurityEventKind]

@@ -6,6 +6,8 @@ export type AppErrorCode =
   | "NOT_FOUND"
   | "CONFLICT"
   | "BAD_REQUEST"
+  | "PRECONDITION_FAILED"
+  | "SERVICE_UNAVAILABLE"
   | "INTERNAL";
 
 const trpcCodeByAppCode: Record<AppErrorCode, TRPCError["code"]> = {
@@ -14,6 +16,8 @@ const trpcCodeByAppCode: Record<AppErrorCode, TRPCError["code"]> = {
   NOT_FOUND: "NOT_FOUND",
   CONFLICT: "CONFLICT",
   BAD_REQUEST: "BAD_REQUEST",
+  PRECONDITION_FAILED: "PRECONDITION_FAILED",
+  SERVICE_UNAVAILABLE: "SERVICE_UNAVAILABLE",
   INTERNAL: "INTERNAL_SERVER_ERROR",
 };
 

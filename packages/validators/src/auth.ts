@@ -37,6 +37,10 @@ export const regenerateRecoveryCodesInputSchema = enableTwoStepInputSchema;
 // Settings PRD, FR-18: closing needs the password, and a code with two-step on.
 export const closeAccountInputSchema = z.object({ password: passwordSchema, code: twoStepCodeSchema.optional() });
 
+// Settings PRD, FR-20: a new address and the password, then the emailed code.
+export const requestEmailChangeInputSchema = z.object({ email: emailSchema, password: passwordSchema });
+export const confirmEmailChangeInputSchema = z.object({ code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code.") });
+
 export type VerifyTwoStepInput = z.infer<typeof verifyTwoStepInputSchema>;
 
 export const logoutInputSchema = z.object({

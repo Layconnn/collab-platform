@@ -758,6 +758,7 @@ enum SecurityEventKind {
   DATA_EXPORTED
   ACCOUNT_CLOSED
   ACCOUNT_RESTORED
+  EMAIL_CHANGED
 }
 
 // Single-use codes for when the authenticator is lost (settings PRD, FR-12).

@@ -36,6 +36,7 @@ export const SETTING_ENTRIES: SettingEntry[] = [
   { label: "Two-step sign-in", description: "A code from your phone when you sign in.", category: "security", href: "/settings/security/two-step", keywords: "2fa mfa two factor authenticator totp otp recovery codes backup verification" },
   { label: "Sessions", description: "Where you're signed in; sign out a device.", category: "security", href: "/settings/security/sessions", keywords: "devices sign out logout signed in browser lost phone" },
   { label: "Security log", description: "Sign-ins and changes in the last 90 days.", category: "security", href: "/settings/security/log", keywords: "activity history audit login failed attempts" },
+  { label: "Change your email", description: "A code goes to the new address to confirm it.", category: "account", href: "/settings/account/email", keywords: "email address e-mail mail change update sign in login" },
   { label: "Download your data", description: "Everything you've put into Commons, as one file.", category: "account", href: "/settings/account/data", keywords: "export download json copy backup gdpr portability archive" },
   { label: "Close your account", description: "Sign out everywhere; erased after 30 days.", category: "account", href: "/settings/account/data", keywords: "delete remove deactivate close account erase gdpr leave commons" },
   { label: "Change your password", description: "Signs out your other devices.", category: "account", href: "/settings/account/password", keywords: "password security sign in" },

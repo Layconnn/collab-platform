@@ -37,7 +37,7 @@ export function AccountSettings() {
     <SettingsGroup label="Account information">
       <SettingsRow label="Name" description="Shown on your discussions, replies and decisions." value={user?.name?.trim() || "Not set"} href="/settings/account/profile" />
       <SettingsRow label="Username" description="How teammates add and mention you." value={user ? `@${user.username}` : ""} href="/settings/account/profile" />
-      <SettingsRow label="Email" description="Where the daily digest goes. Only you can see it." value={user?.email ?? ""} />
+      <SettingsRow label="Email" description="Where the daily digest goes and what you sign in with. Only you can see it." value={user?.email ?? ""} href="/settings/account/email" />
     </SettingsGroup>
     <SettingsGroup label="Security">
       <SettingsRow label="Change your password" description="Your other devices are signed out when it changes." href="/settings/account/password" />

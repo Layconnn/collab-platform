@@ -39,6 +39,7 @@
     "test:two-step-api": "node --test server/api/two-step.integration.test.mjs",
     "test:leave-workspace-api": "node --test server/api/leave-workspace.integration.test.mjs",
     "test:account-api": "node --test server/api/account.integration.test.mjs",
+    "test:email-change-api": "node --test server/api/email-change.integration.test.mjs",
     "test:integration": "node --test server/api/integration.test.mjs",
     "test:e2e": "playwright test"
   },
