@@ -151,6 +151,8 @@ jobs:
         run: pnpm -C apps/web run test:profile-api
       - name: Preferences (real database)
         run: pnpm -C apps/web run test:preferences-api
+      - name: Notification preferences (real database)
+        run: pnpm -C apps/web run test:notification-preferences-api
 
   frontend-tests:
     name: Frontend tests

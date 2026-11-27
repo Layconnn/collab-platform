@@ -192,6 +192,7 @@ export type WorkspaceMemberWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"WorkspaceMember"> | Date | string
   workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  notificationLevel?: Prisma.XOR<Prisma.WorkspaceNotificationLevelNullableScalarRelationFilter, Prisma.WorkspaceNotificationLevelWhereInput> | null
 }
 
 export type WorkspaceMemberOrderByWithRelationInput = {
@@ -203,6 +204,7 @@ export type WorkspaceMemberOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   workspace?: Prisma.WorkspaceOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
+  notificationLevel?: Prisma.WorkspaceNotificationLevelOrderByWithRelationInput
 }
 
 export type WorkspaceMemberWhereUniqueInput = Prisma.AtLeast<{
@@ -218,6 +220,7 @@ export type WorkspaceMemberWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"WorkspaceMember"> | Date | string
   workspace?: Prisma.XOR<Prisma.WorkspaceScalarRelationFilter, Prisma.WorkspaceWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  notificationLevel?: Prisma.XOR<Prisma.WorkspaceNotificationLevelNullableScalarRelationFilter, Prisma.WorkspaceNotificationLevelWhereInput> | null
 }, "id" | "workspaceId_userId">
 
 export type WorkspaceMemberOrderByWithAggregationInput = {
@@ -251,6 +254,7 @@ export type WorkspaceMemberCreateInput = {
   updatedAt?: Date | string
   workspace: Prisma.WorkspaceCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutMembershipsInput
+  notificationLevel?: Prisma.WorkspaceNotificationLevelCreateNestedOneWithoutMembershipInput
 }
 
 export type WorkspaceMemberUncheckedCreateInput = {
@@ -260,6 +264,7 @@ export type WorkspaceMemberUncheckedCreateInput = {
   role?: $Enums.WorkspaceRole
   createdAt?: Date | string
   updatedAt?: Date | string
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUncheckedCreateNestedOneWithoutMembershipInput
 }
 
 export type WorkspaceMemberUpdateInput = {
@@ -269,6 +274,7 @@ export type WorkspaceMemberUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutMembershipsNestedInput
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUpdateOneWithoutMembershipNestedInput
 }
 
 export type WorkspaceMemberUncheckedUpdateInput = {
@@ -278,6 +284,7 @@ export type WorkspaceMemberUncheckedUpdateInput = {
   role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUncheckedUpdateOneWithoutMembershipNestedInput
 }
 
 export type WorkspaceMemberCreateManyInput = {
@@ -345,6 +352,11 @@ export type WorkspaceMemberMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type WorkspaceMemberScalarRelationFilter = {
+  is?: Prisma.WorkspaceMemberWhereInput
+  isNot?: Prisma.WorkspaceMemberWhereInput
 }
 
 export type WorkspaceMemberCreateNestedManyWithoutUserInput = {
@@ -435,12 +447,27 @@ export type EnumWorkspaceRoleFieldUpdateOperationsInput = {
   set?: $Enums.WorkspaceRole
 }
 
+export type WorkspaceMemberCreateNestedOneWithoutNotificationLevelInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceMemberCreateWithoutNotificationLevelInput, Prisma.WorkspaceMemberUncheckedCreateWithoutNotificationLevelInput>
+  connectOrCreate?: Prisma.WorkspaceMemberCreateOrConnectWithoutNotificationLevelInput
+  connect?: Prisma.WorkspaceMemberWhereUniqueInput
+}
+
+export type WorkspaceMemberUpdateOneRequiredWithoutNotificationLevelNestedInput = {
+  create?: Prisma.XOR<Prisma.WorkspaceMemberCreateWithoutNotificationLevelInput, Prisma.WorkspaceMemberUncheckedCreateWithoutNotificationLevelInput>
+  connectOrCreate?: Prisma.WorkspaceMemberCreateOrConnectWithoutNotificationLevelInput
+  upsert?: Prisma.WorkspaceMemberUpsertWithoutNotificationLevelInput
+  connect?: Prisma.WorkspaceMemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.WorkspaceMemberUpdateToOneWithWhereWithoutNotificationLevelInput, Prisma.WorkspaceMemberUpdateWithoutNotificationLevelInput>, Prisma.WorkspaceMemberUncheckedUpdateWithoutNotificationLevelInput>
+}
+
 export type WorkspaceMemberCreateWithoutUserInput = {
   id?: string
   role?: $Enums.WorkspaceRole
   createdAt?: Date | string
   updatedAt?: Date | string
   workspace: Prisma.WorkspaceCreateNestedOneWithoutMembersInput
+  notificationLevel?: Prisma.WorkspaceNotificationLevelCreateNestedOneWithoutMembershipInput
 }
 
 export type WorkspaceMemberUncheckedCreateWithoutUserInput = {
@@ -449,6 +476,7 @@ export type WorkspaceMemberUncheckedCreateWithoutUserInput = {
   role?: $Enums.WorkspaceRole
   createdAt?: Date | string
   updatedAt?: Date | string
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUncheckedCreateNestedOneWithoutMembershipInput
 }
 
 export type WorkspaceMemberCreateOrConnectWithoutUserInput = {
@@ -495,6 +523,7 @@ export type WorkspaceMemberCreateWithoutWorkspaceInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutMembershipsInput
+  notificationLevel?: Prisma.WorkspaceNotificationLevelCreateNestedOneWithoutMembershipInput
 }
 
 export type WorkspaceMemberUncheckedCreateWithoutWorkspaceInput = {
@@ -503,6 +532,7 @@ export type WorkspaceMemberUncheckedCreateWithoutWorkspaceInput = {
   role?: $Enums.WorkspaceRole
   createdAt?: Date | string
   updatedAt?: Date | string
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUncheckedCreateNestedOneWithoutMembershipInput
 }
 
 export type WorkspaceMemberCreateOrConnectWithoutWorkspaceInput = {
@@ -531,6 +561,58 @@ export type WorkspaceMemberUpdateManyWithWhereWithoutWorkspaceInput = {
   data: Prisma.XOR<Prisma.WorkspaceMemberUpdateManyMutationInput, Prisma.WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceInput>
 }
 
+export type WorkspaceMemberCreateWithoutNotificationLevelInput = {
+  id?: string
+  role?: $Enums.WorkspaceRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  workspace: Prisma.WorkspaceCreateNestedOneWithoutMembersInput
+  user: Prisma.UserCreateNestedOneWithoutMembershipsInput
+}
+
+export type WorkspaceMemberUncheckedCreateWithoutNotificationLevelInput = {
+  id?: string
+  workspaceId: string
+  userId: string
+  role?: $Enums.WorkspaceRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type WorkspaceMemberCreateOrConnectWithoutNotificationLevelInput = {
+  where: Prisma.WorkspaceMemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.WorkspaceMemberCreateWithoutNotificationLevelInput, Prisma.WorkspaceMemberUncheckedCreateWithoutNotificationLevelInput>
+}
+
+export type WorkspaceMemberUpsertWithoutNotificationLevelInput = {
+  update: Prisma.XOR<Prisma.WorkspaceMemberUpdateWithoutNotificationLevelInput, Prisma.WorkspaceMemberUncheckedUpdateWithoutNotificationLevelInput>
+  create: Prisma.XOR<Prisma.WorkspaceMemberCreateWithoutNotificationLevelInput, Prisma.WorkspaceMemberUncheckedCreateWithoutNotificationLevelInput>
+  where?: Prisma.WorkspaceMemberWhereInput
+}
+
+export type WorkspaceMemberUpdateToOneWithWhereWithoutNotificationLevelInput = {
+  where?: Prisma.WorkspaceMemberWhereInput
+  data: Prisma.XOR<Prisma.WorkspaceMemberUpdateWithoutNotificationLevelInput, Prisma.WorkspaceMemberUncheckedUpdateWithoutNotificationLevelInput>
+}
+
+export type WorkspaceMemberUpdateWithoutNotificationLevelInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMembersNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutMembershipsNestedInput
+}
+
+export type WorkspaceMemberUncheckedUpdateWithoutNotificationLevelInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  workspaceId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type WorkspaceMemberCreateManyUserInput = {
   id?: string
   workspaceId: string
@@ -545,6 +627,7 @@ export type WorkspaceMemberUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   workspace?: Prisma.WorkspaceUpdateOneRequiredWithoutMembersNestedInput
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUpdateOneWithoutMembershipNestedInput
 }
 
 export type WorkspaceMemberUncheckedUpdateWithoutUserInput = {
@@ -553,6 +636,7 @@ export type WorkspaceMemberUncheckedUpdateWithoutUserInput = {
   role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUncheckedUpdateOneWithoutMembershipNestedInput
 }
 
 export type WorkspaceMemberUncheckedUpdateManyWithoutUserInput = {
@@ -577,6 +661,7 @@ export type WorkspaceMemberUpdateWithoutWorkspaceInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutMembershipsNestedInput
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUpdateOneWithoutMembershipNestedInput
 }
 
 export type WorkspaceMemberUncheckedUpdateWithoutWorkspaceInput = {
@@ -585,6 +670,7 @@ export type WorkspaceMemberUncheckedUpdateWithoutWorkspaceInput = {
   role?: Prisma.EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  notificationLevel?: Prisma.WorkspaceNotificationLevelUncheckedUpdateOneWithoutMembershipNestedInput
 }
 
 export type WorkspaceMemberUncheckedUpdateManyWithoutWorkspaceInput = {
@@ -606,6 +692,7 @@ export type WorkspaceMemberSelect<ExtArgs extends runtime.Types.Extensions.Inter
   updatedAt?: boolean
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  notificationLevel?: boolean | Prisma.WorkspaceMember$notificationLevelArgs<ExtArgs>
 }, ExtArgs["result"]["workspaceMember"]>
 
 export type WorkspaceMemberSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -643,6 +730,7 @@ export type WorkspaceMemberOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type WorkspaceMemberInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  notificationLevel?: boolean | Prisma.WorkspaceMember$notificationLevelArgs<ExtArgs>
 }
 export type WorkspaceMemberIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   workspace?: boolean | Prisma.WorkspaceDefaultArgs<ExtArgs>
@@ -658,6 +746,7 @@ export type $WorkspaceMemberPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     workspace: Prisma.$WorkspacePayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
+    notificationLevel: Prisma.$WorkspaceNotificationLevelPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1062,6 +1151,7 @@ export interface Prisma__WorkspaceMemberClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   workspace<T extends Prisma.WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkspaceDefaultArgs<ExtArgs>>): Prisma.Prisma__WorkspaceClient<runtime.Types.Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  notificationLevel<T extends Prisma.WorkspaceMember$notificationLevelArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.WorkspaceMember$notificationLevelArgs<ExtArgs>>): Prisma.Prisma__WorkspaceNotificationLevelClient<runtime.Types.Result.GetResult<Prisma.$WorkspaceNotificationLevelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1495,6 +1585,25 @@ export type WorkspaceMemberDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many WorkspaceMembers to delete.
    */
   limit?: number
+}
+
+/**
+ * WorkspaceMember.notificationLevel
+ */
+export type WorkspaceMember$notificationLevelArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkspaceNotificationLevel
+   */
+  select?: Prisma.WorkspaceNotificationLevelSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkspaceNotificationLevel
+   */
+  omit?: Prisma.WorkspaceNotificationLevelOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkspaceNotificationLevelInclude<ExtArgs> | null
+  where?: Prisma.WorkspaceNotificationLevelWhereInput
 }
 
 /**

@@ -74,7 +74,8 @@ export const ModelName = {
   WorkspaceInviteUse: 'WorkspaceInviteUse',
   DiscussionRevision: 'DiscussionRevision',
   CommentRevision: 'CommentRevision',
-  UserPreference: 'UserPreference'
+  UserPreference: 'UserPreference',
+  WorkspaceNotificationLevel: 'WorkspaceNotificationLevel'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -451,10 +452,23 @@ export const UserPreferenceScalarFieldEnum = {
   startPage: 'startPage',
   defaultWorkspaceId: 'defaultWorkspaceId',
   lastWorkspaceId: 'lastWorkspaceId',
+  mutedKinds: 'mutedKinds',
+  digestHour: 'digestHour',
+  timeZone: 'timeZone',
   updatedAt: 'updatedAt'
 } as const
 
 export type UserPreferenceScalarFieldEnum = (typeof UserPreferenceScalarFieldEnum)[keyof typeof UserPreferenceScalarFieldEnum]
+
+
+export const WorkspaceNotificationLevelScalarFieldEnum = {
+  workspaceId: 'workspaceId',
+  userId: 'userId',
+  level: 'level',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkspaceNotificationLevelScalarFieldEnum = (typeof WorkspaceNotificationLevelScalarFieldEnum)[keyof typeof WorkspaceNotificationLevelScalarFieldEnum]
 
 
 export const SortOrder = {

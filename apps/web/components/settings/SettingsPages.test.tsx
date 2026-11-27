@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   change: { isPending: false, isSuccess: false, error: null as null | { data: { code: string } } },
   setMode: vi.fn(),
   save: vi.fn(),
-  preferences: { saved: true, theme: "system", motion: "system", density: "comfortable", startPage: "default", defaultWorkspaceId: "w2", lastWorkspaceId: null } as Record<string, unknown>,
+  preferences: { saved: true, theme: "system", motion: "system", density: "comfortable", startPage: "default", defaultWorkspaceId: "w2", lastWorkspaceId: null, mutedKinds: ["DISCUSSION_CREATED"], digestHour: 8, timeZone: "Africa/Lagos" } as Record<string, unknown>,
   prefs: { data: { enabled: true, workspaces: [{ id: "w1", name: "Platform", included: true }, { id: "w2", name: "Marketing", included: false }] }, error: null } as unknown,
 }));
 
@@ -23,6 +23,7 @@ vi.mock("@/lib/trpc/api-client", () => ({
     auth: { changePassword: { useMutation: () => ({ ...mocks.change, mutate: mocks.mutate }) } },
     preferences: {
       get: { useQuery: () => ({ data: mocks.preferences }) },
+      notificationLevels: { useQuery: () => ({ data: [{ workspaceId: "w1", name: "Platform", level: "ALL" }, { workspaceId: "w2", name: "Marketing", level: "NONE" }] }) },
       update: { useMutation: () => ({ mutate: mocks.save, isPending: false, isSuccess: false, error: null, variables: undefined }) },
     },
   },
@@ -46,7 +47,7 @@ describe("Settings", () => {
     const links = within(nav).getAllByRole("link");
     expect(links.map((link) => link.getAttribute("href"))).toEqual(["/settings/account", "/settings/notifications", "/settings/workspaces", "/settings/appearance"]);
     expect(links[0]!.getAttribute("aria-current")).toBe("page");
-    expect(links[1]!.textContent).toContain("The daily digest email");
+    expect(links[1]!.textContent).toContain("the daily digest");
     expect(screen.getByText("Detail")).toBeTruthy();
   });
 
@@ -63,7 +64,8 @@ describe("Settings", () => {
 
   it("matches every word across label, keywords and category", () => {
     expect(searchSettings("password").map((entry) => entry.href)).toEqual(["/settings/account/password"]);
-    expect(searchSettings("email digest").map((entry) => entry.href)).toEqual(["/settings/notifications/digest"]);
+    expect(searchSettings("email digest").map((entry) => entry.href)).toEqual(["/settings/notifications/digest", "/settings/notifications/digest"]);
+    expect(searchSettings("digest time").map((entry) => entry.label)).toEqual(["Digest time"]);
     expect(searchSettings("   ")).toEqual([]);
   });
 
@@ -107,7 +109,9 @@ describe("Settings", () => {
   it("sums up the digest and opens it, embedded", () => {
     render(<NotificationSettings />);
     const row = screen.getByRole("link", { name: /Daily digest/ });
-    expect(row.textContent).toContain("On · 1 of 2 workspaces");
+    expect(row.textContent).toContain("On · 1 of 2 workspaces · 08:00 Africa/Lagos");
+    expect(screen.getByRole("link", { name: /What notifies you/ }).textContent).toContain("5 of 6 on");
+    expect(screen.getByRole("link", { name: /Workspaces/ }).textContent).toContain("1 quieter");
     expect(row.getAttribute("href")).toBe("/settings/notifications/digest");
     cleanup();
     render(<DigestSettings />);

@@ -43,7 +43,7 @@ Vercel Queues has no queue-depth API, so Commons tracks its own backlog (`server
 
 ## Daily digest email
 
-The digest ([PRD](../apps/web/documentation/projects/2026-11-24-daily-digest/PRD.md)) is sent by `.github/workflows/daily-digest.yml` at 06:00 UTC, which calls `POST /api/digest/run` until it answers `done: true`. The app records one `DigestDelivery` row per member and day, so re-running the workflow never sends twice.
+The digest ([PRD](../apps/web/documentation/projects/2026-11-24-daily-digest/PRD.md)) is sent by `.github/workflows/daily-digest.yml`, which runs every hour and calls `POST /api/digest/run` until it answers `done: true`. Each run takes the members whose chosen hour it is in their own time zone (Settings → Notifications → Daily digest; 06:00 UTC for anyone who never chose). The app records one `DigestDelivery` row per member and day of their own calendar, so re-running the workflow never sends twice.
 
 | Setting | Where | Purpose |
 | --- | --- | --- |

@@ -13,6 +13,12 @@ export async function digestSettingsFor(userId: string): Promise<{ enabled: bool
   return { enabled: preference?.enabled ?? true, excludedWorkspaceIds: optOuts.map((row) => row.workspaceId) };
 }
 
+// Workspaces the member set to notify them of nothing (settings PRD, FR-7).
+export async function silencedWorkspaceIds(userId: string): Promise<string[]> {
+  const rows = await prisma.workspaceNotificationLevel.findMany({ where: { userId, level: "NONE" }, select: { workspaceId: true } });
+  return rows.map((row) => row.workspaceId);
+}
+
 async function setEnabled(userId: string, enabled: boolean) {
   await prisma.digestPreference.upsert({ where: { userId }, create: { userId, enabled }, update: { enabled } });
 }
